@@ -1,0 +1,449 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "County Lead Intelligence Engine - County Config",
+  "type": "object",
+  "required": [
+    "county_id",
+    "county_name",
+    "state",
+    "geography",
+    "sources",
+    "dashboard",
+    "deployment"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "county_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]+$",
+      "description": "Short lowercase identifier used in URLs and filenames"
+    },
+    "county_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "Two-letter state code"
+    },
+    "subject_state_full": {
+      "type": "string"
+    },
+    "fips_code": {
+      "type": "string",
+      "pattern": "^[0-9]{5}$"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "operator_market_priority": {
+      "type": "string",
+      "enum": [
+        "primary",
+        "secondary",
+        "exploratory"
+      ]
+    },
+    "geography": {
+      "type": "object",
+      "required": [
+        "municipalities",
+        "parcel_id_format"
+      ],
+      "properties": {
+        "municipalities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "code"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "fips_place": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "parcel_id_format": {
+          "type": "string"
+        },
+        "parcel_id_normalization": {
+          "type": "string"
+        },
+        "address_format_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "category",
+          "subtype",
+          "access_pattern",
+          "scraper_module",
+          "refresh_cadence"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "lead",
+              "enrichment"
+            ]
+          },
+          "subtype": {
+            "type": "string",
+            "enum": [
+              "clerk_recordings",
+              "court_civil",
+              "court_probate",
+              "court_family",
+              "court_eviction",
+              "sheriff_sales",
+              "tax_delinquency",
+              "tax_certificates",
+              "code_enforcement",
+              "parcel_master",
+              "gis_parcels",
+              "usps_vacancy",
+              "utility_shutoff"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "access_pattern": {
+            "type": "string",
+            "enum": [
+              "open_api",
+              "static_html",
+              "spa_with_api",
+              "spa_recaptcha",
+              "waf_imperva",
+              "paywall",
+              "saml",
+              "sealed",
+              "public_records_only"
+            ]
+          },
+          "auth_required": {
+            "type": "boolean"
+          },
+          "rate_limit_rpm": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "scraper_module": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "object"
+          },
+          "doc_type_synonyms": {
+            "type": "object"
+          },
+          "refresh_cadence": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "on_demand"
+            ]
+          },
+          "ttl_days": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "blocked_unblock_paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "public_records",
+                "seeded_session",
+                "captcha_solver",
+                "stealth_browser",
+                "manual_pull",
+                "residential_proxy",
+                "operator_login"
+              ]
+            }
+          },
+          "notes": {
+            "type": "string"
+          },
+          "source_reliability_grade": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              ""
+            ]
+          },
+          "source_freshness": {
+            "type": "string"
+          },
+          "known_limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "last_verified_at": {
+            "type": "string"
+          },
+          "source_priority": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              ""
+            ]
+          },
+          "build_priority": {
+            "type": "string",
+            "enum": [
+              "mvp_required",
+              "high_value",
+              "enrichment",
+              "optional",
+              "future",
+              ""
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "paused_reason": {
+            "type": "string"
+          },
+          "pause_until": {
+            "type": "string"
+          },
+          "allowed_to_export": {
+            "type": "boolean"
+          },
+          "official_status": {
+            "type": "string",
+            "enum": [
+              "OFFICIAL_COUNTY",
+              "OFFICIAL_STATE",
+              "OFFICIAL_CITY",
+              "OFFICIAL_COURT",
+              "OFFICIAL_VENDOR_PORTAL",
+              "UNVERIFIED",
+              "NOT_FOUND",
+              ""
+            ]
+          },
+          "lead_value": {
+            "type": "string",
+            "enum": [
+              "LEAD_GENERATING",
+              "ENRICHMENT",
+              "REFERENCE_ONLY",
+              "UNKNOWN",
+              ""
+            ]
+          },
+          "operator_override": {
+            "type": "boolean"
+          },
+          "verification_note": {
+            "type": "string"
+          },
+          "open_questions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "official_status": {
+                  "enum": [
+                    "UNVERIFIED",
+                    "NOT_FOUND"
+                  ]
+                }
+              },
+              "required": [
+                "official_status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "operator_override": {
+                  "const": true
+                }
+              },
+              "required": [
+                "operator_override"
+              ]
+            },
+            "$comment": "If official_status is UNVERIFIED or NOT_FOUND, operator_override must be true before this source can be built. Per MASTER_PROMPT.md Phase 0 hard rules."
+          }
+        ]
+      }
+    },
+    "scoring_overrides": {
+      "type": "object",
+      "properties": {
+        "match_confidence_floor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "review_queue_ratio_alert_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "high_equity_assessed_to_sale_ratio": {
+          "type": "number",
+          "minimum": 1.0
+        },
+        "long_term_owned_years": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "senior_owner_proxy_years": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "favorable_loan_era_start": {
+          "type": "string",
+          "format": "date"
+        },
+        "favorable_loan_era_end": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "STATIC_JSON_MODE",
+            "SUPABASE_MODE",
+            "HYBRID_MODE"
+          ]
+        },
+        "supabase_enabled": {
+          "type": "boolean"
+        },
+        "dashboard_payload": {
+          "type": "string"
+        },
+        "retain_raw_records_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retain_source_runs_days": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "required": [
+        "title",
+        "primary_color",
+        "accent_color"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "primary_color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "accent_color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "default_view": {
+          "type": "string"
+        },
+        "precanned_views": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label",
+              "filter"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "filter": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "required": [
+        "github_org",
+        "github_repo"
+      ],
+      "properties": {
+        "github_org": {
+          "type": "string"
+        },
+        "github_repo": {
+          "type": "string"
+        },
+        "live_url": {
+          "type": "string"
+        },
+        "scheduled_task_name": {
+          "type": "string"
+        },
+        "watchdog_task_name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

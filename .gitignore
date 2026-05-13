@@ -1,0 +1,42 @@
+﻿# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+
+# Local artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Build artifacts
+data/raw/
+data/runs/
+data/source_heartbeat.json
+data/leads.json
+data/signals.jsonl
+records_delivery/*.pdf
+!records_delivery/_templates/
+*.log
+
+# Operator-supplied county configs are personal — keep universal template only
+config/counties/*.json
+!config/counties/_schema.json
+!config/counties/_template.json
+
+# Nested archives (framework rule)
+*.zip
+*.tar
+*.tar.gz
