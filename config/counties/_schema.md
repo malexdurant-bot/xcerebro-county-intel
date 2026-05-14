@@ -357,3 +357,106 @@ One template ships with the framework:
 **Template validation behavior:** `config/counties/_template.json` is intentionally not valid as a live county config until placeholders are filled. The template is a starting point. A copied real county config must validate against `_schema.json` before Phase 0 can pass.
 
 **Why this matters:** Required fields like `state` and `fips_code` are empty strings in the template, which fails schema validation. This is by design — the schema enforces population correctness at build time, so a forgotten field produces a loud error rather than a silent skip. The first county built on this framework should copy `_template.json` to `config/counties/<county_id>.json` and populate every field during Phase 0 recon. Validation passes only once the populated config is complete.
+
+---
+
+## v5.0.0 — Source Verification Gate, Source Proof Packet, and Build Eligibility Gate
+
+v5.0.0 introduces a trust layer on top of v4.1.0's autonomous first-run flow. The schema gains 26 new source-level fields and 3 new top-level fields, plus 7 new enum types. These fields are populated by Phase 0 recon and consumed by the Build Eligibility Gate.
+
+### New top-level fields
+
+| Field | Type | Purpose |
+|---|---|---|
+| `build_verdict` | enum string | Phase 0's verdict on whether the county is ready to build. One of: `READY_TO_BUILD`, `READY_WITH_BLOCKERS`, `RECON_ONLY`, `WAITING_ON_ACCESS`, `NOT_BUILDABLE_YET`, or `""` (empty during recon). |
+| `build_verdict_reason` | string | Plain-English explanation of the verdict. Required when `build_verdict` is set. |
+| `build_verdict_at` | string | ISO 8601 timestamp of when Phase 0 produced the verdict. |
+
+### New source-level fields (the proof packet)
+
+Every source block in `sources.<source_id>` gains these fields. Phase 0 populates them during recon. The Build Eligibility Gate reads them to produce the verdict.
+
+| Field | Type | Purpose |
+|---|---|---|
+| `verified_from_url` | string | The official government page (or officially-linked vendor index) from which the source URL was discovered. Required for `verification_confidence` HIGH or MEDIUM. |
+| `verification_method` | enum string | How verification was performed. See enum below. |
+| `official_entity` | string | Name of the official government entity that owns/operates this source (e.g. `"<County Name> Clerk's Office"`). |
+| `portal_type` | string | Free-text describing what the portal actually is (e.g. `"land records search"`, `"tax delinquency lookup"`). |
+| `records_available` | array of string | Record types this source actually exposes (e.g. `["deeds", "mortgages", "liens", "lis_pendens"]`). |
+| `search_fields` | array of string | Search fields the portal exposes (e.g. `["name", "parcel_id", "date_range", "document_type"]`). |
+| `access_method` | enum string | How records are accessed. 17 values — see enum below. |
+| `public_access_status` | enum string | Whether the general public can use this source. 12 values — see enum below. |
+| `document_access_status` | enum string | Whether the general public can view document images. 7 values — see enum below. |
+| `source_role` | enum string | The role this source plays in the lead pipeline. 6 values — see enum below. **Only `PRIMARY_LEAD_SOURCE` can create leads.** |
+| `verification_confidence` | enum string | How confident Phase 0 is in this source. 5 values: `HIGH`, `MEDIUM`, `LOW`, `BLOCKED`, `NOT_FOUND`. |
+| `verification_note` | string | Free-text explaining the verification outcome and any caveats. |
+| `open_questions` | array of string | Free-text questions the operator must answer before this source can ship. |
+| `sample_record_path_confirmed` | boolean | True if Phase 0 confirmed the path to records exists. Does NOT mean a record was scraped — just that the search/index/list page was located. |
+| `sample_record_type` | string | Type of sample record path confirmed (e.g. `"search_form"`, `"docket_list"`, `"pdf_index"`, `"api_endpoint"`). |
+| `sample_search_possible` | boolean | True if a public user can perform a search on this portal without login or payment. |
+| `sample_document_view_possible` | boolean | True if a public user can view at least one document image / page result on this portal without additional access requirements. |
+| `blocker` | string | Short description of what's blocking access (empty if not blocked). |
+| `next_access_strategy` | enum string | The strategy for unblocking access. 15 values — see enum below. |
+
+`official_status` is widened to a 5-way `OFFICIAL_*` split (`OFFICIAL_COUNTY`, `OFFICIAL_STATE`, `OFFICIAL_CITY`, `OFFICIAL_COURT`, `OFFICIAL_VENDOR_PORTAL`) plus `UNVERIFIED` and `NOT_FOUND`. The legacy single value `OFFICIAL` is retained for backward compatibility but new builds should use the granular values.
+
+### New enum types
+
+#### `access_method` (17 values)
+
+`OPEN_PUBLIC_PORTAL`, `SEARCHABLE_PUBLIC_PORTAL`, `DOWNLOADABLE_FILE`, `PDF_PUBLICATION`, `API_ENDPOINT`, `MAP_LAYER`, `PUBLIC_BUT_CAPTCHA_PROTECTED`, `PUBLIC_BUT_WAF_PROTECTED`, `PUBLIC_BUT_SESSION_REQUIRED`, `FREE_ACCOUNT_REQUIRED`, `PAID_SUBSCRIPTION_REQUIRED`, `LOGIN_REQUIRED`, `OPERATOR_CREDENTIAL_REQUIRED`, `REQUEST_ONLY`, `MANUAL_PUBLIC_RECORDS_DELIVERY`, `NOT_SEARCHABLE`, `UNKNOWN`.
+
+#### `public_access_status` (12 values)
+
+`FULL_PUBLIC_ACCESS`, `PUBLIC_SEARCH_ONLY`, `PUBLIC_SEARCH_DOCUMENTS_LOCKED`, `FREE_ACCOUNT_REQUIRED`, `PAID_SUBSCRIPTION_REQUIRED`, `LOGIN_REQUIRED`, `CLERK_APPROVAL_REQUIRED`, `CAPTCHA_PROTECTED`, `WAF_PROTECTED`, `REQUEST_ONLY`, `BLOCKED`, `UNKNOWN`.
+
+#### `document_access_status` (7 values)
+
+`DOCUMENTS_PUBLIC`, `DOCUMENTS_PUBLIC_WITH_CAPTCHA`, `DOCUMENTS_LOGIN_REQUIRED`, `DOCUMENTS_PAID_SUBSCRIPTION_REQUIRED`, `DOCUMENTS_CLERK_APPROVAL_REQUIRED`, `DOCUMENTS_NOT_AVAILABLE`, `DOCUMENTS_UNKNOWN`.
+
+#### `source_role` (6 values)
+
+- `PRIMARY_LEAD_SOURCE` — can create leads (clerk recordings, court dockets, sheriff sales, tax delinquency, code enforcement events, etc.)
+- `SUPPORTING_LEAD_SOURCE` — strengthens or confirms leads (case detail pages, document images, sale status)
+- `ENRICHMENT_SOURCE` — enriches leads with property metadata (parcel master, GIS, owner data)
+- `REFERENCE_ONLY` — informational, cannot create leads
+- `BLOCKED_SOURCE` — valuable but inaccessible until next_access_strategy is solved
+- `NOT_FOUND` — source category was searched but no portal exists
+
+**Only `PRIMARY_LEAD_SOURCE` creates leads.** Enrichment-only configurations are not buildable.
+
+#### `verification_confidence` (5 values)
+
+`HIGH`, `MEDIUM`, `LOW`, `BLOCKED`, `NOT_FOUND`.
+
+For required P0 primary lead sources: must be `HIGH` or `MEDIUM`, OR `source_role` is `BLOCKED_SOURCE` with a clear `next_access_strategy`, OR `operator_override: true`.
+
+#### `verification_method` (8 values)
+
+`official_domain`, `official_page_link`, `official_vendor_link`, `state_portal`, `court_portal`, `city_portal`, `manual_operator_verified`, `not_verified`.
+
+#### `next_access_strategy` (15 values)
+
+`try_open_public_portal`, `find_official_vendor_link`, `discover_hidden_api`, `use_playwright`, `use_seeded_session`, `use_captcha_solver`, `use_stealth_browser`, `use_residential_proxy`, `use_operator_login`, `request_free_account`, `use_paid_subscription_if_operator_provides`, `manual_operator_assisted_pull`, `standing_records_delivery`, `public_records_request_last_resort`, `not_available`.
+
+`public_records_request_last_resort` is **not** the default. It is only chosen when a real portal exists but remains unsolved after technical access attempts, OR when no portal exists at all and official recurring delivery is the configured access path.
+
+### Build verdict semantics
+
+Phase 0 produces `build_verdict` based on the populated source proof packets:
+
+| Verdict | Meaning |
+|---|---|
+| `READY_TO_BUILD` | At least one verified `PRIMARY_LEAD_SOURCE` is accessible (verification_confidence HIGH/MEDIUM, sample_search_possible true) AND at least one enrichment source is available. |
+| `READY_WITH_BLOCKERS` | At least one primary lead source is verified, but access constraints or missing enrichment still need work. |
+| `RECON_ONLY` | Sources identified but not enough is accessible to build yet. |
+| `WAITING_ON_ACCESS` | Needed lead source exists but requires login, paid subscription, clerk approval, CAPTCHA solve, seeded session, operator credential, or records delivery. |
+| `NOT_BUILDABLE_YET` | No reliable primary lead source was found. |
+
+Build Mode (Phase 1+) requires `build_verdict == "READY_TO_BUILD"` OR operator explicit authorization to proceed with blockers OR operator explicit approval to use a blocked / low-confidence source.
+
+### Backward compatibility
+
+This is a breaking schema change. v4.x county configs do not validate against the v5.0.0 schema until the proof packet fields are populated (the template defaults them to empty strings, empty arrays, or `false`, which the schema accepts during recon). The legacy `official_status: "OFFICIAL"` value is retained, so v4.x configs with the binary value continue to validate.
+
+Migrating a v4.x county to v5.0.0 means running Phase 0 recon again to populate the new proof packet fields.

@@ -7,6 +7,32 @@ Reusable framework for building autonomous county-lead-intelligence dashboards i
 
 This is not a county-specific build. It is a portable shell. The only file that should change per county is the target county config inside `config/counties/`.
 
+---
+
+## Quick start (v5.0.0+) — one sentence install
+
+**First time using this framework?** Read [`START_HERE.md`](START_HERE.md) for the full first-run walkthrough. The short version:
+
+1. **Clone or open** your private county-build repo (this repo).
+2. **Open Claude Code** in the repo directory:
+   ```
+   claude
+   ```
+3. **Type one sentence** when Claude Code's prompt appears:
+   ```
+   Build <County Name>, <State>.
+   ```
+   Substitute your actual county and state. See `START_HERE.md` for a worked example.
+4. Claude Code parses the target, shows the interpreted slug, asks approval to run the bootstrap script, and proceeds through Phase 0 autonomously.
+5. **Approve the bootstrap once** when Claude Code asks. The bootstrap script creates `runs/<slug>/` and the launch instructions — nothing else.
+6. **Watch Phase 0 run.** Claude Code performs County Source Recon and the Onboarding Gate. When it stops, it prints a change manifest. Review the manifest before authorizing Phase 1.
+
+That's it. No PowerShell commands beyond `claude`. No JSON to edit by hand. No manual launch file to create.
+
+> **Why the one-time approval click?** Claude Code asks before running shell commands by default — that's protection against destructive operations. The autonomous first-run grant is bounded to `scaffold/bootstrap_county.py` only, which creates a folder and a markdown file. Approve once and the bootstrap runs in seconds.
+
+---
+
 ## What this framework does
 
 **The product is fresh county-level distress intelligence with daily refresh.** The county is the moat. Daily refresh is non-negotiable. Fresh distress signals are the core asset. Enrichment data supports county intelligence; it never replaces it.
@@ -96,15 +122,20 @@ framework_v4/
     └── synthetic_expectations.json           # what the build should produce
 ```
 
-## How to use it
+## How to use it (detailed)
+
+**For first-time use, see the Quick Start at the top of this README or read `START_HERE.md`.** The flow below is the manual / advanced operator path used when bootstrap autonomy is not desired (e.g. CI environments, custom slug conventions, or scripted builds).
 
 1. Read `MIGRATION.md` end-to-end.
-2. Create a private GitHub repo named `<county_id>-intel`.
+2. Create a private GitHub repo named `<county_id>-intel-v4` (the `-v4` suffix is the framework-version convention).
 3. Copy this directory into the new repo.
-4. Copy `config/counties/_template.json` to `config/counties/<county_id>.json` and populate. **The template is intentionally not valid as a live county config until placeholders are filled.** It is a starting point. A copied real county config must validate against `_schema.json` before Phase 0 can pass.
-5. Open Claude Code in the repo and paste `MASTER_PROMPT.md` as the first message.
-6. Claude Code runs Phase 0 → Phase 8 autonomously.
-7. Run the deployment checklist in `MIGRATION.md`.
+4. **Either** run `python scaffold/bootstrap_county.py --county "<Name>" --state "<State>" --slug <slug> --phase phase0` (recommended), **or** manually copy `config/counties/_template.json` to `config/counties/<slug>.json` and populate it. The template is intentionally not valid as a live county config until placeholders are filled.
+5. Open Claude Code in the repo and paste this:
+   ```
+   Read MASTER_PROMPT.md and runs/<slug>/LAUNCH_<SLUG_UPPER>.md. Run Phase 0 only.
+   ```
+6. Claude Code runs Phase 0 → review change manifest → operator authorizes Phase 1 → Claude Code runs Phase 1 → review → and so on.
+7. Run the deployment checklist in `MIGRATION.md` after Phase 8 completes.
 8. The county is autonomous and refreshing daily.
 
 ## County build workflow
@@ -139,11 +170,26 @@ The runner exits 0 only when every test exits 0.
 
 ## Versioning
 
-This is v4.0.0.
+This is **v5.0.0**.
 
-- Patch (4.0.1) — clarifications, doc fixes
-- Minor (4.1.0) — new patterns, sources, deal paths, architecture additions
-- Major (5.0.0) — breaking changes requiring migration of existing county builds
+- Patch (5.0.1) — clarifications, doc fixes
+- Minor (5.1.0) — new patterns, sources, deal paths, architecture additions
+- Major (6.0.0) — breaking changes requiring migration of existing county builds
+
+**v5.0.0 added** (released 2026-05-13):
+
+- **Five-Layer Source Verification Gate** (MASTER_PROMPT Section 4.7) — every source goes through Official Origin → Source Category → Data Access → Lead Value / Source Role → Portal Proof verification before being trusted.
+- **Source proof packet** — 18 new fields per source recording the verification outcome.
+- **Build Eligibility Gate** (Section 4.10) — Phase 0 produces a `build_verdict` (`READY_TO_BUILD` / `READY_WITH_BLOCKERS` / `RECON_ONLY` / `WAITING_ON_ACCESS` / `NOT_BUILDABLE_YET`). Build Mode does not start without authorization.
+- **Do Not Proceed Matrix** (Section 4.11) — 11 conditions that halt Phase 0 with a diagnostic verdict.
+- **No False Dashboard rule** — a dashboard row is created by a lead event, never by a parcel record alone.
+- **Source Hierarchy** (Section 4.9) — Tier 1 primary lead / Tier 2 supporting / Tier 3 enrichment. Only Tier 1 creates leads.
+- **Recon Mode vs Build Mode** (Section 4.6) — first run is always Recon Mode.
+- **VIP-friendly verdict message** (Section 4.12) — plain English Phase 0 output.
+- **Operator-readable lead names rule** (Section 4.13) — no raw clerk codes in operator-facing surfaces.
+- **Schema breaking changes** — 26 new source-level fields, 3 new top-level fields, 7 new enum types. v4.x configs require Phase 0 re-recon to populate new proof packet fields.
+
+**v4.1.0 added** (preserved in v5.0.0): the one-sentence install flow, `scaffold/bootstrap_county.py`, `START_HERE.md`, `MASTER_PROMPT.md` Section 4.5 (autonomous first-run rule), and the `runs/<slug>/` directory convention.
 
 Each county's `BUILD_SUMMARY.md` records the framework version it was built against.
 

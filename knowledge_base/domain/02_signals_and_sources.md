@@ -399,3 +399,64 @@ When two sources disagree on a fact:
 5. **GIS** wins for: parcel boundary, lat/lng, legal description geometry
 
 A clerk record from 2023 supersedes a parcel-master record from 2025 on ownership questions, because the clerk records the legal event and the parcel master eventually catches up (often quarterly).
+
+---
+
+## Source Hierarchy (v5.0.0+)
+
+The v5.0.0 Source Verification Gate (MASTER_PROMPT Section 4.7) classifies every source into one of three tiers via the `source_role` field. The tier determines what the source can do in the pipeline. This is the central trust rule of v5.0.0.
+
+### Tier 1 — Primary lead sources (`source_role: PRIMARY_LEAD_SOURCE`)
+
+**Can create leads.** Phase 0 must verify at least one Tier 1 source for the county build to be eligible. Without a verified Tier 1 source, the county is `NOT_BUILDABLE_YET` and the framework stops at the Build Eligibility Gate.
+
+- Clerk records / recorder records (deeds, mortgages, liens, lis pendens, releases, satisfactions, judgments, federal tax liens, mechanics liens)
+- Court filings (civil, probate, family, eviction)
+- Foreclosure filings
+- Sheriff sale records
+- Tax delinquency events
+- Tax sale events
+- Probate events
+- Judgments
+- Liens
+- Lis pendens
+- Recorded notices
+- Code enforcement events (when they expose violations, liens, demolition, condemnation, nuisance, or unsafe-structure data)
+- Demolition events
+- Condemnation events
+
+### Tier 2 — Supporting lead sources (`source_role: SUPPORTING_LEAD_SOURCE`)
+
+**Strengthens or confirms leads.** Cannot create lead volume on its own. Used to enrich Tier 1 events with detail.
+
+- Court case detail pages
+- Document images
+- Auction detail pages
+- Sale status pages
+- Probate case metadata
+- Judgment detail pages
+- Recorded document metadata
+
+### Tier 3 — Enrichment sources (`source_role: ENRICHMENT_SOURCE`)
+
+**Enriches leads only.** Cannot create leads under any circumstances. A county whose only verified sources are Tier 3 is not buildable.
+
+- Parcel data
+- GIS data
+- CAD / appraisal district data
+- Assessor data
+- Owner mailing data
+- Tax roll data
+- Bulk property roll
+- Valuation data (beds / baths / square footage / year built / land use)
+- Equity estimate proxies
+- Absentee-owner status (when derived from owner mailing address)
+- Vacancy status (when derived from USPS or utility data)
+
+### Two other source_role values
+
+- `REFERENCE_ONLY` — informational sources that can't create leads (e.g. a county's published treasurer schedule, an open-data portal index page)
+- `BLOCKED_SOURCE` — a Tier 1 or Tier 2 source that exists but is currently inaccessible. Carries a `next_access_strategy` describing the unblock plan. Cannot create leads until access is solved.
+- `NOT_FOUND` — searched for but the source does not exist in this jurisdiction (e.g. counties without an online clerk portal)
+
+This tier system is enforced by the schema. A source with `source_role: ENRICHMENT_SOURCE` cannot have `lead_value: LEAD_GENERATING`. The Build Eligibility Gate reads these fields to produce the `build_verdict`.

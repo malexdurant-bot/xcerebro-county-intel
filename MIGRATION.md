@@ -251,10 +251,30 @@ Edit `domain/00_client_business_model.md` (persona), `domain/04_deal_path_classi
 
 ## Versioning
 
-This is v4.0.0.
+This is **v5.0.0**.
 
-- Patch (4.0.1) for clarifications, doc fixes
-- Minor (4.1.0) for new patterns, sources, deal paths, architecture additions
+**v5.0.0 changes from v4.1.0** (breaking schema change — v4.x configs need Phase 0 re-recon):
+
+- Added five-layer Source Verification Gate to MASTER_PROMPT.md (Sections 4.6–4.13)
+- Added 26 new source-level proof packet fields to `config/counties/_schema.json`
+- Added 3 new top-level fields: `build_verdict`, `build_verdict_reason`, `build_verdict_at`
+- Added 7 new enum types: `access_method` (17 values), `public_access_status` (12 values), `document_access_status` (7 values), `source_role` (6 values), `verification_confidence` (5 values), `verification_method` (8 values), `next_access_strategy` (15 values). Plus widened `official_status` to a 5-way `OFFICIAL_*` split.
+- Added Build Eligibility Gate semantics — Phase 0 produces a build verdict
+- Added Do Not Proceed Matrix — 11 conditions that halt Phase 0
+- Added No False Dashboard rule — dashboard rows must come from lead events
+- Added Source Hierarchy — Tier 1 primary lead / Tier 2 supporting / Tier 3 enrichment
+- Added Recon Mode vs Build Mode distinction
+- Added VIP-friendly verdict message format
+- Added Operator-readable lead names rule
+- Updated `scaffold/bootstrap_county.py` launch file template to reference v5.0.0 gates (bootstrap script logic unchanged)
+- Bumped `FRAMEWORK_VERSION.json` to `v5.0.0`
+
+**This is a breaking schema change.** A v4.x county config does not validate against the v5.0.0 schema until the proof packet fields are populated. Empty defaults in `_template.json` are accepted during recon; Phase 0 populates them through the verification gate.
+
+**v4.1.0 features preserved:** the one-sentence install flow, `scaffold/bootstrap_county.py`, `START_HERE.md`, autonomous first-run rule (MASTER_PROMPT Section 4.5), and the `runs/<slug>/` directory convention.
+
+- Patch (4.1.1) for clarifications, doc fixes
+- Minor (4.2.0) for new patterns, sources, deal paths, architecture additions
 - Major (5.0.0) for breaking changes that require migration of existing county builds
 
 Each county's `BUILD_SUMMARY.md` records which framework version it was built against.
@@ -263,8 +283,11 @@ Each county's `BUILD_SUMMARY.md` records which framework version it was built ag
 
 ## Files in this framework
 
+**Beginner entry point (v4.1.0+):**
+- `START_HERE.md` — first-time-user walkthrough. Read this before anything else on your first run.
+
 **Master entry point:**
-- `MASTER_PROMPT.md` — what gets pasted into Claude Code at build start
+- `MASTER_PROMPT.md` — the framework contract Claude Code reads on every build. Section 4.5 documents the autonomous first-run rule.
 
 **Domain knowledge base** (the *what*):
 - `knowledge_base/domain/00_client_business_model.md`
@@ -297,11 +320,38 @@ Each county's `BUILD_SUMMARY.md` records which framework version it was built ag
 - `config/counties/_schema.json` — JSON Schema (validates configs)
 - `config/counties/_template.json` — empty config to copy for new counties
 
+**Bootstrap and tests (scaffold):**
+- `scaffold/bootstrap_county.py` — v4.1.0+ bounded bootstrap script. Creates `runs/<slug>/` and the launch file. Claude Code is authorized to run this automatically on first contact per `MASTER_PROMPT.md` Section 4.5.
+- `scaffold/tests/run_all.py` — runs both gate tests
+- `scaffold/tests/test_golden_path.py` — happy-path build gate
+- `scaffold/tests/test_county_agnostic_regression.py` — enforces no hardcoded county names outside config/counties/ and LICENSE.md
+
 **Synthetic test harness:**
 - `scaffold/data/synthetic_parcels.jsonl` — 12 parcels covering every scenario
 - `scaffold/data/synthetic_signals.jsonl` — 24 signals across all 11 patterns
 - `scaffold/data/synthetic_expectations.json` — what the build should produce
 - `scaffold/data/README.md` — how the harness works
 
+**Per-county artifacts (v4.1.0+ convention):**
+
+The framework distinguishes two locations for county-specific files:
+
+- **Canonical config:** `config/counties/<county_slug>.json` — the single source-of-truth source map for the county. Produced by Phase 0 recon. Validated against `_schema.json`. Committed to the repo.
+
+- **Run artifacts:** `runs/<county_slug>/` — county-specific launch files, run manifests, temporary logs, ad-hoc operator notes, and anything else that's county-specific but NOT part of the canonical config. The bootstrap script creates this folder. Phase manifests and operator notes accumulate here over time.
+
+Examples of what goes where:
+
+| File | Location |
+|---|---|
+| The verified source map | `config/counties/bexar_tx.json` |
+| Phase 0 launch instructions | `runs/bexar_tx/LAUNCH_BEXAR_TX.md` |
+| Phase 0 change manifest | `runs/bexar_tx/PHASE0_MANIFEST.md` |
+| Notes from a recon session | `runs/bexar_tx/notes.md` |
+| Build-specific logs (not committed) | `runs/bexar_tx/logs/` (add to `.gitignore`) |
+
+**Why the separation:** the canonical config is what every later phase reads from. It must stay clean and validate-able. Run-folder content is operator scratchpad — useful, county-specific, but never part of the framework's data contract.
+
 **This file:**
 - `MIGRATION.md` — operator-facing instructions
+

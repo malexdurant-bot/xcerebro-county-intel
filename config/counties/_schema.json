@@ -247,6 +247,7 @@
           "official_status": {
             "type": "string",
             "enum": [
+              "OFFICIAL",
               "OFFICIAL_COUNTY",
               "OFFICIAL_STATE",
               "OFFICIAL_CITY",
@@ -255,7 +256,8 @@
               "UNVERIFIED",
               "NOT_FOUND",
               ""
-            ]
+            ],
+            "description": "How the source's official status was determined. v5.0.0 introduces the 5-way OFFICIAL_* split; 'OFFICIAL' is retained for backward compatibility but new builds should use the granular values."
           },
           "lead_value": {
             "type": "string",
@@ -268,16 +270,511 @@
             ]
           },
           "operator_override": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If true, operator has explicitly approved using this source even if verification_confidence is LOW or source_role is BLOCKED_SOURCE. Required for build to proceed past Phase 0 with low-confidence sources."
           },
           "verification_note": {
-            "type": "string"
+            "type": "string",
+            "description": "Free-text explaining the verification outcome and any caveats."
           },
           "open_questions": {
             "type": "array",
             "items": {
               "type": "string"
+            },
+            "description": "Free-text questions the operator must answer before this source can ship."
+          },
+          "verified_from_url": {
+            "type": "string",
+            "description": "The official government page (or officially-linked vendor index) from which the source URL was discovered. Required for verification_confidence HIGH or MEDIUM."
+          },
+          "verification_method": {
+            "type": "string",
+            "enum": [
+              "official_domain",
+              "official_page_link",
+              "official_vendor_link",
+              "state_portal",
+              "court_portal",
+              "city_portal",
+              "manual_operator_verified",
+              "not_verified",
+              ""
+            ]
+          },
+          "official_entity": {
+            "type": "string",
+            "description": "Name of the official government entity that owns/operates this source. Example: '<County Name> Clerk's Office' or '<State> Court of Appeals'."
+          },
+          "portal_type": {
+            "type": "string",
+            "description": "Free-text describing what this portal is (e.g. 'land records search', 'tax delinquency lookup', 'foreclosure docket search')."
+          },
+          "records_available": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of record types this source actually exposes (e.g. ['deeds', 'mortgages', 'liens', 'lis_pendens'])."
+          },
+          "search_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Search fields the portal exposes (e.g. ['name', 'parcel_id', 'date_range', 'document_type'])."
+          },
+          "access_method": {
+            "type": "string",
+            "enum": [
+              "OPEN_PUBLIC_PORTAL",
+              "SEARCHABLE_PUBLIC_PORTAL",
+              "DOWNLOADABLE_FILE",
+              "PDF_PUBLICATION",
+              "API_ENDPOINT",
+              "MAP_LAYER",
+              "PUBLIC_BUT_CAPTCHA_PROTECTED",
+              "PUBLIC_BUT_WAF_PROTECTED",
+              "PUBLIC_BUT_SESSION_REQUIRED",
+              "FREE_ACCOUNT_REQUIRED",
+              "PAID_SUBSCRIPTION_REQUIRED",
+              "LOGIN_REQUIRED",
+              "OPERATOR_CREDENTIAL_REQUIRED",
+              "REQUEST_ONLY",
+              "MANUAL_PUBLIC_RECORDS_DELIVERY",
+              "NOT_SEARCHABLE",
+              "UNKNOWN",
+              ""
+            ]
+          },
+          "public_access_status": {
+            "type": "string",
+            "enum": [
+              "FULL_PUBLIC_ACCESS",
+              "PUBLIC_SEARCH_ONLY",
+              "PUBLIC_SEARCH_DOCUMENTS_LOCKED",
+              "FREE_ACCOUNT_REQUIRED",
+              "PAID_SUBSCRIPTION_REQUIRED",
+              "LOGIN_REQUIRED",
+              "CLERK_APPROVAL_REQUIRED",
+              "CAPTCHA_PROTECTED",
+              "WAF_PROTECTED",
+              "REQUEST_ONLY",
+              "BLOCKED",
+              "UNKNOWN",
+              ""
+            ]
+          },
+          "document_access_status": {
+            "type": "string",
+            "enum": [
+              "DOCUMENTS_PUBLIC",
+              "DOCUMENTS_PUBLIC_WITH_CAPTCHA",
+              "DOCUMENTS_LOGIN_REQUIRED",
+              "DOCUMENTS_PAID_SUBSCRIPTION_REQUIRED",
+              "DOCUMENTS_CLERK_APPROVAL_REQUIRED",
+              "DOCUMENTS_NOT_AVAILABLE",
+              "DOCUMENTS_UNKNOWN",
+              ""
+            ]
+          },
+          "source_role": {
+            "type": "string",
+            "enum": [
+              "PRIMARY_LEAD_SOURCE",
+              "SUPPORTING_LEAD_SOURCE",
+              "ENRICHMENT_SOURCE",
+              "REFERENCE_ONLY",
+              "BLOCKED_SOURCE",
+              "NOT_FOUND",
+              ""
+            ]
+          },
+          "verification_confidence": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW",
+              "BLOCKED",
+              "NOT_FOUND",
+              ""
+            ]
+          },
+          "sample_record_path_confirmed": {
+            "type": "boolean",
+            "description": "True if Claude Code has confirmed the path to records exists on this portal (does NOT mean a record was scraped, just that the search/index/list page was located)."
+          },
+          "sample_record_type": {
+            "type": "string",
+            "description": "Type of sample record path confirmed (e.g. 'search_form', 'docket_list', 'pdf_index', 'api_endpoint')."
+          },
+          "sample_search_possible": {
+            "type": "boolean",
+            "description": "True if a public user can perform a search on this portal without login or payment."
+          },
+          "sample_document_view_possible": {
+            "type": "boolean",
+            "description": "True if a public user can view at least one document image / page result on this portal without additional access requirements."
+          },
+          "blocker": {
+            "type": "string",
+            "description": "Short description of what's blocking access (empty if not blocked)."
+          },
+          "next_access_strategy": {
+            "type": "string",
+            "enum": [
+              "try_open_public_portal",
+              "find_official_vendor_link",
+              "discover_hidden_api",
+              "use_playwright",
+              "use_seeded_session",
+              "use_captcha_solver",
+              "use_stealth_browser",
+              "use_residential_proxy",
+              "use_operator_login",
+              "request_free_account",
+              "use_paid_subscription_if_operator_provides",
+              "manual_operator_assisted_pull",
+              "standing_records_delivery",
+              "public_records_request_last_resort",
+              "not_available",
+              ""
+            ]
+          },
+          "blocker_type": {
+            "type": "string",
+            "enum": [
+              "TECHNICAL_BLOCKER",
+              "PERMISSION_BLOCKER",
+              "SOURCE_NOT_FOUND",
+              "SOURCE_AMBIGUOUS",
+              "SOURCE_DEAD",
+              "SOURCE_WRONG_CATEGORY",
+              "SOURCE_ENRICHMENT_ONLY",
+              "SOURCE_VERIFIED_BUT_NOT_BUILDABLE",
+              "NO_PRIMARY_LEAD_SOURCE",
+              "PORTAL_PROOF_MISSING",
+              "DOCUMENT_ACCESS_LOCKED",
+              "PUBLIC_ACCESS_UNCLEAR",
+              "PAID_ACCESS_REQUIRED",
+              "OPERATOR_CREDENTIAL_REQUIRED",
+              "MANUAL_ASSISTANCE_REQUIRED",
+              ""
+            ]
+          },
+          "auto_resolve_status": {
+            "type": "string",
+            "enum": [
+              "NOT_ATTEMPTED",
+              "ATTEMPTING",
+              "RESOLVED",
+              "PARTIALLY_RESOLVED",
+              "FAILED",
+              "REQUIRES_OPERATOR_APPROVAL",
+              "REQUIRES_CREDENTIALS",
+              "REQUIRES_PAYMENT",
+              "REQUIRES_MANUAL_ASSISTANCE",
+              "NOT_ALLOWED",
+              ""
+            ]
+          },
+          "final_resolution_status": {
+            "type": "string",
+            "enum": [
+              "RESOLVED",
+              "PARTIALLY_RESOLVED",
+              "UNRESOLVED_TECHNICAL",
+              "UNRESOLVED_PERMISSION",
+              "UNRESOLVED_NOT_FOUND",
+              "UNRESOLVED_NOT_ALLOWED",
+              "OPERATOR_REQUIRED",
+              "CREDENTIALS_REQUIRED",
+              "PAYMENT_REQUIRED",
+              "MANUAL_ASSISTANCE_REQUIRED",
+              ""
+            ]
+          },
+          "auto_resolve_attempts": {
+            "type": "array",
+            "description": "Ordered log of resolution attempts for this source (v5.1.0+).",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attempt_order": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "timestamp": {
+                  "type": "string"
+                },
+                "blocker_type": {
+                  "type": "string",
+                  "enum": [
+                    "TECHNICAL_BLOCKER",
+                    "PERMISSION_BLOCKER",
+                    "SOURCE_NOT_FOUND",
+                    "SOURCE_AMBIGUOUS",
+                    "SOURCE_DEAD",
+                    "SOURCE_WRONG_CATEGORY",
+                    "SOURCE_ENRICHMENT_ONLY",
+                    "SOURCE_VERIFIED_BUT_NOT_BUILDABLE",
+                    "NO_PRIMARY_LEAD_SOURCE",
+                    "PORTAL_PROOF_MISSING",
+                    "DOCUMENT_ACCESS_LOCKED",
+                    "PUBLIC_ACCESS_UNCLEAR",
+                    "PAID_ACCESS_REQUIRED",
+                    "OPERATOR_CREDENTIAL_REQUIRED",
+                    "MANUAL_ASSISTANCE_REQUIRED",
+                    ""
+                  ]
+                },
+                "strategy": {
+                  "type": "string",
+                  "enum": [
+                    "find_official_vendor_link",
+                    "replace_homepage_with_record_portal",
+                    "discover_public_search_endpoint",
+                    "discover_hidden_api",
+                    "inspect_network_requests",
+                    "use_playwright",
+                    "use_session_cookie",
+                    "use_seeded_session",
+                    "use_captcha_solver",
+                    "use_stealth_browser",
+                    "use_residential_proxy",
+                    "use_operator_login",
+                    "request_free_account",
+                    "use_paid_subscription_if_operator_provides",
+                    "manual_operator_assisted_pull",
+                    "standing_records_delivery",
+                    "public_records_request_last_resort",
+                    "mark_not_available",
+                    ""
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "PENDING",
+                    "SUCCESS",
+                    "FAILED",
+                    "BLOCKED_BY_PERMISSION",
+                    "BLOCKED_BY_COST",
+                    "REQUIRES_CREDENTIALS",
+                    "REQUIRES_OPERATOR_APPROVAL",
+                    "SKIPPED_NOT_ALLOWED",
+                    ""
+                  ]
+                },
+                "result": {
+                  "type": "string"
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "files_created": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "files_modified": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "next_step": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "attempt_order",
+                "timestamp",
+                "strategy",
+                "status"
+              ]
             }
+          },
+          "lifecycle_status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PENDING",
+              "CURED",
+              "RELEASED",
+              "SATISFIED",
+              "CANCELLED",
+              "DISMISSED",
+              "SOLD",
+              "EXPIRED",
+              "SUPERSEDED",
+              "UNKNOWN",
+              ""
+            ]
+          },
+          "suppression_reason": {
+            "type": "string",
+            "enum": [
+              "released",
+              "satisfied",
+              "paid",
+              "cancelled",
+              "dismissed",
+              "sold",
+              "expired",
+              "superseded",
+              "manual_review",
+              "unknown",
+              ""
+            ]
+          },
+          "expected_refresh_cadence": {
+            "type": "string",
+            "enum": [
+              "REAL_TIME",
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "REQUEST_BASED",
+              "MANUAL",
+              "UNKNOWN",
+              ""
+            ]
+          },
+          "source_freshness_status": {
+            "type": "string",
+            "enum": [
+              "FRESH",
+              "STALE",
+              "OVERDUE",
+              "FAILED",
+              "PAUSED",
+              "UNKNOWN",
+              ""
+            ]
+          },
+          "stale_after_hours": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "last_successful_fetch_at": {
+            "type": "string"
+          },
+          "last_attempted_fetch_at": {
+            "type": "string"
+          },
+          "last_record_seen_at": {
+            "type": "string"
+          },
+          "record_ttl_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "expire_if_not_seen_runs": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "stale_record_policy": {
+            "type": "string",
+            "enum": [
+              "KEEP_UNTIL_RELEASED",
+              "EXPIRE_IF_NOT_SEEN",
+              "EXPIRE_AFTER_TTL",
+              "MANUAL_REVIEW",
+              "NEVER_EXPIRE",
+              ""
+            ]
+          },
+          "quarantine_status": {
+            "type": "string",
+            "enum": [
+              "NOT_QUARANTINED",
+              "QUARANTINED",
+              "UNDER_REVIEW",
+              "RELEASED",
+              ""
+            ]
+          },
+          "quarantine_reason": {
+            "type": "string"
+          },
+          "estimated_runtime_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "estimated_cost_category": {
+            "type": "string",
+            "enum": [
+              "FREE",
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "UNKNOWN",
+              "REQUIRES_OPERATOR_APPROVAL",
+              ""
+            ]
+          },
+          "portal_fingerprint_id": {
+            "type": "string"
+          },
+          "portal_family": {
+            "type": "string",
+            "description": "Vendor family (Tyler, Aumentum, GovOS, Kofile, Fidlar, RealAuction, ArcGIS, etc.) or 'custom_county'."
+          },
+          "fingerprinted_at": {
+            "type": "string"
+          },
+          "fingerprint_confidence": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW",
+              ""
+            ]
+          },
+          "fingerprint_summary": {
+            "type": "string"
+          },
+          "recommended_adapter": {
+            "type": "string"
+          },
+          "credentials_required_kind": {
+            "type": "string",
+            "enum": [
+              "",
+              "free_account",
+              "paid_subscription",
+              "operator_login",
+              "clerk_approved_login",
+              "identity_verified_account",
+              "captcha_solver_key",
+              "proxy_credentials",
+              "api_key"
+            ]
+          },
+          "credentials_declared": {
+            "type": "boolean"
+          },
+          "manual_upload_path": {
+            "type": "string"
+          },
+          "manual_upload_received_at": {
+            "type": "string"
           }
         },
         "allOf": [
@@ -418,6 +915,32 @@
               }
             }
           }
+        },
+        "view_modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "CLIENT_VIEW",
+              "OPERATOR_VIEW",
+              "DEMO_VIEW",
+              "PAUSED_VIEW",
+              "REDACTED_VIEW"
+            ]
+          }
+        },
+        "build_label": {
+          "type": "string",
+          "enum": [
+            "FULL_BUILD",
+            "PARTIAL_BUILD",
+            "SOURCE_LIMITED",
+            "PRIMARY_SOURCE_PENDING",
+            ""
+          ]
+        },
+        "build_label_reason": {
+          "type": "string"
         }
       }
     },
@@ -442,6 +965,132 @@
         },
         "watchdog_task_name": {
           "type": "string"
+        },
+        "scheduler_runtime_class": {
+          "type": "string",
+          "enum": [
+            "RUNS_WHEN_LOGGED_IN_ONLY",
+            "RUNS_WHEN_LOCKED",
+            "RUNS_ON_GITHUB_ACTIONS",
+            "RUNS_ON_SERVER",
+            "SCHEDULER_NOT_CONFIGURED",
+            "SCHEDULER_REQUIRES_OPERATOR_CREDENTIALS",
+            ""
+          ]
+        },
+        "scheduler_test_fired_at": {
+          "type": "string"
+        },
+        "production_verification_status": {
+          "type": "string",
+          "enum": [
+            "NOT_RUN",
+            "PASSED",
+            "FAILED",
+            "PRODUCTION_VERIFICATION_BLOCKED",
+            ""
+          ]
+        },
+        "production_verification_at": {
+          "type": "string"
+        },
+        "last_known_good_commit": {
+          "type": "string"
+        },
+        "last_known_good_dashboard_at": {
+          "type": "string"
+        }
+      }
+    },
+    "build_verdict": {
+      "type": "string",
+      "enum": [
+        "READY_TO_BUILD",
+        "READY_WITH_BLOCKERS",
+        "RECON_ONLY",
+        "WAITING_ON_ACCESS",
+        "NOT_BUILDABLE_YET",
+        "AUTO_RESOLVED_READY_TO_BUILD",
+        "PARTIALLY_RESOLVED_BUILDABLE",
+        "AUTO_RESOLVE_FAILED",
+        ""
+      ],
+      "description": "Phase 0/0.5 verdict on county build eligibility (v5.0.0 baseline, v5.1.0 adds auto-resolve verdicts)."
+    },
+    "build_verdict_reason": {
+      "type": "string",
+      "description": "Plain-English explanation of the build_verdict produced by Phase 0. Required when build_verdict is set."
+    },
+    "build_verdict_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of when Phase 0 produced build_verdict."
+    },
+    "auto_resolve_status": {
+      "type": "string",
+      "enum": [
+        "NOT_ATTEMPTED",
+        "ATTEMPTING",
+        "RESOLVED",
+        "PARTIALLY_RESOLVED",
+        "FAILED",
+        "REQUIRES_OPERATOR_APPROVAL",
+        "REQUIRES_CREDENTIALS",
+        "REQUIRES_PAYMENT",
+        "REQUIRES_MANUAL_ASSISTANCE",
+        "NOT_ALLOWED",
+        ""
+      ],
+      "description": "Overall county-level auto-resolve outcome from Phase 0.5 (v5.1.0+)."
+    },
+    "final_resolution_status": {
+      "type": "string",
+      "enum": [
+        "RESOLVED",
+        "PARTIALLY_RESOLVED",
+        "UNRESOLVED_TECHNICAL",
+        "UNRESOLVED_PERMISSION",
+        "UNRESOLVED_NOT_FOUND",
+        "UNRESOLVED_NOT_ALLOWED",
+        "OPERATOR_REQUIRED",
+        "CREDENTIALS_REQUIRED",
+        "PAYMENT_REQUIRED",
+        "MANUAL_ASSISTANCE_REQUIRED",
+        ""
+      ]
+    },
+    "operator_override_audit": {
+      "type": "array",
+      "description": "Audit trail of operator overrides applied during recon/build (v5.1.0+).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "override_id": {
+            "type": "string"
+          },
+          "operator_name": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "risk": {
+            "type": "string"
+          },
+          "what_was_allowed": {
+            "type": "string"
+          },
+          "what_remains_blocked": {
+            "type": "string"
+          },
+          "dashboard_label_required": {
+            "type": "string"
+          }
         }
       }
     }

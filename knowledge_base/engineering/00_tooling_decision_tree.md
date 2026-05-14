@@ -454,3 +454,31 @@ Playwright is 50-100x slower than `requests`. Don't reach for it until you've co
 | Excel | `openpyxl` | `pandas.read_excel` |
 | DOCX | `python-docx` | `mammoth` |
 | Live verification | Playwright Chromium | — |
+
+---
+
+## Access strategy ladder (v5.0.0+)
+
+The v5.0.0 schema introduces `next_access_strategy` on every source's proof packet (MASTER_PROMPT Section 4.7 / 4.8). This field documents the unblock plan for a `BLOCKED_SOURCE` and signals which technique to attempt during Phase 2 adapter build.
+
+Allowed `next_access_strategy` values, ordered roughly cheapest-to-most-expensive:
+
+1. `try_open_public_portal` — the portal might already be accessible to a plain HTTP fetch; verify before climbing the ladder
+2. `find_official_vendor_link` — the data lives behind an officially-linked vendor (Tyler, GovOS, BiS); locate the vendor index page
+3. `discover_hidden_api` — view-source / Network tab inspection to find an XHR endpoint not advertised on the public page
+4. `use_playwright` — JS-rendered page requiring a real browser
+5. `use_seeded_session` — operator logs in once, framework replays cookies
+6. `use_captcha_solver` — 2Captcha, Anti-Captcha, etc. when reCAPTCHA/hCaptcha blocks automation
+7. `use_stealth_browser` — anti-detect Playwright/undetected-chromedriver for fingerprinting WAFs
+8. `use_residential_proxy` — when datacenter IPs are blocked but residential IPs work
+9. `use_operator_login` — when the source requires per-user authenticated credentials operator must provide
+10. `request_free_account` — when a free-tier account suffices but the framework needs to create or use one
+11. `use_paid_subscription_if_operator_provides` — when access requires a paid subscription the operator already has
+12. `manual_operator_assisted_pull` — when no automated approach works but a human operator can periodically pull the data
+13. `standing_records_delivery` — when the county delivers data on a recurring schedule via email/SFTP
+14. `public_records_request_last_resort` — formal records request to the clerk's office; last resort because of latency
+15. `not_available` — the data does not exist online and no offline access path is viable
+
+**Public records request is not the default.** It is a last resort when a real portal exists but remains unsolved after technical access attempts. Public records request or standing records delivery can be primary ONLY when no usable portal exists or when official recurring delivery is the configured source.
+
+The Build Eligibility Gate (MASTER_PROMPT Section 4.10) treats `BLOCKED_SOURCE` with a clear `next_access_strategy` as eligible for `READY_WITH_BLOCKERS` or `WAITING_ON_ACCESS` verdicts. A `BLOCKED_SOURCE` without a `next_access_strategy` fails the Build Eligibility Gate.

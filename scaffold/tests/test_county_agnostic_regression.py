@@ -61,6 +61,9 @@ def is_exempt_path(rel_path):
         if basename in ("_template.json", "_schema.md", "_schema.json"):
             return False  # universal — must stay agnostic
         return True  # operator-supplied county config
+    # Per-county run folders are exempt (launch files, manifests, operator notes)
+    if rel_str.startswith("runs/"):
+        return True
     # The test files themselves intentionally name these terms
     if rel_str.startswith("scaffold/tests/test_county_agnostic_regression"):
         return True
@@ -69,6 +72,16 @@ def is_exempt_path(rel_path):
     # jurisdiction where Xcerebro LLC is registered, not framework content
     # that should be county-agnostic. Exempt the whole file.
     if rel_str == "LICENSE.md":
+        return True
+    # v4.1.0 — START_HERE.md and scaffold/bootstrap_county.py legitimately use
+    # 'Bexar County, Texas' and similar as user-facing examples to teach the
+    # one-sentence install flow. The examples are explicitly framed as
+    # placeholders to substitute. Concrete examples are necessary for an
+    # onboarding doc — abstract `<COUNTY>` syntax loses the operator on the
+    # first read. Exempt both files.
+    if rel_str == "START_HERE.md":
+        return True
+    if rel_str == "scaffold/bootstrap_county.py":
         return True
     return False
 

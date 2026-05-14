@@ -4,9 +4,9 @@
   "license": "Proprietary VIP-only license",
   "license_file": "LICENSE.md",
   "is_open_source": false,
-  "framework_version": "v4_universal",
+  "framework_version": "v5.1.0-beta",
   "framework_codename": "Xcerebro County Intelligence Harness",
-  "locked_at": "2026-05-08",
+  "locked_at": "2026-05-13",
   "locked_rules": {
     "county_specific_examples_allowed": false,
     "github_pages_allowed": true,
@@ -90,5 +90,6 @@
     "Changing any locked rule requires the operator to explicitly unlock it and update this file.",
     "Do not silently rename folders, move files, replace approved rules, or add county-specific examples.",
     "If a proposed change conflicts with locked rules, stop and ask before patching."
-  ]
+  ],
+  "release_channel": "beta"
 }

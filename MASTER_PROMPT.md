@@ -88,6 +88,824 @@ If you find yourself generating a lead from a parcel-master row alone, stop. Tha
 
 ---
 
+## 4.5. Autonomous First-Run Rule (v4.1.0+)
+
+When the operator opens Claude Code inside the framework repo and gives a one-sentence county build instruction — for example, *"Build &lt;County Name&gt;, &lt;State&gt;."* — Claude Code follows this rule before doing anything else:
+
+**Step 1 — Parse the target.** Extract the county name, state, and inferred slug from the operator's sentence. The default slug convention is `<county_lowercase>_<state_abbrev>` (lowercase county name with spaces and punctuation replaced by underscores, joined to the two-letter state abbreviation with an underscore). Show the interpreted target to the operator BEFORE doing anything else:
+
+```
+Target: <County Name>, <State>
+Slug: <inferred_slug>
+Phase: phase0
+```
+
+If the operator disagrees with the slug, accept their correction. If the county name is ambiguous (some county names exist in multiple states), STOP and ask which state.
+
+**Step 2 — Check for existing state.** Run these checks in order:
+
+1. Does `config/counties/<county_slug>.json` already exist?
+2. Does `runs/<county_slug>/` already exist?
+
+If either exists, do NOT run the bootstrap. Tell the operator the county already has prior work and ask whether to resume, restart, or pick a different slug.
+
+**Step 3 — Run the bootstrap.** If neither exists, Claude Code is authorized to execute exactly this command (and only this command) automatically:
+
+```
+python scaffold/bootstrap_county.py --county "<County Name>" --state "<State>" --slug <county_slug> --phase phase0
+```
+
+This is the ONLY script Claude Code may run autonomously on first contact. The bootstrap script is bounded: it creates `runs/<county_slug>/` and `runs/<county_slug>/LAUNCH_<COUNTY_SLUG>.md`, then exits. It does NOT run scrapers, build dashboards, install dependencies, or touch external services.
+
+When Claude Code requests permission to run the bootstrap, the operator approves once. After approval, the script runs to completion in seconds.
+
+**Step 4 — Read the launch file.** After bootstrap completes, Claude Code reads `runs/<county_slug>/LAUNCH_<COUNTY_SLUG>.md`. That launch file scopes the run to Phase 0 only and embeds the clerk-driven product rule.
+
+**Step 5 — Proceed to Phase 0.** Claude Code now begins Phase 0 Step 1 (Inspect) per Section 6 of this prompt. Phase 0 runs autonomously through its four steps and produces source proof packets per Section 4.7 (Verification Gate).
+
+**Step 6 — Run Phase 0.5 if blockers detected (v5.1.0-beta+).** If any source has `verification_confidence` LOW/BLOCKED or `source_role` BLOCKED_SOURCE, automatically enter Phase 0.5 (Section 4.14). Phase 0.5 attempts approved resolution paths in order, records every attempt in `auto_resolve_attempts`, and updates `auto_resolve_status` per source and county-level. Phase 0.5 does NOT require operator approval to begin — it is the auto-resolve step.
+
+**Step 7 — Produce final build verdict.** After Phase 0.5 completes (or after Phase 0 if no blockers), Claude Code computes the final `build_verdict` (Section 4.10, including v5.1.0-beta values `AUTO_RESOLVED_READY_TO_BUILD`, `PARTIALLY_RESOLVED_BUILDABLE`, `AUTO_RESOLVE_FAILED`). It writes the verdict, reason, and timestamp to the county config.
+
+**Step 8 — Build Mode Approval Gate (Section 4.15).** Claude Code prints the VIP-friendly verdict message (Section 4.12 / 4.26) and STOPS. It does NOT enter Build Mode without explicit operator approval. The approval prompt has the shape defined in Section 4.15. **Claude Code does not advance to Phase 1 / Build Mode without an explicit operator instruction.**
+
+**What Claude Code is NOT authorized to do autonomously on first run:**
+
+- Run any script other than `scaffold/bootstrap_county.py`
+- Install Python dependencies, set up virtualenvs, or modify system state
+- Build scrapers, adapters, dashboards, or databases
+- Deploy to GitHub Pages, create Supabase tables, or touch any external service
+- Modify framework files (anything outside `config/counties/<county_slug>.json` and `runs/<county_slug>/`)
+- Advance past Phase 0
+
+If anything else is needed during Phase 0 (e.g. installing Python dependencies to run the scaffold tests), Claude Code MUST ask the operator for explicit approval before each such action.
+
+This rule exists so a first-time VIP can type one sentence and one approval and have a working Phase 0 build — without writing a single line of code or running a single PowerShell command beyond launching Claude Code.
+
+For concrete user-facing examples of the one-sentence install flow, see `START_HERE.md`.
+
+---
+
+## 4.6. Recon Mode vs Build Mode (v5.0.0+)
+
+The first run is always **Recon Mode**. Recon Mode is what Phase 0 does. The framework does not enter Build Mode until Phase 0 produces a `build_verdict` of `READY_TO_BUILD`, OR the operator explicitly authorizes proceeding with blockers, OR the operator explicitly approves using a blocked / low-confidence source.
+
+**Recon Mode includes:**
+
+- Source discovery (walking the source-category checklist)
+- Source verification (the 5-layer Source Verification Gate — Section 4.7)
+- Public access verification (`public_access_status` and `document_access_status`)
+- Source role classification (`PRIMARY_LEAD_SOURCE` / `SUPPORTING_LEAD_SOURCE` / `ENRICHMENT_SOURCE` / etc.)
+- County config creation (`config/counties/<slug>.json`)
+- Build Eligibility Gate (`build_verdict`)
+- VIP-friendly verdict message
+
+**Build Mode includes:**
+
+- Portal fingerprinting
+- Scraper adapter selection
+- Scraper building
+- Normalization pipeline
+- Dashboard construction
+- Heartbeat + alerting
+- GitHub Pages / Supabase deployment
+
+Build Mode never starts on first contact. Build Mode never starts from an enrichment-only county config. Build Mode never starts unless `build_verdict` permits it.
+
+---
+
+## 4.7. Five-Layer Source Verification Gate (v5.0.0+)
+
+Phase 0 does not simply find URLs. It proves each URL is the correct source before trusting it. For every source in the source-category checklist, walk these 5 layers in order. Each layer's outcome is recorded in the source's proof packet (see Section 4.8).
+
+### Layer 1 — Official origin verification
+
+The source URL must come from one of:
+
+- Official county website
+- Official state website
+- Official city website
+- Official court website
+- Official tax office website
+- Official assessor / appraisal district website
+- Official sheriff website
+- Official GIS website
+- Vendor portal **linked from** an official government website
+
+If the source is a vendor portal (Tyler Technologies, GovOS, BiS, Granicus, etc.), Phase 0 must identify the official government page that links to that vendor portal and record the URL in `verified_from_url`. A vendor portal without an officially-linked origin is `UNVERIFIED`.
+
+**Reject and mark `NOT_FOUND` if the only candidates are:** SEO landing pages, random property data websites, paid lead vendor websites, unofficial directories, Google snippets, AI-guessed URLs, generic department homepages that do not expose or link to records, dead portals, wrong-county portals, wrong-state portals, aggregator pages not linked from official government sources, outdated PDF links with no source page, or pages that describe a department without exposing or linking to its records.
+
+Record `verification_method` as one of: `official_domain`, `official_page_link`, `official_vendor_link`, `state_portal`, `court_portal`, `city_portal`, `manual_operator_verified`, `not_verified`.
+
+### Layer 2 — Source category verification
+
+Verify the source actually exposes the claimed category. A homepage is not a source unless it links to a record portal.
+
+- A **clerk / recorder** source must actually provide land records, deed records, document records, official public records, recorded instrument search, or document image access.
+- A **tax** source must actually provide tax delinquency, tax sale, tax lien, unpaid taxes, treasurer, collector, or related tax-distress access.
+- A **court** source must actually provide case search, civil cases, probate, foreclosure, judgments, docket access, or related court records.
+- A **sheriff / foreclosure** source must actually provide sale notices, auction records, foreclosure listings, sheriff sale records, trustee sale records, or related sale data.
+- A **GIS / parcel** source must actually provide parcel search, map viewer, ArcGIS endpoint, property ID lookup, owner search, or property layers.
+- A **code enforcement** source must actually provide violations, enforcement cases, liens, condemnations, demolition orders, nuisance abatement, or unsafe-structure data.
+
+Record what the portal actually exposes in `records_available` (array) and `search_fields` (array).
+
+### Layer 3 — Data access verification
+
+Classify how records are accessed. This is the difference between "the portal exists" and "the portal is usable."
+
+Record `access_method` as one of: `OPEN_PUBLIC_PORTAL`, `SEARCHABLE_PUBLIC_PORTAL`, `DOWNLOADABLE_FILE`, `PDF_PUBLICATION`, `API_ENDPOINT`, `MAP_LAYER`, `PUBLIC_BUT_CAPTCHA_PROTECTED`, `PUBLIC_BUT_WAF_PROTECTED`, `PUBLIC_BUT_SESSION_REQUIRED`, `FREE_ACCOUNT_REQUIRED`, `PAID_SUBSCRIPTION_REQUIRED`, `LOGIN_REQUIRED`, `OPERATOR_CREDENTIAL_REQUIRED`, `REQUEST_ONLY`, `MANUAL_PUBLIC_RECORDS_DELIVERY`, `NOT_SEARCHABLE`, `UNKNOWN`.
+
+Record `public_access_status` as one of: `FULL_PUBLIC_ACCESS`, `PUBLIC_SEARCH_ONLY`, `PUBLIC_SEARCH_DOCUMENTS_LOCKED`, `FREE_ACCOUNT_REQUIRED`, `PAID_SUBSCRIPTION_REQUIRED`, `LOGIN_REQUIRED`, `CLERK_APPROVAL_REQUIRED`, `CAPTCHA_PROTECTED`, `WAF_PROTECTED`, `REQUEST_ONLY`, `BLOCKED`, `UNKNOWN`.
+
+Record `document_access_status` as one of: `DOCUMENTS_PUBLIC`, `DOCUMENTS_PUBLIC_WITH_CAPTCHA`, `DOCUMENTS_LOGIN_REQUIRED`, `DOCUMENTS_PAID_SUBSCRIPTION_REQUIRED`, `DOCUMENTS_CLERK_APPROVAL_REQUIRED`, `DOCUMENTS_NOT_AVAILABLE`, `DOCUMENTS_UNKNOWN`.
+
+**A source can be official but still not immediately usable.** A clerk recorder portal that exposes searchable indices but locks document images behind paid subscription is `PUBLIC_SEARCH_DOCUMENTS_LOCKED` — usable for SOME lead types (e.g. detecting that a recording happened, with date and document type) but not others (where the document body matters).
+
+### Layer 4 — Lead value and source role verification
+
+Assign `source_role` as one of:
+
+- `PRIMARY_LEAD_SOURCE` — can create leads (clerk records, recorder records, court foreclosure dockets, sheriff sales, tax delinquency, tax sale, probate openings, code-enforcement events with liens/demolition/condemnation)
+- `SUPPORTING_LEAD_SOURCE` — strengthens or confirms leads (court case detail pages, document images, sale status pages, judgment details)
+- `ENRICHMENT_SOURCE` — enriches leads only (parcel master, GIS, CAD / appraisal data, owner mailing, tax roll, bulk property records, USPS vacancy, utility shutoff)
+- `REFERENCE_ONLY` — informational, cannot create leads
+- `BLOCKED_SOURCE` — valuable but inaccessible until `next_access_strategy` is solved
+- `NOT_FOUND` — searched but no portal exists
+
+Also assign `lead_value`: `LEAD_GENERATING`, `ENRICHMENT`, `REFERENCE_ONLY`, or `UNKNOWN`.
+
+**Only `PRIMARY_LEAD_SOURCE` can create leads.** This is non-negotiable and is the central trust rule of v5.0.0.
+
+### Layer 5 — Portal proof verification
+
+For every source, produce a proof packet. Record `sample_record_path_confirmed` (boolean), `sample_record_type` (e.g. `search_form`, `docket_list`, `pdf_index`, `api_endpoint`), `sample_search_possible` (boolean — can a public user perform a search?), and `sample_document_view_possible` (boolean — can a public user view at least one document image?).
+
+`sample_record_path_confirmed` is true only when Phase 0 has located the actual search/index/list page within the portal. It does NOT mean a record has been scraped. It is the difference between "this portal exists" (true for a homepage) and "this portal exposes records via a search form at `/search.aspx`" (true only when the form is located).
+
+If the system cannot confirm a record path, mark `verification_confidence` as `LOW`, `BLOCKED`, or `NOT_FOUND` accordingly.
+
+### Confidence thresholds
+
+For **required P0 primary lead sources**, the build will not proceed past Phase 0 unless:
+
+- `verification_confidence` is `HIGH` or `MEDIUM`, OR
+- `source_role` is `BLOCKED_SOURCE` with a clear `next_access_strategy`, OR
+- `operator_override` is `true`
+
+For **enrichment sources**, `verification_confidence` `MEDIUM` is acceptable.
+
+For **LOW confidence sources**, do not build without `operator_override: true`.
+
+For **BLOCKED sources**, do not build from them. Document the access strategy in `next_access_strategy`.
+
+Allowed `next_access_strategy` values: `try_open_public_portal`, `find_official_vendor_link`, `discover_hidden_api`, `use_playwright`, `use_seeded_session`, `use_captcha_solver`, `use_stealth_browser`, `use_residential_proxy`, `use_operator_login`, `request_free_account`, `use_paid_subscription_if_operator_provides`, `manual_operator_assisted_pull`, `standing_records_delivery`, `public_records_request_last_resort`, `not_available`.
+
+**Public records request is not the default.** It is a last resort when a real portal exists but remains unsolved after technical access attempts. Public records request or standing records delivery can be primary only when no usable portal exists or when official recurring delivery is the configured source.
+
+---
+
+## 4.8. Source proof packet (v5.0.0+)
+
+Every source in `config/counties/<slug>.json` carries a proof packet — the 18 fields populated by Layers 1–5 of the verification gate. The proof packet is the source-of-truth for whether a source is trustworthy.
+
+Required fields in the proof packet:
+
+- `verified_from_url` — official page that linked here
+- `verification_method` — how verification was performed (enum, Section 4.7 Layer 1)
+- `official_entity` — name of the government entity
+- `portal_type` — what the portal actually is
+- `records_available` — array of record types exposed
+- `search_fields` — array of search fields available
+- `access_method` — enum (Section 4.7 Layer 3)
+- `public_access_status` — enum (Section 4.7 Layer 3)
+- `document_access_status` — enum (Section 4.7 Layer 3)
+- `source_role` — enum (Section 4.7 Layer 4)
+- `verification_confidence` — enum (Section 4.7 confidence thresholds)
+- `verification_note` — free-text explanation
+- `open_questions` — array of operator questions
+- `sample_record_path_confirmed` — boolean (Section 4.7 Layer 5)
+- `sample_record_type` — string (Section 4.7 Layer 5)
+- `sample_search_possible` — boolean
+- `sample_document_view_possible` — boolean
+- `blocker` — string describing what's blocking access
+- `next_access_strategy` — enum (Section 4.7 confidence thresholds)
+
+The schema enforces these. A source block missing required proof packet fields will fail Phase 0 validation.
+
+---
+
+## 4.9. Source Hierarchy (v5.0.0+)
+
+Sources are organized in three tiers. The tier determines what the source can do.
+
+### Tier 1 — Primary lead sources
+
+These sources **can create leads**. Phase 0 must verify at least one Tier 1 source for the build to be eligible.
+
+- Clerk records / recorder records
+- Court filings (civil, probate, family, eviction)
+- Foreclosure filings
+- Sheriff sale records
+- Tax delinquency events
+- Tax sale events
+- Probate events
+- Judgments
+- Liens
+- Lis pendens
+- Recorded notices
+- Code enforcement events (when they expose violations / liens / demolition / condemnation / nuisance)
+- Demolition events
+- Condemnation events
+
+### Tier 2 — Supporting lead sources
+
+These sources **strengthen or confirm leads**. They cannot create lead volume on their own.
+
+- Court case detail pages
+- Document images
+- Auction detail pages
+- Sale status pages
+- Probate case metadata
+- Judgment detail pages
+- Recorded document metadata
+
+### Tier 3 — Enrichment sources
+
+These sources **enrich leads only**. They cannot create leads under any circumstances.
+
+- Parcel data
+- GIS data
+- CAD / appraisal district data
+- Assessor data
+- Owner mailing data
+- Tax roll data
+- Bulk property roll
+- Valuation data (beds / baths / square footage / year built / land use)
+- Equity estimate
+- Absentee status
+- Vacancy status
+
+A county whose only verified sources are Tier 3 is **not buildable**. This is the rule that prevents v1/v2 mistakes restated in v5.0.0 vocabulary.
+
+---
+
+## 4.10. Build Eligibility Gate (v5.0.0+)
+
+At the end of Phase 0, the system produces a `build_verdict` and records it in the top-level fields `build_verdict`, `build_verdict_reason`, and `build_verdict_at` in the county config.
+
+### Verdict values
+
+- **`READY_TO_BUILD`** — At least one verified `PRIMARY_LEAD_SOURCE` is accessible (`verification_confidence` HIGH or MEDIUM, `sample_search_possible` true) AND at least one enrichment source is available.
+- **`READY_WITH_BLOCKERS`** — At least one primary lead source is verified, but access constraints or missing enrichment still need work.
+- **`RECON_ONLY`** — Sources identified but not enough is accessible to build yet.
+- **`WAITING_ON_ACCESS`** — Needed lead source exists but requires login, paid subscription, clerk approval, CAPTCHA solve, seeded session, operator credential, or records delivery.
+- **`NOT_BUILDABLE_YET`** — No reliable primary lead source was found.
+
+### Authorization to enter Build Mode
+
+Phase 1+ does not start unless one of these is true:
+
+1. `build_verdict == "READY_TO_BUILD"`
+2. Operator explicitly authorizes proceeding with blockers
+3. Operator explicitly approves using a blocked / low-confidence source
+
+Claude Code stops at the Build Eligibility Gate, prints the VIP-friendly verdict message (Section 4.12), and waits for operator decision.
+
+---
+
+## 4.11. Do Not Proceed Matrix (v5.0.0+)
+
+The system stops after Phase 0 if **any** of these are true. Stopping is a diagnostic result, not a failure.
+
+1. No clerk or recorder source found.
+2. No primary lead source verified.
+3. Only enrichment sources found.
+4. All P0 sources are blocked.
+5. County config fails schema validation.
+6. Portal proof is missing for required P0 sources.
+7. Dashboard would contain zero event-based leads.
+8. The only available data is parcel, GIS, CAD, assessor, tax roll, or bulk property data.
+9. Source access requires paid subscription or login and no operator credential is declared.
+10. The system cannot verify whether the public can view records or document images.
+11. The system cannot reach a `verification_confidence` of `HIGH` or `MEDIUM` on any required P0 source AND `operator_override` is not set.
+
+If any condition fires, Claude Code prints the verdict, lists the firing conditions, and stops. **Do not compensate by filling a dashboard with enrichment data.**
+
+### No False Dashboard rule
+
+The framework must not build or deploy a lead dashboard unless at least one real `PRIMARY_LEAD_SOURCE` is verified or operator-approved.
+
+**Dashboard row contract:** A dashboard row represents a lead opportunity tied to a property and is created by a lead event, never by a parcel record alone. A row should include:
+
+- Property address (if available)
+- Owner (if available)
+- Lead type and subtype (operator-readable name — Section 4.13)
+- Event date
+- Source name and source URL
+- Document type, document number (if available)
+- Case number (if available)
+- Recording date (if available)
+- Event proof
+- Enrichment fields (assessed value, equity proxy, owner mailing — supportive context only)
+- Source proof reference
+
+Parcel records alone cannot create dashboard rows. If primary lead sources are blocked, dashboard build is paused.
+
+---
+
+## 4.12. VIP-friendly Phase 0 result message (v5.0.0+)
+
+At the end of Phase 0, Claude Code outputs a plain-English verdict, not a JSON dump. Format:
+
+```
+Phase 0 completed.
+
+County build verdict: <BUILD_VERDICT>
+
+Reason:
+- <plain English statement about each P0 source>
+- <plain English statement about enrichment availability>
+- <plain English statement about why this verdict was chosen>
+
+Recommended next action:
+<one-sentence recommendation in operator language>
+```
+
+Example:
+
+```
+Phase 0 completed.
+
+County build verdict: WAITING_ON_ACCESS
+
+Reason:
+- The clerk recorder portal was found and verified, but document access requires login or CAPTCHA.
+- Tax delinquency source was verified and publicly searchable.
+- GIS source was verified but is enrichment only.
+- No dashboard should be built yet because the primary clerk source is access-constrained.
+
+Recommended next action:
+Run portal fingerprinting on the clerk source and decide whether to use seeded session, CAPTCHA solver, operator login, or another approved access path.
+```
+
+Then stop. Do not advance to Phase 1.
+
+---
+
+## 4.13. Operator-readable lead names (v5.0.0+)
+
+Never show internal lead codes (e.g. `jfc`, `lp`, `lr`, raw clerk doc-type abbreviations) to operators in dashboard text or operator-facing reports. Internal codes can be stored in the data layer; they must be translated to operator-readable names before rendering.
+
+Required readable names (extend per-county as needed):
+
+- `Foreclosure`
+- `Tax Delinquency`
+- `Tax Lien`
+- `Judgment`
+- `Lis Pendens`
+- `Probate`
+- `Estate`
+- `Construction Lien`
+- `Federal Tax Lien`
+- `Code Violation`
+- `Demolition`
+- `Condemnation`
+- `Vacant`
+- `Absentee`
+- `Out of State Owner`
+
+The translation table lives in `knowledge_base/domain/08_document_normalization.md` (universal) plus per-county overrides in `doc_type_synonyms` within the source block.
+
+---
+
+## 4.14. Phase 0.5 — Auto-Resolve Blockers (v5.1.0-beta+)
+
+Phase 0.5 runs after Phase 0 Source Verification and before Build Mode. Its purpose: when Phase 0 surfaces blocked, ambiguous, dead, wrong-category, or access-constrained primary lead sources, the framework attempts approved resolution paths before declaring a stop verdict.
+
+**The system does not stop at the first blocker.** It attempts to solve each blocker using approved framework paths. It stops only when the remaining issue requires operator action, credentials, payment, manual assistance, or a path that is not allowed.
+
+### Phase 0.5 flow
+
+1. Read every source proof packet produced by Phase 0
+2. For each source whose `source_role` is `BLOCKED_SOURCE`, or whose `verification_confidence` is `LOW`/`BLOCKED`, classify the blocker
+3. Set `blocker_type` on the source (technical vs permission vs not-found vs ambiguous)
+4. For technical blockers, attempt resolution strategies in approved order
+5. For permission blockers, record the requirement and stop attempting (operator must approve credentials/payment/manual path)
+6. Record every attempt in `auto_resolve_attempts` array on the source
+7. Update the source's `source_role`, `verification_confidence`, `access_method`, `public_access_status`, `document_access_status`, and `auto_resolve_status` based on resolution outcome
+8. Update top-level `auto_resolve_status` and `final_resolution_status` for the county
+9. Recompute `build_verdict` — Phase 0.5 may upgrade `WAITING_ON_ACCESS` to `AUTO_RESOLVED_READY_TO_BUILD`, `PARTIALLY_RESOLVED_BUILDABLE`, or downgrade to `AUTO_RESOLVE_FAILED`
+
+### Blocker classification — `blocker_type`
+
+**Technical blockers** (auto-resolvable): JavaScript-rendered portal, pagination, hidden API, session cookies, public CAPTCHA with approved solver enabled, WAF with approved proxy/stealth enabled, document viewer extraction, PDF parsing, CSV download, API endpoint discovery, wrong landing page, generic department homepage, missing vendor link, dead source with discoverable official replacement, portal moved to new official vendor URL, public records search buried behind official site navigation.
+
+**Permission blockers** (require operator approval/credentials/payment): paid subscription, clerk-approved login, private account, operator credentials needed, restricted document image access, subscription-only search, terms-gated access requiring human approval, account creation requiring identity verification or payment, manual government form required, identity-verified account access.
+
+Other `blocker_type` values: `SOURCE_NOT_FOUND`, `SOURCE_AMBIGUOUS`, `SOURCE_DEAD`, `SOURCE_WRONG_CATEGORY`, `SOURCE_ENRICHMENT_ONLY`, `SOURCE_VERIFIED_BUT_NOT_BUILDABLE`, `NO_PRIMARY_LEAD_SOURCE`, `PORTAL_PROOF_MISSING`, `DOCUMENT_ACCESS_LOCKED`, `PUBLIC_ACCESS_UNCLEAR`, `PAID_ACCESS_REQUIRED`, `OPERATOR_CREDENTIAL_REQUIRED`, `MANUAL_ASSISTANCE_REQUIRED`.
+
+### Approved resolution order
+
+The `strategy` field on each `auto_resolve_attempts` entry must come from this enum, attempted in this order (cheapest/safest first):
+
+1. `find_official_vendor_link` — re-walk the official county/state/court page for a vendor-portal link
+2. `replace_homepage_with_record_portal` — replace a generic department homepage with the actual record search portal
+3. `discover_public_search_endpoint` — locate the actual `/search.aspx`, `/records`, or equivalent endpoint
+4. `inspect_network_requests` — view-source / Network-tab analysis for hidden XHR calls
+5. `discover_hidden_api` — locate an undocumented API endpoint serving the portal
+6. `use_playwright` — JS-rendered portals
+7. `use_session_cookie` — replay cookies from operator browser session
+8. `use_seeded_session` — operator-initiated login replayed by framework
+9. `use_captcha_solver` — only if `captcha_solver_allowed` is true in framework version locks
+10. `use_stealth_browser` — only if `stealth_browser_allowed` is true
+11. `use_residential_proxy` — only if `residential_proxy_allowed` is true
+12. `use_operator_login` — only if operator has declared credentials
+13. `request_free_account` — only if operator pre-approves account creation
+14. `use_paid_subscription_if_operator_provides` — only if operator provides authorized credentials
+15. `manual_operator_assisted_pull` — operator downloads file by hand into `runs/<slug>/manual_uploads/`
+16. `standing_records_delivery` — official recurring email/SFTP delivery configured
+17. `public_records_request_last_resort` — formal records request (last resort, never default)
+18. `mark_not_available` — only after all approved paths exhausted
+
+**Public records request is never the default.** It is a final last resort when a real portal exists but remains unsolved after technical access attempts. It can be a primary configured channel only when no usable portal exists or when official recurring records delivery is the actual source.
+
+### Cost gating
+
+Before attempting strategies in the paid/operator-credential tier (steps 9–14 above), check the source's `estimated_cost_category`:
+
+- `FREE` or `LOW` — proceed without operator prompt
+- `MEDIUM`, `HIGH`, or `UNKNOWN` — stop and request operator approval before attempting
+- `REQUIRES_OPERATOR_APPROVAL` — stop and request approval
+
+### Auto-resolve status — `auto_resolve_status` (per source AND county-level)
+
+Values: `NOT_ATTEMPTED`, `ATTEMPTING`, `RESOLVED`, `PARTIALLY_RESOLVED`, `FAILED`, `REQUIRES_OPERATOR_APPROVAL`, `REQUIRES_CREDENTIALS`, `REQUIRES_PAYMENT`, `REQUIRES_MANUAL_ASSISTANCE`, `NOT_ALLOWED`.
+
+### Final resolution status — `final_resolution_status`
+
+Values: `RESOLVED`, `PARTIALLY_RESOLVED`, `UNRESOLVED_TECHNICAL`, `UNRESOLVED_PERMISSION`, `UNRESOLVED_NOT_FOUND`, `UNRESOLVED_NOT_ALLOWED`, `OPERATOR_REQUIRED`, `CREDENTIALS_REQUIRED`, `PAYMENT_REQUIRED`, `MANUAL_ASSISTANCE_REQUIRED`.
+
+### New build verdicts
+
+The Build Eligibility Gate (Section 4.10) gains three v5.1.0-beta verdict values:
+
+- **`AUTO_RESOLVED_READY_TO_BUILD`** — Phase 0 detected blockers; Phase 0.5 resolved them via approved paths; at least one primary lead source is now accessible.
+- **`PARTIALLY_RESOLVED_BUILDABLE`** — Some blockers remain, but at least one primary lead source is verified and accessible enough to build from. A Partial Build (Section 4.16) is permitted.
+- **`AUTO_RESOLVE_FAILED`** — Approved resolution paths were attempted; no primary lead source can be accessed without operator action.
+
+### Updated Do Not Proceed Matrix
+
+In addition to Section 4.11 conditions, after Phase 0.5 the system does NOT proceed to Build Mode if:
+
+- No primary lead source is accessible after Phase 0.5
+- Only enrichment sources are accessible
+- Permission blockers require credentials and credentials are not declared
+- Paid access is required and the operator has not provided authorized credentials
+- The only remaining path is public records request and no standing-delivery source is configured
+- Only manual-assisted pull is possible and no manual file has been provided yet
+- Dashboard would contain zero event-based leads
+- Source proof packet is incomplete for every primary source
+
+---
+
+## 4.15. Build Mode Approval Gate (v5.1.0-beta+)
+
+After Phase 0 and Phase 0.5 complete, Claude Code **stops and asks for explicit operator approval** before entering Build Mode. Build Mode includes portal fingerprinting, scraper adapter selection, scraper building, normalization, enrichment, dashboard, heartbeat, deployment, scheduler, and production verification.
+
+The approval prompt has a specific shape:
+
+```
+Phase 0 and Phase 0.5 are complete.
+
+Build verdict: <build_verdict>
+
+Summary:
+- <one line per primary source: status + accessibility>
+- <one line on enrichment sources>
+- <one line on blocked sources awaiting operator action>
+
+Build label if approved: <FULL_BUILD | PARTIAL_BUILD | SOURCE_LIMITED | PRIMARY_SOURCE_PENDING>
+
+Do you want me to enter Build Mode <with these sources / with the accessible primary source only / not yet>?
+```
+
+Claude Code waits for explicit "yes proceed" / "proceed partial" / "stop" before continuing. Implicit approval is not accepted.
+
+---
+
+## 4.16. Partial Build Contract (v5.1.0-beta+)
+
+If at least one primary lead source is accessible, the system may build from that source while marking blocked primary sources as pending. If zero primary lead sources are accessible, the system must stop — no exceptions.
+
+Partial builds must label the dashboard with one of:
+
+- `PARTIAL_BUILD` — at least one primary source active, others pending
+- `SOURCE_LIMITED` — only one primary source; pipeline narrower than typical
+- `PRIMARY_SOURCE_PENDING` — operator credentials/payment needed to unlock additional primary sources
+
+The `dashboard.build_label` field in the county config records this. The dashboard renders a status banner reflecting the label.
+
+A partial-build dashboard must surface:
+
+- Which primary sources are active
+- Which primary sources are blocked
+- Which sources are pending operator action (credentials / payment / manual)
+- Which enrichment layers are attached
+- What the dashboard does NOT include
+
+Partial builds **cannot** fill the dashboard with enrichment records as leads. The clerk-driven product rule (Section 4) holds regardless of build label.
+
+---
+
+## 4.17. Evidence-First Dashboard Row Contract (v5.1.0-beta+)
+
+Every dashboard row must be created by a lead event and must answer the question: **why is this row here?**
+
+A valid dashboard row contains:
+
+- `lead_event_id` — unique identifier for the originating event
+- `property_address` (if available)
+- `owner` (if available)
+- `lead_type` — operator-readable name (Section 4.13)
+- `lead_subtype` — operator-readable variant if applicable
+- `event_date` — when the event was recorded/filed
+- `source_name` — operator-readable source label
+- `source_url` — link to the originating portal (or pointer to manual upload)
+- `source_role` — must be `PRIMARY_LEAD_SOURCE` or `SUPPORTING_LEAD_SOURCE` (Section 4.7 Layer 4)
+- `document_type` (if available)
+- `document_number` (if available)
+- `case_number` (if available)
+- `recording_date` (if available)
+- `event_proof` — pointer to the evidence ledger entry
+- `source_proof_reference` — pointer to the source's Phase 0 proof packet
+- `enrichment_fields` — assessed value, equity proxy, owner mailing — supportive context ONLY
+- `lifecycle_status` — `ACTIVE`/`CURED`/`RELEASED`/etc. (Section 4.18)
+- `last_verified_at`
+- `confidence_level`
+
+If there is no event proof, the row does not exist as a lead row. Parcel records alone cannot create dashboard rows.
+
+---
+
+## 4.18. Lead lifecycle and suppression (v5.1.0-beta+)
+
+A lead event has a lifecycle. `lifecycle_status` values: `ACTIVE`, `PENDING`, `CURED`, `RELEASED`, `SATISFIED`, `CANCELLED`, `DISMISSED`, `SOLD`, `EXPIRED`, `SUPERSEDED`, `UNKNOWN`.
+
+The framework detects and suppresses cured/closed events where the source provides the signal:
+
+- Lien recorded → lien released → suppress
+- Judgment entered → judgment satisfied → suppress
+- Foreclosure sale scheduled → canceled → suppress
+- Tax delinquency → paid → suppress
+- Probate opened → estate closed → suppress (most cases; estate-distribution edge cases may remain LEAD)
+- Code violation → resolved → suppress
+- Auction → completed → suppress
+- Case → dismissed → suppress
+
+Suppressed leads are **not deleted**. They are retained with `lifecycle_status` and `suppression_reason` for audit. `suppression_reason` values: `released`, `satisfied`, `paid`, `cancelled`, `dismissed`, `sold`, `expired`, `superseded`, `manual_review`, `unknown`.
+
+The dashboard's default view (Client View) hides suppressed rows. Operator View shows them.
+
+---
+
+## 4.19. Source freshness contract (v5.1.0-beta+)
+
+Every source has a freshness expectation. Fields on the source block:
+
+- `expected_refresh_cadence` — `REAL_TIME`, `DAILY`, `WEEKLY`, `MONTHLY`, `REQUEST_BASED`, `MANUAL`, `UNKNOWN`
+- `stale_after_hours` — integer; how many hours without a successful fetch before marking stale (cadence-aware: weekly sources are not stale at 24h)
+- `last_successful_fetch_at` — ISO timestamp
+- `last_attempted_fetch_at` — ISO timestamp
+- `last_record_seen_at` — ISO timestamp
+- `source_freshness_status` — `FRESH`, `STALE`, `OVERDUE`, `FAILED`, `PAUSED`, `UNKNOWN`
+
+The refresh harness updates these fields each run. The watchdog (Section 4.21) alerts when a source's `source_freshness_status` is `STALE`, `OVERDUE`, or `FAILED`.
+
+### Per-source TTL and stale record expiration
+
+Some sources publish lists that go stale (sheriff sale calendars, auction lists, tax sale lists, code violation lists, foreclosure sale calendars, PDF publication lists). Each source can define:
+
+- `record_ttl_days` — records older than this become candidates for expiration
+- `expire_if_not_seen_runs` — records absent from N consecutive runs become candidates
+- `stale_record_policy` — `KEEP_UNTIL_RELEASED`, `EXPIRE_IF_NOT_SEEN`, `EXPIRE_AFTER_TTL`, `MANUAL_REVIEW`, `NEVER_EXPIRE`
+
+Old auction records do not live forever as active leads.
+
+---
+
+## 4.20. Source kill switch and quarantine (v5.1.0-beta+)
+
+Sources can be quarantined without killing the entire county build. Fields:
+
+- `enabled` (existing)
+- `paused_reason` (existing)
+- `pause_until` (existing)
+- `allowed_to_export` (existing)
+- `quarantine_status` — `NOT_QUARANTINED`, `QUARANTINED`, `UNDER_REVIEW`, `RELEASED`
+- `quarantine_reason` — free text
+
+If a source produces bad data or fails verification, the framework can quarantine that source. Quarantined sources do NOT export to dashboard or CRM unless the operator explicitly overrides via the operator override audit trail (Section 4.22).
+
+---
+
+## 4.21. Production self-verification + watchdog + rollback (v5.1.0-beta+)
+
+**This section is partially deferred to v5.2.0** (see Deferred section at end of this document). The framework defines the contract here; the operational scripts ship as stubs in v5.1.0-beta and as fully-functional binaries in v5.2.0 after the first county build exposes the real failure modes.
+
+### Phase 6.5 — Production self-verification (contract)
+
+After dashboard build and before declaring the build complete, Phase 6.5 must verify the actual built output, not just the data files. The verification runs against the live dashboard URL (or local file path for pre-deploy testing).
+
+Required checks:
+
+1. Dashboard loads without console errors
+2. `leads.json` (or data payload) loads
+3. At least one event-based lead row renders if lead data exists
+4. Empty state renders correctly if no leads exist
+5. Filter count matches table row count (Two-Truths invariant, Section 5)
+6. CSV export works
+7. Source proof links render
+8. No enrichment-only rows shown as leads
+9. Client View renders
+10. Operator View renders
+11. Dashboard status banner displays for `PARTIAL_BUILD`, `SOURCE_LIMITED`, `PRIMARY_SOURCE_PENDING`
+12. Build manifest is present
+13. Heartbeat file is present
+14. No broken static asset paths
+15. No uncaught JavaScript errors
+
+Recorded in `deployment.production_verification_status`: `NOT_RUN`, `PASSED`, `FAILED`, `PRODUCTION_VERIFICATION_BLOCKED`.
+
+If verification cannot run because dependencies are missing (no Playwright, etc.), the status is `PRODUCTION_VERIFICATION_BLOCKED` with a clear missing-dependencies report. The framework does NOT declare a build complete with `PRODUCTION_VERIFICATION_BLOCKED`.
+
+Reference implementation: `scaffold/ops/verify_live.py` (v5.1.0-beta ships as a stub with the CLI surface; v5.2.0 ships the working Playwright check).
+
+### Scheduled task test fire (contract)
+
+If the build creates a scheduled refresh task (Windows Task Scheduler, cron, GitHub Action, etc.), the build must test-fire the task before declaring done. `deployment.scheduler_runtime_class` records the classification:
+
+- `RUNS_WHEN_LOGGED_IN_ONLY` — Windows Task Scheduler default; insufficient for production
+- `RUNS_WHEN_LOCKED` — Windows task configured with stored credentials; acceptable for desktop ops
+- `RUNS_ON_GITHUB_ACTIONS` — preferred for daily refresh
+- `RUNS_ON_SERVER` — VPS cron or systemd timer
+- `SCHEDULER_NOT_CONFIGURED` — refresh is manual
+- `SCHEDULER_REQUIRES_OPERATOR_CREDENTIALS` — scheduler depends on undeclared operator credentials; must be resolved before declaring done
+
+### Watchdog (contract)
+
+Reference implementation: `scaffold/ops/watchdog.py` (v5.1.0-beta stub; v5.2.0 working).
+
+Watchdog checks (post-deploy, continuous):
+
+- Dashboard live
+- Data file live
+- Heartbeat freshness
+- Console errors
+- Record count anomaly
+- Source failure
+- CSV export
+- Critical source freshness
+- Build manifest status
+
+On failure: mark build unhealthy → alert operator → rollback to last-known-good if configured → quarantine source if issue is source-specific → write watchdog report.
+
+### Last-known-good rollback
+
+The system preserves:
+
+- `last_known_good_dashboard_at` — timestamp of last verified-good dashboard
+- `last_known_good_commit` — git commit hash if git-based
+- last-known-good `data/leads.json` snapshot
+
+If a new build fails verification, the framework does NOT replace the last-known-good build.
+
+---
+
+## 4.22. Operator override audit trail (v5.1.0-beta+)
+
+If the operator overrides a warning, the override is logged in the county config's `operator_override_audit` array. Each entry:
+
+- `override_id` — unique
+- `operator_name` — if provided
+- `timestamp` — ISO 8601
+- `source_id` — which source the override applies to
+- `reason` — operator's stated reason
+- `risk` — what the framework warned about
+- `what_was_allowed` — which action proceeded under the override
+- `what_remains_blocked` — what the override did NOT unblock
+- `dashboard_label_required` — `PARTIAL_BUILD` / `SOURCE_LIMITED` / `PRIMARY_SOURCE_PENDING` / `""`
+
+Operator overrides are never silent. The audit trail is committed to the county config.
+
+---
+
+## 4.23. Manual Assisted Pull Mode (v5.1.0-beta+)
+
+Some sources cannot be fully automated but can be used if the operator downloads a file manually. Manual uploads land in:
+
+```
+runs/<county_slug>/manual_uploads/
+```
+
+Accepted formats: CSV, XLSX, PDF, HTML export, TXT, ZIP.
+
+The framework, when configured for Manual Assisted Pull on a source:
+
+- Detects new files in the manual upload directory
+- Records `manual_upload_path` and `manual_upload_received_at` on the source
+- Normalizes the manual file using existing document-normalization rules
+- Marks the source as `auto_resolve_status: REQUIRES_MANUAL_ASSISTANCE` until a manual upload arrives, then transitions to `RESOLVED`
+- Includes the manual upload in the audit trail
+
+Manual Assisted Pull is acceptable only if the dashboard clearly labels the source as manual-operator-assisted. The framework does not pretend a manually-uploaded source is automated.
+
+---
+
+## 4.24. Vendor portal library (v5.1.0-beta+)
+
+The framework ships a baseline catalog of common county portal vendors at `knowledge_base/engineering/08_vendor_portal_library.md`. Each entry contains:
+
+- How to identify it
+- Typical source types
+- Common URL patterns
+- Common access method
+- Common blockers
+- Whether document images are typically public or locked
+- Whether login is common
+- Whether paid access is common
+- Possible adapter families
+- Notes
+
+Baseline vendors: Tyler Technologies, Landmark, Aumentum, GovOS, Kofile, CountyFusion, Fidlar, CivilView, RealAuction, ArcGIS, Accela, EnerGov.
+
+Phase 0 reads this library to recognize known vendor families and pre-populate `portal_family`, `recommended_adapter`, and `known_blockers` on the source proof packet.
+
+**No county-specific examples in the vendor library.** Patterns only.
+
+---
+
+## 4.25. Cost and runtime guardrails (v5.1.0-beta+)
+
+Before attempting expensive resolution paths, the framework estimates or flags cost via `estimated_cost_category` on the source block.
+
+`estimated_cost_category` values: `FREE`, `LOW`, `MEDIUM`, `HIGH`, `UNKNOWN`, `REQUIRES_OPERATOR_APPROVAL`.
+
+The framework requests operator approval before using cost-bearing paths unless those paths are pre-approved in the source config (operator-declared API keys, CAPTCHA solver budget, etc.).
+
+The framework also estimates `estimated_runtime_minutes` for the recon and build phases so the operator can plan around them.
+
+---
+
+## 4.26. VIP-friendly failure messages (v5.1.0-beta+)
+
+Failure messages do not sound like broken automation. They explain that the framework protected the build by stopping when it should.
+
+Example after Phase 0.5 hits a permission blocker:
+
+```
+Phase 0.5 completed.
+
+I found the official clerk recorder portal for <County>, <State>, and confirmed it is the correct primary lead source.
+
+However, document access requires clerk-approved login, and no operator credential has been declared.
+
+I attempted the approved public access paths (find-official-vendor-link, discover-public-search-endpoint, inspect-network-requests, hidden-API discovery). None succeeded without credentials.
+
+I am stopping before creating a misleading dashboard.
+
+Recommended next action: Provide authorized clerk credentials, or approve Manual Assisted Pull Mode (download files by hand into runs/<slug>/manual_uploads/).
+```
+
+The message tone is operator-to-operator. Never "I failed." Always "Here is what I found, here is what I tried, here is what you need to decide."
+
+---
+
+## 4.27. v5.2.0 deferred (intentionally not implemented in v5.1.0-beta)
+
+These items from the v5.1.0-beta spec are **intentionally deferred** to v5.2.0. They are documented here so the operator knows the framework is not pretending they're done:
+
+1. **`scaffold/ops/verify_live.py`** — ships as a stub with CLI surface only. Full Playwright-based dashboard verification deferred to v5.2.0 because real verification requires a live deployed dashboard to test against, which no county build has produced yet.
+
+2. **`scaffold/ops/watchdog.py`** — ships as a stub with CLI surface only. Full watchdog deferred to v5.2.0 because watchdog rules depend on real failure modes observed from real production runs.
+
+3. **Last-known-good rollback execution** — the schema fields (`last_known_good_commit`, `last_known_good_dashboard_at`) ship. The rollback EXECUTION (the git-revert-and-redeploy machinery) ships in v5.2.0 after the first successful production deploy.
+
+4. **Alert layer pluggable channels** — Telegram/email/Slack/GitHub-issue/local-report channels referenced in MASTER_PROMPT and schema but not implemented. v5.2.0 ships the alert dispatcher.
+
+5. **Data quality regression checks** — the contract is defined (record count anomaly, doc-type mix changes, etc.) but the actual regression engine ships in v5.2.0 after we have at least one prior run to compare against.
+
+6. **Portal fingerprint cache reuse across runs** — the schema fields ship. The "reuse cached fingerprint instead of re-fingerprinting" optimization ships in v5.2.0.
+
+7. **County source memory across runs** — the schema supports it (existing config is read on subsequent runs). The "smart re-recon that only re-verifies changed sources" optimization ships in v5.2.0.
+
+8. **Run manifest + audit pack file generation** — `runs/<slug>/manifests/` and `runs/<slug>/reports/` directory conventions are documented in MIGRATION.md. The framework-generated audit pack ships in v5.2.0.
+
+The reason these defer to v5.2.0: every one of them depends on data we cannot generate in this patch session. Real production failure modes come from real production. Building these blind would mean shipping broken watchdog rules and pretending we tested them.
+
+---
+
 ## 5. Two-Truths invariant
 
 The dashboard's filter counts and the rendered table must come from the same `matches()` function. Header counts in `leads.json` (`pattern_counts`, `attribute_counts`, etc.) must equal counts re-derived from `records[]`. The pipeline writes both; the build script asserts equality before saving and exits non-zero on drift.
