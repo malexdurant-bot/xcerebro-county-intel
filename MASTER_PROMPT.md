@@ -119,15 +119,15 @@ This is the ONLY script Claude Code may run autonomously on first contact. The b
 
 When Claude Code requests permission to run the bootstrap, the operator approves once. After approval, the script runs to completion in seconds.
 
-**Step 4 — Read the launch file.** After bootstrap completes, Claude Code reads `runs/<county_slug>/LAUNCH_<COUNTY_SLUG>.md`. That launch file scopes the run to Phase 0 only and embeds the clerk-driven product rule.
+**Step 4 — Read the launch file.** After bootstrap completes, Claude Code reads `runs/<county_slug>/LAUNCH_<COUNTY_SLUG>.md`. That launch file scopes the run to Phase 0 only and embeds the clerk-driven product rule. It also reads `runs/<county_slug>/operator_notes.md` (created empty by the bootstrap; see Section 4.30) so any prior operator-volunteered knowledge is in context.
 
-**Step 5 — Proceed to Phase 0.** Claude Code now begins Phase 0 Step 1 (Inspect) per Section 6 of this prompt. Phase 0 runs autonomously through its four steps and produces source proof packets per Section 4.7 (Verification Gate).
+**Step 5 — Proceed to Phase 0.** Claude Code prints `PHASE 0 STARTING` (Section 4.29) and begins Phase 0 Step 1 (Inspect) per Section 6 of this prompt. Phase 0 runs autonomously through its four steps with labeled phase boundaries and produces source proof packets per Section 4.7 (Verification Gate).
 
-**Step 6 — Run Phase 0.5 if blockers detected (v5.1.0-beta+).** If any source has `verification_confidence` LOW/BLOCKED or `source_role` BLOCKED_SOURCE, automatically enter Phase 0.5 (Section 4.14). Phase 0.5 attempts approved resolution paths in order, records every attempt in `auto_resolve_attempts`, and updates `auto_resolve_status` per source and county-level. Phase 0.5 does NOT require operator approval to begin — it is the auto-resolve step.
+**Step 6 — Run Phase 0.5 if blockers detected (v5.1.0-beta+).** If any source has `verification_confidence` LOW/BLOCKED or `source_role` BLOCKED_SOURCE, Claude Code prints `PHASE 0.5 STARTING — AUTO-RESOLVE BLOCKERS` and automatically enters Phase 0.5 (Section 4.14). Phase 0.5 attempts approved resolution paths in order, records every attempt in `auto_resolve_attempts`, and updates `auto_resolve_status` per source and county-level. Phase 0.5 does NOT require operator approval to begin — it is the auto-resolve step. When complete, Claude Code prints `PHASE 0.5 COMPLETE`. If no blockers were detected, Phase 0.5 is skipped and Claude Code prints `PHASE 0.5 SKIPPED — NO BLOCKERS`.
 
-**Step 7 — Produce final build verdict.** After Phase 0.5 completes (or after Phase 0 if no blockers), Claude Code computes the final `build_verdict` (Section 4.10, including v5.1.0-beta values `AUTO_RESOLVED_READY_TO_BUILD`, `PARTIALLY_RESOLVED_BUILDABLE`, `AUTO_RESOLVE_FAILED`). It writes the verdict, reason, and timestamp to the county config.
+**Step 7 — Produce final build verdict and write the populated county config.** After Phase 0.5 completes (or after Phase 0 if no blockers), Claude Code computes the final `build_verdict` (Section 4.10) and writes the populated county config via `scaffold/ops/write_county_config.py` — NOT via the streaming Write tool (Section 4.28). Claude Code prints the `WriteResult.summary()` block to the operator. If the writer returns `JSON_INVALID` or `SCHEMA_INVALID`, Claude Code attempts exactly one structured repair per Section 4.28.4, then stops with `CONFIG_WRITE_FAILED` if the second attempt also fails.
 
-**Step 8 — Build Mode Approval Gate (Section 4.15).** Claude Code prints the VIP-friendly verdict message (Section 4.12 / 4.26) and STOPS. It does NOT enter Build Mode without explicit operator approval. The approval prompt has the shape defined in Section 4.15. **Claude Code does not advance to Phase 1 / Build Mode without an explicit operator instruction.**
+**Step 8 — Build Mode Approval Gate (Section 4.15).** Claude Code prints `BUILD MODE APPROVAL GATE` (Section 4.29), then the VIP-friendly verdict message (Section 4.12 / 4.26), and STOPS. It does NOT enter Build Mode without explicit operator approval. The approval prompt has the shape defined in Section 4.15. **Claude Code does not advance to Phase 1 / Build Mode without an explicit operator instruction.**
 
 **What Claude Code is NOT authorized to do autonomously on first run:**
 
@@ -906,6 +906,148 @@ The reason these defer to v5.2.0: every one of them depends on data we cannot ge
 
 ---
 
+## 4.28. Execution reliability — county config write strategy (v5.1.1-beta+)
+
+This section was added in **v5.1.1-beta** after a real Phase 0 run surfaced a reproducible failure: Claude Code's text-streaming `Write` tool can corrupt a large nested JSON file by emitting a duplicated block of keys near the bottom of the file (observed at roughly 750 lines). The framework's verification gate caught the corruption, so no broken config reached disk — but the autonomous loop stalled because Claude Code had no recovery path other than regenerating the same broken way.
+
+v5.1.1-beta closes that gap with a small set of locked rules. These rules are NOT a new architecture, NOT a repositioning of the product, and NOT a license to expand scope. They patch one specific execution failure.
+
+**Locked rule 4.28.1 — How to write a populated county config.**
+
+Claude Code MUST write a populated `config/counties/<county_slug>.json` via `scaffold/ops/write_county_config.py`, never via its text-streaming file-write tool. The required flow is:
+
+1. Build the full county config as a Python dict in memory. Because Python dicts cannot contain duplicate keys at any nesting level, the source structure is guaranteed valid by construction.
+2. Call `scaffold/ops/write_county_config.write_county_config(config_dict, target_path, schema_path=...)`. Either:
+   - As an `import` from a Python script invoked via the Bash tool, or
+   - Via the writer's CLI: `python scaffold/ops/write_county_config.py --input-json <dict_dump> --target <path> --schema config/counties/_schema.json`.
+3. The writer performs:
+   - `json.dump` to a temp file in the target directory
+   - JSON syntax validation by re-reading the temp file
+   - Optional schema validation against `_schema.json` (graceful skip if `jsonschema` is not installed)
+   - Atomic move of the temp file to the final path
+4. The writer returns a `WriteResult` with `status`, `schema_validation`, `bytes_written`, `top_level_key_count`, `source_names`, `build_verdict`, `operator_override_count`, `errors`, and `notes`. Claude Code MUST print this result block to the operator after every config write.
+
+**Locked rule 4.28.2 — Never stream large JSON.**
+
+Claude Code MUST NOT use any text-streaming file-write tool for a county config larger than 100 lines. The 100-line threshold is conservative; almost every real county config will exceed it. If Claude Code is unable to import the writer module (e.g. the operator is running in a restricted sandbox), Claude Code MUST stop, report `CONFIG_WRITE_FAILED — writer module unavailable`, and ask the operator how to proceed. It does NOT fall back to the streaming tool.
+
+**Locked rule 4.28.3 — Schema validation is optional and graceful.**
+
+If `jsonschema` is installed in the local environment, the writer performs full schema validation and reports `schema_validation: VALIDATED`. If `jsonschema` is missing, the writer reports `schema_validation: SCHEMA_VALIDATION_SKIPPED` along with the note that JSON syntax validation still passed. **The framework does NOT auto-install `jsonschema`** because the one-sentence autonomous flow does not assume an internet-connected package install on the operator's machine. A `SCHEMA_VALIDATION_SKIPPED` result is not a failure; the config is still written.
+
+**Locked rule 4.28.4 — Structured repair: exactly one attempt.**
+
+If the writer returns `JSON_INVALID` or `SCHEMA_INVALID`, Claude Code may attempt **exactly one** structured repair. The repair MUST:
+
+- Re-build the Python dict in memory (do not edit the temp file directly).
+- Call the same `write_county_config` function.
+- NOT fall back to the text-streaming Write tool.
+- NOT introduce a different serialization strategy (no YAML, no toml, no hand-written JSON).
+
+If the second attempt also fails, Claude Code MUST stop, write `runs/<slug>/CONFIG_WRITE_FAILED.md` documenting both attempts, print the final `WriteResult.summary()` block, and surface the failure to the operator. It does NOT try a third time. It does NOT proceed to Phase 1 / Build Mode. It does NOT pretend the config was written.
+
+**Locked rule 4.28.5 — Atomic move semantics.**
+
+The writer guarantees that an existing `config/counties/<county_slug>.json` is never half-overwritten. The final move only happens after validation succeeds. If validation fails, the temp file is left in place for operator inspection and the existing config (if any) is untouched.
+
+**Locked rule 4.28.6 — Overwrite is explicit.**
+
+Re-running Phase 0 on a county that already has a populated config requires the caller to pass `overwrite=True` to the writer. Otherwise the writer returns `PATH_EXISTS_NO_OVERWRITE` and refuses. This protects operator-applied edits from being silently overwritten by a re-recon.
+
+This rule chain is enforced by `scaffold/tests/test_write_county_config.py`, which exercises the happy path, the overwrite guard, the non-dict-input rejection, the missing-schema-file graceful path, the with-jsonschema validation branch, and the dict-cannot-contain-duplicate-keys structural invariant.
+
+---
+
+## 4.29. Phase label enforcement (v5.1.1-beta+)
+
+Phase 0 in v5.1.0-beta sometimes ran Phase 0.5 inline with Step 3 instead of as a labeled boundary. This wasn't structurally broken, but it made it hard for the operator to follow what was happening during a long autonomous run. v5.1.1-beta locks in explicit phase labels so an operator watching the screen always knows which step they're in.
+
+**Locked rule 4.29.1 — Claude Code MUST print labeled boundaries.**
+
+During an autonomous Phase 0 run, Claude Code MUST emit these exact phrase labels at the start and end of each phase, as plain-text lines in the terminal output:
+
+```
+PHASE 0 STARTING
+PHASE 0 STEP 1 — INSPECT
+PHASE 0 STEP 2 — RECON
+PHASE 0 STEP 3 — VERIFICATION GATE
+PHASE 0 COMPLETE
+
+PHASE 0.5 STARTING — AUTO-RESOLVE BLOCKERS
+PHASE 0.5 COMPLETE
+
+PHASE 0 STEP 4 — WRITE CONFIG, VERDICT, MANIFEST
+
+BUILD MODE APPROVAL GATE
+```
+
+These labels are not progress emoji; they are unambiguous status markers. Each label must appear on its own line, not embedded inside a paragraph. The operator should be able to scroll back through a long run and locate any phase boundary by searching for these exact strings.
+
+**Locked rule 4.29.2 — Phase 0.5 is a labeled boundary, not inline.**
+
+If any source has `verification_confidence: LOW`, `source_role: BLOCKED_SOURCE`, or a non-empty `blocker_type`, Phase 0.5 runs as a discrete labeled phase between Phase 0 Step 3 and Phase 0 Step 4. Claude Code MUST NOT interleave auto-resolve attempts inside Step 3's verification output. The `PHASE 0.5 STARTING` line must appear after the last Step 3 source verification and before any auto-resolve work.
+
+If no blockers were detected, Phase 0.5 is skipped and Claude Code prints `PHASE 0.5 SKIPPED — NO BLOCKERS`.
+
+**Locked rule 4.29.3 — Build Mode Approval Gate is always its own labeled boundary.**
+
+After Step 4 (writing the config), Claude Code MUST emit `BUILD MODE APPROVAL GATE` as a labeled line, then the VIP-friendly verdict message from Section 4.12 / 4.26, then stop. It MUST NOT print Phase 1 / Build Mode work before the gate label, even if the operator has previously granted blanket approvals for some tool categories.
+
+---
+
+## 4.30. Operator knowledge capture (v5.1.1-beta+)
+
+During a real Phase 0 run, the operator volunteered that a particular vendor portal was fully public and free for document images — knowledge that Claude Code could not have obtained from web search alone. v5.1.0-beta correctly captured this as an entry in the `operator_override_audit` array (which is a schema-level record of "operator authorized a confidence upgrade"). But operators also share lots of *casual* knowledge that doesn't rise to the level of a formal override: portal quirks, paid-tier costs they've previously evaluated, login workflows that work in their browser, manual-pull tricks, county personnel contacts, etc. v5.1.0-beta had no place to put that.
+
+v5.1.1-beta keeps the schema unchanged and adds a contextual capture file at the run level. Two channels with a clean separation of concerns:
+
+**Locked rule 4.30.1 — Two channels, two purposes.**
+
+- **`operator_override_audit` (schema-level, unchanged from v5.1.0-beta).** Records every operator override that CHANGES what the framework is allowed to do — e.g. upgrading a source's `verification_confidence`, marking a source `operator_override: true` to allow building from a source that would otherwise be blocked, authorizing a manual override of the Build Eligibility Gate. Every entry has `override_id`, `operator_name`, `timestamp`, `source_id`, `reason`, `risk`, `what_was_allowed`, `what_remains_blocked`, and `dashboard_label_required`.
+
+- **`runs/<county_slug>/operator_notes.md` (run-manifest level, new in v5.1.1-beta).** Records every CASUAL piece of operator knowledge that doesn't change framework behavior but is worth keeping for context. Examples: "Portal X requires accepting cookies before search works." "County Y publishes the new docket every Tuesday around 9 AM Central." "Operator personally knows the clerk and can request a CSV dump if the portal goes down." "Paid tier exists but is not worth it; the free tier returns everything."
+
+The schema is NOT modified. `operator_notes.md` is markdown, not JSON. It is human-authored or AI-captured prose, organized by source ID.
+
+**Locked rule 4.30.2 — Claude Code MUST capture casual operator knowledge.**
+
+When the operator volunteers information that is:
+
+- Specific to one or more sources for the current county
+- Operational in nature (access knowledge, portal knowledge, login knowledge, paid-tier knowledge, manual-pull tricks, refresh-cadence observations, personnel contacts, browser-specific quirks)
+- Not yet captured in `operator_override_audit`
+
+…Claude Code MUST append it to `runs/<county_slug>/operator_notes.md` under a section heading for the relevant source ID (or `## general` if it applies broadly). Claude Code should briefly summarize the operator's contribution in its own words and timestamp the entry. Claude Code MUST NOT silently ignore operator-volunteered knowledge by treating it as conversational chat.
+
+If the operator's volunteered information rises to the level of a confidence upgrade or behavioral override (e.g. "Treat this MEDIUM-confidence source as HIGH because I've used it for years"), Claude Code MUST also add an `operator_override_audit` entry. Both channels can be used for the same input.
+
+**Locked rule 4.30.3 — `operator_notes.md` is run-scoped, not framework-scoped.**
+
+`runs/<county_slug>/operator_notes.md` lives inside the county's run directory and travels with the county build. It does NOT get rolled up into the framework-wide knowledge base. If a piece of operator knowledge is broadly applicable across counties (e.g. "Tyler Odyssey portals always require cookies"), Claude Code may surface that observation to the operator at the end of Phase 0 and suggest the operator promote it to the framework knowledge base — but Claude Code does NOT silently promote anything. The operator owns what enters the framework knowledge base.
+
+**Locked rule 4.30.4 — Suggested template for `operator_notes.md`.**
+
+```
+# Operator notes — <County Name>, <State>
+
+This file captures operator-volunteered knowledge during Phase 0 that does
+not rise to the level of a schema-recorded operator override. It is a
+contextual companion to the county config, not a schema-validated artifact.
+
+## general
+
+(notes that apply across all sources)
+
+## <source_id>
+
+- **2026-05-14T01:30:55Z (operator-volunteered):** <summary in Claude Code's own words>
+- ...
+```
+
+This file is created by the bootstrap script when the run directory is created (empty template), populated by Claude Code during Phase 0 as operator knowledge surfaces, and read by Claude Code on subsequent runs of the same county before re-reconning.
+
+---
+
 ## 5. Two-Truths invariant
 
 The dashboard's filter counts and the rendered table must come from the same `matches()` function. Header counts in `leads.json` (`pattern_counts`, `attribute_counts`, etc.) must equal counts re-derived from `records[]`. The pipeline writes both; the build script asserts equality before saving and exits non-zero on drift.
@@ -942,7 +1084,7 @@ Write `RECON.md` documenting each source with:
 - `verification_note` — free-text note from the recon step (what you saw, what you confirmed)
 - `open_questions` — free-text questions the operator must answer before this source can ship
 
-**Step 3 — Save as county config.** Recon output becomes the populated county config at `config/counties/<county_slug>.json`. The recon does not produce a separate document; it produces this file directly. Copy from `config/counties/_template.json` as the starting skeleton, populate every required field.
+**Step 3 — Save as county config.** Recon output becomes the populated county config at `config/counties/<county_slug>.json`. The recon does not produce a separate document; it produces this file directly. Copy from `config/counties/_template.json` as the starting skeleton, populate every required field. **The county config MUST be written via `scaffold/ops/write_county_config.py` per Section 4.28 — never via Claude Code's text-streaming Write tool.** This is non-negotiable as of v5.1.1-beta.
 
 **Step 4 — Onboarding gate.** The build cannot proceed past Phase 0 until `config/counties/<county_slug>.json` validates against `config/counties/_schema.json` AND every required placeholder is filled. Required minimums for the gate to pass:
 
@@ -952,7 +1094,7 @@ Write `RECON.md` documenting each source with:
 - `storage.mode` is one of `STATIC_JSON_MODE`, `SUPABASE_MODE`, `HYBRID_MODE`
 - `client_access` config exists (per `architecture/11_database_and_storage.md`)
 
-Run `python3 -m jsonschema config/counties/_schema.json config/counties/<county_slug>.json` (or equivalent) and confirm zero errors before continuing.
+The `write_county_config` module performs the validation automatically via JSON syntax check (always) and `jsonschema` validation (if installed). If `jsonschema` is missing, the writer logs `SCHEMA_VALIDATION_SKIPPED` and the write proceeds — this is graceful by design (Section 4.28.3). If the operator wants strict validation, they install `jsonschema` locally. The framework does NOT auto-install dependencies.
 
 **Phase 0 hard rules:**
 

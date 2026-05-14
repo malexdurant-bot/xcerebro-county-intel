@@ -31,6 +31,17 @@ That's it. No PowerShell commands beyond `claude`. No JSON to edit by hand. No m
 
 > **Why the one-time approval click?** Claude Code asks before running shell commands by default — that's protection against destructive operations. The autonomous first-run grant is bounded to `scaffold/bootstrap_county.py` only, which creates a folder and a markdown file. Approve once and the bootstrap runs in seconds.
 
+### Autonomy boundaries (v5.1.1-beta)
+
+The first run is autonomous in the sense that you type one sentence and approve one bootstrap. Everything after that — source recon, 5-layer verification gate, auto-resolve of blockers, config writing, and the change manifest — runs hands-off.
+
+There are two boundaries operators should know about:
+
+1. **Claude Code may ask for approval to run bounded scripts.** During Phase 0, Claude Code may request permission for `web_search`, `web_fetch` against official portal domains, and one Python script call to atomically write the populated county config (via `scaffold/ops/write_county_config.py` — see MASTER_PROMPT Section 4.28). Approve broadly; the scope is bounded to the current county repo.
+2. **Claude Code stops on config-write failure.** If the writer returns `JSON_INVALID` or `SCHEMA_INVALID`, Claude Code attempts exactly one structured repair and then stops with `CONFIG_WRITE_FAILED` if the second attempt also fails. It does NOT silently proceed. Open the resulting `runs/<slug>/CONFIG_WRITE_FAILED.md` for diagnosis.
+
+Phase 0 ends at a Build Mode Approval Gate. Build Mode (scrapers, dashboards, deployment) only starts when the operator explicitly authorizes it.
+
 ---
 
 ## What this framework does

@@ -251,7 +251,29 @@ Edit `domain/00_client_business_model.md` (persona), `domain/04_deal_path_classi
 
 ## Versioning
 
-This is **v5.0.0**.
+This is **v5.1.1-beta**.
+
+**v5.1.1-beta changes from v5.1.0-beta** (execution reliability patch — no schema changes, no breaking changes):
+
+- Added MASTER_PROMPT.md Section 4.28 (Execution Reliability — county config write strategy). Locks in six rules: writer module is the only legitimate path for populated county configs; never stream large JSON via Write tool; schema validation is optional and graceful; structured repair is exactly one attempt; atomic move semantics; overwrite is explicit.
+- Added MASTER_PROMPT.md Section 4.29 (Phase Label Enforcement). Locks in exact phase-boundary phrases Claude Code must emit: `PHASE 0 STARTING`, `PHASE 0 STEP 1 — INSPECT`, `PHASE 0 STEP 2 — RECON`, `PHASE 0 STEP 3 — VERIFICATION GATE`, `PHASE 0 COMPLETE`, `PHASE 0.5 STARTING — AUTO-RESOLVE BLOCKERS` (or `PHASE 0.5 SKIPPED — NO BLOCKERS`), `PHASE 0.5 COMPLETE`, `PHASE 0 STEP 4 — WRITE CONFIG, VERDICT, MANIFEST`, `BUILD MODE APPROVAL GATE`. Phase 0.5 is a labeled boundary, never inline with Step 3.
+- Added MASTER_PROMPT.md Section 4.30 (Operator Knowledge Capture). Two channels with clean separation: `operator_override_audit` for schema-level overrides that change framework behavior; `runs/<county_slug>/operator_notes.md` for casual contextual knowledge. No schema change. Claude Code MUST capture operator-volunteered knowledge to the appropriate channel, never treat it as conversational chat.
+- Patched MASTER_PROMPT.md Section 4.5 (Autonomous First-Run Rule) Step 5–8 to reference the new writer module, the phase labels, and the operator notes file.
+- Patched MASTER_PROMPT.md Section 6 Phase 0 Step 3–4 to mandate the writer module and clarify the graceful schema-validation path.
+- New file: `scaffold/ops/write_county_config.py` — the atomic county config writer. Builds dict → json.dump to temp file → JSON syntax validation → optional schema validation (graceful skip if jsonschema missing) → atomic move. Returns a structured `WriteResult` with status, schema_validation, bytes_written, top_level_key_count, source_names, build_verdict, operator_override_count, errors, notes.
+- New file: `scaffold/tests/test_write_county_config.py` — gate test for the writer. 18 assertions across happy path, overwrite guard, non-dict input rejection, missing-schema graceful skip, jsonschema validation branch, and structural impossibility of duplicate keys.
+- Updated `scaffold/tests/run_all.py` to include the new writer test in the gate suite.
+- Updated `scaffold/bootstrap_county.py`:
+  - Framework version stamp bumped to `v5.1.1-beta`
+  - Now creates `runs/<slug>/operator_notes.md` template when bootstrapping
+  - Launch file template now embeds the v5.1.1-beta writer rule, phase label enforcement, and operator knowledge capture sections
+- Updated `START_HERE.md` with an autonomy-boundaries section explaining what "autonomous" means in v5.1.1-beta: one sentence, one approval, but Claude Code may stop on `CONFIG_WRITE_FAILED` and `jsonschema` is not auto-installed.
+- Updated `README.md` with a parallel autonomy-boundaries section in the Quick Start.
+- Bumped `FRAMEWORK_VERSION.json` to `v5.1.1-beta`, `locked_at` to `2026-05-14`.
+
+**This is NOT a schema change.** `_schema.json` and `_template.json` are unchanged. A v5.1.0-beta county config validates against the v5.1.1-beta schema without modification. Re-running Phase 0 on a v5.1.0-beta county now uses the atomic writer; the old config is preserved unless `overwrite=True` is passed explicitly.
+
+**v5.1.0-beta features preserved:** Phase 0.5 Auto-Resolve Blockers, Build Mode Approval Gate, Partial Build Contract, Evidence-First Dashboard Row Contract, Lead lifecycle and suppression, Source freshness contract, Source kill switch and quarantine, production self-verification stubs, `operator_override_audit`, Manual Assisted Pull Mode, Vendor portal library, Cost guardrails, VIP-friendly failure messages, v5.2.0 deferred catalog.
 
 **v5.0.0 changes from v4.1.0** (breaking schema change — v4.x configs need Phase 0 re-recon):
 

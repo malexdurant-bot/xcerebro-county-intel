@@ -50,6 +50,26 @@ Substitute your actual county and state. Claude Code will:
 
 You confirm the slug. You approve the bootstrap. Then you watch.
 
+### How "autonomous" is autonomous (v5.1.1-beta)
+
+The first run is autonomous in the sense that:
+
+- You only ever type ONE sentence — your county build instruction.
+- You only ever approve ONE shell command — the bootstrap script.
+- Everything else (recon, source verification, blocker auto-resolve, config writing, change manifest) runs hands-off.
+
+That said, Claude Code is still operating under a permission model that asks before running shell commands and before fetching web content. During Phase 0 you may see permission prompts for:
+
+- **Web search** — needed for source recon. Safe to approve broadly within the county repo directory.
+- **Web fetch** for official county / state / vendor portal URLs — needed for source verification. Safe to approve broadly for any `.gov`, `.org`, or recognized vendor portal domain.
+
+You may also see Claude Code stop and report an error in two specific cases (both v5.1.1-beta+ design):
+
+- **`CONFIG_WRITE_FAILED`** — Claude Code attempted to write the populated county config but validation failed twice. The framework will not silently proceed past a config-write failure. Open the resulting `runs/<slug>/CONFIG_WRITE_FAILED.md` for diagnosis.
+- **`SCHEMA_VALIDATION_SKIPPED`** in the writer output — `jsonschema` is not installed in your local Python environment. This is not an error; the config was still written and JSON syntax validation still passed. If you want strict schema validation, run `pip install jsonschema` once. The framework does not auto-install dependencies.
+
+Phase 0 stops at a Build Mode Approval Gate. Claude Code will NOT enter Build Mode (scrapers, dashboards, deployment) without an explicit operator instruction to proceed.
+
 ---
 
 ## If Claude Code gets the slug wrong
