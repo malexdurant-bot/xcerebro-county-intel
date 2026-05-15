@@ -8,6 +8,20 @@ or parcels per source_config.
 Intended for sources that don't have a queryable API — e.g. tax-roll
 exports, manual auction lists, operator-curated lead lists.
 
+CONTRACT (v5.1.2-beta-r2+): This translator consumes the framework-canonical
+WRAPPED RAW RECORD shape (MASTER_PROMPT §4.32):
+
+    {
+        "raw_record_id": "...",
+        "source_id": "...",
+        "raw_payload": {<normalized scraper-output fields>}
+    }
+
+For backward compatibility with pre-v5.1.2-beta-r2 CSV ingestion paths
+that emit records FLAT (no raw_payload wrapper), the translator accepts
+either shape — if `raw_payload` is absent, the record itself is treated
+as the payload. New CSV scrapers should produce the wrapped shape.
+
 Expected `source_config` structure:
 
     {

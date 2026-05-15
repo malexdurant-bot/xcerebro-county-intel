@@ -39,20 +39,39 @@ API:
     from scaffold.pipeline.translators import registry, register, lookup
 
     # Decorator pattern for built-in translators:
-    @register("arcgis_foreclosure_notices")
-    def translate_arcgis_foreclosure_notices(raw_records, county_config,
-                                             source_config):
+    @register("foreclosure_notices")
+    def translate_foreclosure_notices(raw_records, county_config,
+                                      source_config):
         ...
         return signals, parcels, per_signal_meta
 
     # Lookup:
-    translator_fn = lookup("arcgis_foreclosure_notices")
+    translator_fn = lookup("foreclosure_notices")
     signals, parcels, meta = translator_fn(raw_records, county_config,
                                             source_config)
 
 The registry refuses to overwrite an existing name unless `force=True`
 is passed. County adapters that need to override a built-in translator
 must do so explicitly.
+
+CONTRACT (v5.1.2-beta-r2+): Translators consume the framework-canonical
+WRAPPED RAW RECORD shape declared in MASTER_PROMPT §4.32:
+
+    {
+        "raw_record_id": "<unique id>",
+        "source_id": "<source id>",
+        "source_url": "<url if applicable>",
+        "source_fetched_at": "<ISO ts>",
+        "raw_payload": {<normalized scraper-output fields>}
+    }
+
+Scrapers normalize source fields (lowercase, framework-canonical names)
+BEFORE writing JSONL. Translators read normalized raw_payload, apply
+source_config (parcel_id_prefix, layer_doc_type_map, field_map, etc.),
+and emit framework signals. Translators MUST NOT contain portal-specific
+code paths (no ArcGIS attribute names, no portal hostnames, no protocol
+parsing). Portal protocol knowledge lives in scaffold/scrapers/ or in
+county-side scrapers/.
 """
 
 from __future__ import annotations
@@ -135,6 +154,6 @@ def clear() -> None:
 # Import the built-in translators so their @register decorators run.
 # Counties that need custom translators import their own modules
 # (typically from scrapers/) at config-load time.
-from scaffold.pipeline.translators import arcgis_foreclosure_notices  # noqa: E402, F401
-from scaffold.pipeline.translators import arcgis_parcel_master  # noqa: E402, F401
+from scaffold.pipeline.translators import foreclosure_notices  # noqa: E402, F401
+from scaffold.pipeline.translators import parcel_master  # noqa: E402, F401
 from scaffold.pipeline.translators import csv_static_list  # noqa: E402, F401

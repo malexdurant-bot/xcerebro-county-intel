@@ -1110,6 +1110,88 @@ These ten rules are enforced by `scaffold/tests/test_county_agnostic_regression.
 
 ---
 
+## 4.32. Scraper-to-translator data contract (v5.1.2-beta-r2+)
+
+The universality contract in §4.31 forbids portal-specific code in universal pipeline modules. To honor that rule, the framework must declare a clear interface between county-side scrapers (which know the portal protocol) and universal translators (which produce framework signals).
+
+This section locks the contract.
+
+### The contract (Path 1: scrapers normalize)
+
+**Scrapers normalize source-specific fields into framework-canonical field names BEFORE writing JSONL.**
+
+Concretely: a scraper pulling from a REST API, public-records portal, court e-portal, or static CSV is responsible for:
+1. Connecting to the source and authenticating per the source's access pattern.
+2. Pulling raw records using the source's protocol.
+3. Mapping the source's field names to framework-canonical lowercase field names (`address`, `doc_number`, `owner_name`, `recording_year`, `recording_month`, `city`, `zip`, `layer_id`, `assessed_value`, `exempt_homestead`, etc.).
+4. Parsing source-specific encodings into framework types where reasonable (boolean exemption flags rather than concatenated code strings, integer ZIP rather than string-with-leading-spaces, etc.).
+5. Wrapping each normalized record in the canonical wrapped shape (below) and writing one JSON line to `data/raw/<source_id>.jsonl`.
+
+Translators then read this normalized output, validate shape, apply per-source config (`parcel_id_prefix`, `layer_doc_type_map`, `field_map` for non-canonical normalizations, `translator_config.*`), and emit framework signals + parcels.
+
+### The wrapped raw-record shape
+
+Every record in `data/raw/<source_id>.jsonl` MUST conform to:
+
+```json
+{
+  "raw_record_id": "<stable unique id for this record>",
+  "source_id": "<source id from county config>",
+  "source_url": "<deep link to the source record if available, else 'about:blank/<source_id>/<id>'>",
+  "source_fetched_at": "<ISO 8601 timestamp when this record was fetched>",
+  "parser_confidence": <integer 0..100, defaults to 95 if scraper has no ambiguity>,
+  "raw_payload": {
+    "<framework-canonical lowercase field name>": <normalized value>,
+    "<another canonical field>": <normalized value>,
+    ...
+  }
+}
+```
+
+Top-level fields are FRAMEWORK METADATA. `raw_payload` is the only field containing source-specific data, and it contains NORMALIZED data — not raw vendor protocol attrs.
+
+### Why this contract
+
+Three reasons the contract picks Path 1 (scraper-normalizes) over Path 2 (translator-translates):
+
+1. **Scrapers already know the source.** They authenticate, paginate, retry, and parse the source's response. Adding normalization is incremental cost on a module that's already source-specific. Pushing normalization into translators forces every translator to know every source's idiosyncrasies, making translators bigger AND more portal-specific.
+
+2. **Translators stay protocol-agnostic.** A `foreclosure_notices` translator works for ANY source that produces normalized foreclosure-notice records, regardless of whether the source is a REST API, court e-portal, scraped HTML, or CSV. The translator cares about RECORD TYPE, not portal protocol.
+
+3. **Data-quality observability.** When a county's `data/raw/<source_id>.jsonl` is on disk in normalized form, an operator can inspect it directly to verify scraping correctness without running pipeline code. Raw vendor responses are harder to inspect — they have inconsistent shape per-portal.
+
+### Framework support for normalization
+
+Scrapers that ingest from common protocols can use framework helpers in `scaffold/scrapers/`:
+- `_arcgis_featureserver.py` — handles pagination, error envelopes, rate limits for REST FeatureServer protocols. Returns raw attrs; the scraper applies field-name normalization on the way out.
+- Future: `_publicsearch_portal.py`, `_tyler_odyssey.py`, `_arcgis_mapserver.py`, etc. as additional protocol clients land.
+
+These helpers DO portal protocol. The scraper that USES them does normalization. The translator that READS the scraper output does signal/parcel emission.
+
+### Migration of pre-v5.1.2-beta-r2 scrapers
+
+Scrapers built against pre-v5.1.2-beta versions may:
+- Emit FLAT records (no `raw_payload` wrapper) — these break the contract.
+- Emit raw vendor attrs without normalization — these break the contract.
+- Use UPPERCASE/mixedCase field names matching the source's protocol verbatim — these break the contract.
+
+These scrapers MUST be migrated to the contract before v5.1.2-beta-r2 translators can consume their output. For counties with existing live data and a preserved regression baseline, a one-time deterministic transform of `data/raw/<source_id>.jsonl` from the legacy shape into the contract shape is acceptable (deterministic = no data drift, baseline reproducibility preserved). Re-scraping is also acceptable but loses baseline reproducibility if the source has updated since the last pull.
+
+### Field-name canonicalization registry (future)
+
+A canonical-field-name registry (`scaffold/data/canonical_record_fields.json` or similar) is on the v5.1.2-beta-final backlog. The registry will enumerate every framework-canonical field name with its type, definition, and which translators read it. Until that registry exists, scrapers should:
+- Use lowercase ASCII with underscores (`owner_name`, not `OwnerName` or `OWNER_NAME`)
+- Match the field names used in existing v5.1.2-beta-r2+ canonical translators (see `scaffold/pipeline/translators/foreclosure_notices.py` and `scaffold/pipeline/translators/parcel_master.py` docstrings for current canonical names)
+- Document any deviations in their docstring AND map them via per-source `field_map` config
+
+### Enforcement
+
+This contract is enforced by `scaffold/tests/test_translator_registry.py`, which feeds wrapped/normalized synthetic records to every registered translator and asserts correct output. The gate test will catch translators that bypass `raw_payload` and read top-level fields, or that assume vendor-protocol field names.
+
+The contract does NOT have a separate test that scans scraper output shape on disk — that's a county-build runtime check during Phase 2 (synthetic harness) and Phase 3 (production pipeline). If a county's `data/raw/*.jsonl` is wrong-shaped, its translator will produce zero signals and the dashboard will be empty, which surfaces the bug at smoke-test time.
+
+---
+
 ## 5. Two-Truths invariant
 
 The dashboard's filter counts and the rendered table must come from the same `matches()` function. Header counts in `leads.json` (`pattern_counts`, `attribute_counts`, etc.) must equal counts re-derived from `records[]`. The pipeline writes both; the build script asserts equality before saving and exits non-zero on drift.

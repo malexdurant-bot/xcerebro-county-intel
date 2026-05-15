@@ -251,6 +251,50 @@ Edit `domain/00_client_business_model.md` (persona), `domain/04_deal_path_classi
 
 ## Versioning
 
+This is **v5.1.2-beta-r2**.
+
+**v5.1.2-beta-r2 changes from v5.1.2-beta** (translator data-contract correction — minor breaking change for `translator` config string):
+
+This revision corrects a data-contract ambiguity discovered during the Bexar in-place migration of v5.1.2-beta. The original v5.1.2-beta canonical translators assumed scrapers were pass-through wrappers around raw vendor protocol output. Bexar's scrapers (and likely all pre-v5.1.2-beta scrapers) instead normalize fields at scrape time before persisting. v5.1.2-beta-r2 reverses the assumption and locks the framework around **Path 1: scrapers normalize, translators consume normalized output**.
+
+Key corrections:
+
+- **MASTER_PROMPT.md §4.32 Scraper-to-Translator Data Contract.** New section. Declares the canonical wrapped raw-record shape that scrapers must produce and translators must consume:
+  ```json
+  {
+    "raw_record_id": "...",
+    "source_id": "...",
+    "source_url": "...",
+    "source_fetched_at": "...",
+    "raw_payload": {<lowercase framework-canonical field names>}
+  }
+  ```
+  Scrapers normalize source fields. Translators read normalized `raw_payload`. Translators are protocol-agnostic and never know whether the data came from a REST API, public-records portal, court e-portal, or static CSV. Portal protocol knowledge lives in the scraper or in `scaffold/scrapers/` protocol clients.
+- **Translator rename.** Vendor-protocol prefix dropped:
+  - `arcgis_foreclosure_notices` → `foreclosure_notices`
+  - `arcgis_parcel_master` → `parcel_master`
+  - `csv_static_list` unchanged (CSV isn't a vendor-specific protocol).
+  - Translator files renamed in `scaffold/pipeline/translators/`.
+  - Schema enum (`config/counties/_schema.json` `sources.<id>.translator`) updated to reflect new names; old names removed.
+  - This is a SMALL breaking change. County configs declaring `translator: "arcgis_foreclosure_notices"` must update to `translator: "foreclosure_notices"`. No code-side migration required because the v5.1.2-beta canonical translators were not in production use (only Bexar had v5.1.2-beta and Bexar was mid-migration).
+- **Translator implementations rewritten.** `foreclosure_notices` reads lowercase normalized fields (`address`, `doc_number`, `recording_year`, `recording_month`, `city`, `zip`, `layer_id` — no underscore) from `raw_payload`. `parcel_master` reads framework-canonical fields (`parcel_id`, `address`, `owner_name`, etc.) from `raw_payload` and prefers pre-parsed `exempt_*` boolean fields; legacy compatibility path parses raw `exemptions` string via `translator_config.exemption_codes` if booleans absent.
+- **`test_translator_registry.py` rewritten.** 39 tests covering the new contract: builtin registration under new names, normalized-payload consumption, cross-county-leak policy with lowercase city keys, sale_date_rule dispatch from normalized year/month, parcel_master boolean-exemption fast path, parcel_master legacy-string fallback, empty-parcel_id skip behavior. Old test cases referencing UPPERCASE ArcGIS attrs removed.
+- **`docs/v5.1.2-beta_bexar_migration_playbook.md`** updated to reflect new translator names + lowercase normalized translator_config field references + one-time `data/raw/parcel_master.jsonl` shape transform step (flat → wrapped).
+- **`FRAMEWORK_VERSION.json`** bumped to `v5.1.2-beta-r2`, `locked_at: 2026-05-15`.
+- **All 4 gate tests PASS:** golden path (46/46), county-agnostic regression (zero violations), atomic config writer (18/18), translator registry (39/39).
+
+**Why this is r2, not v5.1.3.** v5.1.2-beta was tagged on 2026-05-14 and pushed to canonical, but it had not propagated to any production county before Bexar's mid-migration exposed the data-contract ambiguity. r2 corrects the beta release in-place under the same minor version. The original v5.1.2-beta tag is preserved on the canonical repo for audit-trail purposes; v5.1.2-beta-r2 is the recommended version for any new county build or any in-progress migration.
+
+**Bexar migration impact.** Bexar's in-place migration paused at Step 5 of the v5.1.2-beta playbook when the contract ambiguity surfaced. With v5.1.2-beta-r2 canonical translators, Bexar resumes migration with:
+1. A one-time deterministic shape transform of `data/raw/parcel_master.jsonl` from flat to wrapped shape (no data drift; baseline reproducibility preserved).
+2. `bexar_tx.json` translator names updated (`foreclosure_notices` / `parcel_master`).
+3. `bexar_tx.json` `translator_config` field-name references updated from UPPERCASE ArcGIS attrs to lowercase normalized names.
+4. Resume Step 5 of the playbook with corrected translators.
+
+**v5.1.2-beta features preserved:** Universality Contract §4.31, schema additions, translator registry mechanics, sale_date_rules, owner_name_patterns defensive guard, upgraded regression test, scaffold/data/synthetic_attribute_overrides.json.
+
+---
+
 This is **v5.1.2-beta**.
 
 **v5.1.2-beta changes from v5.1.1-beta** (universality contract enforcement — schema additions, no breaking schema changes for existing configs):

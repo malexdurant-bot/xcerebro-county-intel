@@ -1,17 +1,42 @@
 """
-arcgis_foreclosure_notices translator (built-in, v5.1.2-beta+).
+foreclosure_notices translator (built-in, v5.1.2-beta-r2+).
 
-Converts raw records from an ArcGIS REST MapServer / FeatureServer
-foreclosure-notices layer into framework signals + placeholder parcels.
+Converts NORMALIZED foreclosure-notice records (produced by a county-side
+scraper) into framework signals + placeholder parcels.
 
-This translator is COUNTY-AGNOSTIC. It contains no county name, no
-state statute reference, no municipality list, no field-name literal.
-All county-specific schema mapping comes from `source_config`.
+This translator consumes the framework-canonical RAW RECORD shape declared
+in MASTER_PROMPT §4.32 (Scraper-to-Translator Data Contract, v5.1.2-beta-r2+):
+
+    {
+        "raw_record_id": "<unique id>",
+        "source_id": "<source id from county config>",
+        "source_url": "<deep link if available>",
+        "source_fetched_at": "<ISO timestamp>",
+        "parser_confidence": <0..100>,
+        "raw_payload": {
+            "address": "<situs address, uppercase canonical>",
+            "doc_number": "<recording document number>",
+            "recording_year": <int>,
+            "recording_month": <int>,
+            "city": "<situs city, uppercase canonical>",
+            "zip": "<5-digit ZIP>",
+            "layer_id": <int>,  # which doc-type bucket this record came from
+            "<any other source-specific normalized fields>": ...
+        }
+    }
+
+The translator is PROTOCOL-AGNOSTIC. It does not know whether the underlying
+data was pulled via REST API, public-records portal, court e-portal, manual
+CSV, or any other access pattern. The county-side scraper handles portal
+protocol AND field-name normalization.
+
+Renamed in v5.1.2-beta-r2: dropped the vendor-protocol prefix from the
+translator name. The translator is no longer protocol-specific.
 
 Expected `source_config` structure:
 
     {
-        "translator": "arcgis_foreclosure_notices",
+        "translator": "foreclosure_notices",
         "translator_config": {
             "layer_doc_type_map": {
                 "0": {
@@ -24,35 +49,24 @@ Expected `source_config` structure:
                     "subtype_label": "Tax Foreclosure Notice",
                     "pattern": "tax"
                 }
-            },
-            "address_field": "ADDRESS",
-            "doc_number_field": "DOC_NUMBER",
-            "year_field": "YEAR",
-            "month_field": "MONTH",
-            "city_field": "CITY",
-            "zip_field": "ZIP"
+            }
         },
         "parcel_id_prefix": "BX-ADDR-"
     }
 
-Expected raw record shape (from scaffold/scrapers/_arcgis_featureserver.py):
+Layer-based doc-type dispatch is OPTIONAL. If `layer_doc_type_map` is
+omitted, the translator uses a single default `canonical` declared at
+the top level of translator_config. Counties whose scrapers don't have
+layer semantics can use the simpler config.
 
-    {
-        "source_id": "...",
-        "raw_record_id": "...",
-        "raw_payload": {
-            "<address_field>": "...",
-            "<doc_number_field>": "...",
-            "<year_field>": 2026,
-            "<month_field>": 6,
-            "<city_field>": "...",
-            "<zip_field>": "...",
-            "_layer_id": 0
-        },
-        "source_url": "...",
-        "source_fetched_at": "...",
-        "parser_confidence": 95
-    }
+Cross-county-leak detection: reads
+county_config.geography.accepted_municipalities[] and
+county_config.geography.cross_county_policy. Address `city` is compared
+against accepted_municipalities; unknown cities trigger the configured
+unknown_city_action (drop / flag_for_review / accept_with_warning).
+
+Sale-date derivation: reads county_config.geography.sale_date_rule and
+dispatches to scaffold.pipeline.sale_date_rules.
 
 Returns: (signals, parcels, per_signal_meta_by_url)
 """
@@ -86,7 +100,6 @@ def _city_check(
     if not city:
         return [], "keep"
     if not accepted_municipalities:
-        # No accepted_municipalities means policy disabled.
         return [], "keep"
     city_upper = city.upper().strip()
     accepted_names = {m["name"].upper() for m in accepted_municipalities}
@@ -97,21 +110,21 @@ def _city_check(
         return [], "drop"
     elif action == "accept_with_warning":
         return ["potential_cross_county_leak"], "keep"
-    else:  # flag_for_review (default)
+    else:
         return ["potential_cross_county_leak"], "keep"
 
 
-@register("arcgis_foreclosure_notices")
-def translate_arcgis_foreclosure_notices(
+@register("foreclosure_notices")
+def translate_foreclosure_notices(
     raw_records: list[dict],
     county_config: dict,
     source_config: dict,
 ) -> tuple[list[dict], list[dict], dict[str, dict]]:
     """
-    Translate ArcGIS foreclosure-notices raw records into pipeline signals.
+    Translate normalized foreclosure-notice raw records into pipeline signals.
 
     Args:
-        raw_records: List of raw records from an ArcGIS layer.
+        raw_records: List of raw records in canonical wrapped shape (§4.32).
         county_config: Full county config (geography, sources, etc.).
         source_config: This source's config block.
 
@@ -119,13 +132,12 @@ def translate_arcgis_foreclosure_notices(
         (signals, parcels, per_signal_meta_by_url)
     """
     tc = source_config.get("translator_config", {}) or {}
-    layer_doc_type_map: dict = tc.get("layer_doc_type_map", {})
-    address_field = tc.get("address_field", "ADDRESS")
-    doc_number_field = tc.get("doc_number_field", "DOC_NUMBER")
-    year_field = tc.get("year_field", "YEAR")
-    month_field = tc.get("month_field", "MONTH")
-    city_field = tc.get("city_field", "CITY")
-    zip_field = tc.get("zip_field", "ZIP")
+    layer_doc_type_map: dict = tc.get("layer_doc_type_map", {}) or {}
+
+    # If no layer map, expect a single canonical at translator_config root.
+    default_canonical = tc.get("canonical")
+    default_subtype = tc.get("subtype_label", default_canonical)
+    default_pattern = tc.get("pattern", "foreclosure")
 
     parcel_id_prefix = source_config.get("parcel_id_prefix", "PARCEL-")
 
@@ -142,23 +154,37 @@ def translate_arcgis_foreclosure_notices(
     source_id = source_config.get("_source_id", "foreclosure_notices")
 
     for raw in raw_records:
-        payload = raw.get("raw_payload", {})
-        address = (payload.get(address_field) or "").strip()
-        doc_number = (payload.get(doc_number_field) or "").strip()
-        year = payload.get(year_field)
-        month = payload.get(month_field)
-        city = (payload.get(city_field) or "").strip()
-        zip_code = (payload.get(zip_field) or "").strip()
-        layer_id = str(payload.get("_layer_id", "0"))
+        # Canonical shape: raw_payload contains normalized fields.
+        payload = raw.get("raw_payload", {}) or {}
+
+        # Normalized field names (lowercase, framework-canonical).
+        address = (payload.get("address") or "").strip()
+        doc_number = (payload.get("doc_number") or "").strip()
+        recording_year = payload.get("recording_year")
+        recording_month = payload.get("recording_month")
+        city = (payload.get("city") or "").strip()
+        zip_code = (payload.get("zip") or "").strip()
+        layer_id_raw = payload.get("layer_id")
 
         if not address or not doc_number:
             continue
 
-        # Resolve doc-type from layer mapping.
-        layer_mapping = layer_doc_type_map.get(layer_id, layer_doc_type_map.get("0", {}))
-        canonical = layer_mapping.get("canonical", "NOTICE_OF_SUBSTITUTE_TRUSTEE_SALE")
-        subtype_label = layer_mapping.get("subtype_label", canonical)
-        pattern = layer_mapping.get("pattern", "foreclosure")
+        # Resolve doc-type. Layer-based dispatch if configured; else default.
+        if layer_doc_type_map:
+            # Layer IDs can be int or str; normalize to str for lookup.
+            layer_key = str(layer_id_raw) if layer_id_raw is not None else "0"
+            layer_mapping = layer_doc_type_map.get(layer_key)
+            if not layer_mapping:
+                # Unknown layer — try the first entry as a tolerant fallback.
+                first_layer = sorted(layer_doc_type_map.keys())[0] if layer_doc_type_map else None
+                layer_mapping = layer_doc_type_map.get(first_layer, {}) if first_layer else {}
+            canonical = layer_mapping.get("canonical", "NOTICE_OF_SUBSTITUTE_TRUSTEE_SALE")
+            subtype_label = layer_mapping.get("subtype_label", canonical)
+            pattern = layer_mapping.get("pattern", "foreclosure")
+        else:
+            canonical = default_canonical or "NOTICE_OF_SUBSTITUTE_TRUSTEE_SALE"
+            subtype_label = default_subtype or canonical
+            pattern = default_pattern
 
         # Cross-county-leak detection.
         preset_flags, action = _city_check(
@@ -169,8 +195,8 @@ def translate_arcgis_foreclosure_notices(
 
         # Derive expected sale date via the configured state rule.
         try:
-            year_int = int(year) if year else None
-            month_int = int(month) if month else None
+            year_int = int(recording_year) if recording_year else None
+            month_int = int(recording_month) if recording_month else None
         except (ValueError, TypeError):
             year_int = month_int = None
 
@@ -183,7 +209,6 @@ def translate_arcgis_foreclosure_notices(
                     sale_date_rule=sale_date_rule,
                 )
             except Exception:
-                # On rule failure, fall back to first-of-month.
                 try:
                     expected_sale_date = date(year_int, month_int, 1).isoformat()
                 except Exception:
@@ -204,11 +229,11 @@ def translate_arcgis_foreclosure_notices(
 
         # Build the signal.
         signal_id = "sig_" + hashlib.sha1(
-            f"{source_id}|{doc_number}|{layer_id}".encode("utf-8")
+            f"{source_id}|{doc_number}|{layer_id_raw}".encode("utf-8")
         ).hexdigest()[:16]
         source_url = (
             raw.get("source_url")
-            or f"about:blank/{source_id}/{doc_number}/{layer_id}"
+            or f"about:blank/{source_id}/{doc_number}/{layer_id_raw}"
         )
         signal = {
             "signal_id": signal_id,
@@ -230,7 +255,7 @@ def translate_arcgis_foreclosure_notices(
         per_signal_meta_by_url[source_url] = {
             "preset_review_flags": preset_flags,
             "expected_sale_date": expected_sale_date,
-            "match_confidence": 0,  # placeholder until parcel-master matcher runs
+            "match_confidence": 0,
             "match_method": "placeholder",
             "address": address,
             "city": city,

@@ -258,11 +258,11 @@
           },
           "translator": {
             "type": "string",
-            "description": "v5.1.2-beta+: Name of a registered translator function in scaffold/pipeline/translators/. Tells the orchestrator how to convert this source's raw records into framework signals + placeholder parcels. If empty, the orchestrator skips this source during pipeline run (raw data still gets pulled but does not produce signals). Examples: 'arcgis_foreclosure_notices', 'arcgis_parcel_master', 'publicsearch_clerk_recordings', 'tyler_odyssey_court', 'csv_static_list'.",
+            "description": "v5.1.2-beta+: Name of a registered translator function in scaffold/pipeline/translators/. Tells the orchestrator how to convert this source's raw records into framework signals + placeholder parcels. If empty, the orchestrator skips this source during pipeline run (raw data still gets pulled but does not produce signals). Examples: 'foreclosure_notices', 'parcel_master', 'publicsearch_clerk_recordings', 'tyler_odyssey_court', 'csv_static_list'. Renamed in v5.1.2-beta-r2: arcgis_foreclosure_notices -> foreclosure_notices, arcgis_parcel_master -> parcel_master (translators are now protocol-agnostic; portal protocol lives in the scraper).",
             "enum": [
               "",
-              "arcgis_foreclosure_notices",
-              "arcgis_parcel_master",
+              "foreclosure_notices",
+              "parcel_master",
               "publicsearch_clerk_recordings",
               "tyler_odyssey_court",
               "csv_static_list",
@@ -272,7 +272,7 @@
           },
           "translator_config": {
             "type": "object",
-            "description": "v5.1.2-beta+: Per-translator configuration. Schema is translator-specific; the translator validates its own config at registration time. Examples: layer_doc_type_map for arcgis_foreclosure_notices, field_label_aliases for publicsearch_clerk_recordings."
+            "description": "v5.1.2-beta+: Per-translator configuration. Schema is translator-specific; the translator validates its own config at registration time. Examples: layer_doc_type_map for foreclosure_notices, field_label_aliases for publicsearch_clerk_recordings."
           },
           "field_map": {
             "type": "object",
