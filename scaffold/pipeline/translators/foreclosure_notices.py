@@ -51,8 +51,26 @@ Expected `source_config` structure:
                 }
             }
         },
-        "parcel_id_prefix": "BX-ADDR-"
+        "parcel_id_prefix": "BX-ADDR-",
+        "field_map": {
+            "address": "<source's actual address field name in raw_payload>",
+            "doc_number": "<source's actual doc_number field name>",
+            "recording_year": "<source's actual year field>",
+            "recording_month": "<source's actual month field>",
+            "city": "<source's actual city field>",
+            "zip": "<source's actual zip field>",
+            "layer_id": "<source's actual layer_id field>"
+        }
     }
+
+`field_map` is OPTIONAL (v5.1.2-beta-r3+). Keys are the canonical field
+names the translator expects; values are the actual field names the
+scraper writes to raw_payload. If a key is absent from field_map (or
+field_map itself is absent), identity mapping applies — the translator
+reads the canonical name directly from raw_payload. This bridges the
+gap when a scraper normalizes to its own conventions
+(e.g. `situs_address` instead of `address`) rather than to the
+translator's canonical names.
 
 Layer-based doc-type dispatch is OPTIONAL. If `layer_doc_type_map` is
 omitted, the translator uses a single default `canonical` declared at
@@ -134,6 +152,19 @@ def translate_foreclosure_notices(
     tc = source_config.get("translator_config", {}) or {}
     layer_doc_type_map: dict = tc.get("layer_doc_type_map", {}) or {}
 
+    # Field-name bridge (v5.1.2-beta-r3+). The translator reads canonical
+    # framework field names from raw_payload. If a scraper's normalized
+    # field names differ from canonical, source_config.field_map declares
+    # the mapping: keys are canonical names the translator expects, values
+    # are the actual field names the scraper writes to raw_payload.
+    # If field_map is absent, identity mapping is used (translator reads
+    # canonical names directly).
+    field_map = source_config.get("field_map", {}) or {}
+
+    def _resolve(canonical_name: str) -> str:
+        """Resolve a canonical field name to the source's actual field name."""
+        return field_map.get(canonical_name, canonical_name)
+
     # If no layer map, expect a single canonical at translator_config root.
     default_canonical = tc.get("canonical")
     default_subtype = tc.get("subtype_label", default_canonical)
@@ -157,14 +188,14 @@ def translate_foreclosure_notices(
         # Canonical shape: raw_payload contains normalized fields.
         payload = raw.get("raw_payload", {}) or {}
 
-        # Normalized field names (lowercase, framework-canonical).
-        address = (payload.get("address") or "").strip()
-        doc_number = (payload.get("doc_number") or "").strip()
-        recording_year = payload.get("recording_year")
-        recording_month = payload.get("recording_month")
-        city = (payload.get("city") or "").strip()
-        zip_code = (payload.get("zip") or "").strip()
-        layer_id_raw = payload.get("layer_id")
+        # Read canonical fields via field_map bridge.
+        address = (payload.get(_resolve("address")) or "").strip()
+        doc_number = (payload.get(_resolve("doc_number")) or "").strip()
+        recording_year = payload.get(_resolve("recording_year"))
+        recording_month = payload.get(_resolve("recording_month"))
+        city = (payload.get(_resolve("city")) or "").strip()
+        zip_code = (payload.get(_resolve("zip")) or "").strip()
+        layer_id_raw = payload.get(_resolve("layer_id"))
 
         if not address or not doc_number:
             continue

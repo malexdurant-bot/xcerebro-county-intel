@@ -251,6 +251,56 @@ Edit `domain/00_client_business_model.md` (persona), `domain/04_deal_path_classi
 
 ## Versioning
 
+This is **v5.1.2-beta-r3**.
+
+**v5.1.2-beta-r3 changes from v5.1.2-beta-r2** (field_map bridge for non-canonical scraper field names — no breaking changes):
+
+This revision activates the `field_map` bridge in both canonical translators. v5.1.2-beta added `sources.<id>.field_map` to the schema but the v5.1.2-beta-r2 translators did not actually read it — they assumed scrapers emit framework-canonical field names directly. The first parcel_master migration (Bexar) discovered that pre-existing scrapers commonly normalize to source-specific conventions (`situs_address`, `owner_mailing_addr1`, `property_class`) rather than canonical (`address`, `owner_mailing_address`, `property_use`).
+
+`field_map` is the universal bridge. The translator resolves canonical field names through `field_map` (if present) before reading from `raw_payload`. Canonical fields absent from `field_map` are read directly (identity mapping). No county-side shim required. No re-scrape required.
+
+Key changes:
+
+- **`foreclosure_notices` translator** now reads `source_config.field_map` and resolves all 7 canonical fields (`address`, `doc_number`, `recording_year`, `recording_month`, `city`, `zip`, `layer_id`) through it. Partial maps (only some keys mapped) work correctly; unlisted keys default to identity.
+- **`parcel_master` translator** now reads `source_config.field_map` and resolves all canonical parcel fields through it (`parcel_id`, `address`, `owner_name`, `owner_mailing_*`, `city`, `zip`, `assessed_value`, `land_value`, `improvement_value`, `year_built`, `property_use`, `acres`, `legal_description`, `exemptions`). Exemption booleans (`exempt_homestead` etc.) are explicitly NOT field-mapped — they are framework-canonical semantics, not source nomenclature.
+- **MASTER_PROMPT.md §4.32** updated with explicit `field_map` documentation, including the limitation that exemption keys are not field-mapped.
+- **test_translator_registry.py** extended from 39 → 55 tests. New cases: field_map full mapping (both translators), partial field_map, identity fallback for non-mapped keys.
+- **FRAMEWORK_VERSION.json** bumped to `v5.1.2-beta-r3`.
+- **scaffold/bootstrap_county.py** FRAMEWORK_VERSION constant bumped.
+- **All 4 gate tests PASS:** golden path (46/46), county-agnostic regression (zero violations), atomic config writer (18/18), translator registry (60/60).
+
+**No schema changes.** `sources.<id>.field_map` was already in `_schema.json` from v5.1.2-beta. r3 just makes translators honor it. r2 county configs work unchanged on r3 (field_map is optional).
+
+**No breaking changes.** Translators in r2 read canonical names directly. Translators in r3 do the same UNLESS `field_map` is present. Existing configs continue to work.
+
+**Bexar migration path with r3:**
+
+After overlaying r3 canonical into the Bexar repo, `bexar_tx.json` adds a `field_map` to the parcel_master source:
+
+```json
+"parcel_master": {
+  "translator": "parcel_master",
+  "parcel_id_prefix": "BCAD-",
+  "field_map": {
+    "address": "situs_address",
+    "city": "situs_city",
+    "zip": "situs_zip",
+    "owner_mailing_address": "owner_mailing_addr1",
+    "property_use": "property_class"
+  }
+}
+```
+
+The wrap script from r2 still applies (deterministic flat → wrapped transform of `data/raw/parcel_master.jsonl`). No changes to scrapers, no re-scrape. The 287-lead baseline is preserved because the underlying data is bit-identical inside the wrapper, and `field_map` bridges the field names at translator-read time.
+
+**Deferred to v5.1.2-beta-final:**
+
+- `scaffold/data/canonical_record_fields.json` — the canonical-field-name registry. v5.1.2-beta-r3 ships the bridge mechanism; v5.1.2-beta-final will publish the canonical vocabulary so new scrapers can avoid needing `field_map` at all.
+
+**v5.1.2-beta-r2 features preserved:** §4.32 Scraper-to-translator data contract, renamed translators, wrapped raw_payload contract, csv_static_list unchanged.
+
+---
+
 This is **v5.1.2-beta-r2**.
 
 **v5.1.2-beta-r2 changes from v5.1.2-beta** (translator data-contract correction — minor breaking change for `translator` config string):

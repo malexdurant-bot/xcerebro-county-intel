@@ -1,5 +1,5 @@
 """
-Gate test for scaffold/pipeline/translators/ registry (v5.1.2-beta-r2+).
+Gate test for scaffold/pipeline/translators/ registry (v5.1.2-beta-r3+).
 
 Verifies:
   - Built-in translators register at import time and are looked up by name.
@@ -14,8 +14,14 @@ Verifies:
   - The parcel_master translator consumes normalized raw_payload with
     pre-parsed exempt_* booleans OR falls back to legacy string parsing.
   - The csv_static_list translator maps per-source doc_type_synonyms.
+  - (r3) Both foreclosure_notices and parcel_master translators honor
+    source_config.field_map for bridging non-canonical scraper field
+    names to canonical names. Partial field_map (only some keys mapped,
+    others default to identity) works correctly. This is a UNIVERSAL
+    translator feature — the same pattern applies to all future
+    translators (clerk_recordings, tax_collector, court, etc.).
 
-CONTRACT (v5.1.2-beta-r2): Translators consume the framework-canonical
+CONTRACT (v5.1.2-beta-r2+): Translators consume the framework-canonical
 WRAPPED RAW RECORD shape (MASTER_PROMPT §4.32):
 
     {
@@ -23,7 +29,8 @@ WRAPPED RAW RECORD shape (MASTER_PROMPT §4.32):
         "source_id": "...",
         "source_url": "...",
         "raw_payload": {<normalized scraper-output fields, lowercase
-                        framework-canonical names>}
+                        framework-canonical names OR scraper-specific
+                        names bridged via source_config.field_map>}
     }
 
 Translators DO NOT consume raw vendor protocol attributes (UPPERCASE
@@ -478,9 +485,217 @@ def test_csv_static_list_unknown_doc_type_skipped():
     case("unknown doc_type is skipped", len(sig) == 0)
 
 
+def test_foreclosure_translator_field_map_bridges_non_canonical_names():
+    print("\n[foreclosure translator: field_map bridges non-canonical scraper names (r3)]")
+    fn = lookup("foreclosure_notices")
+    # Scraper writes "situs_addr", "rec_doc", "rec_yr", "rec_mo" instead of
+    # the canonical lowercase names. field_map bridges them.
+    raw = [{
+        "raw_record_id": "raw_fm",
+        "raw_payload": {
+            "situs_addr": "400 FIELDMAP DR",
+            "rec_doc": "DOC-FM",
+            "rec_yr": 2026,
+            "rec_mo": 8,
+            "situs_city": "ACCEPTEDTOWN",
+            "situs_zip": "33333",
+            "lyr": 0,
+        },
+        "source_url": "about:test/raw_fm",
+        "parser_confidence": 95,
+    }]
+    county_config = {
+        "geography": {
+            "accepted_municipalities": [
+                {"name": "ACCEPTEDTOWN", "kind": "incorporated"}
+            ],
+        }
+    }
+    source_config = {
+        "translator": "foreclosure_notices",
+        "translator_config": {
+            "layer_doc_type_map": {
+                "0": {
+                    "canonical": "NOTICE_OF_SUBSTITUTE_TRUSTEE_SALE",
+                    "subtype_label": "NSTS",
+                    "pattern": "foreclosure",
+                }
+            }
+        },
+        "field_map": {
+            "address": "situs_addr",
+            "doc_number": "rec_doc",
+            "recording_year": "rec_yr",
+            "recording_month": "rec_mo",
+            "city": "situs_city",
+            "zip": "situs_zip",
+            "layer_id": "lyr",
+        },
+        "parcel_id_prefix": "TST-",
+    }
+    sig, par, meta = fn(raw, county_config, source_config)
+    case("field_map bridges yields one signal", len(sig) == 1)
+    case("field_map bridges yields one parcel", len(par) == 1)
+    if par:
+        case(
+            "parcel address resolved via field_map",
+            par[0]["address"] == "400 FIELDMAP DR",
+        )
+
+
+def test_foreclosure_translator_partial_field_map():
+    print("\n[foreclosure translator: partial field_map uses identity for missing keys (r3)]")
+    fn = lookup("foreclosure_notices")
+    # Scraper writes 'situs_addr' but other fields are already canonical.
+    raw = [{
+        "raw_record_id": "raw_partial",
+        "raw_payload": {
+            "situs_addr": "500 PARTIAL ST",
+            "doc_number": "DOC-PRT",
+            "recording_year": 2026,
+            "recording_month": 9,
+            "city": "ACCEPTEDTOWN",
+            "zip": "44444",
+            "layer_id": 0,
+        },
+        "source_url": "about:test/raw_partial",
+        "parser_confidence": 95,
+    }]
+    county_config = {
+        "geography": {
+            "accepted_municipalities": [
+                {"name": "ACCEPTEDTOWN", "kind": "incorporated"}
+            ],
+        }
+    }
+    source_config = {
+        "translator": "foreclosure_notices",
+        "translator_config": {
+            "layer_doc_type_map": {
+                "0": {
+                    "canonical": "NOTICE_OF_SUBSTITUTE_TRUSTEE_SALE",
+                    "subtype_label": "NSTS",
+                    "pattern": "foreclosure",
+                }
+            }
+        },
+        "field_map": {"address": "situs_addr"},
+        "parcel_id_prefix": "TST-",
+    }
+    sig, par, meta = fn(raw, county_config, source_config)
+    case("partial field_map yields one signal", len(sig) == 1)
+    if par:
+        case(
+            "mapped field resolves",
+            par[0]["address"] == "500 PARTIAL ST",
+        )
+
+
+def test_parcel_master_translator_field_map_bridges_non_canonical_names():
+    print("\n[parcel_master translator: field_map bridges non-canonical scraper names (r3)]")
+    fn = lookup("parcel_master")
+    # Scraper writes situs_*/property_class instead of canonical names.
+    raw = [{
+        "raw_record_id": "p_fm",
+        "source_id": "parcel_master",
+        "raw_payload": {
+            "parcel_id": "CAD-FM",
+            "situs_address": "600 PARCELMAP CT",
+            "situs_city": "BOERNE",
+            "situs_zip": "78006",
+            "owner_name": "FIELDMAP OWNER",
+            "owner_mailing_addr1": "PO BOX 1",
+            "owner_mailing_city": "AUSTIN",
+            "owner_mailing_state": "ZZ",
+            "owner_mailing_zip": "78701",
+            "assessed_value": 300000,
+            "land_value": 60000,
+            "improvement_value": 240000,
+            "year_built": 1985,
+            "property_class": "A1",
+            "acres": 0.25,
+            "legal_description": "LOT 5 BLOCK 9",
+            "exempt_homestead": True,
+            "exempt_over_65": False,
+            "exempt_disabled": False,
+        },
+    }]
+    source_config = {
+        "translator": "parcel_master",
+        "field_map": {
+            "address": "situs_address",
+            "city": "situs_city",
+            "zip": "situs_zip",
+            "owner_mailing_address": "owner_mailing_addr1",
+            "property_use": "property_class",
+        },
+    }
+    sig, par, meta = fn(raw, {}, source_config)
+    case("field_map bridges yields one parcel", len(par) == 1)
+    if par:
+        p = par[0]
+        case("parcel_id preserved", p["parcel_id"] == "CAD-FM")
+        case(
+            "address resolved via field_map",
+            p["address"] == "600 PARCELMAP CT",
+        )
+        case(
+            "city resolved via field_map",
+            p["city"] == "BOERNE",
+        )
+        case(
+            "zip resolved via field_map",
+            p["zip"] == "78006",
+        )
+        case(
+            "owner_mailing_address resolved via field_map",
+            p["owner_mailing_address"] == "PO BOX 1",
+        )
+        case(
+            "property_use resolved via field_map",
+            p["property_use"] == "A1",
+        )
+        case(
+            "owner_name still resolves via identity (no field_map entry)",
+            p["owner_name"] == "FIELDMAP OWNER",
+        )
+        case(
+            "assessed_value parses correctly through identity",
+            p["assessed_value"] == 300000,
+        )
+        case(
+            "exempt_homestead boolean preserved",
+            p["exempt_homestead"] is True,
+        )
+
+
+def test_parcel_master_translator_no_field_map_identity():
+    print("\n[parcel_master translator: no field_map = identity mapping (r3 backward-compat)]")
+    fn = lookup("parcel_master")
+    # Scraper writes canonical names; no field_map needed.
+    raw = [{
+        "raw_record_id": "p_identity",
+        "raw_payload": {
+            "parcel_id": "CAD-ID",
+            "address": "800 IDENTITY ST",
+            "owner_name": "IDENTITY OWNER",
+            "city": "ACCEPTEDTOWN",
+            "exempt_homestead": True,
+        },
+    }]
+    source_config = {"translator": "parcel_master"}
+    sig, par, meta = fn(raw, {}, source_config)
+    case("identity: one parcel produced", len(par) == 1)
+    if par:
+        case(
+            "identity: address read directly without field_map",
+            par[0]["address"] == "800 IDENTITY ST",
+        )
+
+
 def main() -> int:
     print("=" * 72)
-    print("TRANSLATOR REGISTRY TEST — v5.1.2-beta-r2")
+    print("TRANSLATOR REGISTRY TEST — v5.1.2-beta-r3")
     print("=" * 72)
     test_builtins_registered()
     test_lookup_returns_callable()
@@ -497,6 +712,11 @@ def main() -> int:
     test_parcel_master_translator_empty_parcel_id_skipped()
     test_csv_static_list_doc_type_synonyms()
     test_csv_static_list_unknown_doc_type_skipped()
+    # r3 additions: field_map support (universal translator feature)
+    test_foreclosure_translator_field_map_bridges_non_canonical_names()
+    test_foreclosure_translator_partial_field_map()
+    test_parcel_master_translator_field_map_bridges_non_canonical_names()
+    test_parcel_master_translator_no_field_map_identity()
 
     passed = sum(1 for r in results if r[0] == PASS)
     failed = sum(1 for r in results if r[0] == FAIL)

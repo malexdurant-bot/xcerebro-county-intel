@@ -51,12 +51,39 @@ parsing inline (legacy compatibility mode).
 Renamed in v5.1.2-beta-r2: dropped the vendor-protocol prefix from the
 translator name. The translator is no longer protocol-specific.
 
-Expected `source_config` structure (minimal):
+Expected `source_config` structure (minimal — scraper produces canonical names):
 
     {
         "translator": "parcel_master",
         "parcel_id_prefix": "CAD-"
     }
+
+Expected `source_config` structure with field_map (v5.1.2-beta-r3+, when
+the scraper's normalized field names differ from canonical):
+
+    {
+        "translator": "parcel_master",
+        "parcel_id_prefix": "CAD-",
+        "field_map": {
+            "address": "situs_address",
+            "city": "situs_city",
+            "zip": "situs_zip",
+            "owner_mailing_address": "owner_mailing_addr1",
+            "property_use": "property_class"
+            # Other canonical names that match identically can be omitted.
+        }
+    }
+
+`field_map` is OPTIONAL. Keys are the canonical field names the translator
+expects; values are the actual field names the scraper writes to raw_payload.
+If a key is absent from field_map (or field_map itself is absent), identity
+mapping applies — the translator reads the canonical name directly from
+raw_payload.
+
+Exemption boolean keys (`exempt_homestead`, `exempt_over_65`, `exempt_disabled`,
+`exempt_veteran`) are NOT field-mapped. The scraper either emits these
+canonical boolean keys directly or doesn't emit them at all — the framework
+defines exemption semantics, not per-source exemption nomenclature.
 
 Legacy-compatibility config (when scraper emits raw exemptions string):
 
@@ -133,18 +160,32 @@ def translate_parcel_master(
     tc = source_config.get("translator_config", {}) or {}
     legacy_exemption_codes = tc.get("exemption_codes", {})
 
+    # Field-name bridge (v5.1.2-beta-r3+). The translator reads canonical
+    # framework field names from raw_payload. If a scraper's normalized
+    # field names differ from canonical, source_config.field_map declares
+    # the mapping: keys are canonical names the translator expects, values
+    # are the actual field names the scraper writes to raw_payload.
+    # If field_map is absent, identity mapping is used.
+    field_map = source_config.get("field_map", {}) or {}
+
+    def _resolve(canonical_name: str) -> str:
+        """Resolve a canonical field name to the source's actual field name."""
+        return field_map.get(canonical_name, canonical_name)
+
     parcels: list[dict] = []
 
     for raw in raw_records:
         # Canonical shape: raw_payload contains normalized fields.
         payload = raw.get("raw_payload", {}) or {}
 
-        parcel_id = payload.get("parcel_id")
+        parcel_id = payload.get(_resolve("parcel_id"))
         if parcel_id is None or str(parcel_id).strip() == "":
             continue
 
         # Parse exemptions. Prefer pre-parsed booleans; fall back to legacy
         # string parsing if booleans absent and legacy config provided.
+        # Exemption keys are framework-canonical and not field-mapped — the
+        # scraper either emits them as canonical or doesn't emit them at all.
         if "exempt_homestead" in payload or "exempt_over_65" in payload:
             exemption_flags = {
                 "exempt_homestead": bool(payload.get("exempt_homestead", False)),
@@ -153,28 +194,28 @@ def translate_parcel_master(
                 "exempt_veteran": bool(payload.get("exempt_veteran", False)),
             }
         else:
-            raw_exemptions = payload.get("exemptions")
+            raw_exemptions = payload.get(_resolve("exemptions"))
             exemption_flags = _parse_legacy_exemptions(
                 raw_exemptions, legacy_exemption_codes
             )
 
         parcel = {
             "parcel_id": str(parcel_id).strip(),
-            "address": (payload.get("address") or "").strip(),
-            "owner_name": (payload.get("owner_name") or "").strip(),
-            "owner_mailing_address": (payload.get("owner_mailing_address") or "").strip(),
-            "owner_mailing_city": (payload.get("owner_mailing_city") or "").strip(),
-            "owner_mailing_state": (payload.get("owner_mailing_state") or "").strip(),
-            "owner_mailing_zip": (payload.get("owner_mailing_zip") or "").strip(),
-            "city": (payload.get("city") or "").strip(),
-            "zip": (payload.get("zip") or "").strip(),
-            "assessed_value": _try_int(payload.get("assessed_value")),
-            "land_value": _try_int(payload.get("land_value")),
-            "improvement_value": _try_int(payload.get("improvement_value")),
-            "year_built": _try_int(payload.get("year_built")),
-            "property_use": payload.get("property_use") or "",
-            "acres": payload.get("acres"),
-            "legal_description": (payload.get("legal_description") or "").strip(),
+            "address": (payload.get(_resolve("address")) or "").strip(),
+            "owner_name": (payload.get(_resolve("owner_name")) or "").strip(),
+            "owner_mailing_address": (payload.get(_resolve("owner_mailing_address")) or "").strip(),
+            "owner_mailing_city": (payload.get(_resolve("owner_mailing_city")) or "").strip(),
+            "owner_mailing_state": (payload.get(_resolve("owner_mailing_state")) or "").strip(),
+            "owner_mailing_zip": (payload.get(_resolve("owner_mailing_zip")) or "").strip(),
+            "city": (payload.get(_resolve("city")) or "").strip(),
+            "zip": (payload.get(_resolve("zip")) or "").strip(),
+            "assessed_value": _try_int(payload.get(_resolve("assessed_value"))),
+            "land_value": _try_int(payload.get(_resolve("land_value"))),
+            "improvement_value": _try_int(payload.get(_resolve("improvement_value"))),
+            "year_built": _try_int(payload.get(_resolve("year_built"))),
+            "property_use": payload.get(_resolve("property_use")) or "",
+            "acres": payload.get(_resolve("acres")),
+            "legal_description": (payload.get(_resolve("legal_description")) or "").strip(),
             "parcel_master_status": "matched_pending_join",
             **exemption_flags,
         }

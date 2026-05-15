@@ -49,7 +49,7 @@ SUPPORTED_PHASES = ("phase0",)
 
 # Framework version stamp — must match FRAMEWORK_VERSION.json. Updated here
 # so generated launch files record which framework version produced them.
-FRAMEWORK_VERSION = "v5.1.2-beta-r2"
+FRAMEWORK_VERSION = "v5.1.2-beta-r3"
 
 
 def parse_args(argv):

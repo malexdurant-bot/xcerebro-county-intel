@@ -1184,6 +1184,31 @@ A canonical-field-name registry (`scaffold/data/canonical_record_fields.json` or
 - Match the field names used in existing v5.1.2-beta-r2+ canonical translators (see `scaffold/pipeline/translators/foreclosure_notices.py` and `scaffold/pipeline/translators/parcel_master.py` docstrings for current canonical names)
 - Document any deviations in their docstring AND map them via per-source `field_map` config
 
+### Field-name bridge via source_config.field_map (v5.1.2-beta-r3+)
+
+When a scraper's normalized field names DIFFER from the translator's expected canonical names — common during initial framework adoption when scrapers predate the canonical-field-name decisions — the source config can declare a `field_map`:
+
+```json
+{
+  "translator": "parcel_master",
+  "field_map": {
+    "address": "situs_address",
+    "city": "situs_city",
+    "zip": "situs_zip",
+    "owner_mailing_address": "owner_mailing_addr1",
+    "property_use": "property_class"
+  }
+}
+```
+
+Keys are the canonical field names the translator expects; values are the actual field names the scraper writes to `raw_payload`. The translator resolves each canonical name through `field_map` before reading. Canonical fields NOT listed in `field_map` are read directly (identity mapping).
+
+`field_map` is OPTIONAL. Scrapers that already normalize to canonical names need no `field_map` at all. Scrapers that normalize to source-specific conventions provide a `field_map` and the translator bridges automatically. This eliminates the need to either (a) re-scrape after framework adoption, or (b) require all scrapers to adopt canonical names immediately.
+
+Limitations of `field_map`:
+- Exemption boolean keys (`exempt_homestead`, `exempt_over_65`, `exempt_disabled`, `exempt_veteran`) are NOT field-mapped. The scraper either emits canonical exemption keys directly or doesn't emit them at all. Exemption semantics are framework-canonical; per-source nomenclature is not honored.
+- `field_map` is read by translators built in v5.1.2-beta-r3+. Custom county translators registered via `@register(name, force=True)` are responsible for honoring their own `field_map` if they want this capability.
+
 ### Enforcement
 
 This contract is enforced by `scaffold/tests/test_translator_registry.py`, which feeds wrapped/normalized synthetic records to every registered translator and asserts correct output. The gate test will catch translators that bypass `raw_payload` and read top-level fields, or that assume vendor-protocol field names.
