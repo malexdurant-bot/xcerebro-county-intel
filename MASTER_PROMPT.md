@@ -1048,6 +1048,68 @@ This file is created by the bootstrap script when the run directory is created (
 
 ---
 
+## 4.31. Universality contract (v5.1.2-beta+)
+
+This section exists because the v5.1.1-beta-seeded Bexar build (May 2026) produced a working Phase 1–4 pipeline but contaminated the universal framework with Bexar-specific data: a `BEXAR_ACCEPTED_CITIES` frozenset inside `scaffold/pipeline/source_translators.py`, a Texas-specific `first_tuesday_of_month` helper, hardcoded BCAD field names in the matcher, a single-county source dispatch in `build_leads.py`, BCAD-specific comments in seven framework files, and a hardcoded `BX-ADDR-` parcel-ID prefix. An audit identified 11 specific Bexar leaks in `scaffold/pipeline/` and 4 in `dashboard/`. The framework code knew it was running for Bexar.
+
+That violated the core product promise: **the framework is universal, the county build is configured, and county-specific data lives in county-scoped files**. v5.1.2-beta locks in this contract.
+
+**Locked rule 4.31.1 — No county name, no city name, no statute reference, no portal hostname, no vendor name in `scaffold/pipeline/`.**
+
+Any file under `scaffold/pipeline/` (including `scaffold/pipeline/translators/`) MUST NOT contain a literal string referencing:
+
+- A real US county name (Bexar, Maricopa, Cuyahoga, etc.)
+- A real US city name (San Antonio, Phoenix, etc.) — unless it's a generic example in a comment block, clearly labeled as illustrative
+- A US state's foreclosure / probate / assessor statute (Tex. Prop. Code §51.002, Cal. Civ. Code §2924, etc.)
+- A vendor portal hostname (publicsearch.us, tylertech.cloud, harrisgovern.com, etc.)
+- A real county-specific vendor product name (BCAD, HCAD, etc.)
+
+The `test_county_agnostic_regression.py` test enforces this rule by scanning `scaffold/pipeline/**/*.py` (and other universal directories) and failing on any of the patterns above. The test exempts `data/`, `runs/`, `.claude/`, `dashboard/`, and `scrapers/` because those are county-scoped or operator-scoped.
+
+**Locked rule 4.31.2 — Cross-county portability.** The same `scaffold/pipeline/` code must run for any county without code changes. Counties enter the pipeline through three doors and three doors only:
+
+1. **County config** — `config/counties/<slug>.json`. Reads include `geography.accepted_municipalities[]`, `geography.sale_date_rule`, `geography.cross_county_policy`, `sources.<id>.translator`, `sources.<id>.translator_config`, `sources.<id>.field_map`, `sources.<id>.doc_type_synonyms`, `sources.<id>.parcel_id_prefix`, `state_rule_family`.
+2. **Source adapters** — `scrapers/<source>.py`. County-side code that scrapes a portal. Adapter output is normalized raw records; the framework's translator registry converts them into signals + parcels.
+3. **Translator registry** — `scaffold/pipeline/translators/`. The framework provides generic translators (ArcGIS foreclosure notices, ArcGIS parcel master, CSV static list, etc.) plus a hybrid registry where counties register additional named translators via county adapter code when none of the built-ins fit.
+
+The orchestrator (`scaffold/pipeline/build_leads.py`) MUST NOT branch on source ID, county name, or state. It MUST dispatch to translators by string name from county config.
+
+**Locked rule 4.31.3 — State-specific rules go through state rule families.**
+
+`geography.sale_date_rule.rule_name` selects an entry from `scaffold/pipeline/sale_date_rules.py`'s registry. Built-in rules: `first_tuesday_of_month` (TX, GA), `first_monday_of_month`, `first_business_day_of_month`, `scheduled_by_sheriff`, `first_of_month` (fallback). `geography.sale_date_rule.holiday_shift` declares which date-shift logic to apply when the computed date is a state-recognized holiday. `state_rule_family` is reserved for future per-state defaults (statute references, foreclosure-stage doc-type defaults). State rules NEVER appear as literal logic in pipeline code.
+
+**Locked rule 4.31.4 — Doc-type synonyms come from config, not code.**
+
+Each source declares its own doc-type label → canonical mapping in `sources.<id>.doc_type_synonyms`. The pipeline's normalize module reads this per-source map at runtime. There is no in-code synonym table referencing state-specific instruments. Common state-level doc-type variants belong in `canonical_doc_types.json` as `common_abbreviations` on the canonical entry.
+
+**Locked rule 4.31.5 — Field maps come from config, not code.**
+
+Each source declares its raw-field-name → framework-canonical-field-name mapping in `sources.<id>.field_map`. The matcher and the parcel translator read this map at runtime. No source-specific field name appears as a literal in `scaffold/pipeline/`.
+
+**Locked rule 4.31.6 — Parcel ID prefixes come from config, not code.**
+
+Each source whose translator emits placeholder parcel IDs declares its prefix in `sources.<id>.parcel_id_prefix`. The translator uses this prefix. If omitted, the framework uses a generic `PARCEL-` prefix.
+
+**Locked rule 4.31.7 — Synthetic fixture data and overrides stay in `scaffold/data/`.**
+
+The synthetic harness is framework-canonical. Synthetic fixtures (`synthetic_signals.jsonl`, `synthetic_parcels.jsonl`, `synthetic_expectations.json`) live in `scaffold/data/`. Synthetic-mode-only attribute overrides MUST NOT appear in production pipeline code. If a synthetic fixture needs an override that doesn't fall out naturally from the pipeline's production logic, the override lives in `scaffold/data/synthetic_attribute_overrides.json` (new in v5.1.2-beta), loaded ONLY when the orchestrator is invoked with `--synthetic`. Production runs MUST NOT read this file.
+
+**Locked rule 4.31.8 — Defensive guard on owner-name signal emission.**
+
+The owner-name pattern emitter (`scaffold/pipeline/owner_name_patterns.py`) MUST NOT emit signals for parcels that aren't already linked to a lead-generating signal in the current run. Standalone parcels — enrichment-only records — cannot produce lead rows. This rule is enforced by the emitter itself: callers pass the set of parcel IDs that already carry a lead-generating signal; the emitter refuses to emit for parcels outside that set. The clerk-driven product rule is thus enforced at three layers: orchestrator dispatch, signal emission, and dashboard projection (Two-Truths invariant in `dashboard.py`).
+
+**Locked rule 4.31.9 — Translator registry is the only source-dispatch path.**
+
+The orchestrator MUST iterate over `county_config.sources`, look up `sources.<id>.translator`, dispatch via `translators.lookup(name)(raw_records, county_config, source_config)`. It MUST NOT contain a hardcoded `if source_id == "foreclosure_notices_map":` branch or any other source-specific dispatch logic.
+
+**Locked rule 4.31.10 — Comments referencing real counties are scrubbed.**
+
+Comments in universal pipeline files (`scaffold/pipeline/**`) referencing a real county, city, or vendor by name are scrubbed during v5.1.2-beta. Where an example is illustrative, the comment uses generic placeholders (`<county>`, `<source>`, `<vendor>`). The regression test scans comments too.
+
+These ten rules are enforced by `scaffold/tests/test_county_agnostic_regression.py`, which is now part of the gate suite (was historically more lenient). The test fails the build if any of the patterns above appear in universal directories.
+
+---
+
 ## 5. Two-Truths invariant
 
 The dashboard's filter counts and the rendered table must come from the same `matches()` function. Header counts in `leads.json` (`pattern_counts`, `attribute_counts`, etc.) must equal counts re-derived from `records[]`. The pipeline writes both; the build script asserts equality before saving and exits non-zero on drift.

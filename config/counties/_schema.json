@@ -45,6 +45,23 @@
         "exploratory"
       ]
     },
+    "state_rule_family": {
+      "type": "string",
+      "description": "v5.1.2-beta+: Identifies the state legal framework this county operates under. Translators and matchers use this to look up state-level defaults (statute references, foreclosure-stage doc-types, recording conventions) without hardcoding state-specific logic in scaffold/pipeline/. Counties in the same state share a rule family. If a county needs to override the state family's defaults, the override goes in geography.* or sources.*. If omitted, the framework operates with no state-level assumptions (all rules must be specified explicitly per county).",
+      "enum": [
+        "TX_non_judicial_foreclosure",
+        "CA_non_judicial_foreclosure",
+        "AZ_non_judicial_foreclosure",
+        "GA_non_judicial_foreclosure",
+        "FL_judicial_foreclosure",
+        "NY_judicial_foreclosure",
+        "NJ_judicial_foreclosure",
+        "OH_judicial_foreclosure",
+        "PA_judicial_foreclosure",
+        "IL_judicial_foreclosure",
+        ""
+      ]
+    },
     "geography": {
       "type": "object",
       "required": [
@@ -54,6 +71,7 @@
       "properties": {
         "municipalities": {
           "type": "array",
+          "description": "Canonical list of incorporated municipalities in this county. Used for dashboard filters, location parsers, and validation. Distinct from accepted_municipalities[] which is a superset including unincorporated communities + spelling variants.",
           "items": {
             "type": "object",
             "required": [
@@ -70,6 +88,93 @@
               "fips_place": {
                 "type": "string"
               }
+            }
+          }
+        },
+        "accepted_municipalities": {
+          "type": "array",
+          "description": "v5.1.2-beta+: Superset of municipalities[] including unincorporated communities, CDP designations, and spelling variants known to be in-county. Used by source translators to gate the potential_cross_county_leak review flag — addresses whose city is NOT in this list get flagged for operator review. Each entry has a `name` (uppercase canonical) and a `kind` describing why it's accepted. If omitted, cross-county detection falls back to municipalities[] only.",
+          "items": {
+            "type": "object",
+            "required": ["name", "kind"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Uppercase canonical name. Translators compare addresses against this exact string (case-insensitive)."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "incorporated",
+                  "unincorporated_community",
+                  "cdp",
+                  "spelling_variant",
+                  "neighboring_overlap"
+                ],
+                "description": "Why this name is accepted. `neighboring_overlap` flags cities that border the county and may legitimately appear in records (handled at translator level, NOT a cross-county leak)."
+              },
+              "canonical_name": {
+                "type": "string",
+                "description": "Optional. If this entry is a spelling_variant or CDP, what its canonical municipality name is."
+              }
+            }
+          }
+        },
+        "cross_county_policy": {
+          "type": "object",
+          "description": "v5.1.2-beta+: How translators should handle addresses whose city is not in accepted_municipalities[]. Controls whether the lead is dropped, flagged for review, or accepted with a warning.",
+          "properties": {
+            "unknown_city_action": {
+              "type": "string",
+              "enum": ["drop", "flag_for_review", "accept_with_warning"],
+              "default": "flag_for_review",
+              "description": "What to do with leads from a city not in accepted_municipalities[]. `flag_for_review` is recommended (sets review_flag=potential_cross_county_leak). `drop` discards the lead. `accept_with_warning` writes a note but still ships the lead."
+            },
+            "neighboring_county_municipalities": {
+              "type": "array",
+              "description": "Optional list of municipality names known to overlap the county boundary. Useful for operator review notes.",
+              "items": {"type": "string"}
+            }
+          }
+        },
+        "sale_date_rule": {
+          "type": "object",
+          "description": "v5.1.2-beta+: How translators should derive `expected_sale_date` for foreclosure / sheriff sale leads when the raw source only provides year+month. Captures state statute. The framework provides a registry of rule implementations; counties pick by `rule_name`. If omitted, translators use first-of-month as a fallback.",
+          "properties": {
+            "rule_name": {
+              "type": "string",
+              "enum": [
+                "first_tuesday_of_month",
+                "first_monday_of_month",
+                "first_business_day_of_month",
+                "any_business_day_after_notice",
+                "scheduled_by_sheriff",
+                "scheduled_by_court",
+                "custom"
+              ],
+              "description": "Registered rule name. Framework dispatches to the matching implementation."
+            },
+            "holiday_shift": {
+              "type": "object",
+              "description": "Optional. How to shift sale dates that fall on a state-recognized holiday.",
+              "properties": {
+                "shift_dates": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9]{2}-[0-9]{2}$",
+                    "description": "MM-DD format. E.g. '01-01' for New Year's Day, '07-04' for Independence Day."
+                  }
+                },
+                "shift_to": {
+                  "type": "string",
+                  "enum": ["next_weekday", "next_wednesday", "next_tuesday", "next_business_day", "previous_business_day"]
+                }
+              }
+            },
+            "statute_reference": {
+              "type": "string",
+              "description": "Plain-text citation. Used in operator notes and dashboard explanations."
             }
           }
         },
@@ -151,11 +256,41 @@
           "scraper_module": {
             "type": "string"
           },
+          "translator": {
+            "type": "string",
+            "description": "v5.1.2-beta+: Name of a registered translator function in scaffold/pipeline/translators/. Tells the orchestrator how to convert this source's raw records into framework signals + placeholder parcels. If empty, the orchestrator skips this source during pipeline run (raw data still gets pulled but does not produce signals). Examples: 'arcgis_foreclosure_notices', 'arcgis_parcel_master', 'publicsearch_clerk_recordings', 'tyler_odyssey_court', 'csv_static_list'.",
+            "enum": [
+              "",
+              "arcgis_foreclosure_notices",
+              "arcgis_parcel_master",
+              "publicsearch_clerk_recordings",
+              "tyler_odyssey_court",
+              "csv_static_list",
+              "static_html_table",
+              "custom"
+            ]
+          },
+          "translator_config": {
+            "type": "object",
+            "description": "v5.1.2-beta+: Per-translator configuration. Schema is translator-specific; the translator validates its own config at registration time. Examples: layer_doc_type_map for arcgis_foreclosure_notices, field_label_aliases for publicsearch_clerk_recordings."
+          },
+          "field_map": {
+            "type": "object",
+            "description": "v5.1.2-beta+: Maps the source's raw field names to framework-canonical field names. Replaces hardcoded source-specific field name references in pipeline code. Example for an appraisal-district parcel source: {\"parcel_id\": \"<source's parcel ID field>\", \"situs_address\": \"<source's situs field>\", \"owner_name\": \"<source's owner field>\", \"exemptions\": \"<source's exemptions field>\"}. Keys are framework-canonical field names; values are the source's actual field names.",
+            "additionalProperties": {"type": "string"}
+          },
+          "parcel_id_prefix": {
+            "type": "string",
+            "description": "v5.1.2-beta+: Prefix used to construct synthetic parcel IDs when this source produces records that aren't yet matched to a real parcel-master entry. Replaces hardcoded prefixes in pipeline code. Should be SHORT and county-mnemonic. If omitted, framework uses a generic 'PARCEL-' prefix.",
+            "pattern": "^[A-Z][A-Z0-9_-]{0,15}-?$"
+          },
           "fields": {
             "type": "object"
           },
           "doc_type_synonyms": {
-            "type": "object"
+            "type": "object",
+            "description": "v5.1.2-beta+: Maps source-specific document type strings to framework-canonical doc type names. Replaces hardcoded source aliases in scaffold/pipeline/normalize.py. Keys are the source's literal doc-type strings (case-insensitive lookup at runtime); values are canonical type names from knowledge_base/domain/canonical_doc_types.json. Example: {\"Notice of Substitute Trustee's Sale\": \"NOTICE_OF_SUBSTITUTE_TRUSTEE_SALE\", \"NSTS\": \"NOTICE_OF_SUBSTITUTE_TRUSTEE_SALE\"}.",
+            "additionalProperties": {"type": "string"}
           },
           "refresh_cadence": {
             "type": "string",

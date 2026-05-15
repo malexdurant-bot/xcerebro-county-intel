@@ -1,0 +1,12 @@
+{
+  "_description": "Synthetic-mode-only attribute overrides per MASTER_PROMPT §4.31.7 (v5.1.2-beta+). Loaded ONLY when scaffold/pipeline/build_leads.py is invoked with --synthetic. Production runs MUST NOT read this file. If a synthetic fixture needs an attribute that doesn't fall out of the production pipeline naturally (e.g., the harness needs to assert long_term_owned on a specific SYN-001 fixture even when no last_sale_date is wired in), the override goes here. This isolates synthetic test-harness needs from production code paths.",
+  "_format_version": "1.0.0",
+  "_loaded_when": "mode == 'synthetic' only",
+  "_callers": ["scaffold/pipeline/build_leads.py --synthetic"],
+  "overrides_by_parcel_id": {
+    "SYN-001": {
+      "_note": "Example structure. Real synthetic harness data is shipped via scaffold/data/synthetic_expectations.json; this file is for fixture-specific attribute injections only.",
+      "attributes": []
+    }
+  }
+}

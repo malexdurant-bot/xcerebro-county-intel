@@ -1020,6 +1020,40 @@
       ],
       "notes": "Personal property security interest. Enrichment.",
       "source_priority": "P2"
+    },
+    "ESTATE_OWNER_NAME_PATTERN": {
+      "lead_pattern": "estate",
+      "subtype": "estate_owner_name_pattern",
+      "source_class": "lead_generating",
+      "default_confidence": 75,
+      "document_priority": 55,
+      "common_abbreviations": [],
+      "notes": "v5.1.2-beta+: Derived signal emitted by the pipeline when a parcel-master owner-name string matches an estate/heirship regex pattern (e.g. 'ESTATE OF', 'EST OF', 'HEIRS OF', 'HEIRS'). Medium confidence because it's a name pattern, not a court-filed instrument — but operationally valuable: appraisal districts see the estate string the moment the owner of record changes, often weeks or months before probate court filings surface. Pairs powerfully with foreclosure_notices and tax_delinquency to identify heir-hunting opportunities.",
+      "source_priority": "P2"
+    },
+    "LIVING_TRUST_OWNER_NAME_PATTERN": {
+      "lead_pattern": "transfer",
+      "subtype": "living_trust_owner_name_pattern",
+      "source_class": "lead_generating",
+      "default_confidence": 70,
+      "document_priority": 30,
+      "common_abbreviations": [],
+      "notes": "v5.1.2-beta+: Derived signal emitted by the pipeline when a parcel-master owner-name string matches a living-trust regex pattern (e.g. 'LIVING TRUST', 'FAMILY TRUST', 'REVOCABLE TRUST', 'REV TRUST', 'TRUSTEE'). Trust ownership often signals a deceased or incapacitated original owner — the trust holds the property because the grantor can no longer act on it directly. Operator leverage when paired with distress signals.",
+      "source_priority": "P2"
+    },
+    "SHERIFF_SALE_SURPLUS": {
+      "lead_pattern": "surplus_owed",
+      "subtype": "sheriff_sale_surplus",
+      "source_class": "lead_generating",
+      "default_confidence": 80,
+      "document_priority": 50,
+      "common_abbreviations": [
+        "SURPLUS",
+        "SALE SURPLUS",
+        "SHERIFF SURPLUS"
+      ],
+      "notes": "v5.1.2-beta+: Notice or filing that proceeds from a sheriff sale exceeded the debt owed. Former owner is entitled to the surplus funds and is typically a high-value contact target. Promoted from synthetic-only canonical to real canonical so production sources can declare this type via doc_type_synonyms.",
+      "source_priority": "P0"
     }
   },
   "lead_patterns": [

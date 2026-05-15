@@ -5,6 +5,7 @@ Runs:
   1. scaffold/tests/test_golden_path.py
   2. scaffold/tests/test_county_agnostic_regression.py
   3. scaffold/tests/test_write_county_config.py   (v5.1.1-beta+)
+  4. scaffold/tests/test_translator_registry.py    (v5.1.2-beta+)
 
 All must pass for the framework to be shippable. Exits 0 only when every
 test exits 0. Operator-friendly output preserved from each underlying script.
@@ -16,6 +17,7 @@ Each underlying script can still be run directly for focused work:
   python scaffold/tests/test_golden_path.py
   python scaffold/tests/test_county_agnostic_regression.py
   python scaffold/tests/test_write_county_config.py
+  python scaffold/tests/test_translator_registry.py
 """
 
 import subprocess
@@ -29,6 +31,7 @@ TESTS = [
     ("Golden path", TESTS_DIR / "test_golden_path.py"),
     ("County-agnostic regression", TESTS_DIR / "test_county_agnostic_regression.py"),
     ("Atomic county config writer (v5.1.1-beta)", TESTS_DIR / "test_write_county_config.py"),
+    ("Translator registry (v5.1.2-beta)", TESTS_DIR / "test_translator_registry.py"),
 ]
 
 

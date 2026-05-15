@@ -251,7 +251,54 @@ Edit `domain/00_client_business_model.md` (persona), `domain/04_deal_path_classi
 
 ## Versioning
 
-This is **v5.1.1-beta**.
+This is **v5.1.2-beta**.
+
+**v5.1.2-beta changes from v5.1.1-beta** (universality contract enforcement — schema additions, no breaking schema changes for existing configs):
+
+This release closes the universality drift identified by the May 2026 audit of a v5.1.1-beta-seeded Phase 1-4 county build. The audit found 11 specific county-specific leaks in `scaffold/pipeline/` and 4 in `dashboard/`: a hardcoded municipality frozenset, a state-specific sale-date helper, hardcoded source-id dispatch in the orchestrator, in-code doc-type aliases, county-mnemonic parcel ID prefixes baked into code, vendor-named comments, and a single-county translator module. The framework code knew it was running for a specific county. v5.1.2-beta locks the universality contract.
+
+Key additions:
+
+- **MASTER_PROMPT.md §4.31 Universality Contract.** Ten locked rules. No county name, city, statute, vendor, or portal hostname in `scaffold/pipeline/`. Cross-county portability. State rules via `sale_date_rules` registry. Doc-type synonyms from config. Field maps from config. Parcel-ID prefixes from config. Synthetic-fixture overrides isolated to `scaffold/data/synthetic_attribute_overrides.json`. Owner-name signal emitter requires the defensive guard (parcels not already linked to a lead-generating signal cannot produce a signal). Translator registry is the only source-dispatch path. County-specific comments are scrubbed.
+- **Schema additions** (`config/counties/_schema.json`):
+  - `geography.accepted_municipalities[]` — superset of municipalities including unincorporated communities, spelling variants, neighboring overlaps. Replaces hardcoded city frozensets in universal code.
+  - `geography.cross_county_policy` — `unknown_city_action` (drop | flag_for_review | accept_with_warning) plus optional `neighboring_county_municipalities`.
+  - `geography.sale_date_rule` — `rule_name` selects from the framework registry (`first_tuesday_of_month`, `first_monday_of_month`, `first_business_day_of_month`, `first_of_month`, etc.); `holiday_shift` parameterizes date-shift logic; `statute_reference` for operator-readable provenance.
+  - `state_rule_family` at config root — reserved for future per-state defaults.
+  - `sources.<id>.translator` — name of a registered translator (enum). Replaces hardcoded source dispatch.
+  - `sources.<id>.translator_config` — per-translator config (layer maps, field maps, etc.).
+  - `sources.<id>.field_map` — raw-field-name → canonical-field-name mapping. Replaces in-code source-specific field literals.
+  - `sources.<id>.parcel_id_prefix` — county-mnemonic prefix for synthetic parcel IDs. Replaces hardcoded prefixes.
+  - `sources.<id>.doc_type_synonyms` — per-source doc-type label → canonical-type mapping. Replaces in-code synonym tables.
+- **canonical_doc_types.json additions:** 71 → 74 types.
+  - `ESTATE_OWNER_NAME_PATTERN` (lead_pattern: estate, default_confidence: 75). Promotes owner-name-pattern signal class from synthetic-only to canonical.
+  - `LIVING_TRUST_OWNER_NAME_PATTERN` (lead_pattern: transfer, default_confidence: 70).
+  - `SHERIFF_SALE_SURPLUS` (lead_pattern: surplus_owed, default_confidence: 80). Promotes from synthetic-only to canonical.
+- **New framework modules** (county-agnostic; verified by upgraded regression test):
+  - `scaffold/pipeline/__init__.py` — package contract.
+  - `scaffold/pipeline/translators/__init__.py` — translator registry. `register(name, force=False)`, `lookup(name)`, `registered_names()`, `unregister(name)`, `clear()`. Raises `TranslatorAlreadyRegistered` on duplicate, `TranslatorNotFound` on missing.
+  - `scaffold/pipeline/translators/arcgis_foreclosure_notices.py` — built-in. Reads `translator_config.layer_doc_type_map`, honors `geography.accepted_municipalities`, `geography.cross_county_policy`, `geography.sale_date_rule`, `sources.<id>.parcel_id_prefix`.
+  - `scaffold/pipeline/translators/arcgis_parcel_master.py` — built-in. Reads `sources.<id>.field_map` and `translator_config.exemption_codes`. Returns parcels (no signals — parcel_master is enrichment).
+  - `scaffold/pipeline/translators/csv_static_list.py` — built-in. Per-source `doc_type_synonyms` for label → canonical mapping. Skips records with unmapped doc-types (never guesses).
+  - `scaffold/pipeline/sale_date_rules.py` — built-in rule registry (`first_tuesday_of_month`, `first_monday_of_month`, `first_business_day_of_month`, `first_of_month`) with configurable holiday_shift. County rules are NAMED, not encoded.
+  - `scaffold/pipeline/owner_name_patterns.py` — universal regex emitter. **Defensive guard**: `emit_owner_name_signals_for_parcel()` requires `parcels_with_lead_signals: set[str]` and refuses to emit for parcels not in that set. Closes audit Q9 fragility — standalone enrichment-only parcels cannot create lead rows.
+- **scaffold/data/synthetic_attribute_overrides.json** — placeholder isolating synthetic-fixture-only attribute overrides per §4.31.7. Production runs MUST NOT read this file.
+- **Upgraded `scaffold/tests/test_county_agnostic_regression.py`:** Now scans 15+ phrase patterns including vendor names (BCAD, HCAD, MCAD, etc.), portal hostnames (publicsearch.us, tylertech.cloud, etc.), state statute references (Tex. Prop. Code, Cal. Civ. Code, etc.). Exempts `data/`, `.claude/`, `dashboard/`, `scrapers/`, `scaffold/tests/fixtures/`, `scaffold/data/`, `sale_date_rules.py`, `MASTER_PROMPT.md`, `MIGRATION.md`, `LICENSE.md`, `START_HERE.md`, `README.md`, `bootstrap_county.py`, vendor portal library. PASSES on framework.
+- **New `scaffold/tests/test_translator_registry.py`:** 26 tests covering builtin registration, lookup, force-override semantics, duplicate-refusal, cross-county-leak policy (drop/flag), sale_date_rule dispatch, parcel_master field_map parsing, csv_static_list per-source doc_type_synonyms, unknown-doc-type skip behavior.
+- **`scaffold/tests/run_all.py`** wired in the translator registry test (4 tests in gate suite now).
+- **`README.md`** autonomy-boundaries section updated with the universality contract as the third boundary.
+- **`scaffold/bootstrap_county.py`** FRAMEWORK_VERSION stamp bumped to `v5.1.2-beta`.
+- **`FRAMEWORK_VERSION.json`** bumped to `v5.1.2-beta`, `locked_at: 2026-05-14`.
+
+**This is NOT a breaking schema change for existing configs.** A v5.1.1-beta county config validates against the v5.1.2-beta schema without modification — all new fields are optional. v5.1.1-beta counties continue to work; they just don't gain the universality-contract benefits until they migrate sources to use the translator field and pull municipality lists out of in-code constants.
+
+**v5.1.2-beta universal pipeline runtime modules are NOT in canonical yet.** The framework's `normalize.py`, `stack.py`, `score.py`, `classify.py`, `evidence.py`, `review.py`, `dashboard.py`, `manifest.py`, `matcher.py`, and `build_leads.py` still live as contaminated code inside the Bexar repo from the v5.1.1-beta-seeded build. v5.1.2-beta provides the architectural scaffolding (schema + contract + registry + sale_date_rules + owner_name_patterns + regression) plus a Bexar in-place migration playbook (`docs/v5.1.2-beta_bexar_migration_playbook.md`). The Bexar repo refactors its pipeline in-place against the new framework primitives, regression-tests against current Bexar output (287 leads, parcel_master coverage 79%), and the cleaned pipeline modules are then promoted back to canonical as **v5.1.2-beta-final**. Until then, the canonical framework runs the synthetic harness only.
+
+**v5.1.1-beta features preserved:** execution reliability, `write_county_config.py`, atomic config writer, Phase 0 + Phase 0.5 rules, Build Mode Approval Gate, Source Verification Gate, No False Dashboard rule, Evidence First Dashboard contract, Manual Assisted Pull Mode, operator override audit, vendor portal library, all tests already passing (golden path, county-agnostic regression, atomic config writer 18/18).
+
+**v5.1.0-beta features preserved:** Phase 0.5 Auto-Resolve Blockers, Build Mode Approval Gate, Partial Build Contract, Evidence-First Dashboard Row Contract, Lead lifecycle and suppression, Source freshness contract, Source kill switch and quarantine, production self-verification stubs, Manual Assisted Pull Mode, Vendor portal library, Cost guardrails, VIP-friendly failure messages, v5.2.0 deferred catalog.
+
+---
 
 **v5.1.1-beta changes from v5.1.0-beta** (execution reliability patch — no schema changes, no breaking changes):
 
