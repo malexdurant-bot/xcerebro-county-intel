@@ -301,8 +301,10 @@ def main() -> int:
           report["registry_missing_reason"] == [])
     check("bridge_totality_report: lead_types_unexplained is empty",
           report["lead_types_unexplained"] == [])
-    check("bridge_totality_report: registry_total == 74 (the registry size)",
-          report["registry_total"] == 74)
+    check("bridge_totality_report: registry_total == 77 (v5.5.0 — bumped "
+          "from 74 by §4.5 registry additions: civil_judgment, "
+          "abstract_of_judgment, certificate_of_title)",
+          report["registry_total"] == 77)
     check("bridge_totality_report: lead_types_total == 27 (the §16 sweep size)",
           report["lead_types_total"] == 27)
 

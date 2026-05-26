@@ -214,8 +214,18 @@ def build_base_record(
     else:
         parcel_resolution_status = "UNRESOLVED"
 
-    # The aggregation-key parcel_id is non-null only on a RESOLVED parcel.
-    key_parcel_id = parcel_id if parcel_resolution_status == "RESOLVED" else None
+    # v5.5.0 §4.4 fix (prior defect, formerly line 218): the aggregation-key
+    # `parcel_id` is keyed off the RAW EVENT's parcel_id, not the verdict
+    # status. A §17 REVIEW_REQUIRED record may still carry a real parcel_id on
+    # property_refs — and §13.14 requires that downstream enrichment still
+    # attaches to it (a foreclosure-notice review-routed because no owner is
+    # named on the document still has a parcel, and enrichment joining on that
+    # parcel is the whole point of the §13.14 enrichment-decoupling rule).
+    # Zeroing the agg-key parcel_id on REVIEW_REQUIRED blocked that join and
+    # contradicted §13.14. Now: the agg-key carries parcel_id whenever the raw
+    # event has one; the verdict status lives on parcel_resolution_status and
+    # is not folded into the key.
+    key_parcel_id = parcel_id
     aggregation_key = aggregation_key_engine.compute_aggregation_key(
         parcel_id=key_parcel_id,
         canonical_doc_type=canonical_doc_type,

@@ -689,3 +689,93 @@ trustee-sale portals, foreclosure-listing portals, auction vendors, official ven
 portals, and posted-notices pages are all valid primary event sources. Recon does not
 halt merely because clerk or recorder access is blocked, provided another verified
 primary event source exists for at least one lead type.
+
+## 01.27 v5.5.0 hard-recon protocol (§S1 amendment)
+
+v5.5.0 hardens the recon protocol against the failure modes the three-county
+build exposed (Duval, Greene, Smith). The §1.1–1.6 canon below is mandatory
+before a county is build-ready; the v5.5.0 hardening makes it executable and
+testable through the framework's invariant suite, not just doc.
+
+### §1.1 — exhaustive primary-source catalog
+
+Recon MUST catalog every reachable primary source carrying a distress
+event. Catalog categories (none of these is optional — operators must
+investigate or PUNCH-LIST each):
+
+- clerk / recorder official records
+- foreclosure auction calendars (RealForeclose / RealAuction family)
+- tax-deed and tax-certificate sale portals
+- sheriff / constable sale calendars
+- county court (foreclosure / probate / judgment)
+- legal-notice publications
+- code enforcement / demolition / condemnation
+- surplus / excess proceeds
+- **county TAX COLLECTOR (delinquency)** — a SEPARATE office from the
+  county PROPERTY APPRAISER / ASSESSOR. Both must be cataloged separately;
+  conflating them is a defect. v5.5.0 §3.3 originates leads from the
+  tax-collector channel through the `PRIMARY_DEFAULT_SOURCE` role.
+
+### §1.2 — enrichment source catalog
+
+Recon MUST catalog enrichment sources explicitly:
+- parcel master / appraisal district / property appraiser
+- GIS layers
+- assessor / CAD records
+- tax roll (status-condition — `tax_default` / `tax_delinquency` only
+  qualifies as a lead through the §3.3 gate, not through this catalog).
+
+§13.14 / §4.3 dead-board rule: a county with no resolved enrichment is a
+verification failure, not a pass. Enrichment is mandatory to LOCATE; per
+R3(iii) it is OPTIONAL to scoring. Both rules coexist.
+
+### §1.3 — hunt beyond the dossier
+
+The banked source dossier is a starting point. Recon must actively search
+for additional sources — sub-jurisdictional courts, municipal-specific
+recorders, court-of-record-by-lead-type variants. v5.5.0 missed-source
+audit (§1.6) is the test.
+
+### §1.4 — historical instances + prior-year context
+
+Recon must probe prior-year / historical instances of each source:
+- prior auctions (recurrence is a §3.9 stacking signal — historical
+  scheduled events become HISTORICAL_CONTEXT_ONLY on a current lead);
+- prior petition PDFs (delinquency-history evidence on a current
+  tax-default lead);
+- prior posted notices (recurrence + dispossession-rate signals).
+
+v5.5.0 §3.9 / §6.6 forbid pulling past sale dates as upcoming leads —
+historical data feeds recurrence signal and downstream / post-sale lead
+types, NOT past-as-upcoming.
+
+### §1.5 — classification with the v5.5.0 8-role taxonomy
+
+Each source gets classified with the full v5.5.0 role list:
+
+- `PRIMARY_EVENT_SOURCE` — recorded / filed / posted event
+- `PRIMARY_DEFAULT_SOURCE` — tax-default / delinquency / tax-sale (§3.3)
+- `PRIMARY_OWNER_STATUS_SOURCE` — estate-titled / life-tenant ownership
+  condition (§3.5)
+- `SUPPORTING_EVENT_SOURCE`, `ENRICHMENT_SOURCE`, `REFERENCE_SOURCE`
+- `BLOCKED_SOURCE` — punch-listed with the exact blocker and the exact
+  operator unlock needed (Cloudflare → cf_clearance cookie / login →
+  credentials / paywall → subscription / CAPTCHA → solver / etc.).
+- `REJECTED_SOURCE` — not official enough / not relevant / not useful.
+  Distinct from BLOCKED — REJECTED has no actionable next step.
+
+A BLOCKED source is NEVER a reason to call the county complete. The exact
+unlock path is part of recon output.
+
+### §1.6 — MISSED-SOURCE AUDIT
+
+Before any county is called done, recon must perform a structured re-sweep:
+- run the §1.1 + §1.2 catalog tables again, confirming each row has been
+  investigated;
+- prove the negative — every category lists either a build path or a
+  punch-listed blocker;
+- confirm no unprobed source remains.
+
+A county with unprobed sources is not complete. The v5.5.0 county-build
+contract test consumes the audit output.
+

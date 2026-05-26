@@ -535,12 +535,52 @@
       "default_confidence": 85,
       "document_priority": 60,
       "common_abbreviations": [
+        "JL",
+        "JUDGMENT LIEN",
+        "PROPERTY JUDGMENT LIEN"
+      ],
+      "notes": "Civil judgment recorded against property. v5.5.0: scope clarified — only the property-attached lien instrument lives here; the upstream debtor-only docket items live under CIVIL_JUDGMENT / ABSTRACT_OF_JUDGMENT, which carry source_class review_required until property attachment is proven (§17.D / §3.6 doc-type honesty).",
+      "source_priority": "P0"
+    },
+    "CIVIL_JUDGMENT": {
+      "lead_pattern": "lien",
+      "subtype": "civil_judgment",
+      "source_class": "review_required",
+      "default_confidence": 70,
+      "document_priority": 30,
+      "common_abbreviations": [
+        "CIVIL JUDGMENT",
+        "MONEY JUDGMENT"
+      ],
+      "notes": "v5.5.0 (§3.6 / §4.5): the upstream civil-court money judgment — a court order in favor of a creditor against a debtor. Does NOT attach to real property on its own (the lien is created by a separate filing — see ABSTRACT_OF_JUDGMENT / JUDGMENT_LIEN). source_class is review_required, NOT lead_generating: §17 must NOT promote a civil_judgment to a property lead until property attachment is proven in the raw record. Routes to review_required absent that proof.",
+      "source_priority": "P1"
+    },
+    "ABSTRACT_OF_JUDGMENT": {
+      "lead_pattern": "lien",
+      "subtype": "abstract_of_judgment",
+      "source_class": "review_required",
+      "default_confidence": 75,
+      "document_priority": 40,
+      "common_abbreviations": [
         "AJ",
         "ABS JDGT",
-        "JL",
         "ABSTRACT OF JUDGMENT"
       ],
-      "notes": "Civil judgment recorded against property.",
+      "notes": "v5.5.0 (§3.6 / §4.5): the abstract-of-judgment filing — the document that, when recorded in the county where a debtor owns real property, creates a property lien. Without proven property attachment (a recording county matching a real owned parcel), the abstract is a debtor-only docket item and is review_required. With proven property attachment, downstream classifies as JUDGMENT_LIEN. §17 honors this gate.",
+      "source_priority": "P0"
+    },
+    "CERTIFICATE_OF_TITLE": {
+      "lead_pattern": "foreclosure",
+      "subtype": "certificate_of_title",
+      "source_class": "lead_generating",
+      "default_confidence": 92,
+      "document_priority": 85,
+      "common_abbreviations": [
+        "COT",
+        "CERTIFICATE OF TITLE",
+        "CLERK CERTIFICATE OF TITLE"
+      ],
+      "notes": "v5.5.0 (§4.5): the post-foreclosure-sale title instrument the clerk records following a foreclosure auction in judicial-foreclosure jurisdictions (equivalent to a sheriff_deed / trustees_deed_upon_sale in non-judicial states). Concludes the foreclosure lifecycle; the GE party is the new title holder; the GR is the prior owner (the lead). §3.9 classifies this as POST_SALE_TITLE_EVENT — it is a recorded event, not a scheduled upcoming sale.",
       "source_priority": "P0"
     },
     "HOA_LIEN": {

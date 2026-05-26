@@ -160,6 +160,31 @@ def is_exempt_path(rel_path):
     if rel_str.startswith("scaffold/tests/test_county_agnostic_regression"):
         return True
 
+    # v5.5.0 §5.11 — the stale-label scanner contains the foreign-county
+    # token registry it scans for, by the same exemption logic as this
+    # test. It is the implementation of the rule, not a county-specific
+    # assertion.
+    if rel_str == "scaffold/ops/stale_label_scanner.py":
+        return True
+    if rel_str == "scaffold/ops/verify_live_contract.py":
+        # The slug→token-allowlist map in run_static_checks() — same rule,
+        # same exemption as the scanner above.
+        return True
+    if rel_str.startswith("scaffold/tests/v5_5_0/"):
+        # v5.5.0 invariant tests reference foreign-county tokens as test
+        # fixtures and verify the scanner flags them — by the same
+        # exemption that exempts scaffold/tests/ generally (already
+        # broadly exempt via scaffold/tests/ → True, but pinned here
+        # for clarity).
+        return True
+    # The v5.5.0 §3.5 owner_status_classifier carries the company-suffix
+    # token list — "P.A." / "PA" is the UNIVERSAL professional-association
+    # corporate suffix (a US legal entity type), NOT the Pennsylvania state
+    # code. The scanner's PA whole-token rule false-positives here; the
+    # file is universal framework code.
+    if rel_str == "scaffold/pipeline/owner_status_classifier.py":
+        return True
+
     # The sale_date_rules registry must include the rule name as
     # a registry key. The string is a rule identifier, not a
     # state-specific assertion. Exempt this single file.

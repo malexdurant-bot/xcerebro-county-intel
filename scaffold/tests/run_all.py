@@ -59,6 +59,16 @@ if _v5_4_0_dir.is_dir():
     for _script in sorted(_v5_4_0_dir.glob("test_*.py")):
         TESTS.append((f"v5.4.0 contract-shape — {_script.stem}", _script))
 
+# v5.5.0+ — framework-hardening invariants (tax-default gate, owner-status
+# classifier, scheduled-event classifier, dashboard contract + stale-label
+# scanner, refresh verification gate, verify_live contract, registry
+# additions, source-role enum extension, leads_base §4.4 fix, §20 new check
+# classes 13-16, recon + access-ladder docs). Auto-discovered.
+_v5_5_0_dir = TESTS_DIR / "v5_5_0"
+if _v5_5_0_dir.is_dir():
+    for _script in sorted(_v5_5_0_dir.glob("test_*.py")):
+        TESTS.append((f"v5.5.0 hardening — {_script.stem}", _script))
+
 
 def main():
     results = []

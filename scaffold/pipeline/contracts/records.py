@@ -46,12 +46,32 @@ from typing import Any, Literal, Optional
 
 SOURCE_ROLES: tuple[str, ...] = (
     "PRIMARY_EVENT_SOURCE",
+    "PRIMARY_DEFAULT_SOURCE",
+    "PRIMARY_OWNER_STATUS_SOURCE",
     "SUPPORTING_EVENT_SOURCE",
     "ENRICHMENT_SOURCE",
     "REFERENCE_SOURCE",
     "BLOCKED_SOURCE",
+    "REJECTED_SOURCE",
 )
-"""16.E source-role contract. Only PRIMARY_EVENT_SOURCE originates a lead."""
+"""16.E source-role contract. v5.5.0 extends the v5.4.0 5-role list with:
+
+  - PRIMARY_DEFAULT_SOURCE: official / officially-authorized tax-default,
+    delinquency, collection, foreclosure, struck-off, tax-sale, or
+    redemption source that proves default status. The §3.3 tax-default
+    qualification gate originates leads from this role.
+  - PRIMARY_OWNER_STATUS_SOURCE: official parcel / tax / appraisal /
+    records / title source that proves an operator-accepted ownership
+    condition (e.g. an estate-titled owner). §3.5 originates leads from
+    this role through the owner_status_classifier; this is NOT an event
+    source and must be labelled separately from PRIMARY_EVENT_SOURCE.
+  - REJECTED_SOURCE: a source that is not official enough / not relevant /
+    not accessible / not useful for the county build. Distinct from
+    BLOCKED_SOURCE (the latter has an operator unlock path; REJECTED has
+    no actionable next step).
+
+PRIMARY_EVENT_SOURCE / PRIMARY_DEFAULT_SOURCE / PRIMARY_OWNER_STATUS_SOURCE
+are the three lead-originating roles; the rest do not originate leads."""
 
 NAME_TYPES: tuple[str, ...] = ("TP", "DF", "GR", "GE", "PL", "OTHER")
 """Party role codes. 17.C defines TP/DF/GR/GE; PL and OTHER are added by this
@@ -150,10 +170,13 @@ LEAD_STATUSES: tuple[str, ...] = (
 # Literal type aliases for field annotations.
 SourceRole = Literal[
     "PRIMARY_EVENT_SOURCE",
+    "PRIMARY_DEFAULT_SOURCE",
+    "PRIMARY_OWNER_STATUS_SOURCE",
     "SUPPORTING_EVENT_SOURCE",
     "ENRICHMENT_SOURCE",
     "REFERENCE_SOURCE",
     "BLOCKED_SOURCE",
+    "REJECTED_SOURCE",
 ]
 NameType = Literal["TP", "DF", "GR", "GE", "PL", "OTHER"]
 OwnerType = Literal["ENTITY", "ESTATE", "TRUST", "INDIVIDUAL", "UNKNOWN"]
@@ -405,6 +428,22 @@ SCORE_TIER_VALUES: tuple[str, ...] = (
 """Score tiers per score.py. Mirrors score.SCORE_TIERS — kept here as a
 contract-side constant for the dataclass and the schema test."""
 
+LEAD_ORIGIN_TYPES: tuple[str, ...] = (
+    "RECORDED_EVENT",        # §17 path — clerk recordings, court filings
+    "TAX_DEFAULT",           # §3.3 gate — PRIMARY_DEFAULT_SOURCE
+    "OWNER_STATUS",          # §3.5 gate — PRIMARY_OWNER_STATUS_SOURCE
+    "POST_SALE_TITLE_EVENT", # §3.9 — concluded foreclosure cycle
+    "SURPLUS_EVENT",         # §3.9 — excess proceeds
+)
+"""v5.5.0 lead-origin channels (§3.8 / §0.1). Three originate via the
+PRIMARY_*_SOURCE roles; the last two come through scheduled-event-classifier
+post-sale handling."""
+
+QUALIFICATION_STATUSES: tuple[str, ...] = (
+    "QUALIFIED", "REVIEW_REQUIRED", "NOT_QUALIFIED",
+)
+"""v5.5.0 §3.3 qualification verdicts (also reused by §3.5 estate-status)."""
+
 TITLE_COMPLEXITY_TIER_VALUES: tuple[str, ...] = (
     "None", "Light curative", "Moderate curative", "Heavy curative",
 )
@@ -514,6 +553,16 @@ class ScoredLeadRecord:
     doc_type_normalization: Optional[dict] = None
     parcel_display: Optional[ParcelDisplay] = None
     lead_status_history: tuple[dict, ...] = ()
+    # v5.5.0 §3.8 / §0.1 lead-origination provenance + qualification audit
+    # fields. All optional / nullable for backward compatibility — v5.4.x
+    # scored_leads without these fields remain valid; v5.5.0 emitters
+    # populate them.
+    lead_origin_type: Optional[str] = None  # one of LEAD_ORIGIN_TYPES (below)
+    event_source: Optional[str] = None
+    owner_source: Optional[str] = None
+    enrichment_source: Optional[str] = None
+    qualification_status: Optional[str] = None  # QUALIFIED/REVIEW_REQUIRED/NOT_QUALIFIED
+    qualification_evidence: Optional[dict] = None
 
     def __post_init__(self) -> None:
         # R3(iii) enrichment-optional consistency: parcel_display is present

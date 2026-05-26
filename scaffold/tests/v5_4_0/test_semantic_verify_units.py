@@ -96,12 +96,16 @@ def main() -> int:
         [_matched_lead()], leads_base_records=_PRIMARY_LB)
     check("clean matched_leads → verdict DEPLOY_OK",
           clean["verdict"] == "DEPLOY_OK")
-    check("report carries all twelve §20.C check classes",
-          sorted(r["check"] for r in clean["checks"]) == list(range(1, 13)))
+    check("report carries all sixteen check classes (12 §20.C + 4 v5.5.0 "
+          "§4 — checks 13-16 SKIP when scored_leads is not supplied to "
+          "run_semantic_verification)",
+          sorted(r["check"] for r in clean["checks"]) == list(range(1, 17)))
     check("the six data-shape checks (1,2,4,5,6,12) ran",
           all(_status(clean, n) == "VALID" for n in (1, 2, 4, 5, 6, 12)))
-    check("the six deploy-time checks (3,7,8,9,10,11) are SKIPPED",
-          clean["skipped_checks"] == [3, 7, 8, 9, 10, 11])
+    check("the six deploy-time checks (3,7,8,9,10,11) plus the four v5.5.0 "
+          "§4 checks (13,14,15,16) are SKIPPED when scored_leads not "
+          "supplied",
+          clean["skipped_checks"] == [3, 7, 8, 9, 10, 11, 13, 14, 15, 16])
     check("clean run reports mechanical_ok True", clean["mechanical_ok"] is True)
 
     # --- DEPLOY_BLOCKED — filer surfaced as owner (Check 1 + Check 12) ------

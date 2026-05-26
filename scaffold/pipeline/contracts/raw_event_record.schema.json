@@ -31,15 +31,21 @@
       "type": "string",
       "enum": [
         "PRIMARY_EVENT_SOURCE",
+        "PRIMARY_DEFAULT_SOURCE",
+        "PRIMARY_OWNER_STATUS_SOURCE",
         "SUPPORTING_EVENT_SOURCE",
         "ENRICHMENT_SOURCE",
         "REFERENCE_SOURCE",
-        "BLOCKED_SOURCE"
+        "BLOCKED_SOURCE",
+        "REJECTED_SOURCE"
       ],
-      "description": "Source role per 16_source_of_record_matrix.md 16.E. Only PRIMARY_EVENT_SOURCE originates a lead."
+      "description": "Source role per 16_source_of_record_matrix.md 16.E (v5.5.0 extends to 8 roles). Three roles ORIGINATE leads: PRIMARY_EVENT_SOURCE (recorded event), PRIMARY_DEFAULT_SOURCE (tax-default per §3.3 gate), PRIMARY_OWNER_STATUS_SOURCE (estate-titled-owner per §3.5). The rest (SUPPORTING_EVENT_SOURCE, ENRICHMENT_SOURCE, REFERENCE_SOURCE, BLOCKED_SOURCE, REJECTED_SOURCE) do not."
     },
     "raw_doc_type": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "The document-type code as the source published it, before normalization. Audit field."
     },
     "canonical_doc_type": {
@@ -48,16 +54,25 @@
       "description": "The doc type after county-taxonomy normalization (17_debtor_party_rules.md 17.A canonical_doc_type). Keys the 17.C debtor_party_rules lookup and the 18.B aggregation key."
     },
     "instrument_number": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Recording instrument / document number. Required field (may be null when the source row carries none); the 18.E union-by-instrument dedup keys off this."
     },
     "recorded_date": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date",
       "description": "Date the instrument was recorded. Required field (may be null). 18.C earliest/latest_recorded_date derive from this."
     },
     "event_date": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date",
       "description": "The underlying event date when distinct from the recording date (e.g. sale date, filing date)."
     },
@@ -72,7 +87,10 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "name_type"],
+        "required": [
+          "name",
+          "name_type"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -80,18 +98,31 @@
           },
           "name_type": {
             "type": "string",
-            "enum": ["TP", "DF", "GR", "GE", "PL", "OTHER"],
+            "enum": [
+              "TP",
+              "DF",
+              "GR",
+              "GE",
+              "PL",
+              "OTHER"
+            ],
             "description": "Party role code. 17.C defines TP (taxpayer), DF (defendant), GR (grantor), GE (grantee). PL (plaintiff) and OTHER are added by this contract because 17.C names plaintiff filers without giving them a name_type code — see contract finding F-2."
           },
           "raw_role": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The party-role label as the source published it, before mapping to name_type. Audit field."
           }
         }
       }
     },
     "document_body_text": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Full document text. Required input for the doc types whose 17.C expected_debtor is 'extracted from document body' (foreclosure_notice, trustee_sale, probate, affidavit_of_heirship). Null for structured-field doc types."
     },
     "property_refs": {
@@ -100,22 +131,39 @@
       "description": "Property identifiers carried in the source row. parcel_id may be null when the source does not link to a parcel; the lead is still emitted UNRESOLVED per 13_lead_origination_contract.md 13.14.",
       "properties": {
         "parcel_id": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "County-canonical parcel identifier, when the source carries one."
         },
         "situs_address": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Property situs address, when carried in the source row or document body."
         },
         "legal_description": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "case_number": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Court case number, for court-sourced events."
         }
       },
-      "required": ["parcel_id", "situs_address", "legal_description", "case_number"]
+      "required": [
+        "parcel_id",
+        "situs_address",
+        "legal_description",
+        "case_number"
+      ]
     },
     "amounts": {
       "type": "array",
@@ -123,28 +171,56 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["label", "value"],
+        "required": [
+          "label",
+          "value"
+        ],
         "properties": {
-          "label": { "type": "string" },
-          "value": { "type": ["number", "null"] }
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
         }
       }
     },
     "evidence_ids": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Evidence ledger entry ids backing this raw event (see evidence_ledger_entry.schema.json)."
     },
-    "parser_name": { "type": ["string", "null"] },
-    "parser_version": { "type": ["string", "null"] },
+    "parser_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "parser_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "parser_confidence": {
-      "type": ["number", "null"],
+      "type": [
+        "number",
+        "null"
+      ],
       "minimum": 0,
       "maximum": 100,
       "description": "Translator self-reported confidence, 0-100."
     },
     "captured_at": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date-time",
       "description": "When the underlying source row was collected."
     }

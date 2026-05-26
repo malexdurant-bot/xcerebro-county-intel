@@ -355,3 +355,64 @@ When recon identifies a blocked source, the framework writes to `RECON.md`:
 ```
 
 This entry becomes the source's section in `methodology.html` so the operator's client sees exactly what paths are active and what the data freshness implications are.
+
+## v5.5.0 access ladder (§S2 amendment)
+
+v5.5.0 canonizes the access ladder distilled from the three-county build.
+The ladder is the order recon must walk before declaring a source
+BLOCKED_SOURCE. The §5.11 stale-label scanner + §7.1 verification gate
+flag a source that was prematurely declared blocked.
+
+### §2.1 — Playwright is standard authorized tooling
+
+Playwright (incl. playwright-stealth where the source supports normal
+public navigation only with stealth headers) is STANDARD authorized
+tooling, not last-resort. For any JS-rendered / SPA source, Playwright
+is the expected approach.
+
+### §2.2 — access ladder (mandatory order)
+
+The ladder operators must walk in order before classifying a source
+BLOCKED:
+
+1. **stdlib HTTP** — `urllib.request` / `requests` / direct API. If the
+   data is in the response, no browser is needed.
+2. **Playwright headless** — JS-rendered / SPA / dynamic-content sources.
+3. **Playwright + stealth** — adds stealth fingerprint to handle sources
+   that detect headless browsers.
+4. **operator-seeded session** — operator manually authenticates in a
+   real browser, exports cookies / credentials (cf_clearance,
+   session cookie, auth cookie), the workflow consumes them.
+
+NEVER bypass CAPTCHA / Cloudflare Managed Challenge / paywalls / logins /
+access controls. Operator-seeded cookies are allowed ONLY when supplied
+by the operator from an AUTHORIZED session.
+
+A source moves to BLOCKED_SOURCE only after the ladder is exhausted; the
+punch-list states which rung would unlock it.
+
+### §2.3 — CI considerations
+
+- Stealth-Playwright sources may need `xvfb-run` in GitHub Actions.
+- Fragile browser sources are `continue-on-error` in the daily refresh
+  workflow (§6.7); critical sources (enrichment, committed delinquency
+  files) are NOT — they fail the run.
+- Per operator-seeded source, document:
+  - cookie / credential source
+  - manual-browser session note
+  - expiration risk
+  - whether daily refresh can run unattended
+
+### §2.4 — recon-before-scraper (mandatory)
+
+Open the source, confirm the data is in the response, identify the
+access method, THEN write the adapter. No scraper written against an
+unknown DOM. v5.5.0 county-build test consumes this gate — a scraper
+without a corresponding recon record fails the §02 Build Mode Protocol.
+
+### §2.5 — reuse proven operator code
+
+If a working adapter for a source family (RealForeclose, RealAuction,
+SearchIQS, ArcGIS REST, etc.) already exists in an operator repo,
+locate and reuse its access pattern before rolling a new one.
+

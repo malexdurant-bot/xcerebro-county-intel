@@ -1,0 +1,144 @@
+# v5.5.0 §6 — Daily refresh workflow template.
+#
+# This is the CANONICAL daily-refresh GitHub Actions workflow scaffold. Every
+# county build copies this file into .github/workflows/daily_refresh.yml and
+# fills in the county-specific bits marked <COUNTY_TODO>. The structure is
+# canon:
+#
+#   1. CI starts with gitignored data/raw/ EMPTY (§6.2). The workflow MUST
+#      re-fetch or commit BOTH primary event sources AND enrichment sources
+#      (parcel / CAD / appraiser data).
+#   2. Enrichment that can't be re-fetched in CI must be committed; a missing
+#      committed file FAILS LOUDLY (§6.3).
+#   3. The §6.4 publish gate runs BEFORE the Pages artifact is replaced.
+#   4. §6.5 last-good preservation: if the gate returns DO_NOT_PUBLISH, the
+#      workflow does NOT replace the live artifact. A failure report is
+#      written for the operator.
+#   5. §6.6 bounded pull windows: each adapter declares its own window (see
+#      scaffold/ops/refresh_verification_gate.py).
+#   6. §6.7 fragile browser sources are continue-on-error; critical sources
+#      (enrichment, committed delinquency files) FAIL the run.
+
+name: daily-refresh
+
+on:
+  schedule:
+    # Daily at 06:00 UTC. Adjust per county.
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write    # commit refreshed enrichment / raw data
+  pages: write       # publish to GitHub Pages
+  id-token: write    # OIDC token for Pages deploy
+
+concurrency:
+  group: daily-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # to allow last-good rollback if needed
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema
+          # county-specific deps go here
+
+      # §6.7 — fragile browser sources may need playwright + xvfb.
+      # Uncomment for counties whose primary sources are stealth-Playwright.
+      # - name: Install Playwright
+      #   run: |
+      #     pip install playwright
+      #     python -m playwright install --with-deps chromium
+
+      # §6.2 — CI starts with empty data/raw/. Force-clean.
+      - name: Clean data/raw/
+        run: rm -rf data/raw/ && mkdir -p data/raw/
+
+      # §6.3 — committed manual-download sources MUST be present.
+      - name: Verify committed manual-download sources present
+        run: python3 scaffold/ops/verify_committed_sources.py
+        continue-on-error: false
+
+      # §6.7 — fragile browser sources are continue-on-error; critical sources
+      # are not. The orchestrator's run_pipeline_staged handles this routing.
+      - name: Run scrapers — primary event sources
+        run: python3 scrapers/run_event_sources.py   # <COUNTY_TODO> per-county entry
+        continue-on-error: false                      # fail on critical sources
+
+      - name: Run scrapers — fragile browser sources
+        run: python3 scrapers/run_browser_sources.py  # <COUNTY_TODO>
+        continue-on-error: true                       # §6.7 — fragile is OK to fail
+
+      - name: Run scrapers — enrichment sources
+        run: python3 scrapers/run_enrichment_sources.py  # <COUNTY_TODO>
+        continue-on-error: false                          # §6.4 — enrichment critical
+
+      # §6.2 — re-run the enrichment join + owner-resolution step.
+      - name: Build dashboard (staged pipeline)
+        run: |
+          python3 scaffold/pipeline/build_leads.py \
+              --county-config config/counties/<COUNTY_SLUG>.json \
+              --out data/dashboard
+
+      # §6.4 — publish gate (the load-bearing canon).
+      - name: §6.4 publish gate (verify_refresh_publishable)
+        id: gate
+        run: python3 scaffold/ops/refresh_verification_gate_cli.py \
+                --scored-leads data/dashboard/scored_leads.json \
+                --report-out data/dashboard/refresh_gate.json
+        continue-on-error: true   # don't fail the job — read $?
+
+      # §6.5 — last-good preservation. If the gate failed, DO NOT publish.
+      - name: §6.5 publish or preserve last-good
+        run: |
+          if [ "${{ steps.gate.outcome }}" = "success" ]; then
+            echo "publish: gate PUBLISH"
+            cp data/dashboard/dashboard.json dashboard/data.json
+            cp data/dashboard/scored_leads.json dashboard/scored_leads.json
+          else
+            echo "preserve: gate DO_NOT_PUBLISH — last-good Pages artifact stays live"
+            cp data/dashboard/refresh_gate.json runs/<COUNTY_SLUG>/last_failed_refresh.json
+            # Do NOT touch dashboard/ — last-good remains.
+          fi
+
+      - name: Commit refreshed enrichment + dashboard data (only on PUBLISH)
+        if: steps.gate.outcome == 'success'
+        run: |
+          git config user.email "ci-bot@xcerebro.local"
+          git config user.name  "xcerebro-ci-bot"
+          git add dashboard/data.json dashboard/scored_leads.json
+          # Commit fetched enrichment only if it lives in a tracked dir.
+          git diff --cached --quiet || git commit -m "daily refresh $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push
+
+      - name: Upload Pages artifact (only on PUBLISH)
+        if: steps.gate.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard
+
+      - name: Deploy to GitHub Pages (only on PUBLISH)
+        if: steps.gate.outcome == 'success'
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Write failure report (DO_NOT_PUBLISH path)
+        if: steps.gate.outcome != 'success'
+        run: |
+          echo "Daily refresh DO_NOT_PUBLISH — see refresh_gate.json" \
+              > runs/<COUNTY_SLUG>/last_refresh_failure.txt

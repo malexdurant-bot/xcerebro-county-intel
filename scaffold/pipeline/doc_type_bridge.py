@@ -124,6 +124,12 @@ REGISTRY_TO_LEAD_TYPE: dict[str, Optional[str]] = {
     "sheriff_deed": "Sheriff Sale",
     "sheriff_sale": "Sheriff Sale",
     "trustees_deed_upon_sale": "Trustee Sale",
+    # v5.5.0 §4.5 — certificate_of_title is the post-foreclosure title
+    # instrument used in judicial-foreclosure states (sheriff_deed /
+    # trustees_deed_upon_sale family). The §16 mapping is "Foreclosure" —
+    # it is a post-sale conclusion of the foreclosure lifecycle, not a
+    # standalone scheduled sale.
+    "certificate_of_title": "Foreclosure",
     # --- Tax-related -------------------------------------------------------
     "tax_deed": "Tax Sale",
     "tax_foreclosure_notice": "Tax Lien Foreclosure",
@@ -132,12 +138,16 @@ REGISTRY_TO_LEAD_TYPE: dict[str, Optional[str]] = {
     "state_tax_lien": "State Tax Lien",
     # --- Court / judgment / lis pendens -----------------------------------
     "lis_pendens": "Lis Pendens",
-    # §16 distinguishes "Civil Judgment" from "Abstract of Judgment" but the
-    # registry carries a single `judgment_lien` (with "Abstract of Judgment"
-    # as a common abbreviation). The bridge maps to the broader "Civil
-    # Judgment" §16 category; an abstract-of-judgment recording falls under
-    # the same registry instrument.
+    # v5.5.0 §4.5 — three judgment-family doc types now distinct (formerly
+    # collapsed through judgment_lien). §16 distinguishes "Civil Judgment"
+    # (the court-order docket item) from "Abstract of Judgment" (the
+    # property-attachment-filing instrument); the registry carries one
+    # property-attached lien (judgment_lien) plus the two upstream
+    # debtor-only types (civil_judgment, abstract_of_judgment) which route
+    # review_required until property attachment is proven.
     "judgment_lien": "Civil Judgment",
+    "civil_judgment": "Civil Judgment",
+    "abstract_of_judgment": "Abstract of Judgment",
     # --- Liens (construction / mechanic) ----------------------------------
     "mechanics_lien": "Mechanic Lien",
     "construction_lien": "Construction Lien",
@@ -321,16 +331,12 @@ LEAD_TYPES_16: tuple[str, ...] = (
     "Surplus",
 )
 
-# Several §16 lead types are bridged through a SHARED registry doc type — most
-# notably "Civil Judgment" and "Abstract of Judgment" both map back to
-# `judgment_lien`. The bridge records these as documented many-to-one cases so
-# the totality test does not flag them as a missing mapping.
-LEAD_TYPES_SHARED_REGISTRY_MAPPING: dict[str, str] = {
-    "Abstract of Judgment": "judgment_lien (shared with 'Civil Judgment' — the "
-                            "registry carries one instrument for both; the "
-                            "common abbreviation 'ABSTRACT OF JUDGMENT' is "
-                            "listed on the JUDGMENT_LIEN registry entry)",
-}
+# Several §16 lead types may be bridged through a SHARED registry doc type
+# as a many-to-one case. Empty in v5.5.0: Abstract of Judgment was promoted
+# from a Session-8 shared mapping into its own first-class registry entry
+# (§4.5), so it no longer needs the shared-mapping carve-out. Kept as a
+# dict for future cases.
+LEAD_TYPES_SHARED_REGISTRY_MAPPING: dict[str, str] = {}
 
 
 # ---------------------------------------------------------------------------

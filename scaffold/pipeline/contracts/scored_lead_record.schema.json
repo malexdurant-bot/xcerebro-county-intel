@@ -200,6 +200,40 @@
         "doc_type_review_required": { "type": "boolean" }
       }
     },
+    "lead_origin_type": {
+      "type": ["string", "null"],
+      "enum": [
+        "RECORDED_EVENT",
+        "TAX_DEFAULT",
+        "OWNER_STATUS",
+        "POST_SALE_TITLE_EVENT",
+        "SURPLUS_EVENT",
+        null
+      ],
+      "description": "v5.5.0 §3.8 / §4.4 audit field — declares which lead-origination channel this scored_lead came through. RECORDED_EVENT = §17 path (clerk recordings, court filings); TAX_DEFAULT = §3.3 gate (PRIMARY_DEFAULT_SOURCE); OWNER_STATUS = §3.5 gate (PRIMARY_OWNER_STATUS_SOURCE estate-titled owner); POST_SALE_TITLE_EVENT / SURPLUS_EVENT per §3.9. Optional for backward compatibility; v5.5.0 emitters populate it."
+    },
+    "event_source": {
+      "type": ["string", "null"],
+      "description": "v5.5.0 §3.8 audit field — the source_id of the originating event (e.g. 'clerk_recordings', 'tax_collector_delinquent', 'foreclosure_auction')."
+    },
+    "owner_source": {
+      "type": ["string", "null"],
+      "description": "v5.5.0 §3.8 audit field — the source_id from which the resolved owner_name was attached. Equal to event_source when §17 resolved the owner from the document; equal to the enrichment source when owner was attached downstream (e.g. parcel-master enrichment); null when owner is still review_required."
+    },
+    "enrichment_source": {
+      "type": ["string", "null"],
+      "description": "v5.5.0 §3.8 audit field — the source_id of the parcel-master / appraisal enrichment row that populated parcel_display. Null when enrichment_status is UNENRICHED."
+    },
+    "qualification_status": {
+      "type": ["string", "null"],
+      "enum": ["QUALIFIED", "REVIEW_REQUIRED", "NOT_QUALIFIED", null],
+      "description": "v5.5.0 §3.3 / §3.5 audit field — the qualification gate's verdict for the originating row. Optional; defaulted to QUALIFIED by the seam when a scored_lead emerges from a normal §17 path."
+    },
+    "qualification_evidence": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "description": "v5.5.0 audit field — per-criterion booleans from the qualification gate (e.g. the §3.3 5-criteria dict). Free-form so different gates can populate it differently; the §20 verification gate consumes this."
+    },
     "parcel_display": {
       "type": ["object", "null"],
       "description": "OPTIONAL parcel-master snapshot used by the dashboard. Present iff enrichment_status is ENRICHED — the R3(iii) modifier path. Null when scoring ran without enrichment.",

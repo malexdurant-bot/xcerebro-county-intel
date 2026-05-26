@@ -367,6 +367,237 @@ _CHECKS = (
 )
 
 
+# ---------------------------------------------------------------------------
+# v5.5.0 §4.1 / §4.2 / §4.3 / §4.6 — additional pre-publish semantic checks
+# that run on the SCORED_LEADS layer (the data that actually reaches the
+# dashboard). The §20 checks 1-12 above run on matched_leads.json (§19 output);
+# the v5.5.0 checks need scored_leads + dashboard payload context so they live
+# in their own check pass invoked after scoring (or skipped when scored_leads
+# isn't supplied at call time).
+# ---------------------------------------------------------------------------
+
+def _check_13_tax_default_qualification(scored_leads: list, ctx: dict) -> dict:
+    """v5.5.0 §4.1 — every scored_lead with lead_origin_type TAX_DEFAULT
+    MUST carry qualification_status QUALIFIED and the §3.3 5-criteria
+    evidence. A row whose lead_origin_type claims TAX_DEFAULT but the
+    qualification gate did not bless is a §3.3 violation."""
+    if scored_leads is None:
+        return _result(
+            13, "Tax-default qualification (v5.5.0 §4.1)", "SKIPPED",
+            "no scored_leads supplied — check runs only when scoring stage "
+            "results are available.")
+    offenders = []
+    seen = 0
+    for sl in scored_leads:
+        if sl.get("lead_origin_type") != "TAX_DEFAULT":
+            continue
+        seen += 1
+        qs = sl.get("qualification_status")
+        if qs != "QUALIFIED":
+            offenders.append({
+                "scored_lead_id": sl.get("scored_lead_id"),
+                "qualification_status": qs,
+                "reason": "TAX_DEFAULT lead without QUALIFIED status",
+            })
+            continue
+        ev = sl.get("qualification_evidence") or {}
+        if not all(
+            ev.get(k) is True for k in
+            ("a_official_source", "b_default_condition", "c_property_tie",
+             "d_source_proof", "e_not_generic_roll")
+        ):
+            offenders.append({
+                "scored_lead_id": sl.get("scored_lead_id"),
+                "qualification_evidence": ev,
+                "reason": "§3.3 five-criteria evidence incomplete",
+            })
+    if offenders:
+        return _result(
+            13, "Tax-default qualification (v5.5.0 §4.1)", "INVALID",
+            f"{len(offenders)} TAX_DEFAULT scored_lead(s) presented without "
+            f"the §3.3 five-criteria gate verdict / evidence — generic "
+            f"tax-roll data is being inflated to leads.",
+            offenders[:10])
+    return _result(
+        13, "Tax-default qualification (v5.5.0 §4.1)", "VALID",
+        f"{seen} TAX_DEFAULT scored_lead(s) all carry QUALIFIED status with "
+        f"complete §3.3 five-criteria evidence.")
+
+
+def _check_14_eventless_lead_rejection(scored_leads: list, ctx: dict) -> dict:
+    """v5.5.0 §4.2 — a scored_lead must have an event_source and evidence_ids
+    AND a non-empty signals chain. Rows with no originating event / no
+    source proof fail (an inflated board)."""
+    if scored_leads is None:
+        return _result(
+            14, "Eventless-lead rejection (v5.5.0 §4.2)", "SKIPPED",
+            "no scored_leads supplied.")
+    offenders = []
+    for sl in scored_leads:
+        has_source_ids = bool(sl.get("source_ids") or [])
+        has_evidence = bool(sl.get("evidence_ids") or [])
+        has_event_source = bool(sl.get("event_source") or sl.get("source_ids"))
+        if not (has_source_ids and has_evidence and has_event_source):
+            offenders.append({
+                "scored_lead_id": sl.get("scored_lead_id"),
+                "lead_id": sl.get("lead_id"),
+                "source_ids": sl.get("source_ids"),
+                "evidence_ids": sl.get("evidence_ids"),
+                "event_source": sl.get("event_source"),
+                "reason": "missing event_source / source_ids / evidence_ids",
+            })
+    if offenders:
+        return _result(
+            14, "Eventless-lead rejection (v5.5.0 §4.2)", "INVALID",
+            f"{len(offenders)} scored_lead(s) carry no originating event / "
+            f"no source proof — an inflated-board violation.",
+            offenders[:10])
+    return _result(
+        14, "Eventless-lead rejection (v5.5.0 §4.2)", "VALID",
+        f"all {len(scored_leads)} scored_leads carry event_source + "
+        f"source_ids + evidence_ids.")
+
+
+def _check_15_dead_board_rule(scored_leads: list, ctx: dict) -> dict:
+    """v5.5.0 §4.3 — DEAD-BOARD rule. Reject an all-Unknown board when
+    enrichment was POSSIBLE but not joined. Pass when scored_leads show
+    enrichment was attempted (any ENRICHED leads, or the operator explicitly
+    declared no enrichment join was available — owner unresolved with proof
+    is OK per §4.3).
+
+    The rule is precise:
+      - if ZERO scored_leads have enrichment_status == 'ENRICHED' AND
+      - at least one scored_lead has a real parcel_id (i.e. a join key
+        existed AND was therefore possible), AND
+      - the dashboard would render with owner_name == placeholder /
+        UNKNOWN for all rows
+      → INVALID (DEAD board — a join key existed, enrichment was possible,
+        not done).
+      - if the operator-supplied ctx flag 'enrichment_join_unavailable'
+        is True → AMBIGUOUS (skipped enforcement, operator override).
+      - otherwise → VALID.
+    """
+    if scored_leads is None:
+        return _result(
+            15, "Dead-board rule (v5.5.0 §4.3)", "SKIPPED",
+            "no scored_leads supplied.")
+    if not scored_leads:
+        return _result(
+            15, "Dead-board rule (v5.5.0 §4.3)", "VALID",
+            "empty scored_leads — no board to publish, no dead-board check.")
+
+    n_enriched = sum(
+        1 for sl in scored_leads
+        if sl.get("enrichment_status") == "ENRICHED"
+    )
+    n_with_parcel = sum(
+        1 for sl in scored_leads
+        if (sl.get("primary_parcel_id") or "").strip()
+    )
+    n_with_known_owner = sum(
+        1 for sl in scored_leads
+        if (sl.get("owner_name") or "")
+        and "unidentified party" not in str(sl.get("owner_name", "")).lower()
+        and "UNKNOWN" not in str(sl.get("owner_name", "")).upper()
+    )
+
+    enrichment_join_unavailable = ctx.get("enrichment_join_unavailable", False)
+    if enrichment_join_unavailable:
+        return _result(
+            15, "Dead-board rule (v5.5.0 §4.3)", "AMBIGUOUS",
+            "operator override: enrichment_join_unavailable=True — the "
+            "all-Unknown board is allowed because no enrichment join is "
+            "available for this county/run (§4.3 carve-out).")
+
+    if n_enriched == 0 and n_with_parcel > 0 and n_with_known_owner == 0:
+        return _result(
+            15, "Dead-board rule (v5.5.0 §4.3)", "INVALID",
+            f"DEAD BOARD: {len(scored_leads)} scored_lead(s), "
+            f"{n_with_parcel} carry a real parcel_id (so a join key exists), "
+            f"yet 0 are ENRICHED and 0 carry a known owner_name. Enrichment "
+            f"was possible and was not done.")
+
+    return _result(
+        15, "Dead-board rule (v5.5.0 §4.3)", "VALID",
+        f"{n_enriched}/{len(scored_leads)} ENRICHED; "
+        f"{n_with_known_owner}/{len(scored_leads)} carry a known owner.")
+
+
+def _check_16_no_past_sale_as_upcoming(scored_leads: list, ctx: dict) -> dict:
+    """v5.5.0 §4.6 — a scored_lead whose lead_origin_type implies a future
+    sale (RECORDED_EVENT carrying an UPCOMING_SALE signal) MUST NOT have a
+    past primary_event_date. We can only enforce this when scored_leads
+    carry the §3.9 classification; absent that, this check is SKIPPED.
+
+    Precise: a scored_lead whose primary_event_date is BEFORE today's date
+    AND whose lead_origin_type is NOT POST_SALE_TITLE_EVENT / SURPLUS_EVENT
+    / TAX_DEFAULT / OWNER_STATUS (i.e. a scheduled-event lead that should
+    be future-dated) → INVALID. The check uses ctx['as_of'] (caller-
+    supplied) for the cutoff.
+    """
+    if scored_leads is None:
+        return _result(
+            16, "No-past-sale-as-upcoming (v5.5.0 §4.6)", "SKIPPED",
+            "no scored_leads supplied.")
+    as_of = ctx.get("as_of")
+    if as_of is None:
+        return _result(
+            16, "No-past-sale-as-upcoming (v5.5.0 §4.6)", "SKIPPED",
+            "no as_of date supplied in ctx — cannot evaluate scheduled-event "
+            "freshness.")
+    from datetime import date as _date  # local import to keep header light
+    if not isinstance(as_of, _date):
+        return _result(
+            16, "No-past-sale-as-upcoming (v5.5.0 §4.6)", "SKIPPED",
+            f"ctx['as_of'] is not a date (got {type(as_of).__name__}).")
+    OK_BACKWARD_ORIGINS = {
+        "POST_SALE_TITLE_EVENT", "SURPLUS_EVENT",
+        "TAX_DEFAULT", "OWNER_STATUS",
+    }
+    offenders = []
+    for sl in scored_leads:
+        origin = sl.get("lead_origin_type")
+        if origin in OK_BACKWARD_ORIGINS or origin is None:
+            continue  # not a scheduled-event lead — past dates are fine
+        ed = sl.get("primary_event_date")
+        if not ed:
+            continue
+        try:
+            ed_date = _date.fromisoformat(str(ed)[:10])
+        except (ValueError, TypeError):
+            continue
+        if ed_date < as_of:
+            offenders.append({
+                "scored_lead_id": sl.get("scored_lead_id"),
+                "lead_origin_type": origin,
+                "primary_event_date": str(ed),
+                "as_of": as_of.isoformat(),
+                "reason": "past sale date on scheduled-event lead",
+            })
+    if offenders:
+        return _result(
+            16, "No-past-sale-as-upcoming (v5.5.0 §4.6)", "INVALID",
+            f"{len(offenders)} scheduled-event scored_lead(s) carry "
+            f"primary_event_date in the past — §3.9 PAST_SALE leaked into "
+            f"the upcoming-lead board.",
+            offenders[:10])
+    return _result(
+        16, "No-past-sale-as-upcoming (v5.5.0 §4.6)", "VALID",
+        f"all scheduled-event scored_leads carry primary_event_date >= as_of "
+        f"({as_of.isoformat()}).")
+
+
+_V5_5_0_CHECKS = (
+    _check_13_tax_default_qualification,
+    _check_14_eventless_lead_rejection,
+    _check_15_dead_board_rule,
+    _check_16_no_past_sale_as_upcoming,
+)
+"""v5.5.0 §4 check pass — runs on the scored_leads layer. Invoked by
+run_v5_5_0_semantic_checks(); also auto-included in
+run_semantic_verification when scored_leads is supplied."""
+
+
 def _deploy_verdict(check_results: list) -> str:
     """Compute the §20.F deploy verdict over the executed checks."""
     executed = [r for r in check_results if r["status"] != "SKIPPED"]
@@ -382,14 +613,20 @@ def run_semantic_verification(
     *,
     leads_base_records: Optional[list] = None,
     evidence_ledger: Optional[dict] = None,
+    scored_leads: Optional[list] = None,
+    as_of=None,
+    enrichment_join_unavailable: bool = False,
 ) -> dict:
     """Run the §20 semantic verification gate over matched_leads.json.
 
     §20.G: semantic verification runs AFTER mechanical verification. This
     function first mechanically validates every matched lead against
     matched_lead_record.schema.json; a mechanical failure blocks the semantic
-    checks and yields DEPLOY_BLOCKED. It then runs the twelve §20.C checks and
-    computes the §20.F deploy verdict.
+    checks and yields DEPLOY_BLOCKED. It then runs the twelve §20.C checks
+    AND, when scored_leads is supplied, the v5.5.0 §4 check pass (4 new
+    checks — tax-default qualification, eventless-lead rejection, dead-board
+    rule, no-past-sale-as-upcoming) — then computes the §20.F deploy verdict
+    over the union.
 
     Args:
         matched_leads: The aggregator's matched-lead records (matched_leads.json).
@@ -398,10 +635,19 @@ def run_semantic_verification(
             4). Optional — Check 4's row-provenance part is skipped without it.
         evidence_ledger: Optional evidence-ledger index (evidence_id -> entry).
             Reserved for evidence-trace reporting.
+        scored_leads: Optional — when supplied, the v5.5.0 §4 check pass runs
+            on the scored_leads layer (the data that actually reaches the
+            dashboard). Without it, checks 13-16 SKIPPED.
+        as_of: Optional — required for check 16 (no-past-sale-as-upcoming);
+            checks scheduled-event freshness against this cutoff date.
+        enrichment_join_unavailable: When True, check 15 (dead-board rule)
+            yields AMBIGUOUS instead of INVALID — the operator override per
+            §4.3 carve-out.
 
     Returns:
-        A report dict — `verdict`, `checks` (twelve §20.C results), the run /
-        skipped / invalid / ambiguous tallies, and `mechanical_ok`.
+        A report dict — `verdict`, `checks` (§20.C 1-12 plus v5.5.0 13-16
+        when scored_leads supplied), the run / skipped / invalid / ambiguous
+        tallies, and `mechanical_ok`.
     """
     # §20.G — mechanical verification first.
     validator = _matched_lead_validator()
@@ -435,9 +681,16 @@ def run_semantic_verification(
     ctx = {
         "source_role_by_id": role_by_id,
         "evidence_ledger": evidence_ledger or {},
+        "as_of": as_of,
+        "enrichment_join_unavailable": enrichment_join_unavailable,
     }
 
     results = [check(matched_leads, ctx) for check in _CHECKS]
+    # v5.5.0 §4 pass — runs over scored_leads when supplied; the four new
+    # checks SKIP cleanly when scored_leads is None.
+    results.extend(
+        check(scored_leads, ctx) for check in _V5_5_0_CHECKS
+    )
     verdict = _deploy_verdict(results)
 
     return {
