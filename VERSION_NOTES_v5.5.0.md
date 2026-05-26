@@ -151,6 +151,46 @@ run §6.4 gate, publish OR preserve last-good per gate verdict.
 
 Pinned by `scaffold/tests/v5_5_0/test_verify_live_contract.py` (20 checks).
 
+### §1.5 — OFFICIAL-VENUE TEST (framework adjustment, post-initial-candidate)
+
+`scaffold/pipeline/source_venue_classifier.py` (NEW). A third-party-hosted
+platform IS a `PRIMARY_EVENT_SOURCE` / `PRIMARY_DEFAULT_SOURCE` when recon
+confirms it is the OFFICIAL VENUE where the county (or its appointed
+officer — sheriff, trustee, tax collector) statutorily CONDUCTS or
+PUBLISHES the distress event. Vendor hosting does NOT disqualify.
+RealAuction / RealForeclose / RealTaxDeed are the precedent: county-
+appointed auction platforms, already canon.
+
+The disqualifier is NOT "third-party domain." The disqualifier is
+"marketplace re-listing" — a platform that merely re-lists events
+conducted/published elsewhere, with its own derived distress tags.
+
+Three executable registries:
+- `KNOWN_OFFICIAL_VENUE_PLATFORMS` — Real* family + GovEase + Bid4Assets
+  + CivicSource + PublicSurplus (precedent; per-county recon evidence
+  still required).
+- `CONDITIONAL_PLATFORMS` — Auction.com / Xome / HUD-Home-Store —
+  PRIMARY only when recon supplies a `county_evidence` dict with
+  `official_designation_url` + `officer_or_office`; CONDITIONAL_REQUIRES_EVIDENCE
+  otherwise.
+- `REJECTED_AGGREGATOR_PLATFORMS` — Zillow, Trulia, Realtor.com,
+  RealtyTrac, Foreclosure.com, Homes.com, Redfin, Movoto, Estately —
+  AGGREGATOR_REJECTED in all counties (no statutory notices, no sales
+  conducted; derived distress tags only).
+
+The recon orchestrator always wins — the classifier returns the DEFAULT
+verdict; per-county recon can still downgrade a known-official-venue
+platform if it discovers the platform is being used as an aggregator in
+that jurisdiction.
+
+A source admitted by this test STILL passes the §3.3 / §17 / §3.5
+qualification gates and STILL carries source proof. OFFICIAL-VENUE is
+necessary, not sufficient.
+
+Pinned by `scaffold/tests/v5_5_0/test_source_venue_classifier.py`
+(60 checks). The §01.27.1 doc amendment in
+`knowledge_base/protocols/01_county_recon.md` records the canon.
+
 ### §S1 / §S2 — Recon protocol + access ladder docs
 
 `knowledge_base/protocols/01_county_recon.md` §01.27 (NEW) — v5.5.0 hard
@@ -173,9 +213,11 @@ Pinned by `scaffold/tests/v5_5_0/test_recon_and_access_docs_present.py`
 
 ## Test count
 
-v5.5.0 ships **288 new invariant checks** across 11 new test files in
-`scaffold/tests/v5_5_0/`. The harness (`scaffold/tests/run_all.py`)
-auto-discovers them.
+v5.5.0 ships **348 new invariant checks** across **12** new test files in
+`scaffold/tests/v5_5_0/` (288 from the initial candidate + 60 from the
+§1.5 OFFICIAL-VENUE TEST adjustment). The harness
+(`scaffold/tests/run_all.py`) auto-discovers them. 42 gate scripts PASS
+end-to-end.
 
 ---
 

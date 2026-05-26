@@ -779,3 +779,80 @@ Before any county is called done, recon must perform a structured re-sweep:
 A county with unprobed sources is not complete. The v5.5.0 county-build
 contract test consumes the audit output.
 
+
+## 01.27.1 §1.5 — OFFICIAL-VENUE TEST (v5.5.0 adjustment)
+
+A third-party-hosted platform IS a `PRIMARY_EVENT_SOURCE` /
+`PRIMARY_DEFAULT_SOURCE` when recon confirms it is the OFFICIAL VENUE
+where the county (or its appointed officer — sheriff, trustee, tax
+collector) statutorily CONDUCTS or PUBLISHES the distress event. Vendor
+hosting does NOT disqualify a source. The RealAuction / RealForeclose /
+RealTaxDeed family is the precedent — county-appointed auction platforms,
+already canon as primary event sources.
+
+The disqualifier is NOT "third-party domain." The disqualifier is
+"marketplace re-listing." A platform that merely RE-LISTS or AGGREGATES
+events conducted / published elsewhere, with its own derived status tags
+(its own "pre-foreclosure" / "foreclosure" estimates), is REJECTED_SOURCE.
+
+### The test, applied per-county in recon (never blanket)
+
+Q1. Does the county / sheriff / trustee / tax collector officially
+    conduct the sale, or publish the statutory notice, ON this platform?
+       YES → PRIMARY (official venue).
+       NO  → continue.
+Q2. Does the platform re-list sales conducted elsewhere, or apply its
+    own derived distress tags?
+       YES → REJECTED (aggregator / marketplace re-listing).
+
+### Conditional / unconditional decisions canonized in code
+
+The framework ships an executable classifier
+(`scaffold/pipeline/source_venue_classifier.py`) carrying three registries
+that operationalize this test:
+
+- **`KNOWN_OFFICIAL_VENUE_PLATFORMS`** — the Real* family (RealAuction,
+  RealForeclose, RealTaxDeed, RealTDM, RealTDA), GovEase, Bid4Assets,
+  CivicSource, PublicSurplus. Default verdict OFFICIAL_VENUE_PRIMARY.
+  Per-county recon evidence is STILL required (the platform being on the
+  list does NOT blanket-classify it as PRIMARY in every county); the
+  registry is historical-precedent documentation.
+
+- **`CONDITIONAL_PLATFORMS`** — platforms where the official-venue answer
+  is variable enough that recon MUST record the specific evidence (the
+  county/sheriff/trustee page that designates the platform as the
+  official venue) before the source is admitted as PRIMARY. **Auction.com**
+  is the canonical case: PRIMARY only in counties where recon documents
+  the sheriff/trustee officially conducts the sale through Auction.com;
+  REJECTED elsewhere. Required evidence fields:
+  - `official_designation_url` — the official county/sheriff/trustee page
+  - `officer_or_office` — which officer made the designation (`sheriff`,
+    `trustee`, `tax_collector`, `clerk_of_court`)
+
+- **`REJECTED_AGGREGATOR_PLATFORMS`** — Zillow, Trulia, Realtor.com,
+  RealtyTrac, Foreclosure.com, Homes.com, Redfin, Movoto, Estately.
+  Listings portals that conduct NO sales and publish NO statutory
+  notices in any county; their distress tags are derived estimates.
+  AGGREGATOR_REJECTED in all counties.
+
+Unknown platforms (not in any registry) return UNKNOWN_PLATFORM and
+recon must classify manually per the §1.5 test — they are NEVER
+auto-promoted to PRIMARY.
+
+### Still subject to qualification
+
+A source admitted as PRIMARY by the OFFICIAL-VENUE TEST STILL passes the
+normal qualification gate (§3.3 for tax-default rows, the §17
+debtor-party engine for event rows, §3.5 for owner-status rows) and
+STILL carries source proof. The OFFICIAL-VENUE TEST is necessary, not
+sufficient.
+
+### Recon orchestrator always wins
+
+The classifier returns the DEFAULT verdict for a platform based on its
+registry. The per-county recon orchestrator is the source of truth for
+the FINAL verdict — a known-official-venue platform can still be
+REJECTED for a specific county if recon discovers it's being used as a
+marketplace re-listing in that jurisdiction, and the operator records the
+downgrade rationale.
+

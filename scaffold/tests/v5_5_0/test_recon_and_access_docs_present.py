@@ -58,6 +58,16 @@ def main() -> int:
             "primary_owner_status_source",
             "rejected_source",
             "§1.6 — missed-source audit",
+            # §01.27.1 OFFICIAL-VENUE TEST amendment
+            "01.27.1 §1.5 — official-venue test",
+            "the disqualifier is not",
+            "marketplace re-listing",
+            "auction.com",
+            "zillow",
+            "realauction",
+            "known_official_venue_platforms",
+            "conditional_platforms",
+            "rejected_aggregator_platforms",
         ):
             check(f"§S1 recon doc carries: {phrase!r}",
                   phrase.lower() in text)
