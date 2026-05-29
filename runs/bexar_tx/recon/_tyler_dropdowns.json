@@ -1,0 +1,27 @@
+{
+  "CaseType": "ERR:Cannot read properties of undefined (reading 'roles')",
+  "CourtLocation": "ERR:Cannot read properties of undefined (reading 'roles')",
+  "SearchBy": "ERR:Cannot read properties of undefined (reading 'roles')",
+  "CaseStatus": "ERR:Cannot read properties of undefined (reading 'roles')",
+  "CaseType_listbox_li": [
+    "All Offices Case Search"
+  ],
+  "CourtLocation_listbox_li": [
+    "All Locations",
+    "County Clerk",
+    "District Clerk",
+    "Justice of the Peace"
+  ],
+  "SearchBy_listbox_li": [
+    "Smart Search",
+    "Attorney Bar Number",
+    "Attorney Name",
+    "Business Name",
+    "Case Cross-Reference Number",
+    "Case Number",
+    "Citation Number",
+    "Judicial Officer",
+    "Nickname",
+    "Party Name"
+  ]
+}

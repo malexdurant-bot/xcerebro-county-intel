@@ -592,7 +592,7 @@
       "ttl_days": 1095,
       "blocked_unblock_paths": [],
       "notes": "Tyler Technologies Odyssey-powered Justice Information Portal. Replaced search.bexar.org and apps.bexar.org/dklitsearch in a consolidated migration. Covers District Clerk Civil & Criminal records and dockets, County Clerk misdemeanors, hearings, jail, and bail bonds. Probate cases are also accessible via the same portal (declared as a separate source block for build clarity).",
-      "verification_note": "Public Smart Search confirmed; registration not required for public data. Vendor: Tyler Technologies. Free.",
+      "verification_note": "Public Smart Search confirmed; registration not required for public data. Vendor: Tyler Technologies. Free. Build-Mode recon 2026-05-28 (runs/bexar_tx/recon/tyler_odyssey_court_recon.md): Smart Search submit is reCAPTCHA v2 gated for ANONYMOUS users (Settings_CaptchaEnabled=true), but CAPTCHA is disabled for AUTHENTICATED accounts (Settings_CaptchaDisabledForAuthenticated=true) — so a free registered account makes it automatable. Also: Tyler Smart Search has no date-only query (FileDateStart/End only refine a name/case search), so a daily-refresh discovery strategy (Search Hearings date listing, blank-criteria+date range, or case-number enumeration) must be chosen and validated with an account before a scraper spec.",
       "open_questions": [
         "Confirm civil case detail / document image access is free.",
         "Confirm Odyssey API access policy with operator / vendor."
@@ -618,7 +618,7 @@
         "court"
       ],
       "access_method": "SEARCHABLE_PUBLIC_PORTAL",
-      "public_access_status": "PUBLIC_SEARCH_ONLY",
+      "public_access_status": "CAPTCHA_PROTECTED",
       "document_access_status": "DOCUMENTS_UNKNOWN",
       "source_role": "PRIMARY_LEAD_SOURCE",
       "verification_confidence": "HIGH",
@@ -626,8 +626,8 @@
       "sample_record_type": "search_form",
       "sample_search_possible": true,
       "sample_document_view_possible": false,
-      "blocker": "",
-      "next_access_strategy": "",
+      "blocker": "Anonymous Smart Search is reCAPTCHA v2 gated; not automatable without a free authenticated account (CAPTCHA disabled for authenticated) or a CAPTCHA solver. Plus no date-only search (discovery strategy undecided).",
+      "next_access_strategy": "request_free_account",
       "blocker_type": "",
       "auto_resolve_status": "NOT_ATTEMPTED",
       "final_resolution_status": "",
@@ -685,7 +685,7 @@
       "ttl_days": 1825,
       "blocked_unblock_paths": [],
       "notes": "Probate court cases are filed with the County Clerk's Probate Department (100 Dolorosa, Suite 104) and indexed in the same Tyler Odyssey portal as civil. Declared as a separate source block because the lead pattern (estate openings, dependent administrations, heirship) is distinct from civil-distress patterns.",
-      "verification_note": "Probate filings searchable through the consolidated Justice Information Portal. Texas Estates Code: probate records are public in most cases.",
+      "verification_note": "Probate filings searchable through the consolidated Justice Information Portal. Texas Estates Code: probate records are public in most cases. Build-Mode recon 2026-05-28 (runs/bexar_tx/recon/tyler_odyssey_court_recon.md): Smart Search submit is reCAPTCHA v2 gated for ANONYMOUS users (Settings_CaptchaEnabled=true), but CAPTCHA is disabled for AUTHENTICATED accounts (Settings_CaptchaDisabledForAuthenticated=true) — so a free registered account makes it automatable. Also: Tyler Smart Search has no date-only query (FileDateStart/End only refine a name/case search), so a daily-refresh discovery strategy (Search Hearings date listing, blank-criteria+date range, or case-number enumeration) must be chosen and validated with an account before a scraper spec.",
       "open_questions": [
         "Confirm whether the Tyler portal exposes case-type filter for probate."
       ],
@@ -707,7 +707,7 @@
         "filing_date_range"
       ],
       "access_method": "SEARCHABLE_PUBLIC_PORTAL",
-      "public_access_status": "PUBLIC_SEARCH_ONLY",
+      "public_access_status": "CAPTCHA_PROTECTED",
       "document_access_status": "DOCUMENTS_UNKNOWN",
       "source_role": "PRIMARY_LEAD_SOURCE",
       "verification_confidence": "HIGH",
@@ -715,8 +715,8 @@
       "sample_record_type": "search_form",
       "sample_search_possible": true,
       "sample_document_view_possible": false,
-      "blocker": "",
-      "next_access_strategy": "",
+      "blocker": "Anonymous Smart Search is reCAPTCHA v2 gated; not automatable without a free authenticated account (CAPTCHA disabled for authenticated) or a CAPTCHA solver. Plus no date-only search (discovery strategy undecided).",
+      "next_access_strategy": "request_free_account",
       "blocker_type": "",
       "auto_resolve_status": "NOT_ATTEMPTED",
       "final_resolution_status": "",

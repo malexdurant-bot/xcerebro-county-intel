@@ -1,0 +1,741 @@
+<!DOCTYPE html><html class="asp-no-fluid-layout js flexbox flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers no-applicationcache svg inlinesvg smil svgclippaths cookies no-ie chrome no-safari no-opera no-opera-next no-firefox no-khtml webkit no-edge no-undetected-browser no-ie-lt-6 no-ie-lt-7 no-ie-lt-8 no-ie-lt-9 no-ie-lt-10 no-ie-lt-11 no-ie-lt-12 no-ie-gt-6 no-ie-gt-7 no-ie-gt-8 no-ie-gt-9 no-ie-gt-10 no-ie-gt-11 no-ie-version-6 no-ie-version-7 no-ie-version-8 no-ie-version-9 no-ie-version-10 no-ie-version-11 k-webkit k-webkit124 portal-page-hearing-search" dir="ltr" lang="en-US" style=""><head><meta http-equiv="origin-trial" content="A7vZI3v+Gz7JfuRolKNM4Aff6zaGuT7X0mf3wtoZTnKv6497cVMnhy03KDqX7kBz/q/iidW7srW31oQbBt4VhgoAAACUeyJvcmlnaW4iOiJodHRwczovL3d3dy5nb29nbGUuY29tOjQ0MyIsImZlYXR1cmUiOiJEaXNhYmxlVGhpcmRQYXJ0eVN0b3JhZ2VQYXJ0aXRpb25pbmczIiwiZXhwaXJ5IjoxNzU3OTgwODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}</style>
+  <meta charset="UTF-8">
+  
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=10,chrome=1">
+
+
+    <title>Search Hearings - Bexar County Justice Portal</title>
+
+  <!-- mobile optimized -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <!-- allow pinned sites -->
+  <meta name="application-name" content="Odyssey Portal">
+
+  <!-- Favicon -->
+  <link href="/Portal/favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/Portal/Content/tylerui/images/apple-touch-icon-144x144-precomposed.png">
+  
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/Portal/Content/tylerui/images/apple-touch-icon-114x114-precomposed.png">
+  
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/Portal/Content/tylerui/images/apple-touch-icon-72x72-precomposed.png">
+  
+  <link rel="apple-touch-icon-precomposed" href="/Portal/Content/tylerui/images/apple-touch-icon-precomposed.png">
+
+  <script type="text/javascript" async="" charset="utf-8" src="https://www.gstatic.com/recaptcha/releases/hsFBb1u5wWWWkWP4in1ua2cQ/recaptcha__en.js" crossorigin="anonymous" integrity="sha384-lIGkJy/ifBvYLcMC4DQHp6MP4+CdsSQsdz5dRsF5u+8bggv6r0m96jXICY4RQXSL"></script><script>
+    window.odyPortal = window.odyPortal || {};
+    window.odyPortal.sessionInfo = {
+      pageLoadTime: (new Date()).getTime() 
+    };
+    var usePersonaCaseSummary = "True" == "True" ? true : false;
+  </script>
+
+  <!-- Plugin Styles -->
+  
+
+  
+  <link href="/Portal/Content/PortalReset.css?v=HD3euui7n1lxavx56-Rd62SNCgtVTbp1sCISDUiiG1Y1" rel="stylesheet">
+
+
+  
+  <link rel="stylesheet" href="/Portal/Content/tylerui/tylerui-browser-requirements.css">
+  <!-- Bundled Content -->
+
+  <!-- ModernizrDefunctr JS -->
+  <script src="/Portal/bundles/ModernizrDefunctr?v=3BC6zM2_o9Xw5CKmkDTIn-sTFHSO-9JROdFmqORHGbg1"></script>
+
+
+  <!-- TylerUI CSS -->
+  <link href="/Portal/bundles/TylerUiCss?v=2Go4wo9adQ5mntd201B85jxp3nJ_aoWrhFNHIcOFaBk1" rel="stylesheet">
+
+  <!-- Kendo CSS -->
+  <link href="/Portal/Content/external/telerik/kendo/kendo.css?v=bzDcF29RRoChnTfBlWURSAWwZYCnKtnPd1nO9Jfp5ec1" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link href="/Portal/Content/main.css?v=CgWFMp8_LWgMAiC4pgPaBGu3ojzhmUUk1znmG2TRWkM1" rel="stylesheet">
+
+  <!-- Print CSS -->
+  <link href="/Portal/Content/print.css?v=_hW1boXuxZ3OXNXlcQ9b5v2BQnQwFjXcNWRG53y8mds1" rel="stylesheet" type="text/css" media="print">
+
+
+  
+
+  <script src="/Portal/bundles/TylerUiJs?v=INAW8YK3Ll-gwPl67-zOt0LcCuahWQUMOGE0j8o03Es1"></script>
+
+
+  
+
+  <script src="/Portal/Scripts/ePortal/main.js?v=lsW2epud0pmlmK0Lcjom1SqyXs16McEvjU6eXg4obI41"></script>
+
+  <script src="/Portal/Scripts/ePortal/ePortal.js?v=NVWkfvyy5YDmkK3HuwzEsRYmt3A5sRIKIfZPeR66Mq81"></script>
+
+
+    <script type="text/javascript">
+    //The base URL of Portal
+    window.applicationBaseUrl = "https://portal-txbexar.tylertech.cloud/Portal/";
+    window.userIsAuthenticated = 'False' === 'True' ? true : false;
+    window.virtualDirectory = '/Portal';
+    window.resolveWebIntentDirectoryURI = '/Portal/ResolveWebIntent/GetIntentList';
+  </script>
+
+
+<style type="text/css" id="vakata-stylesheet">#vakata-dragged { display:block; margin:0 0 0 0; padding:4px 4px 4px 24px; position:absolute; top:-2000px; line-height:16px; z-index:10000; } #vakata-contextmenu { display:block; visibility:hidden; left:0; top:-200px; position:absolute; margin:0; padding:0; min-width:180px; background:#ebebeb; border:1px solid silver; z-index:10000; *width:180px; } #vakata-contextmenu ul { min-width:180px; *width:180px; } #vakata-contextmenu ul, #vakata-contextmenu li { margin:0; padding:0; list-style-type:none; display:block; } #vakata-contextmenu li { line-height:20px; min-height:20px; position:relative; padding:0px; } #vakata-contextmenu li a { padding:1px 6px; line-height:17px; display:block; text-decoration:none; margin:1px 1px 0 1px; } #vakata-contextmenu li ins { float:left; width:16px; height:16px; text-decoration:none; margin-right:2px; } #vakata-contextmenu li a:hover, #vakata-contextmenu li.vakata-hover > a { background:gray; color:white; } #vakata-contextmenu li ul { display:none; position:absolute; top:-2px; left:100%; background:#ebebeb; border:1px solid gray; } #vakata-contextmenu .right { right:100%; left:auto; } #vakata-contextmenu .bottom { bottom:-1px; top:auto; } #vakata-contextmenu li.vakata-separator { min-height:0; height:1px; line-height:1px; font-size:1px; overflow:hidden; margin:0 2px; background:silver; /* border-top:1px solid #fefefe; */ padding:0; } </style><style type="text/css" id="jstree-stylesheet">.jstree ul, .jstree li { display:block; margin:0 0 0 0; padding:0 0 0 0; list-style-type:none; } .jstree li { display:block; min-height:18px; line-height:18px; white-space:nowrap; margin-left:18px; min-width:18px; } .jstree-rtl li { margin-left:0; margin-right:18px; } .jstree > ul > li { margin-left:0px; } .jstree-rtl > ul > li { margin-right:0px; } .jstree ins { display:inline-block; text-decoration:none; width:18px; height:18px; margin:0 0 0 0; padding:0; } .jstree a { display:inline-block; line-height:16px; height:16px; color:black; white-space:nowrap; text-decoration:none; padding:1px 2px; margin:0; } .jstree a:focus { outline: none; } .jstree a > ins { height:16px; width:16px; } .jstree a > .jstree-icon { margin-right:3px; } .jstree-rtl a > .jstree-icon { margin-left:3px; margin-right:0; } li.jstree-open > ul { display:block; } li.jstree-closed > ul { display:none; } #vakata-dragged ins { display:block; text-decoration:none; width:16px; height:16px; margin:0 0 0 0; padding:0; position:absolute; top:4px; left:4px;  -moz-border-radius:4px; border-radius:4px; -webkit-border-radius:4px; } #vakata-dragged .jstree-ok { background:green; } #vakata-dragged .jstree-invalid { background:red; } #jstree-marker { padding:0; margin:0; font-size:12px; overflow:hidden; height:12px; width:8px; position:absolute; top:-30px; z-index:10001; background-repeat:no-repeat; display:none; background-color:transparent; text-shadow:1px 1px 1px white; color:black; line-height:10px; } #jstree-marker-line { padding:0; margin:0; line-height:0%; font-size:1px; overflow:hidden; height:1px; width:100px; position:absolute; top:-30px; z-index:10000; background-repeat:no-repeat; display:none; background-color:#456c43;  cursor:pointer; border:1px solid #eeeeee; border-left:0; -moz-box-shadow: 0px 0px 2px #666; -webkit-box-shadow: 0px 0px 2px #666; box-shadow: 0px 0px 2px #666;  -moz-border-radius:1px; border-radius:1px; -webkit-border-radius:1px; }.jstree .jstree-real-checkbox { display:none; } .jstree-themeroller .ui-icon { overflow:visible; } .jstree-themeroller a { padding:0 2px; } .jstree-themeroller .jstree-no-icon { display:none; }.jstree .jstree-wholerow-real { position:relative; z-index:1; } .jstree .jstree-wholerow-real li { cursor:pointer; } .jstree .jstree-wholerow-real a { border-left-color:transparent !important; border-right-color:transparent !important; } .jstree .jstree-wholerow { position:relative; z-index:0; height:0; } .jstree .jstree-wholerow ul, .jstree .jstree-wholerow li { width:100%; } .jstree .jstree-wholerow, .jstree .jstree-wholerow ul, .jstree .jstree-wholerow li, .jstree .jstree-wholerow a { margin:0 !important; padding:0 !important; } .jstree .jstree-wholerow, .jstree .jstree-wholerow ul, .jstree .jstree-wholerow li { background:transparent !important; }.jstree .jstree-wholerow ins, .jstree .jstree-wholerow span, .jstree .jstree-wholerow input { display:none !important; }.jstree .jstree-wholerow a, .jstree .jstree-wholerow a:hover { text-indent:-9999px; !important; width:100%; padding:0 !important; border-right-width:0px !important; border-left-width:0px !important; } .jstree .jstree-wholerow-span { position:absolute; left:0; margin:0px; padding:0; height:18px; border-width:0; padding:0; z-index:0; }</style></head>
+
+<body data-spy="scroll" data-target="#mysidebar">
+  <!-- center for IE9 since it ignores bootstrap 3 -->
+<center>
+
+    <!-- use noscript and also keep outside of controller to avoid flash in Safari and IE (can't use ng-cloak because there is no js it won't uncloak-->
+    <noscript>
+        <div class="nojs-content">
+            <h2>JavaScript must be enabled in order for you to use this application.</h2>
+            <p>However, it seems JavaScript is either disabled or not supported by your browser.</p>
+            <p>To use this application, enable JavaScript by changing your browser options, then try again.</p>
+        </div>
+    </noscript>
+
+    
+
+    
+
+
+</center>
+
+  <omnibar id="omnibar" class="">
+    
+
+    <div class="row" style="background-color: transparent;
+          height: 60px;
+         background-image: url(/Portal/theme/images/header-bg.png?v=638940442954110137);
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: left;
+          width: 1920px;">
+      <div class="col-md-12">
+      </div>
+    </div>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          
+          <brand class="navbar-brand">
+            <a href="/Portal/">
+                <img src="/Portal/Theme/images/logo.png?v=638940442953954088" alt="site logo" class="pull-left" style="height: 36px; width:36px;">
+              <div style="width: 100%; padding-left: 4.5rem; margin-top: 7px;">
+                <div class="product">Bexar County Justice Portal</div>
+              </div>
+            </a>
+          </brand>
+        </div>
+        <div id="navbar" class="hidden-xs pull-right">
+  <div class="dropdown" style="margin-top:15px;">
+    <button class="dropdown-toggle btn btn-default login-btn" data-toggle="dropdown" aria-expandable="false" id="dropdownMenu1" style="cursor: pointer;">
+      Register / Sign In
+      <span class="fa fa-user fa-fw"></span>
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+      <li role="presentation"><a href="/Portal/Account/Register">Register</a></li>
+      <li role="presentation">
+        <a href="/Portal/Account/Login">Sign In</a>
+      </li>
+      </ul>
+    </div>
+
+          
+        </div><!--/.nav-collapse -->
+        <div id="navbar" class="hidden-lg hidden-md hidden-sm">
+  <div class="dropdown" style="margin-top:15px;">
+    <button class="dropdown-toggle btn btn-default login-btn" data-toggle="dropdown" aria-expandable="false" id="dropdownMenu1" style="cursor: pointer;">
+      Register / Sign In
+      <span class="fa fa-user fa-fw"></span>
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+      <li role="presentation"><a href="/Portal/Account/Register">Register</a></li>
+      <li role="presentation">
+        <a href="/Portal/Account/Login">Sign In</a>
+      </li>
+      </ul>
+    </div>
+
+        </div>
+      </div><!--/.container-fluid -->
+    </nav>
+    <div class="row" style="
+    background-color: #40528F;
+    height: 30px;
+    margin-top:  -20px;
+    margin-bottom: 20px;">
+      <div class="col-md-12">
+      </div>
+    </div>
+  </omnibar>
+
+
+  <div id="main" class="container page" style="min-height: 850px; margin-top: 120px;">
+    <div class="hidden-lg hidden-md hidden-sm" style="height:55px;"></div>
+    
+
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+
+<!-- BEGIN _PortletZone\Index.cshtml BEGIN -->
+    <div class="section">
+      <div role="main" class="panel panel-default">
+        <div class="panel-body">
+          <div class="row">
+            <h1 class="col-md-10 col-sm-9">Search Hearings</h1>
+              <h2 class="col-md-2 col-sm-3 required-indicator-key">* Required</h2>
+          </div>
+          
+  <!-- /end div.portlet-header -->
+
+<div class="portlet-body">
+
+
+
+<script src="/Portal/Scripts/ePortal/portlets/hearingSearchPortlet.js?v=MFCNWvSthTnvvhm2gH2TnCtHQ2pPLut01QrPa0BWGoc1"></script>
+
+<script src="https://www.google.com/recaptcha/api.js"></script>
+
+<script>
+  var ensureFloatingLabel = function (selector) {
+    if (selector && selector.val() && selector.val().length > 0) {
+      selector.next().addClass("stay");
+    }
+  }
+
+  $(function () {
+    HearingSearchPortlet.init();
+    TabControl.TabRenderComplete($("#frmHS"), true);
+
+    // OWA-1896: Some floating labels "sink" when they should not.
+    ensureFloatingLabel($("#selHSJudicialOfficer"));
+    ensureFloatingLabel($("#selHSCourtroom"));
+  });
+</script>
+<script id="settingsViewModelJSON" type="application/json">
+  {"MaximumSearchDays":-1,"CaptchaEnabled":false,"MagistrateEnabled":false,"DefaultLocation":"All Locations","DisableWildcardCase":false,"DisallowSearchingPriorCurrentDate":false}
+</script>
+
+<form action="/Portal/Hearing/SearchHearings/HearingSearch" class="HearingSearchPortlet" id="frmHS" method="post"><input id="PortletName" name="PortletName" type="hidden" value="HearingSearch"><input data-val="true" data-val-required="The Captcha Enabled field is required." id="Settings_CaptchaEnabled" name="Settings.CaptchaEnabled" type="hidden" value="False"><input data-val="true" data-val-required="The Default Location field is required." id="Settings_DefaultLocation" name="Settings.DefaultLocation" type="hidden" value="All Locations"><div class="row"><div class="validation-summary-valid col-md-12" data-valmsg-summary="true"><span>One or more fields was completed incorrectly:</span><ul style="text-indent: 2.5em;"></ul></div></div>  <div class="col-md-12 col-sm-12"><h2><span style="float:left">Basic Search Options</span></h2></div>
+  <div class="col-md-12 col-sm-12">
+
+    <fieldset><select class="form-control" data-val="true" data-val-required="Court location is required" id="cboHSLocationGroup" name="SearchCriteria.SelectedCourt"><option value=""></option>
+<option selected="selected" value="All Locations">All Locations</option>
+<option value="County Clerk">County Clerk</option>
+<option value="District Clerk">District Clerk</option>
+<option value="Justice of the Peace">Justice of the Peace</option>
+</select><label for="cboHSLocationGroup" class="stay" style="position: absolute;">* Select Location</label></fieldset>
+
+    <span class="field-validation-valid" data-valmsg-for="SearchCriteria.SelectedCourt" data-valmsg-replace="false" data-valmsg-icon="true">
+  <div class="error-icon"></div>
+</span>
+  </div>
+  <div class="col-md-12 col-sm-12">
+    <fieldset>
+      <legend></legend>
+      <select class="form-control valid" data-val="true" data-val-required="Hearing type is required field" id="cboHSHearingTypeGroup" name="SearchCriteria.SelectedHearingType">
+          <option value="All Hearings" parent="All Locations">All Hearings</option>
+          <span class="disabledOptionWrapper"><option value="County Clerk Civil Hearings" parent="County Clerk">County Clerk Civil Hearings</option></span>
+          <span class="disabledOptionWrapper"><option value="County Clerk Criminal" parent="County Clerk">County Clerk Criminal</option></span>
+          <span class="disabledOptionWrapper"><option value="District Clerk Civil Hearings" parent="District Clerk">District Clerk Civil Hearings</option></span>
+          <span class="disabledOptionWrapper"><option value="District Clerk Criminal" parent="District Clerk">District Clerk Criminal</option></span>
+          <span class="disabledOptionWrapper"><option value="JP Hearings" parent="Justice of the Peace">JP Hearings</option></span>
+      </select>
+      <label for="cboHSHearingTypeGroup" style="position:absolute;" class="stay">* Select Hearing Types</label>
+    </fieldset>
+  </div>
+    <div class="col-md-12 col-sm-12" id="searchByDiv">
+      <fieldset>
+        <legend></legend>
+        <select data-val="true" data-val-required="Search type is a required field" id="cboHSSearchBy" name="SearchCriteria.SearchByType" class="valid form-control">
+          <option value=""></option>
+            <option value="CaseNumber">Case Number</option>
+            <option value="PartyName" data-name-type="true" data-soundex="true">Party Name</option>
+            <option value="BusinessName" data-soundex="true">Business Name</option>
+            <option value="AttorneyName" data-name-type="true" data-soundex="true">Attorney Name</option>
+            <option value="AttorneyBarNumber">Attorney Bar Number</option>
+            <option value="JudicialOfficer" data-judicialofficer="true">Judicial Officer</option>
+            <option value="Courtroom" data-courtroom="true">Courtroom</option>
+        </select>
+        <label for="cboHSSearchBy" style="position: absolute;">* Select Search Types</label>
+      </fieldset>
+    </div>
+  <div class="col-md-12 col-sm-12" id="sounds-like-container" style="display: none;">
+    <div class="form-check-box"><input data-val="true" data-val-required="The Soundex field is required." id="SearchCriteria_Soundex" name="SearchCriteria.Soundex" tabindex="0" type="checkbox" value="true" disabled="" title="Soundex cannot be used for this search type"><input name="SearchCriteria.Soundex" type="hidden" value="false" disabled=""><span class="ClickThroughIE"></span><label class="ClickThroughIE">Sounds Like</label></div>
+  </div>
+  <div class="col-md-12 col-sm-12" id="seachValueDiv" style="display: none;">
+    <fieldset><input class="form-control" data-val="true" data-val-generalvalidation="To perform a wildcard search for case numbers, use a minimum of 4 characters followed by an asterisk" data-val-generalvalidation-name="System.Web.Mvc.ViewContext" data-val-length="Please enter a value for search criteria 100 characters or less." data-val-length-max="100" data-val-searchcriteriarequired="Search Criteria is required" data-val-searchcriteriarequired-acceptablecasetypes="CaseNumber,CrossRefNumber" data-val-searchcriteriarequired-searchbyddselector="cboHSSearchBy" data-val-wildcard="To perform a wildcard search for case numbers, use a minimum of 4 characters followed by an asterisk" data-val-wildcard-name="System.Web.Mvc.ViewContext" id="SearchCriteria_SearchValue" maxlength="100" name="SearchCriteria.SearchValue" tabindex="0" type="text" value="" disabled="" style="display: none;"><label for="SearchCriteria_SearchValue">* Search by Criteria</label></fieldset>
+  </div>
+  <div class="col-md-12 col-sm-12" id="seachValueAttorneyNumberDiv" style="display: none;">
+    <fieldset><input class="form-control" data-val="true" data-val-length="Please enter an Attorney Number that is 100 characters or less." data-val-length-max="100" data-val-searchcriteriarequired="Search Criteria is required" data-val-searchcriteriarequired-acceptablecasetypes="AttorneyBarNumber" data-val-searchcriteriarequired-searchbyddselector="cboHSSearchBy" data-val-wildcard="Wildcards cannot be used with this search type" data-val-wildcard-name="System.Web.Mvc.ViewContext" id="SearchCriteria_SearchAttorneyNumber" maxlength="100" name="SearchCriteria.SearchAttorneyNumber" tabindex="0" type="text" value="" disabled="" style="display: none;"><label for="SearchCriteria_SearchAttorneyNumber">* Search by Criteria</label></fieldset>
+  </div>
+  <div class="col-md-12 col-sm-12" id="lastNameDiv" style="display:none;">
+    <fieldset><input class="form-control" data-val="true" data-val-generalvalidation="Last Name or Business Name must be at least 1 letter, or 3 letters followed by an optional asterisk. Names can include a space, hyphen, or apostrophe." data-val-generalvalidation-name="System.Web.Mvc.ViewContext" data-val-length="Please enter a Last Name or Business Name that is 100 characters or less." data-val-length-max="100" data-val-searchcriteriarequired="Last Name is required" data-val-searchcriteriarequired-acceptablecasetypes="PartyName,AttorneyName,BusinessName" data-val-searchcriteriarequired-searchbyddselector="cboHSSearchBy" data-val-wildcard="Wildcards cannot be used with Sounds Like selected" data-val-wildcard-name="System.Web.Mvc.ViewContext" id="txtHSLastName" maxlength="100" name="SearchCriteria.LastNameValue" tabindex="0" type="text" value="" disabled="" style="display: none;"><label for="txtHSLastName">* Last Name</label></fieldset>
+  </div>
+  <div class="col-md-12 col-sm-12" id="firstNameDiv" style="display:none;">
+    <fieldset><input class="form-control" data-val="true" data-val-generalvalidation="First name field must be at least 1 letter, followed by an optional asterisk.  Names can include a space, hyphen, or apostrophe." data-val-generalvalidation-name="System.Web.Mvc.ViewContext" data-val-length="Please enter a First Name that is 100 characters or less." data-val-length-max="100" data-val-searchcriteriarequired="First Name is required" data-val-searchcriteriarequired-acceptablecasetypes="PartyName,AttorneyName" data-val-searchcriteriarequired-searchbyddselector="cboHSSearchBy" data-val-wildcard="Wildcards cannot be used with Sounds Like selected" data-val-wildcard-name="System.Web.Mvc.ViewContext" id="txtHSFirstName" maxlength="100" name="SearchCriteria.FirstNameValue" tabindex="0" type="text" value="" disabled="" style="display: none;"><label for="txtHSFirstName">* First Name</label></fieldset>
+  </div>
+  <div class="col-md-12 col-sm-12" id="middleNameDiv" style="display:none;">
+    <fieldset><input class="form-control" data-val="true" data-val-generalvalidation="MiddleNameErrors!!" data-val-generalvalidation-name="System.Web.Mvc.ViewContext" data-val-length="Please enter a a Middle Name that is 100 characters or less." data-val-length-max="100" data-val-wildcard="Wildcards cannot be used with Sounds Like selected" data-val-wildcard-name="System.Web.Mvc.ViewContext" id="txtHSMiddleName" maxlength="100" name="SearchCriteria.MiddleNameValue" tabindex="0" type="text" value="" disabled="" style="display: none;"><label for="txtHSMiddleName">Middle Name</label></fieldset>
+  </div>
+    <div class="col-md-12 col-sm-12" id="judicialOfficerDiv" style="display:none">
+      <fieldset>
+        <legend></legend>
+        <select data-val="true" data-val-required="Judicial Officer is a required field" id="selHSJudicialOfficer" name="SearchCriteria.SelectedJudicialOfficer" class="valid form-control" disabled="" style="display: none;">
+          <option value=""></option>
+            <option value="29952">131st, District Court</option>
+            <option value="29962">144th, District Court</option>
+            <option value="29953">150th, District Court</option>
+            <option value="29954">166th, District Court</option>
+            <option value="29963">175th, District Court</option>
+            <option value="29964">186th, District Court</option>
+            <option value="29965">187th, District Court</option>
+            <option value="29955">224th, District Court</option>
+            <option value="29956">225th, District Court</option>
+            <option value="29966">226th, District Court</option>
+            <option value="29967">227th, District Court</option>
+            <option value="29957">285th, District Court</option>
+            <option value="29958">288th, District Court</option>
+            <option value="29972">289th, District Court</option>
+            <option value="29968">290th, District Court</option>
+            <option value="29969">379th, District Court</option>
+            <option value="29948">37th, District Court</option>
+            <option value="29973">386th, District Court</option>
+            <option value="29970">399th, District Court</option>
+            <option value="29959">407th, District Court</option>
+            <option value="29960">408th, District Court</option>
+            <option value="29975">436th, District Court</option>
+            <option value="29971">437th, District Court</option>
+            <option value="29961">438th, District Court</option>
+            <option value="29949">45th, District Court</option>
+            <option value="29950">57th, District Court</option>
+            <option value="29951">73rd, District Court</option>
+            <option value="29797">Ables, Stephen B</option>
+            <option value="93555">Alvarado, Jonathan</option>
+            <option value="29752">Alvarado, Rosie</option>
+            <option value="29691">Alvarez, Mary Lou</option>
+            <option value="29753">Angelini, Raymond C</option>
+            <option value="72714">Arevalos, Andrea</option>
+            <option value="29396">Arteaga, Antonia</option>
+            <option value="56350">Baker, Keith</option>
+            <option value="29678">Barnard, Marialyn</option>
+            <option value="29818">Boyd, Stephanie R</option>
+            <option value="52703">Brown, Clifford Addison</option>
+            <option value="52705">Brown, Edith</option>
+            <option value="52172">Brown, Mary C</option>
+            <option value="86956">Brown, Matthew W</option>
+            <option value="53557">Burley, Kimberly</option>
+            <option value="56344">Caballero, Monica L</option>
+            <option value="56345">Caballero, Monica L</option>
+            <option value="92839">Cabanas, Alfonso</option>
+            <option value="41943">Cadena, Robert E</option>
+            <option value="29469">Canales, David A</option>
+            <option value="29551">Canales, H. Paul</option>
+            <option value="29802">Casseb, Solomon J, III</option>
+            <option value="29517">Castro, Frank J</option>
+            <option value="29714">Catoe, Nick</option>
+            <option value="93553">Chacon, Meredith</option>
+            <option value="29449">Chapa, Cynthia Marie</option>
+            <option value="92687">Chapa, Luz Elena</option>
+            <option value="29403">Chapman, Brenda</option>
+            <option value="41992">Christian, M'liss</option>
+            <option value="29846">Christian, Wayne A</option>
+            <option value="92602">Civil, Family</option>
+            <option value="71239">CMAG, CMAG</option>
+            <option value="41510">CONV, CONV</option>
+            <option value="29931">County Court-at-Law, 1</option>
+            <option value="29933">County Court-at-Law, 10</option>
+            <option value="29941">County Court-at-Law, 11</option>
+            <option value="29942">County Court-at-Law, 12</option>
+            <option value="29943">County Court-at-Law, 13</option>
+            <option value="29944">County Court-at-Law, 14</option>
+            <option value="29945">County Court-at-Law, 15</option>
+            <option value="29934">County Court-at-Law, 2</option>
+            <option value="29932">County Court-at-Law, 3</option>
+            <option value="29935">County Court-at-Law, 4</option>
+            <option value="29936">County Court-at-Law, 5</option>
+            <option value="29937">County Court-at-Law, 6</option>
+            <option value="29938">County Court-at-Law, 7</option>
+            <option value="29939">County Court-at-Law, 8</option>
+            <option value="29940">County Court-at-Law, 9</option>
+            <option value="53313">Cox, Cornelius</option>
+            <option value="91734">Criminal, County Court</option>
+            <option value="91732">Criminal, District Court</option>
+            <option value="29375">Darring, Anne B</option>
+            <option value="29590">Davis, J. Frank</option>
+            <option value="72709">Del Prado, Christine</option>
+            <option value="92931">Denton, Michael</option>
+            <option value="55652">Dewalt, Eric</option>
+            <option value="29683">Diaz, Monique</option>
+            <option value="72715">Dominguez, Erica</option>
+            <option value="56362">Donovan, William E</option>
+            <option value="56364">Donovan, William E</option>
+            <option value="52646">DRO, Director</option>
+            <option value="52647">DRO, Program Specialist</option>
+            <option value="52649">DRO, SPP Coordinator</option>
+            <option value="52648">DRO, Staff Attorney</option>
+            <option value="73284">Ellison, Lynn</option>
+            <option value="72708">Escalona, Kristina</option>
+            <option value="72694">Flores, Marisa</option>
+            <option value="72705">Flores, Marisa</option>
+            <option value="29581">Gabriel, John D, JR</option>
+            <option value="72717">Garcia, Cesar</option>
+            <option value="72704">Garcia, Michele</option>
+            <option value="29769">Garcia, Richard</option>
+            <option value="52819">Garza, Nicole</option>
+            <option value="29737">Garza, Patrick J</option>
+            <option value="87130">GARZA, ROBERT</option>
+            <option value="29505">Glenn, Ernie L</option>
+            <option value="29715">Gonzales, Norma</option>
+            <option value="93950">Gonzalez, Charles</option>
+            <option value="55656">Gonzalez, Leo</option>
+            <option value="29789">Gonzalez, Rosie Speedlin</option>
+            <option value="29394">Haas, Aaron S</option>
+            <option value="93520">Halstead, Woodrow</option>
+            <option value="29812">Harle, Sid L</option>
+            <option value="71097">Henderson, Kevin</option>
+            <option value="29709">Herr, Maria Teresa</option>
+            <option value="72695">Hortick, Christine</option>
+            <option value="29864">Huff, Yolanda T</option>
+            <option value="55654">Ishimoto, James</option>
+            <option value="55657">Janssen, Marilisa</option>
+            <option value="29663">Jarrett, Lisa</option>
+            <option value="29382">Jimenez, Angelica I</option>
+            <option value="29829">Johnson, Timothy F</option>
+            <option value="50420">JUDGE, DEFAULT</option>
+            <option value="91719">Judge, Transfer</option>
+            <option value="71395">Judge, Visiting</option>
+            <option value="29719">Kazen, Oscar</option>
+            <option value="71549">Keasler, Michael</option>
+            <option value="29446">Key, Carlo</option>
+            <option value="29684">Leon, Michael De</option>
+            <option value="72716">Lira, Melanie</option>
+            <option value="29607">Lock, Jeb</option>
+            <option value="29608">Longoria, John A.</option>
+            <option value="52820">Lopez, Branden</option>
+            <option value="56351">Lopez, Rogelio</option>
+            <option value="87638">MAC, Office</option>
+            <option value="29800">Marion, Sandee Bryan</option>
+            <option value="93949">Marr, Jack</option>
+            <option value="92649">Martinez, Elizabeth</option>
+            <option value="72701">MARTINEZ, GLORIA A.</option>
+            <option value="29758">Martinez, Rebecca C</option>
+            <option value="86065">Massey Brissette, Lori</option>
+            <option value="53315">Matthews, Sylvia A</option>
+            <option value="29488">McLane, David</option>
+            <option value="52678">Mental Health Court, 1</option>
+            <option value="29686">Mery, Michael E</option>
+            <option value="29843">Meza, Velia J</option>
+            <option value="56356">Miller, Byron E</option>
+            <option value="53700">Moe, Erika</option>
+            <option value="29429">Montemayor, Charles E</option>
+            <option value="72700">Moody, Grant</option>
+            <option value="29614">Moore, Jefferson</option>
+            <option value="72205">Najera, Miguel</option>
+            <option value="72707">Nieto, Nadine Melissa</option>
+            <option value="72696">NIETO, NADINE MELISSA</option>
+            <option value="29669">Noll, Larry</option>
+            <option value="72127">NOTZON, MONICA Z.</option>
+            <option value="41509">Obledo, Carla</option>
+            <option value="29650">O'Connell, Kevin M</option>
+            <option value="87388">OFFICE, MAC</option>
+            <option value="29773">Olivarri, Ray J</option>
+            <option value="72719">Palomo, Rebecca "Beckie"</option>
+            <option value="29666">Parker, Laura Lee</option>
+            <option value="72703">Patterson, Julie Bray</option>
+            <option value="93552">Paulissen, Walter</option>
+            <option value="29480">Peeples, David</option>
+            <option value="72718">Pena, Erica</option>
+            <option value="29620">Pena, Jennifer</option>
+            <option value="54002">Perales, Raul T</option>
+            <option value="72710">Perez, Joel</option>
+            <option value="91639">PIC, PIC</option>
+            <option value="93554">Pittl, Kelly</option>
+            <option value="41955">Ploch, A.J.</option>
+            <option value="29648">Pozza, Karen H</option>
+            <option value="56361">Price, Jack</option>
+            <option value="29764">Price, Richard E</option>
+            <option value="29946">Probate Court, 1</option>
+            <option value="29947">Probate Court, 2</option>
+            <option value="85341">Probate Court, 3</option>
+            <option value="29452">Quezada, Carlos</option>
+            <option value="29453">Ramirez, Celeste</option>
+            <option value="29783">Ramos, Rolando</option>
+            <option value="29782">Rangel, Ron</option>
+            <option value="29562">Rausch, James A</option>
+            <option value="52173">Rayes, Donna</option>
+            <option value="29803">Reed, Susan D</option>
+            <option value="53314">Reeder, Lauren R</option>
+            <option value="29861">Required, No Signature</option>
+            <option value="55653">Reynolds, Erik</option>
+            <option value="73092">Reynolds, Erik</option>
+            <option value="29836">Rickhoff, Tom</option>
+            <option value="29450">Riedl, Carla M</option>
+            <option value="92183">Robertson, Benjamin</option>
+            <option value="56355">Rodriguez, Ciro D</option>
+            <option value="29482">Rodriguez, David J</option>
+            <option value="29502">Rodriguez, Eric J</option>
+            <option value="92932">Rodriguez, Linda</option>
+            <option value="29654">Rodriguez, Linda A</option>
+            <option value="92678">Rodriguez, Liza</option>
+            <option value="29701">Roman, Mary</option>
+            <option value="72702">Ruiz, Sylvia M</option>
+            <option value="72713">Saenz, Melissa</option>
+            <option value="29747">Sakai, Peter</option>
+            <option value="29537">Saldana, Gloria</option>
+            <option value="29672">Salinas, Laura</option>
+            <option value="29509">Salinas-Ender, Elma</option>
+            <option value="53599">Samaniego, Carmen</option>
+            <option value="29423">Scharf-Zeldes, Barbie</option>
+            <option value="29508">Shaughnessy, Edward</option>
+            <option value="72712">Shaw, William "Cruz"</option>
+            <option value="29849">Shaw, William Cruz</option>
+            <option value="29852">Shelton, Walden E, JR</option>
+            <option value="29422">Shipp, Barrett</option>
+            <option value="29707">Skinner, Melisa</option>
+            <option value="72711">Sosa, Rose</option>
+            <option value="29602">Specia, John J, JR</option>
+            <option value="29738">Spencer, Polly Jackson</option>
+            <option value="29839">Stolhandske, Tommy</option>
+            <option value="29552">Stowe, Helen Petry</option>
+            <option value="29451">Stryker, Cathleen M</option>
+            <option value="29708">Tanner, Martha</option>
+            <option value="29790">Tejeda, Robert</option>
+            <option value="56371">Tejeda, Robert  "Bobby"</option>
+            <option value="55655">Tocci, James</option>
+            <option value="52704">TOCCI, JAMES</option>
+            <option value="92838">Todd, Jason</option>
+            <option value="29840">Torres, Tina</option>
+            <option value="29461">Torres-Stahl, Catherine</option>
+            <option value="29383">Trevino, Arcelia I</option>
+            <option value="85644">Unassigned, Judge, .</option>
+            <option value="56365">Uresti, Yolanda Acuna</option>
+            <option value="29535">Uzomba, Grace M</option>
+            <option value="29599">Valdes, Jacqueline Herr</option>
+            <option value="29673">Valenzuela, Lori</option>
+            <option value="29712">Vara, Melissa</option>
+            <option value="29845">Vasquez, Veronica</option>
+            <option value="72706">Vasquez-Hortick, Christine</option>
+            <option value="58748">Vazquez, Roberto A</option>
+            <option value="29640">Vickers, Joe W</option>
+            <option value="56348">Walker, Stephen M</option>
+            <option value="92787">WALLIS, BEN A, III</option>
+            <option value="29426">Watkins, Beth</option>
+            <option value="59102">Whatley, Janna K.</option>
+            <option value="29631">Wheat, James Sumner</option>
+            <option value="29652">Williams, K. Stephen</option>
+            <option value="29619">Wisser, Jon N</option>
+            <option value="41970">Wood, Mike</option>
+            <option value="91735">Woodard, David</option>
+            <option value="29392">Ximenez, Alfredo M</option>
+            <option value="56358">Zaragoza, Edmundo</option>
+            <option value="56359">Zaragoza, Edmundo M</option>
+            <option value="73090">Zebell Sosa, Rose</option>
+            <option value="55658">Zebell-Sosa, Rose</option>
+        </select>
+        <label for="selHSJudicialOfficer" style="position:absolute;">* Select Judicial Officer</label>
+      </fieldset>
+    </div>
+      <input type="hidden" value="0" id="HSPrevSelectedJudicialOfficer">
+    <div class="col-md-12 col-sm-12" id="courtRoomDiv" style="display:none">
+      <fieldset>
+        <legend></legend>
+        <select data-val="true" data-val-required="Courtroom is a required field" id="selHSCourtroom" name="SearchCriteria.SelectedCourtRoom" class="valid form-control" disabled="" style="display: none;">
+          <option value=""></option>
+            <option value="29979">131st District Court</option>
+            <option value="29980">144th District Court</option>
+            <option value="29981">150th District Court</option>
+            <option value="29982">166th District Court</option>
+            <option value="29983">175th District Court</option>
+            <option value="29985">186th District Court</option>
+            <option value="29986">187th District Court</option>
+            <option value="29987">224th District Court</option>
+            <option value="29988">225th District Court</option>
+            <option value="29989">226th District Court</option>
+            <option value="29990">227th District Court</option>
+            <option value="29991">285th District Court</option>
+            <option value="29992">288th District Court</option>
+            <option value="29993">289th District Court</option>
+            <option value="29994">290th District Court</option>
+            <option value="29996">379th District Court</option>
+            <option value="29974">37th District Court</option>
+            <option value="30047">386th District Court</option>
+            <option value="29997">399th District Court</option>
+            <option value="29998">407th District Court</option>
+            <option value="29999">408th District Court</option>
+            <option value="30000">436th District Court</option>
+            <option value="30001">437th District Court</option>
+            <option value="30002">438th District Court</option>
+            <option value="29976">45th District Court</option>
+            <option value="29977">57th District Court</option>
+            <option value="29978">73rd District Court</option>
+            <option value="52070">Alternative Dispute Resolution</option>
+            <option value="87224">Auxiliary Jail Court</option>
+            <option value="93833">Bond Docket</option>
+            <option value="53097">College Bound</option>
+            <option value="52071">Conversion</option>
+            <option value="30018">County Court 1 at Law</option>
+            <option value="30019">County Court 10 at Law</option>
+            <option value="30020">County Court 11 at Law</option>
+            <option value="30021">County Court 12 at Law</option>
+            <option value="30038">County Court 13 at Law</option>
+            <option value="87221">County Court 13 Impact</option>
+            <option value="30022">County Court 14 at Law</option>
+            <option value="30023">County Court 15 at Law</option>
+            <option value="30024">County Court 2 at Law</option>
+            <option value="30025">County Court 3 at Law</option>
+            <option value="30026">County Court 4 at Law</option>
+            <option value="30027">County Court 5 at Law</option>
+            <option value="30028">County Court 6 at Law</option>
+            <option value="30029">County Court 7 at Law</option>
+            <option value="87222">County Court 7 Impact</option>
+            <option value="30031">County Court 8 at Law</option>
+            <option value="30033">County Court 9 at Law</option>
+            <option value="30003">Criminal Court</option>
+            <option value="57616">Criminal Law Magistrate</option>
+            <option value="53098">Crossover</option>
+            <option value="53099">EAGLES</option>
+            <option value="53100">Early Childhood Court</option>
+            <option value="53101">Family Drug Court</option>
+            <option value="87828">Felony Impact Court</option>
+            <option value="92351">Felony PIC #2</option>
+            <option value="53102">Guardianship</option>
+            <option value="54314">JP Court 1, Place 1</option>
+            <option value="54315">JP Court 1, Place 1 (SOMERSET CITY COURT)</option>
+            <option value="54316">JP Court 1, Place 1 (SOUTHWEST HIGH SCHOOL)</option>
+            <option value="54317">JP Court 1, Place 2</option>
+            <option value="54318">JP Court 2, Place 1</option>
+            <option value="54319">JP Court 2, Place 2</option>
+            <option value="54320">JP Court 2, Place 3</option>
+            <option value="54321">JP Court 3, Place 1</option>
+            <option value="54322">JP Court 3, Place 1</option>
+            <option value="54323">JP Court 3, Place 2</option>
+            <option value="54324">JP Court 4, Place 1</option>
+            <option value="54325">JP Court 4, Place 2</option>
+            <option value="52595">Monitoring Court</option>
+            <option value="53103">PEARLS</option>
+            <option value="53104">PMC Project</option>
+            <option value="72206">Pre-Indictment Court</option>
+            <option value="52072">Probate Court</option>
+            <option value="30044">Probate Court 1</option>
+            <option value="30045">Probate Court 2</option>
+            <option value="86182">Probate Court 3</option>
+            <option value="92801">Protection Order Hearing</option>
+            <option value="30004">Room 1.09</option>
+            <option value="30005">Room 101</option>
+            <option value="30006">Room 120</option>
+            <option value="30007">Room 200</option>
+            <option value="30008">Room 203</option>
+            <option value="30009">Room 205</option>
+            <option value="30010">Room 213</option>
+            <option value="52243">Room 218</option>
+            <option value="30011">Room 306</option>
+            <option value="30012">Room 307</option>
+            <option value="55226">Room 308</option>
+            <option value="30013">Room 32</option>
+            <option value="30014">Room 403</option>
+            <option value="30015">Room 411</option>
+            <option value="30016">Room 422</option>
+            <option value="87064">Room 5.3</option>
+            <option value="30017">Room B.32</option>
+            <option value="30046">San Antonio State Hospital</option>
+            <option value="30035">See Below</option>
+        </select>
+        <label for="selHSCourtroom" style="position:absolute;">* Select Courtroom</label>
+      </fieldset>
+    </div>
+      <input type="hidden" value="0" id="HSPrevSelectedCourtroom">
+    <div>
+      <div class="col-md-6 col-sm-6" id="dateFromDiv">
+        <fieldset><input type="text" id="SearchCriteria_DateFrom" name="SearchCriteria.DateFrom" value="" class="tyler-datepicker form-control hasDatepicker" autocomplete="off" data-val="true" data-val-required="Date From is a required field" data-val-regex="Please select a valid date. (MM/DD/YYYY)" data-val-regex-pattern="(((10|12|0?[13578])([/])(3[01]|[12][0-9]|0?[1-9])([/])((1[8-9]\d{2})|([2-9]\d{3})))|((11|0?[469])([/])(30|[12][0-9]|0?[1-9])([/])((1[8-9]\d{2})|([2-9]\d{3})))|((0?2)([/])(2[0-8]|1[0-9]|0?[1-9])([/])((1[8-9]\d{2})|([2-9]\d{3})))|((0?2)([/])(29)([/])([2468][048]00))|((0?2)([/])(29)([/])([3579][26]00))|((0?2)([/])(29)([/])([1][89][0][48]))|((0?2)([/])(29)([/])([2-9][0-9][0][48]))|((0?2)([/])(29)([/])([1][89][2468][048]))|((0?2)([/])(29)([/])([2-9][0-9][2468][048]))|((0?2)([/])(29)([/])([1][89][13579][26]))|((0?2)([/])(29)([/])([2-9][0-9][13579][26])))" <=""><label for="SearchCriteria_DateFrom">* Search by Date From</label></fieldset>
+      </div>
+      <div class="col-md-6 col-sm-6" id="dateToDiv">
+        <fieldset><input type="text" id="SearchCriteria_DateTo" name="SearchCriteria.DateTo" value="" class="tyler-datepicker form-control hasDatepicker" autocomplete="off" data-val="true" data-val-required="Date To is a required field" data-val-regex="Please select a valid date. (MM/DD/YYYY)" data-val-regex-pattern="(((10|12|0?[13578])([/])(3[01]|[12][0-9]|0?[1-9])([/])((1[8-9]\d{2})|([2-9]\d{3})))|((11|0?[469])([/])(30|[12][0-9]|0?[1-9])([/])((1[8-9]\d{2})|([2-9]\d{3})))|((0?2)([/])(2[0-8]|1[0-9]|0?[1-9])([/])((1[8-9]\d{2})|([2-9]\d{3})))|((0?2)([/])(29)([/])([2468][048]00))|((0?2)([/])(29)([/])([3579][26]00))|((0?2)([/])(29)([/])([1][89][0][48]))|((0?2)([/])(29)([/])([2-9][0-9][0][48]))|((0?2)([/])(29)([/])([1][89][2468][048]))|((0?2)([/])(29)([/])([2-9][0-9][2468][048]))|((0?2)([/])(29)([/])([1][89][13579][26]))|((0?2)([/])(29)([/])([2-9][0-9][13579][26])))" data-val-maxdate="Date To must be on or before 05/27/2026." data-val-maxdate-maxdaysfromtoday="-1" <=""><label for="SearchCriteria_DateTo">* Search by Date To</label></fieldset>
+      </div>
+    </div>
+  <div class="col-md-12 col-sm-12">
+    <p>&nbsp;</p>
+    <a class="btn btn-primary pull-left" href="/Portal/Hearings/HearingSearch/Clear/26">Clear</a>
+    <input type="submit" id="btnHSSubmit" name="Search" class="btn btn-primary pull-right" value="Submit">
+  </div>
+</form>
+</div> <!-- /end div.portlet-body -->
+
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <footer role="contentinfo" class="margin-top center-block" style="width: 95%;">
+  <div class="row visible-xs">
+    <div class="col-xs-12" style="margin:0 0 0.5rem -0.5rem;">
+      <img class="pull-left noprint" src="/Portal/Content/tylerui/images/empowered.png" alt="Empowered By Tyler Technologies">
+    </div>
+    <div class="col-xs-12">
+      <small class="pull-left noprint">© 2026 Tyler Technologies, Inc. | All Rights Reserved</small>
+      <br>
+      <small class="pull-left noprint">Version: 2017.1.60.1</small>
+    </div>
+  </div>
+  <div class="row hidden-xs">
+    <div class="col-xs-6 col-md-6">
+      <small class="pull-left noprint">© 2026 Tyler Technologies, Inc. | All Rights Reserved</small>
+      <br>
+      <small class="pull-left noprint">Version: 2017.1.60.1</small>
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <img alt="Empowered By Tyler Technologies" class="pull-right noprint" src="/Portal/Content/tylerui/images/empowered.png">
+    </div>
+  </div>
+</footer>
+
+    <div style="display: none">Machine: ZWPODTXBEXPTL02</div>
+
+  <script>
+    (function(config) {
+      Object.keys(config).forEach(function(k) {
+        window.odyPortal.sessionInfo[k] = config[k];
+      });
+    })({"sessionTimeout":20,"isAuthenticated":false,"isKioskMode":false,"isRouteHomeOrIndex":false,"homeUrl":"/Portal/?clearSession=True","logOffUrl":"/Portal/Account/LogOff?showLandingPage=True","refreshUrl":"/Portal/Home/RefreshSession"});
+  </script>
+  <div id="timeout-wrapper" class="lockoutScreen" style="display:none">
+    <div class="hidden-lg hidden-md hidden-sm" style="height:55px;"></div>
+    <div id="page-timeout" class="timeout-container" style="border: 2px solid rgba(100,100,100,0.3); padding: 30px; border-radius: 0; height: 220px;">
+      <h2 style="margin-top:0;">Are you still here?</h2>
+      <hr>
+      <p>
+        Your session will expire in <b><span class="text-primary" id="timeOutTimer">60</span></b> seconds due to inactivity.
+      </p>
+      <p>
+        <input type="button" id="timeoutContinueBtn" class="btn btn-primary pull-right" value="I'm still here.">
+      </p>
+    </div>
+  </div>
+  <div id="sessionTimeoutOverlay" style="display: none; position: fixed; top: 0; left: 0; bottom: 0; right: 0; z-index: 2147483646; background-color: #000; opacity: 0.7;">
+  </div>
+
+
+
+
+
+
+
+<div id="jstree-marker" style="display: none;">»</div><div id="jstree-marker-line" style="display: none;"></div><div id="vakata-contextmenu"></div><div id="ui-datepicker-div" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div></body></html>

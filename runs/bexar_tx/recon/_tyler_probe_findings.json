@@ -1,0 +1,178 @@
+{
+  "base": "https://portal-txbexar.tylertech.cloud",
+  "landing": "https://portal-txbexar.tylertech.cloud/Portal/",
+  "steps": [
+    {
+      "name": "landing",
+      "final_url": "https://portal-txbexar.tylertech.cloud/Portal/",
+      "title": "Bexar County Justice Portal",
+      "html_len": 21145,
+      "gate_markers": [
+        "continue",
+        "location"
+      ],
+      "login_markers": [
+        "login",
+        "register",
+        "sign in"
+      ],
+      "antibot_markers": [],
+      "has_search_input": false,
+      "buttons": [
+        "Register / Sign In",
+        "Register / Sign In"
+      ],
+      "links": [
+        "Bexar County Justice Portal",
+        "Register",
+        "Sign In",
+        "Register",
+        "Sign In",
+        "Bexar District Clerk Gloria A. Martinez",
+        "Bexar County Clerk Lucy Adame-Clark",
+        "Smart Search\n\nSearch for court records.",
+        "Search Hearings\n\nSearch for court hearin",
+        "Jail Search\n\nSearch for and view a party",
+        "Make Payments\n\nMake a payment or select "
+      ]
+    },
+    {
+      "name": "probe /Portal/Home/Dashboard/29",
+      "status": 200,
+      "final_url": "https://portal-txbexar.tylertech.cloud/Portal/Home/Dashboard/29",
+      "title": "Smart Search - Bexar County Justice Portal",
+      "html_len": 186689,
+      "antibot_markers": [
+        "g-recaptcha",
+        "recaptcha"
+      ],
+      "gate_markers": [
+        "accept",
+        "continue",
+        "location"
+      ],
+      "search_inputs": [
+        "Settings_CaptchaEnabled",
+        "Settings_CaptchaDisabledForAuthenticated",
+        "caseCriteria_SearchCriteria",
+        "caseCriteria.JudicialOfficerSearchBy_input",
+        "caseCriteria_JudicialOfficerSearchBy",
+        "caseCriteria_NameLast",
+        "caseCriteria_NameFirst",
+        "caseCriteria_NameMiddle",
+        "caseCriteria.NameSuffix_input",
+        "caseCriteria_NameSuffix",
+        "g-recaptcha-response",
+        "caseCriteria_AdvancedSearchOptionsOpen",
+        "caseCriteria.AdvancedSearchOptionsOpen",
+        "btnSSClear",
+        "btnSSSubmit",
+        "caseCriteria.CourtLocation_input",
+        "caseCriteria_CourtLocation",
+        "caseCriteria.SearchBy_input",
+        "caseCriteria_SearchBy",
+        "caseCriteria_SearchCases",
+        "caseCriteria.SearchCases",
+        "caseCriteria_SearchByPartyName",
+        "caseCriteria.SearchByPartyName",
+        "caseCriteria_SearchByNickName",
+        "caseCriteria.SearchByNickName",
+        "caseCriteria_SearchByBusinessName",
+        "caseCriteria.SearchByBusinessName",
+        "caseCriteria_UseSoundex",
+        "caseCriteria.UseSoundex",
+        "caseCriteria_PhoneNumber"
+      ],
+      "saved_html": "_tyler_portal_home_dashboard_29.html"
+    },
+    {
+      "name": "probe /Portal/Home/Dashboard/26",
+      "status": 200,
+      "final_url": "https://portal-txbexar.tylertech.cloud/Portal/Home/Dashboard/26",
+      "title": "Search Hearings - Bexar County Justice Portal",
+      "html_len": 50943,
+      "antibot_markers": [
+        "recaptcha"
+      ],
+      "gate_markers": [
+        "accept",
+        "continue",
+        "location"
+      ],
+      "search_inputs": [
+        "PortletName",
+        "Settings_CaptchaEnabled",
+        "Settings_DefaultLocation",
+        "cboHSLocationGroup",
+        "cboHSHearingTypeGroup",
+        "cboHSSearchBy",
+        "SearchCriteria_Soundex",
+        "SearchCriteria.Soundex",
+        "SearchCriteria_SearchValue",
+        "SearchCriteria_SearchAttorneyNumber",
+        "txtHSLastName",
+        "txtHSFirstName",
+        "txtHSMiddleName",
+        "selHSJudicialOfficer",
+        "HSPrevSelectedJudicialOfficer",
+        "selHSCourtroom",
+        "HSPrevSelectedCourtroom",
+        "SearchCriteria_DateFrom",
+        "SearchCriteria_DateTo",
+        "btnHSSubmit",
+        "timeoutContinueBtn"
+      ],
+      "saved_html": "_tyler_portal_home_dashboard_26.html"
+    },
+    {
+      "name": "probe /Portal/Home/Dashboard/27",
+      "status": 200,
+      "final_url": "https://portal-txbexar.tylertech.cloud/Portal/",
+      "title": "Bexar County Justice Portal",
+      "html_len": 21145,
+      "antibot_markers": [],
+      "gate_markers": [
+        "continue",
+        "location"
+      ],
+      "search_inputs": [
+        "timeoutContinueBtn"
+      ],
+      "saved_html": "_tyler_portal_home_dashboard_27.html"
+    },
+    {
+      "name": "probe /Portal/SmartSearch/SmartSearch",
+      "status": 500,
+      "final_url": "https://portal-txbexar.tylertech.cloud/Portal/SmartSearch/SmartSearch",
+      "title": "Error - Bexar County Justice Portal",
+      "html_len": 18473,
+      "antibot_markers": [],
+      "gate_markers": [
+        "continue",
+        "location"
+      ],
+      "search_inputs": [
+        "timeoutContinueBtn"
+      ]
+    },
+    {
+      "name": "probe /Portal/Home/WorkspaceMode?p=0",
+      "status": 200,
+      "final_url": "https://portal-txbexar.tylertech.cloud/Portal/",
+      "title": "Bexar County Justice Portal",
+      "html_len": 21145,
+      "antibot_markers": [],
+      "gate_markers": [
+        "continue",
+        "location"
+      ],
+      "search_inputs": [
+        "timeoutContinueBtn"
+      ],
+      "saved_html": "_tyler_portal_home_workspacemode_p_0.html"
+    }
+  ],
+  "xhr": [],
+  "antibot_markers": [],
+  "errors": []
+}
