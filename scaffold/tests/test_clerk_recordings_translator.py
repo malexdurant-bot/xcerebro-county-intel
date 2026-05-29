@@ -212,6 +212,44 @@ def test_keystone_integration() -> int:
     return 0 if ok else 1
 
 
+def test_probate_cluster_end_to_end() -> int:
+    """The probate/estate cluster (PROBATE / WILL / LETTERS), unlocked by the
+    v5.4.0 framework-vocabulary extension (PROBATE_RECORDING / WILL_RECORDING /
+    PROBATE_LETTERS -> §16 'Probate'), maps and reaches scored leads as the
+    'estate' pattern. Umbrella probate recordings have no document body, so
+    §17 routes them to REVIEW_REQUIRED — created, not dropped."""
+    county = _county_config()
+    fn = lookup(TRANSLATOR)
+    raws = [
+        _raw("2001", "PROBATE", "700 ESTATE LN, SAN ANTONIO, TEXAS, 78209"),
+        _raw("2002", "WILL", "800 LEGACY DR, SAN ANTONIO, TEXAS, 78210"),
+        _raw("2003", "LETTERS", "900 HEIR ST, SAN ANTONIO, TEXAS, 78211"),
+    ]
+    signals, parcels, _ = fn(raws, county, _src_config(county))
+    ok = True
+    ok &= _assert("probate cluster maps to umbrella canonicals",
+                  {s["doc_type"] for s in signals} ==
+                  {"PROBATE_RECORDING", "WILL_RECORDING", "PROBATE_LETTERS"},
+                  str({s["doc_type"] for s in signals}))
+    adapted = [bl._adapt_translator_signal(s, "clerk_recordings") for s in signals]
+    with tempfile.TemporaryDirectory() as td:
+        res = bl.run_pipeline(
+            mode="production", parcels=parcels, raw_signals=adapted,
+            county_id="bexar_tx", county_name="Bexar", state="TX",
+            scoring_overrides=county.get("scoring_overrides", {}),
+            build_label="SOURCE_LIMITED", workdir=Path(td),
+            approve_needs_review=True,
+        )
+    ok &= _assert("probate cluster survives the seam -> 3 estate leads",
+                  len(res["scored_leads"]) == 3
+                  and res["payload"].get("dropped_signals_unmapped_doc_type") == 0,
+                  str(len(res["scored_leads"])))
+    ok &= _assert("probate cluster scores as the estate pattern",
+                  res["payload"]["pattern_counts"] == {"estate": 3},
+                  str(res["payload"]["pattern_counts"]))
+    return 0 if ok else 1
+
+
 def main() -> int:
     print("[translator test] publicsearch_clerk_recordings")
     rcs = [
@@ -221,6 +259,7 @@ def main() -> int:
         test_validation_skips(),
         test_level2_flags(),
         test_keystone_integration(),
+        test_probate_cluster_end_to_end(),
     ]
     failures = sum(1 for rc in rcs if rc != 0)
     print(f"\nfailures: {failures} of {len(rcs)}")

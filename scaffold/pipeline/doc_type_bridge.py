@@ -146,6 +146,11 @@ REGISTRY_TO_LEAD_TYPE: dict[str, Optional[str]] = {
     "letters_of_administration": "Probate",
     "determination_of_heirship": "Probate",
     "muniment_of_title": "Probate",
+    # Umbrella probate recordings (clerk generic PROBATE / WILL / LETTERS index
+    # codes) — same §16 "Probate" lead type as the narrower forms above.
+    "probate_recording": "Probate",
+    "will_recording": "Probate",
+    "probate_letters": "Probate",
     "affidavit_of_heirship": "Affidavit of Heirship",
     "executors_deed": "Executor Deed",
     "administrators_deed": "Administrator Deed",

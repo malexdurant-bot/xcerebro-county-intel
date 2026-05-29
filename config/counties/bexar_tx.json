@@ -415,6 +415,18 @@
           "HOSP LN": {
             "canonical": "HOSPITAL_LIEN",
             "subtype_label": "HOSPITAL LIEN"
+          },
+          "PROBATE": {
+            "canonical": "PROBATE_RECORDING",
+            "subtype_label": "PROBATE"
+          },
+          "WILL": {
+            "canonical": "WILL_RECORDING",
+            "subtype_label": "WILL & TESTAMENT"
+          },
+          "LETTERS": {
+            "canonical": "PROBATE_LETTERS",
+            "subtype_label": "LETTERS"
           }
         },
         "unknown_doc_type_handling": "skip_with_warning",

@@ -722,6 +722,45 @@
       "notes": "Probate without administration. Will admitted solely to clear title.",
       "source_priority": "P0"
     },
+    "PROBATE_RECORDING": {
+      "lead_pattern": "estate",
+      "subtype": "probate_recording",
+      "source_class": "lead_generating",
+      "default_confidence": 80,
+      "document_priority": 78,
+      "common_abbreviations": [
+        "PROBATE",
+        "PROBATE RECORDING"
+      ],
+      "notes": "Umbrella probate recording in the land/official-public records index (the clerk's generic PROBATE code). A probate proceeding touching real property; the specific instrument (letters / heirship / muniment) is not distinguished at the index level. Routes to review for debtor/heir identification when no document body is captured.",
+      "source_priority": "P0"
+    },
+    "WILL_RECORDING": {
+      "lead_pattern": "estate",
+      "subtype": "will_recording",
+      "source_class": "lead_generating",
+      "default_confidence": 80,
+      "document_priority": 75,
+      "common_abbreviations": [
+        "WILL & TESTAMENT",
+        "WILL AND TESTAMENT",
+        "WILL"
+      ],
+      "notes": "A will recorded in the official public records. Estate signal: the testator is typically deceased and real property is passing to heirs/devisees. Distinct from MUNIMENT_OF_TITLE (which is a will admitted solely to clear title).",
+      "source_priority": "P0"
+    },
+    "PROBATE_LETTERS": {
+      "lead_pattern": "estate",
+      "subtype": "probate_letters",
+      "source_class": "lead_generating",
+      "default_confidence": 84,
+      "document_priority": 80,
+      "common_abbreviations": [
+        "LETTERS"
+      ],
+      "notes": "Umbrella for the clerk's generic LETTERS code, which does not distinguish letters testamentary from letters of administration. Both narrower forms (LETTERS_TESTAMENTARY / LETTERS_OF_ADMINISTRATION) carry the same estate lead pattern; this umbrella covers the undistinguished index entry.",
+      "source_priority": "P0"
+    },
     "DIVORCE_FILING": {
       "lead_pattern": "divorce",
       "subtype": "divorce_filing",
