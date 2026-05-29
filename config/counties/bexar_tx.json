@@ -378,7 +378,7 @@
       "fingerprinted_at": "",
       "fingerprint_confidence": "MEDIUM",
       "fingerprint_summary": "PublicSearch.us-hosted public records UI. SPA. Free quick search with date-range filters. Document image access likely cost-bearing.",
-      "recommended_adapter": "publicsearch_api_or_playwright",
+      "recommended_adapter": "publicsearch_playwright_result_list",
       "credentials_required_kind": "",
       "credentials_declared": false,
       "manual_upload_path": "",
@@ -386,8 +386,72 @@
       "category": "lead",
       "subtype": "clerk_recordings",
       "access_pattern": "spa_with_api",
-      "scraper_module": "scrapers/clerk_seeded.py",
-      "refresh_cadence": "daily"
+      "scraper_module": "scrapers/clerk_recordings.py",
+      "refresh_cadence": "daily",
+      "translator": "publicsearch_clerk_recordings",
+      "parcel_id_prefix": "BX-PS-",
+      "field_map": {
+        "doc_number": "document_number",
+        "address": "property_address"
+      },
+      "translator_config": {
+        "doc_type_code_map": {
+          "LIS PEN": {
+            "canonical": "LIS_PENDENS",
+            "subtype_label": "LIS PENDENS"
+          },
+          "MECHLN": {
+            "canonical": "MECHANICS_LIEN",
+            "subtype_label": "MECHANICS LIEN"
+          },
+          "FTL": {
+            "canonical": "FEDERAL_TAX_LIEN",
+            "subtype_label": "FEDERAL TAX LIEN"
+          },
+          "STL": {
+            "canonical": "STATE_TAX_LIEN",
+            "subtype_label": "STATE TAX LIEN"
+          },
+          "HOSP LN": {
+            "canonical": "HOSPITAL_LIEN",
+            "subtype_label": "HOSPITAL LIEN"
+          }
+        },
+        "unknown_doc_type_handling": "skip_with_warning",
+        "foreclosure_dedup_codes": [
+          "FC"
+        ],
+        "lifecycle_suppression_codes": [
+          "VOID UCCRP",
+          "PART RL STL",
+          "RL STL",
+          "VOID STL",
+          "CANC J",
+          "CANCEL",
+          "DISMISS",
+          "P RL J",
+          "PART RL",
+          "RECONV",
+          "REINST",
+          "REL H LN",
+          "RELEASE",
+          "REMOVAL",
+          "RESCISS",
+          "REVOCTN",
+          "RL H LN",
+          "RL J",
+          "SAT",
+          "SAT J",
+          "SUBORD",
+          "TERMIN",
+          "VOID OPR",
+          "WAIVER",
+          "SR",
+          "PART RL FTL",
+          "RL FTL",
+          "VOID FTL"
+        ]
+      }
     },
     "foreclosure_notices_map": {
       "url": "https://maps.bexar.org/foreclosures",
