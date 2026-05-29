@@ -149,6 +149,26 @@ def _parcel_record(feature: dict) -> dict:
     }
 
 
+def _wrap_record(rec: dict) -> dict:
+    """Wrap a flat parcel record in the §4.32 raw envelope the canonical
+    translator contract expects (raw_payload + provenance). Previously this
+    was a one-time external transform (v5.1.2-beta-r3 Step 5''); doing it in
+    the scraper makes every re-pull translator-ready and removes the footgun
+    where a fresh pull silently broke the parcel_master translator. The
+    per-source field_map in the county config bridges these flat field names
+    (situs_address, etc.) to the translator's canonical names — that bridge is
+    unchanged because the flat fields now live inside raw_payload."""
+    pid = rec.get("parcel_id") or rec.get("_object_id")
+    return {
+        "raw_record_id": f"raw_{pid}",
+        "source_id": rec.get("_source_id") or SOURCE_ID,
+        "source_url": f"{SERVICE_URL}/0",
+        "source_fetched_at": rec.get("_fetched_at"),
+        "parser_confidence": 100,
+        "raw_payload": rec,
+    }
+
+
 def _has_exempt(exempt_str: str | None, token: str) -> bool:
     if not exempt_str:
         return False
@@ -312,7 +332,7 @@ def run(*, output_path: Path | None = None,
         with open(tmp, "w", encoding="utf-8") as fh:
             for rec in fetch_for_zips(server, target_zips,
                                        max_features_per_zip=max_features_per_zip):
-                fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                fh.write(json.dumps(_wrap_record(rec), ensure_ascii=False) + "\n")
                 count += 1
                 z = rec.get("situs_zip") or ""
                 per_zip_counts[z] = per_zip_counts.get(z, 0) + 1
@@ -343,7 +363,7 @@ def run(*, output_path: Path | None = None,
                 continue
             if pid:
                 seen_parcel_ids.add(pid)
-            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            fh.write(json.dumps(_wrap_record(rec), ensure_ascii=False) + "\n")
             count += 1
     tmp.replace(output_path)
     stats.update({

@@ -362,14 +362,31 @@ def build_results_url(doc_type_code: str, start_yyyymmdd: str,
 _HARD_HALT_PATTERNS = [
     (re.compile(r"\b(sign in to continue|please log in|login required|"
                 r"authentication required)\b", re.I), "login_wall"),
-    (re.compile(r"\b(recaptcha|are you a robot|verify you are human|"
-                r"bot challenge|captcha)\b", re.I), "captcha_or_bot_challenge"),
+    # NOTE: the bare token "captcha" is deliberately NOT matched here. Every
+    # normal PublicSearch results page embeds a benign reCAPTCHA site key in
+    # its config JSON ("captcha-site-key":"6Lf..."), which a \bcaptcha\b
+    # pattern false-matched — hard-halting every live run (caught on the first
+    # live pull, 2026-05-28). Match only genuine challenge phrasings/providers:
+    # an interstitial says "reCAPTCHA"/"hCaptcha"/"verify you are human" and
+    # carries a provider marker; it does NOT serve a result table.
+    (re.compile(r"\b(recaptcha|hcaptcha|are you a robot|verify you are human|"
+                r"bot challenge|complete the captcha|captcha verification|"
+                r"please complete the captcha)\b|cf-browser-verification|"
+                r"cf-challenge|challenge-platform|just a moment\b|"
+                r"\b(datadome|perimeterx|incapsula)\b", re.I),
+     "captcha_or_bot_challenge"),
     (re.compile(r"\b(service unavailable|under maintenance|503)\b", re.I),
      "maintenance_or_503"),
 ]
 
 
 def detect_hard_halt(html: str) -> str | None:
+    # A real challenge/interstitial never serves the result table. If rendered
+    # result rows are present, the page is legitimate regardless of any token
+    # that happens to appear in embedded config (defense-in-depth alongside the
+    # tightened patterns above).
+    if 'role="row"' in html:
+        return None
     for pat, reason in _HARD_HALT_PATTERNS:
         if pat.search(html):
             return reason

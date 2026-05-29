@@ -621,6 +621,21 @@ def main() -> int:
                 "enabled. Other sources are deferred."
             )
 
+        # §4.16: an explicit operator-declared build label in the county config
+        # wins over the crude source-count heuristic above. The heuristic counts
+        # any translator source (including enrichment) and can only emit
+        # SOURCE_LIMITED/FULL_BUILD — it cannot express PARTIAL_BUILD or
+        # PRIMARY_SOURCE_PENDING, which depend on how many *primary* lead
+        # sources are live vs. pending (build-state knowledge the pipeline does
+        # not have). When the operator sets dashboard.build_label, honor it.
+        cfg_dash = county_config.get("dashboard") or {}
+        cfg_label = (cfg_dash.get("build_label") or "").strip()
+        if cfg_label:
+            build_label = cfg_label
+            cfg_reason = (cfg_dash.get("build_label_reason") or "").strip()
+            if cfg_reason:
+                build_label_reason = cfg_reason
+
         print(f"[production] translated sources: {translated_sources}",
               file=sys.stderr)
 

@@ -1183,8 +1183,8 @@
       "CLIENT_VIEW",
       "OPERATOR_VIEW"
     ],
-    "build_label": "",
-    "build_label_reason": ""
+    "build_label": "PARTIAL_BUILD",
+    "build_label_reason": "Partial build: two primary lead sources live (foreclosure_notices_map + clerk_recordings); court_civil, court_probate and tax_collector still pending (recon/spec or access decision). parcel_master attached as enrichment."
   },
   "deployment": {
     "github_org": "xcerebro",
