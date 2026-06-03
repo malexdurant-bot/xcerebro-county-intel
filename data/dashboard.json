@@ -1,35 +1,35 @@
 {
-  "generated_at": "2026-06-03T22:54:59Z",
+  "generated_at": "2026-06-03T23:23:44Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "production",
   "county": "Bexar",
   "state": "TX",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 544,
+  "lead_total": 592,
   "enrichment_breakdown": {
-    "ENRICHED": 19,
-    "UNENRICHED": 525
+    "ENRICHED": 27,
+    "UNENRICHED": 565
   },
   "pattern_counts": {
-    "foreclosure": 417,
-    "lien": 89,
-    "tax": 39
+    "foreclosure": 430,
+    "lien": 97,
+    "tax": 66
   },
   "attribute_counts": {
-    "entity_owned": 4
+    "entity_owned": 8
   },
   "stack_depth_distribution": {
-    "1": 543,
+    "1": 591,
     "2": 1
   },
   "score_tier_distribution": {
-    "Archive": 80,
-    "Low": 17,
+    "Archive": 81,
+    "Low": 37,
     "Strong": 394,
-    "Workable": 53
+    "Workable": 80
   },
   "deal_path_distribution": {
-    "wholesale": 544
+    "wholesale": 592
   },
   "records": [
     {
@@ -410,6 +410,289 @@
       "enrichment_status": "ENRICHED"
     },
     {
+      "lead_id": "lead_parcel_BX-PS-4B594B0782AE",
+      "scored_lead_id": "scored_c13bb76947b862cd",
+      "primary_parcel_id": "BX-PS-4B594B0782AE",
+      "display_address": "",
+      "display_owner": "COMPLETE CARE CULEBRA",
+      "display_score": 30,
+      "display_tier": "Archive",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_HOSPITAL_LIEN",
+          "delta": 25
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_c1299fe2d068cfec"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
+      "lead_id": "lead_parcel_BX-PS-58389C3AAB40",
+      "scored_lead_id": "scored_9e6d7c3527b50bd8",
+      "primary_parcel_id": "BX-PS-58389C3AAB40",
+      "display_address": "8722 CINNAMON CREEK DRIVE, SAN ANTONIO, TEXAS, 78240",
+      "display_owner": "OREI AXIO PROPERTY OWNER LLC",
+      "display_score": 37,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [
+        "entity_owned"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 2
+        }
+      ],
+      "evidence_ids": [
+        "ev_d8d1cda7e4d483d1"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
+      "lead_id": "lead_parcel_BX-PS-59BA5A36E6A7",
+      "scored_lead_id": "scored_01c571dbe6fb9400",
+      "primary_parcel_id": "BX-PS-59BA5A36E6A7",
+      "display_address": "1702 ALLENDE DR, SAN ANTONIO, TEXAS, 78237",
+      "display_owner": "GARNICA GEORGE JR",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_0d436c11983a089b"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
+      "lead_id": "lead_parcel_BX-PS-75953E63FB85",
+      "scored_lead_id": "scored_c6675cc3f9decb88",
+      "primary_parcel_id": "BX-PS-75953E63FB85",
+      "display_address": "8648 HUEBNER RD, SAN ANTONIO, TEXAS, 78240",
+      "display_owner": "CST STATIONS TEXAS LLC",
+      "display_score": 37,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [
+        "entity_owned"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 2
+        }
+      ],
+      "evidence_ids": [
+        "ev_53cc4ff48dc67dd6"
+      ],
+      "primary_event_date": "2026-05-29",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
+      "lead_id": "lead_parcel_BX-PS-769A9DE9D523",
+      "scored_lead_id": "scored_b42757ab72f81e57",
+      "primary_parcel_id": "BX-PS-769A9DE9D523",
+      "display_address": "1700 JACKSON KELLER ROAD, SAN ANTONIO, TEXAS, 78213",
+      "display_owner": "STERLING AT CASTLE HILLS SA LLC",
+      "display_score": 37,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [
+        "entity_owned"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 2
+        }
+      ],
+      "evidence_ids": [
+        "ev_471de3d629910a2f"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
       "lead_id": "lead_parcel_BX-PS-7AAE157EE1BB",
       "scored_lead_id": "scored_e0c8e4ec113b305e",
       "primary_parcel_id": "BX-PS-7AAE157EE1BB",
@@ -565,6 +848,65 @@
         "ev_d55f54ebff6ad2de"
       ],
       "primary_event_date": "2026-05-26",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
+      "lead_id": "lead_parcel_BX-PS-89E1237CAC2B",
+      "scored_lead_id": "scored_d25f11466e36a926",
+      "primary_parcel_id": "BX-PS-89E1237CAC2B",
+      "display_address": "7600 CALLAGHAN ROAD, SAN ANTONIO, TEXAS, 78229",
+      "display_owner": "ABODE GROUP LLC",
+      "display_score": 37,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [
+        "entity_owned"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 2
+        }
+      ],
+      "evidence_ids": [
+        "ev_2929c2f6b6c9f248"
+      ],
+      "primary_event_date": "2026-05-27",
       "review_flags": [],
       "enrichment_status": "ENRICHED"
     },
@@ -734,6 +1076,59 @@
       "enrichment_status": "ENRICHED"
     },
     {
+      "lead_id": "lead_parcel_BX-PS-A0AE9B7187FA",
+      "scored_lead_id": "scored_b6ef183b80e939cc",
+      "primary_parcel_id": "BX-PS-A0AE9B7187FA",
+      "display_address": "3735 E COMMERCE ST, SAN ANTONIO, TEXAS, 78219",
+      "display_owner": "DIAMANTE APARTMENTS",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_4316caf723689fe7"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
       "lead_id": "lead_parcel_BX-PS-A50B14DB58D2",
       "scored_lead_id": "scored_3ab3fff65f3aec88",
       "primary_parcel_id": "BX-PS-A50B14DB58D2",
@@ -796,6 +1191,59 @@
         "ev_c10f10fc2aa0ff0a"
       ],
       "primary_event_date": "2026-05-22",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED"
+    },
+    {
+      "lead_id": "lead_parcel_BX-PS-C0E0FEB00EC5",
+      "scored_lead_id": "scored_b58fc5cab0d552de",
+      "primary_parcel_id": "BX-PS-C0E0FEB00EC5",
+      "display_address": "",
+      "display_owner": "SOUTH TEXAS EXTERIOR ROOFING",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_86bee39ecc130f1a"
+      ],
+      "primary_event_date": "2026-05-28",
       "review_flags": [],
       "enrichment_status": "ENRICHED"
     },
@@ -7668,6 +8116,2246 @@
         "ev_52feec76375f905c"
       ],
       "primary_event_date": "2026-05-26",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260099775",
+      "scored_lead_id": "scored_814564a241452da5",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_3f435f09f178522f"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260099795",
+      "scored_lead_id": "scored_57e3ed5e19e99f36",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_8f8f6365396a0d8f"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100287",
+      "scored_lead_id": "scored_80982cef37f14cdc",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_2c505f6e58f5b60c"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100754",
+      "scored_lead_id": "scored_46df5e0642a86fdb",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "state_tax_lien against unidentified party",
+      "display_score": 50,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_STATE_TAX_LIEN",
+          "delta": 45
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_42fe0f0eb1a41e6e"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:STATE OF <*>"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100786",
+      "scored_lead_id": "scored_7f20424ba4eb232d",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_54732ef2b7c8bae7"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:UNITED STATES OF AMERICA"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100787",
+      "scored_lead_id": "scored_0d3b82dc707770a4",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_ba70adbb026c9d79"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100788",
+      "scored_lead_id": "scored_e8da803054468ed3",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_34ae5cf27661d5fc"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100789",
+      "scored_lead_id": "scored_013be37142a66a91",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_1134d929fae8b5ee"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100790",
+      "scored_lead_id": "scored_4c45fef7af3678fc",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_8df675c6a578e76c"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100791",
+      "scored_lead_id": "scored_1d3b52e319ce521e",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_f1984c9e3190a0a3"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100792",
+      "scored_lead_id": "scored_4ea5467d8a65be75",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_3bf45b08c3082daf"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100793",
+      "scored_lead_id": "scored_aab2829906da98e1",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_5bc0dec55ccba693"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100794",
+      "scored_lead_id": "scored_793dfe571b7892be",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_8b1aba77814230eb"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100795",
+      "scored_lead_id": "scored_0a259df7ab2bb72d",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_303dffd1515cd1fd"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100796",
+      "scored_lead_id": "scored_6b092d7d50f6cd65",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_81ae287cbf71a342"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100797",
+      "scored_lead_id": "scored_7312813bef043e65",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_a0498e6c599bc5ab"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100798",
+      "scored_lead_id": "scored_9d76bd113ee634b4",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_005379de988f7fd7"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100799",
+      "scored_lead_id": "scored_002f67732d129f83",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_8549fae9a4a736c5"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100800",
+      "scored_lead_id": "scored_4f5079ba1e8dc848",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_b39572e9c75eaa18"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100801",
+      "scored_lead_id": "scored_87a26eb7b5d6a13f",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_af19dabe7128112f"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100802",
+      "scored_lead_id": "scored_d54fb7feb0d13817",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_b9c7568d4cf3aeee"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100803",
+      "scored_lead_id": "scored_a8897a66da8f0a5b",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_ca78b0eb423a8e2d"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100804",
+      "scored_lead_id": "scored_ab2af08d8e4de6cd",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_a3fb96b8eb3614b7"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100805",
+      "scored_lead_id": "scored_c2b87bb065d3d77c",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_e1d9b79db307c98d"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100806",
+      "scored_lead_id": "scored_95bc0c16834825ea",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_f53c3a114a1a659f"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260100807",
+      "scored_lead_id": "scored_aa5c4dca2afc474f",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "federal_tax_lien against unidentified party",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_FEDERAL_TAX_LIEN",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_6e5a526d7693d7ec"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260101114",
+      "scored_lead_id": "scored_e942e54adf3bf729",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_defad063450cceab"
+      ],
+      "primary_event_date": "2026-05-27",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260101494",
+      "scored_lead_id": "scored_6ac2cf8b957a9c58",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_9f593c9ec2b0f887"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260101510",
+      "scored_lead_id": "scored_f8d7194e86a73dc2",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_14aaf42b5d835a54"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260101539",
+      "scored_lead_id": "scored_6346e877dfadc77e",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_723ef9b2dbc1a325"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260101542",
+      "scored_lead_id": "scored_921e6fecb78580ab",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_c732b39161de9d7a"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260101605",
+      "scored_lead_id": "scored_4cc8416e42daff89",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_2c008eb0b73fedca"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260101609",
+      "scored_lead_id": "scored_043af0da71d9055a",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_fa0726e686eb806b"
+      ],
+      "primary_event_date": "2026-05-28",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260102504",
+      "scored_lead_id": "scored_aad24345e762795f",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "state_tax_lien against unidentified party",
+      "display_score": 50,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_STATE_TAX_LIEN",
+          "delta": 45
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_25406ad23e70958a"
+      ],
+      "primary_event_date": "2026-05-29",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:STATE OF <*>"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260102505",
+      "scored_lead_id": "scored_c70e1f7d27d513f4",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "state_tax_lien against unidentified party",
+      "display_score": 50,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_STATE_TAX_LIEN",
+          "delta": 45
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_9323302049ed3282"
+      ],
+      "primary_event_date": "2026-05-29",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:STATE OF <*>"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260102506",
+      "scored_lead_id": "scored_3ea740c3aa4a0da1",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "state_tax_lien against unidentified party",
+      "display_score": 50,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_STATE_TAX_LIEN",
+          "delta": 45
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_7577fb08121bd567"
+      ],
+      "primary_event_date": "2026-05-29",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:STATE OF <*>"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260102524",
+      "scored_lead_id": "scored_a909161336df6c94",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "state_tax_lien against unidentified party",
+      "display_score": 50,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_STATE_TAX_LIEN",
+          "delta": 45
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_dcb08610f5509146"
+      ],
+      "primary_event_date": "2026-05-29",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:STATE OF <*>"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260102910",
+      "scored_lead_id": "scored_c977a7674bc6d9c7",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_cc49c5e72cdc8f77"
+      ],
+      "primary_event_date": "2026-05-29",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260102916",
+      "scored_lead_id": "scored_4a84a6e7a6e01a52",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_f38bc9229c817acc"
+      ],
+      "primary_event_date": "2026-05-29",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_20260102919",
+      "scored_lead_id": "scored_55f2b3394c706aac",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [
+        "ev_5ee9406029424d47"
+      ],
+      "primary_event_date": "2026-05-29",
       "review_flags": [
         "parcel_resolution_review_required",
         "matched_lead_review_reason:expected_debtor_name_type DF missing"
@@ -30429,5 +33117,6 @@
     "last_known_good_commit": "",
     "last_known_good_dashboard_at": ""
   },
-  "dropped_signals_unmapped_doc_type": 0
+  "dropped_signals_unmapped_doc_type": 0,
+  "deduped_overlap_signals": 98
 }

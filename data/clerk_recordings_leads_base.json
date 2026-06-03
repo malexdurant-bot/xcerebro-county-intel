@@ -51,6 +51,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_005379de988f7fd7",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_005379de988f7fd7"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100798",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100798",
+      "legal_description": null,
+      "parcel_id": "BX-PS-2A0596C9259B",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_005379de988f7fd7",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714755"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -443,6 +492,104 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "mechanics_lien",
+      "parcel_id": "BX-PS-59BA5A36E6A7",
+      "signal_type": "mechanics_lien"
+    },
+    "base_record_id": "base_raw_0d436c11983a089b",
+    "canonical_doc_type": "mechanics_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_0d436c11983a089b"
+    ],
+    "filer_entity": "TEXAS ASSOCIATIONS OF PROFESSIONALS FCU",
+    "instrument_number": "20260101666",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "GARNICA GEORGE JR",
+    "owner_type": "INDIVIDUAL",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "GARNICA GEORGE JR",
+        "name_type": "GR",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GR"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "GARNICA GEORGE JR",
+    "property_refs": {
+      "case_number": "20260101666",
+      "legal_description": null,
+      "parcel_id": "BX-PS-59BA5A36E6A7",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_0d436c11983a089b",
+    "recorded_date": "2026-05-28",
+    "review_reason": null,
+    "signal_type": "mechanics_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316732811"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_1134d929fae8b5ee",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_1134d929fae8b5ee"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100789",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100789",
+      "legal_description": null,
+      "parcel_id": "BX-PS-E76841C7581A",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_1134d929fae8b5ee",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714721"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -488,6 +635,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316687295"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_14aaf42b5d835a54",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_14aaf42b5d835a54"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260101510",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260101510",
+      "legal_description": null,
+      "parcel_id": "BX-PS-727F755CFF61",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_14aaf42b5d835a54",
+    "recorded_date": "2026-05-28",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316729125"
   },
   {
     "additional_owner_names": [],
@@ -982,6 +1178,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "state_tax_lien",
+      "parcel_id": null,
+      "signal_type": "state_tax_lien"
+    },
+    "base_record_id": "base_raw_25406ad23e70958a",
+    "canonical_doc_type": "state_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_25406ad23e70958a"
+    ],
+    "filer_entity": "STATE OF TEXAS",
+    "instrument_number": "20260102504",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "state_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "state_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "state_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260102504",
+      "legal_description": null,
+      "parcel_id": "BX-PS-90685EC59755",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_25406ad23e70958a",
+    "recorded_date": "2026-05-29",
+    "review_reason": "known_filer_pattern match: government_entity:STATE OF <*>",
+    "signal_type": "state_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316747160"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "mechanics_lien",
       "parcel_id": "BX-PS-7B6DE8B0D479",
       "signal_type": "mechanics_lien"
@@ -1076,6 +1321,153 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695418"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "mechanics_lien",
+      "parcel_id": "BX-PS-89E1237CAC2B",
+      "signal_type": "mechanics_lien"
+    },
+    "base_record_id": "base_raw_2929c2f6b6c9f248",
+    "canonical_doc_type": "mechanics_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_2929c2f6b6c9f248"
+    ],
+    "filer_entity": "INTERSOLUTIONS LLC",
+    "instrument_number": "20260100412",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "ABODE GROUP LLC",
+    "owner_type": "ENTITY",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "ABODE GROUP LLC",
+        "name_type": "GR",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GR"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "ABODE GROUP LLC",
+    "property_refs": {
+      "case_number": "20260100412",
+      "legal_description": null,
+      "parcel_id": "BX-PS-89E1237CAC2B",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_2929c2f6b6c9f248",
+    "recorded_date": "2026-05-27",
+    "review_reason": null,
+    "signal_type": "mechanics_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316709648"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_2c008eb0b73fedca",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_2c008eb0b73fedca"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260101605",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260101605",
+      "legal_description": null,
+      "parcel_id": "BX-PS-8FEED2B1BC95",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_2c008eb0b73fedca",
+    "recorded_date": "2026-05-28",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316731573"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_2c505f6e58f5b60c",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_2c505f6e58f5b60c"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260100287",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260100287",
+      "legal_description": null,
+      "parcel_id": "BX-PS-616DB35F264B",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_2c505f6e58f5b60c",
+    "recorded_date": "2026-05-27",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316708602"
   },
   {
     "additional_owner_names": [],
@@ -1325,6 +1717,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_303dffd1515cd1fd",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_303dffd1515cd1fd"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100795",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100795",
+      "legal_description": null,
+      "parcel_id": "BX-PS-C382106D7973",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_303dffd1515cd1fd",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714773"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "mechanics_lien",
       "parcel_id": "BX-PS-1BAA4C87F47B",
       "signal_type": "mechanics_lien"
@@ -1517,6 +1958,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695008"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_34ae5cf27661d5fc",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_34ae5cf27661d5fc"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100788",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100788",
+      "legal_description": null,
+      "parcel_id": "BX-PS-8C3E20686A99",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_34ae5cf27661d5fc",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714747"
   },
   {
     "additional_owner_names": [],
@@ -1815,6 +2305,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_3bf45b08c3082daf",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_3bf45b08c3082daf"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100792",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100792",
+      "legal_description": null,
+      "parcel_id": "BX-PS-CC9A10D61994",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_3bf45b08c3082daf",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714751"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": "BX-PS-C84522EF87DF",
       "signal_type": "hospital_lien"
@@ -2060,6 +2599,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_3f435f09f178522f",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_3f435f09f178522f"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260099775",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260099775",
+      "legal_description": null,
+      "parcel_id": "BX-PS-481D00D737F2",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_3f435f09f178522f",
+    "recorded_date": "2026-05-27",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316703909"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -2105,6 +2693,104 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695409"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "state_tax_lien",
+      "parcel_id": null,
+      "signal_type": "state_tax_lien"
+    },
+    "base_record_id": "base_raw_42fe0f0eb1a41e6e",
+    "canonical_doc_type": "state_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_42fe0f0eb1a41e6e"
+    ],
+    "filer_entity": "STATE OF TEXAS",
+    "instrument_number": "20260100754",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "state_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "state_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "state_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100754",
+      "legal_description": null,
+      "parcel_id": "BX-PS-43C60BCEA6CD",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_42fe0f0eb1a41e6e",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:STATE OF <*>",
+    "signal_type": "state_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714308"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "mechanics_lien",
+      "parcel_id": "BX-PS-A0AE9B7187FA",
+      "signal_type": "mechanics_lien"
+    },
+    "base_record_id": "base_raw_4316caf723689fe7",
+    "canonical_doc_type": "mechanics_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_4316caf723689fe7"
+    ],
+    "filer_entity": "CORE DISTRIBUTING CENTRAL LLC",
+    "instrument_number": "20260101997",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "DIAMANTE APARTMENTS",
+    "owner_type": "INDIVIDUAL",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "DIAMANTE APARTMENTS",
+        "name_type": "GR",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GR"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "DIAMANTE APARTMENTS",
+    "property_refs": {
+      "case_number": "20260101997",
+      "legal_description": null,
+      "parcel_id": "BX-PS-A0AE9B7187FA",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_4316caf723689fe7",
+    "recorded_date": "2026-05-28",
+    "review_reason": null,
+    "signal_type": "mechanics_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316738089"
   },
   {
     "additional_owner_names": [],
@@ -2301,6 +2987,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695017"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "mechanics_lien",
+      "parcel_id": "BX-PS-769A9DE9D523",
+      "signal_type": "mechanics_lien"
+    },
+    "base_record_id": "base_raw_471de3d629910a2f",
+    "canonical_doc_type": "mechanics_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_471de3d629910a2f"
+    ],
+    "filer_entity": "INTERSOLUTIONS LLC",
+    "instrument_number": "20260100413",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "STERLING AT CASTLE HILLS SA LLC",
+    "owner_type": "ENTITY",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "STERLING AT CASTLE HILLS SA LLC",
+        "name_type": "GR",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GR"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "STERLING AT CASTLE HILLS SA LLC",
+    "property_refs": {
+      "case_number": "20260100413",
+      "legal_description": null,
+      "parcel_id": "BX-PS-769A9DE9D523",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_471de3d629910a2f",
+    "recorded_date": "2026-05-27",
+    "review_reason": null,
+    "signal_type": "mechanics_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316709646"
   },
   {
     "additional_owner_names": [],
@@ -2697,6 +3432,104 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "mechanics_lien",
+      "parcel_id": "BX-PS-75953E63FB85",
+      "signal_type": "mechanics_lien"
+    },
+    "base_record_id": "base_raw_53cc4ff48dc67dd6",
+    "canonical_doc_type": "mechanics_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_53cc4ff48dc67dd6"
+    ],
+    "filer_entity": "SUNBELT RENTALS INC",
+    "instrument_number": "20260103333",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "CST STATIONS TEXAS LLC",
+    "owner_type": "ENTITY",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "CST STATIONS TEXAS LLC",
+        "name_type": "GR",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GR"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "CST STATIONS TEXAS LLC",
+    "property_refs": {
+      "case_number": "20260103333",
+      "legal_description": null,
+      "parcel_id": "BX-PS-75953E63FB85",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_53cc4ff48dc67dd6",
+    "recorded_date": "2026-05-29",
+    "review_reason": null,
+    "signal_type": "mechanics_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316758843"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_54732ef2b7c8bae7",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_54732ef2b7c8bae7"
+    ],
+    "filer_entity": "UNITED STATES",
+    "instrument_number": "20260100786",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100786",
+      "legal_description": null,
+      "parcel_id": "BX-PS-8623752F5DEF",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_54732ef2b7c8bae7",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:UNITED STATES OF AMERICA",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714744"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "federal_tax_lien",
       "parcel_id": null,
       "signal_type": "federal_tax_lien"
@@ -2991,6 +3824,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_5bc0dec55ccba693",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_5bc0dec55ccba693"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100793",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100793",
+      "legal_description": null,
+      "parcel_id": "BX-PS-F961661DAD3F",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_5bc0dec55ccba693",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714759"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "lis_pendens",
       "parcel_id": null,
       "signal_type": "lis_pendens"
@@ -3085,6 +3967,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/315582617"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_5ee9406029424d47",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_5ee9406029424d47"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260102919",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260102919",
+      "legal_description": null,
+      "parcel_id": "BX-PS-B24079E435F0",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_5ee9406029424d47",
+    "recorded_date": "2026-05-29",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316754402"
   },
   {
     "additional_owner_names": [],
@@ -3285,6 +4216,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_6e5a526d7693d7ec",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_6e5a526d7693d7ec"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100807",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100807",
+      "legal_description": null,
+      "parcel_id": "BX-PS-F0B858B8E747",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_6e5a526d7693d7ec",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714761"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "state_tax_lien",
       "parcel_id": null,
       "signal_type": "state_tax_lien"
@@ -3330,6 +4310,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316693699"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_723ef9b2dbc1a325",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_723ef9b2dbc1a325"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260101539",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260101539",
+      "legal_description": null,
+      "parcel_id": "BX-PS-1A5D619397CB",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_723ef9b2dbc1a325",
+    "recorded_date": "2026-05-28",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316730292"
   },
   {
     "additional_owner_names": [],
@@ -3428,6 +4457,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695012"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "state_tax_lien",
+      "parcel_id": null,
+      "signal_type": "state_tax_lien"
+    },
+    "base_record_id": "base_raw_7577fb08121bd567",
+    "canonical_doc_type": "state_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_7577fb08121bd567"
+    ],
+    "filer_entity": "STATE OF TEXAS",
+    "instrument_number": "20260102506",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "state_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "state_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "state_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260102506",
+      "legal_description": null,
+      "parcel_id": "BX-PS-A29A1FC1F082",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_7577fb08121bd567",
+    "recorded_date": "2026-05-29",
+    "review_reason": "known_filer_pattern match: government_entity:STATE OF <*>",
+    "signal_type": "state_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316747155"
   },
   {
     "additional_owner_names": [],
@@ -3628,6 +4706,153 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_81ae287cbf71a342",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_81ae287cbf71a342"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100796",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100796",
+      "legal_description": null,
+      "parcel_id": "BX-PS-F0011378F4EB",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_81ae287cbf71a342",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714766"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_8549fae9a4a736c5",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_8549fae9a4a736c5"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100799",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100799",
+      "legal_description": null,
+      "parcel_id": "BX-PS-70A95A3F8D6C",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_8549fae9a4a736c5",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714735"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "mechanics_lien",
+      "parcel_id": "BX-PS-C0E0FEB00EC5",
+      "signal_type": "mechanics_lien"
+    },
+    "base_record_id": "base_raw_86bee39ecc130f1a",
+    "canonical_doc_type": "mechanics_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_86bee39ecc130f1a"
+    ],
+    "filer_entity": "EFINITY FINANCIAL INC",
+    "instrument_number": "20260102118",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "SOUTH TEXAS EXTERIOR ROOFING",
+    "owner_type": "INDIVIDUAL",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "SOUTH TEXAS EXTERIOR ROOFING",
+        "name_type": "GR",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GR"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "SOUTH TEXAS EXTERIOR ROOFING",
+    "property_refs": {
+      "case_number": "20260102118",
+      "legal_description": null,
+      "parcel_id": "BX-PS-C0E0FEB00EC5",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_86bee39ecc130f1a",
+    "recorded_date": "2026-05-28",
+    "review_reason": null,
+    "signal_type": "mechanics_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316738846"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -3673,6 +4898,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316687851"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_8b1aba77814230eb",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_8b1aba77814230eb"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100794",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100794",
+      "legal_description": null,
+      "parcel_id": "BX-PS-BB26B37E8B8C",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_8b1aba77814230eb",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714770"
   },
   {
     "additional_owner_names": [],
@@ -3726,6 +5000,104 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_8df675c6a578e76c",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_8df675c6a578e76c"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100790",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100790",
+      "legal_description": null,
+      "parcel_id": "BX-PS-0A2ED1C73A7D",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_8df675c6a578e76c",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714725"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_8f8f6365396a0d8f",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_8f8f6365396a0d8f"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260099795",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260099795",
+      "legal_description": null,
+      "parcel_id": "BX-PS-493639A15A85",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_8f8f6365396a0d8f",
+    "recorded_date": "2026-05-27",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316703941"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "state_tax_lien",
       "parcel_id": null,
       "signal_type": "state_tax_lien"
@@ -3771,6 +5143,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316693700"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "state_tax_lien",
+      "parcel_id": null,
+      "signal_type": "state_tax_lien"
+    },
+    "base_record_id": "base_raw_9323302049ed3282",
+    "canonical_doc_type": "state_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_9323302049ed3282"
+    ],
+    "filer_entity": "STATE OF TEXAS",
+    "instrument_number": "20260102505",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "state_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "state_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "state_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260102505",
+      "legal_description": null,
+      "parcel_id": "BX-PS-16A8B860F690",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_9323302049ed3282",
+    "recorded_date": "2026-05-29",
+    "review_reason": "known_filer_pattern match: government_entity:STATE OF <*>",
+    "signal_type": "state_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316747162"
   },
   {
     "additional_owner_names": [],
@@ -3873,6 +5294,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_9f593c9ec2b0f887",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_9f593c9ec2b0f887"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260101494",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260101494",
+      "legal_description": null,
+      "parcel_id": "BX-PS-299D7C1FDB38",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_9f593c9ec2b0f887",
+    "recorded_date": "2026-05-28",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316728587"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -3918,6 +5388,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695002"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_a0498e6c599bc5ab",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_a0498e6c599bc5ab"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100797",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100797",
+      "legal_description": null,
+      "parcel_id": "BX-PS-E3A4D558B827",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_a0498e6c599bc5ab",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714737"
   },
   {
     "additional_owner_names": [],
@@ -4114,6 +5633,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316691609"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_a3fb96b8eb3614b7",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_a3fb96b8eb3614b7"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100804",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100804",
+      "legal_description": null,
+      "parcel_id": "BX-PS-59E2F1532DD3",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_a3fb96b8eb3614b7",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714758"
   },
   {
     "additional_owner_names": [],
@@ -4412,6 +5980,104 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_af19dabe7128112f",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_af19dabe7128112f"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100801",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100801",
+      "legal_description": null,
+      "parcel_id": "BX-PS-7079F54C364B",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_af19dabe7128112f",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714748"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_b39572e9c75eaa18",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_b39572e9c75eaa18"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100800",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100800",
+      "legal_description": null,
+      "parcel_id": "BX-PS-20B7A7D99DB4",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_b39572e9c75eaa18",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714743"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": "BX-PS-17C6F04417DA",
       "signal_type": "hospital_lien"
@@ -4461,6 +6127,104 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_b9c7568d4cf3aeee",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_b9c7568d4cf3aeee"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100802",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100802",
+      "legal_description": null,
+      "parcel_id": "BX-PS-2795347988A9",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_b9c7568d4cf3aeee",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714754"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_ba70adbb026c9d79",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_ba70adbb026c9d79"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100787",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100787",
+      "legal_description": null,
+      "parcel_id": "BX-PS-8F05BCB7A369",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_ba70adbb026c9d79",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714745"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "mechanics_lien",
       "parcel_id": "BX-PS-A50B14DB58D2",
       "signal_type": "mechanics_lien"
@@ -4506,6 +6270,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/315582172"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "hospital_lien",
+      "parcel_id": "BX-PS-4B594B0782AE",
+      "signal_type": "hospital_lien"
+    },
+    "base_record_id": "base_raw_c1299fe2d068cfec",
+    "canonical_doc_type": "hospital_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_c1299fe2d068cfec"
+    ],
+    "filer_entity": "CANO REANNA POSADA",
+    "instrument_number": "20260100785",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "COMPLETE CARE CULEBRA",
+    "owner_type": "INDIVIDUAL",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "COMPLETE CARE CULEBRA",
+        "name_type": "GE",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GE"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "COMPLETE CARE CULEBRA",
+    "property_refs": {
+      "case_number": "20260100785",
+      "legal_description": null,
+      "parcel_id": "BX-PS-4B594B0782AE",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_c1299fe2d068cfec",
+    "recorded_date": "2026-05-27",
+    "review_reason": null,
+    "signal_type": "hospital_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714733"
   },
   {
     "additional_owner_names": [],
@@ -4657,6 +6470,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_c732b39161de9d7a",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_c732b39161de9d7a"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260101542",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260101542",
+      "legal_description": null,
+      "parcel_id": "BX-PS-2A3A30AB8DFB",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_c732b39161de9d7a",
+    "recorded_date": "2026-05-28",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316730297"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -4702,6 +6564,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316694985"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_ca78b0eb423a8e2d",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_ca78b0eb423a8e2d"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100803",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100803",
+      "legal_description": null,
+      "parcel_id": "BX-PS-35DA0A01AABE",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_ca78b0eb423a8e2d",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714757"
   },
   {
     "additional_owner_names": [],
@@ -4800,6 +6711,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316693713"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_cc49c5e72cdc8f77",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_cc49c5e72cdc8f77"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260102910",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260102910",
+      "legal_description": null,
+      "parcel_id": "BX-PS-468F171DC565",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_cc49c5e72cdc8f77",
+    "recorded_date": "2026-05-29",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316754396"
   },
   {
     "additional_owner_names": [],
@@ -5098,6 +7058,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "mechanics_lien",
+      "parcel_id": "BX-PS-58389C3AAB40",
+      "signal_type": "mechanics_lien"
+    },
+    "base_record_id": "base_raw_d8d1cda7e4d483d1",
+    "canonical_doc_type": "mechanics_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_d8d1cda7e4d483d1"
+    ],
+    "filer_entity": "LANVAN INC",
+    "instrument_number": "20260101122",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "OREI AXIO PROPERTY OWNER LLC",
+    "owner_type": "ENTITY",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "OREI AXIO PROPERTY OWNER LLC",
+        "name_type": "GR",
+        "notes": null,
+        "resolution_status": "RESOLVED",
+        "role": "debtor",
+        "source_field": "GR"
+      }
+    ],
+    "parcel_resolution_status": "RESOLVED",
+    "primary_owner_name": "OREI AXIO PROPERTY OWNER LLC",
+    "property_refs": {
+      "case_number": "20260101122",
+      "legal_description": null,
+      "parcel_id": "BX-PS-58389C3AAB40",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_d8d1cda7e4d483d1",
+    "recorded_date": "2026-05-27",
+    "review_reason": null,
+    "signal_type": "mechanics_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316718250"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "lis_pendens",
       "parcel_id": null,
       "signal_type": "lis_pendens"
@@ -5192,6 +7201,153 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695426"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "state_tax_lien",
+      "parcel_id": null,
+      "signal_type": "state_tax_lien"
+    },
+    "base_record_id": "base_raw_dcb08610f5509146",
+    "canonical_doc_type": "state_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_dcb08610f5509146"
+    ],
+    "filer_entity": "STATE OF TEXAS",
+    "instrument_number": "20260102524",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "state_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "state_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "state_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260102524",
+      "legal_description": null,
+      "parcel_id": "BX-PS-F37CE9035D62",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_dcb08610f5509146",
+    "recorded_date": "2026-05-29",
+    "review_reason": "known_filer_pattern match: government_entity:STATE OF <*>",
+    "signal_type": "state_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316747750"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_defad063450cceab",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_defad063450cceab"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260101114",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260101114",
+      "legal_description": null,
+      "parcel_id": "BX-PS-A03FFBB86BEC",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_defad063450cceab",
+    "recorded_date": "2026-05-27",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316718226"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_e1d9b79db307c98d",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_e1d9b79db307c98d"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100805",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100805",
+      "legal_description": null,
+      "parcel_id": "BX-PS-C128B178E3EC",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_e1d9b79db307c98d",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714740"
   },
   {
     "additional_owner_names": [],
@@ -5539,6 +7695,104 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_f1984c9e3190a0a3",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_f1984c9e3190a0a3"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100791",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100791",
+      "legal_description": null,
+      "parcel_id": "BX-PS-68955A0CBFB3",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_f1984c9e3190a0a3",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714738"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_f38bc9229c817acc",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_f38bc9229c817acc"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260102916",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260102916",
+      "legal_description": null,
+      "parcel_id": "BX-PS-0A85A220D5EA",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_f38bc9229c817acc",
+    "recorded_date": "2026-05-29",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316754399"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -5686,6 +7940,55 @@
   {
     "additional_owner_names": [],
     "aggregation_key": {
+      "canonical_doc_type": "federal_tax_lien",
+      "parcel_id": null,
+      "signal_type": "federal_tax_lien"
+    },
+    "base_record_id": "base_raw_f53c3a114a1a659f",
+    "canonical_doc_type": "federal_tax_lien",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_f53c3a114a1a659f"
+    ],
+    "filer_entity": "INTERNAL REVENUE SERVICE",
+    "instrument_number": "20260100806",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "federal_tax_lien against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "federal_tax_lien against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "federal_tax_lien against unidentified party",
+    "property_refs": {
+      "case_number": "20260100806",
+      "legal_description": null,
+      "parcel_id": "BX-PS-4CF70D352695",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_f53c3a114a1a659f",
+    "recorded_date": "2026-05-27",
+    "review_reason": "known_filer_pattern match: government_entity:INTERNAL REVENUE SERVICE",
+    "signal_type": "federal_tax_lien",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316714753"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
       "canonical_doc_type": "hospital_lien",
       "parcel_id": null,
       "signal_type": "hospital_lien"
@@ -5731,6 +8034,55 @@
     "source_id": "clerk_recordings",
     "source_role": "PRIMARY_EVENT_SOURCE",
     "source_url": "https://bexar.tx.publicsearch.us/doc/316695024"
+  },
+  {
+    "additional_owner_names": [],
+    "aggregation_key": {
+      "canonical_doc_type": "lis_pendens",
+      "parcel_id": null,
+      "signal_type": "lis_pendens"
+    },
+    "base_record_id": "base_raw_fa0726e686eb806b",
+    "canonical_doc_type": "lis_pendens",
+    "confidence_status": "Confirmed",
+    "enrichment_status": "UNENRICHED",
+    "event_date": null,
+    "evidence_ids": [
+      "ev_fa0726e686eb806b"
+    ],
+    "filer_entity": null,
+    "instrument_number": "20260101609",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "lis_pendens against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "lis_pendens against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "lis_pendens against unidentified party",
+    "property_refs": {
+      "case_number": "20260101609",
+      "legal_description": null,
+      "parcel_id": "BX-PS-B088DF1BDB29",
+      "situs_address": null
+    },
+    "raw_event_id": "raw_fa0726e686eb806b",
+    "recorded_date": "2026-05-28",
+    "review_reason": "expected_debtor_name_type DF missing",
+    "signal_type": "lis_pendens",
+    "source_id": "clerk_recordings",
+    "source_role": "PRIMARY_EVENT_SOURCE",
+    "source_url": "https://bexar.tx.publicsearch.us/doc/316731564"
   },
   {
     "additional_owner_names": [],
