@@ -8,8 +8,8 @@
     "build_priority": "mvp_required",
     "access_pattern": "open_api",
     "status": "healthy",
-    "last_attempted_at": "2026-05-29T02:00:32Z",
-    "last_successful_at": "2026-05-29T02:00:32Z",
+    "last_attempted_at": "2026-06-03T22:54:59Z",
+    "last_successful_at": "2026-06-03T22:54:59Z",
     "last_failed_at": null,
     "last_failure_reason": null,
     "records_seen_current_run": 122,
@@ -29,7 +29,7 @@
         "strategy": "arcgis_rest_query",
         "status": "SUCCESS",
         "reason": "Phase 3 production pull from clerk_recordings",
-        "timestamp": "2026-05-29T02:00:32Z"
+        "timestamp": "2026-06-03T22:54:59Z"
       }
     ],
     "final_access_strategy": "arcgis_rest_query",
@@ -44,8 +44,8 @@
     "build_priority": "mvp_required",
     "access_pattern": "open_api",
     "status": "healthy",
-    "last_attempted_at": "2026-05-29T02:00:32Z",
-    "last_successful_at": "2026-05-29T02:00:32Z",
+    "last_attempted_at": "2026-06-03T22:54:59Z",
+    "last_successful_at": "2026-06-03T22:54:59Z",
     "last_failed_at": null,
     "last_failure_reason": null,
     "records_seen_current_run": 423,
@@ -65,7 +65,7 @@
         "strategy": "arcgis_rest_query",
         "status": "SUCCESS",
         "reason": "Phase 3 production pull from foreclosure_notices_map",
-        "timestamp": "2026-05-29T02:00:32Z"
+        "timestamp": "2026-06-03T22:54:59Z"
       }
     ],
     "final_access_strategy": "arcgis_rest_query",
