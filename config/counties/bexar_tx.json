@@ -765,8 +765,11 @@
       "pause_until": "",
       "allowed_to_export": true,
       "source_freshness": "DAILY",
-      "known_limitations": [],
-      "last_verified_at": "2026-05-14T15:55:00Z",
+      "known_limitations": [
+        "ACT portal (bexar.acttax.com) exposes NO delinquent-only filter, list, or bulk export — per-account lookup only (confirmed 2026-06-03 live recon). Not a lead-discovery source; viable only as per-account delinquent-balance ENRICHMENT on leads already in hand. A discovery 'walk' would require blindly querying ~700k+ accounts and is infeasible.",
+        "Delinquent-tax DISTRESS leads in Bexar are event-based and come from the LGBS tax-sale list (taxsales.lgbs.com): Sale / Resale / Struck-off / Future-sale post-judgment tax foreclosures, free and public. A PIA bulk delinquent roll from the Tax Assessor-Collector is an optional B-grade (delayed) breadth supplement, not a daily feed. Full path scoping + ranking in operator_notes.md (2026-06-03). source_role unchanged pending an operator build decision."
+      ],
+      "last_verified_at": "2026-06-03T23:40:00Z",
       "auth_required": false,
       "rate_limit_rpm": null,
       "fields": {},
@@ -775,10 +778,7 @@
       "blocked_unblock_paths": [],
       "notes": "ACT Tax Solutions-hosted tax-account portal for the Bexar County Tax Assessor-Collector. Free public account search by owner / business / address / account / CAD ID. Delinquency status is visible at the per-account level (no separate delinquent-roll dump). Per the 12% July penalty + 1%/month interest + 20% Sep 1 collection-fee rule, accounts past Jan 31 carry visible delinquent balances.",
       "verification_note": "Officially linked from bexar.org/1529 (Property Tax). Vendor: ACT Tax Solutions. Free search; payments incur card-processing fee (2.10% credit; free for e-check).",
-      "open_questions": [
-        "Confirm whether ACT exposes a delinquent-only filter or list.",
-        "Decide whether to pull delinquency via per-parcel BCAD walk or via PIA bulk request."
-      ],
+      "open_questions": [],
       "verified_from_url": "https://www.bexar.org/1529/Property-Tax",
       "verification_method": "official_vendor_link",
       "official_entity": "Bexar County Tax Assessor-Collector",
