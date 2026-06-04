@@ -45,6 +45,10 @@ runs/*/.cache/
 secrets/
 *.pem
 *.key
+# Authenticated browser sessions (Playwright storage_state) — never commit
+runs/*/.auth/
+*storage_state*.json
+*.session.json
 
 # Coverage / test artifacts
 .coverage
