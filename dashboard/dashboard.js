@@ -501,8 +501,13 @@
 
   async function boot() {
     wireEvents();
-    const isSynthetic = new URL(window.location.href).searchParams.get("synthetic") !== "0";
-    const paths = isSynthetic
+    // Default to production data; fall back to the synthetic sample only when
+    // no production payload is served (fetchFirst tries the list in order).
+    // Pass ?synthetic=1 to force the synthetic sample first (demo / offline
+    // preview). ?synthetic=0 (or omitting it) keeps production-first.
+    const forceSynthetic =
+      new URL(window.location.href).searchParams.get("synthetic") === "1";
+    const paths = forceSynthetic
       ? DATA_PATHS_SYNTH.concat(DATA_PATHS_PROD)
       : DATA_PATHS_PROD.concat(DATA_PATHS_SYNTH);
     try {
