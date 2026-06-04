@@ -1681,6 +1681,255 @@
     "additional_owner_names": [],
     "enrichment_status": "UNENRICHED",
     "evidence_ids": [
+      "ev_562f6c4770721f75"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2003TA103528",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_562f6c4770721f75"
+        ],
+        "instrument_numbers": [
+          "2003TA103528"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003559208"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_5f92a242c4da0a00"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2006TA102455",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_5f92a242c4da0a00"
+        ],
+        "instrument_numbers": [
+          "2006TA102455"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003792019"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_d996544fa58fd22b"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2010TA101408",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_d996544fa58fd22b"
+        ],
+        "instrument_numbers": [
+          "2010TA101408"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001255608"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_1ad966252d6ffc40"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2010TA101443",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_1ad966252d6ffc40"
+        ],
+        "instrument_numbers": [
+          "2010TA101443"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1000957791"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_6f890caf4ee5b577",
       "ev_b9c0cbcabd565e34"
     ],
     "filer_entity": null,
@@ -1716,6 +1965,7 @@
         "count": 1,
         "earliest_recorded_date": "2026-06-02",
         "evidence_ids": [
+          "ev_6f890caf4ee5b577",
           "ev_b9c0cbcabd565e34"
         ],
         "instrument_numbers": [
@@ -1728,15 +1978,700 @@
         ],
         "signal_type": "tax_foreclosure_notice",
         "source_ids": [
-          "foreclosure_notices_map"
+          "foreclosure_notices_map",
+          "tax_sale_lgbs"
         ],
         "source_urls": [
-          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272011TA102021%27&outFields=*&f=json"
+          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272011TA102021%27&outFields=*&f=json",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003990488"
         ]
       }
     ],
     "source_ids": [
-      "foreclosure_notices_map"
+      "foreclosure_notices_map",
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_d5cd59f3a9297341"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2011TA102046",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_d5cd59f3a9297341"
+        ],
+        "instrument_numbers": [
+          "2011TA102046"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003202542"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_b8897a06b4a241b4"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA100316",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_b8897a06b4a241b4"
+        ],
+        "instrument_numbers": [
+          "2012TA100316"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003783284"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_9aeab29a898636e5"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA100529",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_9aeab29a898636e5"
+        ],
+        "instrument_numbers": [
+          "2012TA100529"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003000085"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_25106cb056336e11"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA100721",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_25106cb056336e11"
+        ],
+        "instrument_numbers": [
+          "2012TA100721"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003056875"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_7fe688e4de287d49"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA100829",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_7fe688e4de287d49"
+        ],
+        "instrument_numbers": [
+          "2012TA100829"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001442477"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_def532a103472de8"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA100837",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_def532a103472de8"
+        ],
+        "instrument_numbers": [
+          "2012TA100837"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1002987265"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_0df28c10253f6027"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA102233",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_0df28c10253f6027"
+        ],
+        "instrument_numbers": [
+          "2012TA102233"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1004567173"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_47a9b2d8be006325"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA102463",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_47a9b2d8be006325"
+        ],
+        "instrument_numbers": [
+          "2012TA102463"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1005484119"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_a81bcb331314c0c1"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA103556",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_a81bcb331314c0c1"
+        ],
+        "instrument_numbers": [
+          "2012TA103556"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001256455"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_30c514149c3f5a17"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA104125",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_30c514149c3f5a17"
+        ],
+        "instrument_numbers": [
+          "2012TA104125"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001460045"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_a1a4fd941e90d56c"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2012TA104960",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_a1a4fd941e90d56c"
+        ],
+        "instrument_numbers": [
+          "2012TA104960"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001930870"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
     ]
   },
   {
@@ -1805,6 +2740,69 @@
     "additional_owner_names": [],
     "enrichment_status": "UNENRICHED",
     "evidence_ids": [
+      "ev_4e45bfb3378bc8c9"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2013TA102144",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_4e45bfb3378bc8c9"
+        ],
+        "instrument_numbers": [
+          "2013TA102144"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1000938264"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_1f5f00ae8a8efc43",
       "ev_4e4c4e0a1861988d"
     ],
     "filer_entity": null,
@@ -1840,6 +2838,7 @@
         "count": 1,
         "earliest_recorded_date": "2026-06-02",
         "evidence_ids": [
+          "ev_1f5f00ae8a8efc43",
           "ev_4e4c4e0a1861988d"
         ],
         "instrument_numbers": [
@@ -1852,21 +2851,149 @@
         ],
         "signal_type": "tax_foreclosure_notice",
         "source_ids": [
-          "foreclosure_notices_map"
+          "foreclosure_notices_map",
+          "tax_sale_lgbs"
         ],
         "source_urls": [
-          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272014TA100941%27&outFields=*&f=json"
+          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272014TA100941%27&outFields=*&f=json",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1002999366"
         ]
       }
     ],
     "source_ids": [
-      "foreclosure_notices_map"
+      "foreclosure_notices_map",
+      "tax_sale_lgbs"
     ]
   },
   {
     "additional_owner_names": [],
     "enrichment_status": "UNENRICHED",
     "evidence_ids": [
+      "ev_3d6a7f67cf9a8b76"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2014TA101322",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_3d6a7f67cf9a8b76"
+        ],
+        "instrument_numbers": [
+          "2014TA101322"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001388209"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_81ef5b2075432d63"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2014TA102449",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_81ef5b2075432d63"
+        ],
+        "instrument_numbers": [
+          "2014TA102449"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003533460"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_504aee002336ee3c",
       "ev_882a760d0a378ef2"
     ],
     "filer_entity": null,
@@ -1902,6 +3029,7 @@
         "count": 1,
         "earliest_recorded_date": "2026-06-02",
         "evidence_ids": [
+          "ev_504aee002336ee3c",
           "ev_882a760d0a378ef2"
         ],
         "instrument_numbers": [
@@ -1914,22 +3042,342 @@
         ],
         "signal_type": "tax_foreclosure_notice",
         "source_ids": [
-          "foreclosure_notices_map"
+          "foreclosure_notices_map",
+          "tax_sale_lgbs"
         ],
         "source_urls": [
-          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272015TA103055%27&outFields=*&f=json"
+          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272015TA103055%27&outFields=*&f=json",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1004390183"
         ]
       }
     ],
     "source_ids": [
-      "foreclosure_notices_map"
+      "foreclosure_notices_map",
+      "tax_sale_lgbs"
     ]
   },
   {
     "additional_owner_names": [],
     "enrichment_status": "UNENRICHED",
     "evidence_ids": [
-      "ev_3e6f8abdbc6a5ad4"
+      "ev_1befe24a85f4cc60"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2016TA101507",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_1befe24a85f4cc60"
+        ],
+        "instrument_numbers": [
+          "2016TA101507"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001386885"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_d1f83502701df68d"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2016TA102210",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_d1f83502701df68d"
+        ],
+        "instrument_numbers": [
+          "2016TA102210"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1000971860"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_638a8a318f3f30d5",
+      "ev_97e9fde36f7482c1",
+      "ev_996075395ad71450"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2016TA102622",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_638a8a318f3f30d5",
+          "ev_97e9fde36f7482c1",
+          "ev_996075395ad71450"
+        ],
+        "instrument_numbers": [
+          "2016TA102622"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001938293",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001938308",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001938320"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_745b85181050613c"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2016TA103726",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_745b85181050613c"
+        ],
+        "instrument_numbers": [
+          "2016TA103726"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1004383637"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_99ebd0fec3ee677c"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2016TA104241",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_99ebd0fec3ee677c"
+        ],
+        "instrument_numbers": [
+          "2016TA104241"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003867272"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_3e6f8abdbc6a5ad4",
+      "ev_cc97b4ac199530af"
     ],
     "filer_entity": null,
     "lead_id": "lead_unresolved_2017TA101415",
@@ -1964,7 +3412,8 @@
         "count": 1,
         "earliest_recorded_date": "2026-06-02",
         "evidence_ids": [
-          "ev_3e6f8abdbc6a5ad4"
+          "ev_3e6f8abdbc6a5ad4",
+          "ev_cc97b4ac199530af"
         ],
         "instrument_numbers": [
           "2017TA101415"
@@ -1976,21 +3425,276 @@
         ],
         "signal_type": "tax_foreclosure_notice",
         "source_ids": [
-          "foreclosure_notices_map"
+          "foreclosure_notices_map",
+          "tax_sale_lgbs"
         ],
         "source_urls": [
-          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272017TA101415%27&outFields=*&f=json"
+          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272017TA101415%27&outFields=*&f=json",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001590591"
         ]
       }
     ],
     "source_ids": [
-      "foreclosure_notices_map"
+      "foreclosure_notices_map",
+      "tax_sale_lgbs"
     ]
   },
   {
     "additional_owner_names": [],
     "enrichment_status": "UNENRICHED",
     "evidence_ids": [
+      "ev_2fd0974776ff7f6f",
+      "ev_99d9a6b783495424"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2017TA101445",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_2fd0974776ff7f6f",
+          "ev_99d9a6b783495424"
+        ],
+        "instrument_numbers": [
+          "2017TA101445"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001364060",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1002600928"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_6e70164150b1ed65"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2018TA100450",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_6e70164150b1ed65"
+        ],
+        "instrument_numbers": [
+          "2018TA100450"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001502179"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_6ff905a7114516a5"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2018TA100631",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_6ff905a7114516a5"
+        ],
+        "instrument_numbers": [
+          "2018TA100631"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001255550"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_b0f7803460701b19"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2018TA101059",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_b0f7803460701b19"
+        ],
+        "instrument_numbers": [
+          "2018TA101059"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003026440"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_83857206d224238b",
       "ev_fd7c762d2070a660"
     ],
     "filer_entity": null,
@@ -2026,6 +3730,7 @@
         "count": 1,
         "earliest_recorded_date": "2026-06-02",
         "evidence_ids": [
+          "ev_83857206d224238b",
           "ev_fd7c762d2070a660"
         ],
         "instrument_numbers": [
@@ -2038,15 +3743,80 @@
         ],
         "signal_type": "tax_foreclosure_notice",
         "source_ids": [
-          "foreclosure_notices_map"
+          "foreclosure_notices_map",
+          "tax_sale_lgbs"
         ],
         "source_urls": [
-          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272018TA102181%27&outFields=*&f=json"
+          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272018TA102181%27&outFields=*&f=json",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003329810"
         ]
       }
     ],
     "source_ids": [
-      "foreclosure_notices_map"
+      "foreclosure_notices_map",
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_d56660ae73c85c1a"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2019TA102477",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_d56660ae73c85c1a"
+        ],
+        "instrument_numbers": [
+          "2019TA102477"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001338715"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
     ]
   },
   {
@@ -2109,6 +3879,68 @@
     ],
     "source_ids": [
       "foreclosure_notices_map"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_14c60590f31fa621"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2022TA100303",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": null,
+        "evidence_ids": [
+          "ev_14c60590f31fa621"
+        ],
+        "instrument_numbers": [
+          "2022TA100303"
+        ],
+        "latest_recorded_date": null,
+        "recorded_date_range": [
+          null,
+          null
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1005890358"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
     ]
   },
   {
@@ -2363,7 +4195,8 @@
     "additional_owner_names": [],
     "enrichment_status": "UNENRICHED",
     "evidence_ids": [
-      "ev_55dc814ca38485da"
+      "ev_55dc814ca38485da",
+      "ev_7802e66fc54eecf6"
     ],
     "filer_entity": null,
     "lead_id": "lead_unresolved_2022TA101941",
@@ -2398,7 +4231,8 @@
         "count": 1,
         "earliest_recorded_date": "2026-06-02",
         "evidence_ids": [
-          "ev_55dc814ca38485da"
+          "ev_55dc814ca38485da",
+          "ev_7802e66fc54eecf6"
         ],
         "instrument_numbers": [
           "2022TA101941"
@@ -2410,21 +4244,149 @@
         ],
         "signal_type": "tax_foreclosure_notice",
         "source_ids": [
-          "foreclosure_notices_map"
+          "foreclosure_notices_map",
+          "tax_sale_lgbs"
         ],
         "source_urls": [
-          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272022TA101941%27&outFields=*&f=json"
+          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272022TA101941%27&outFields=*&f=json",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1000659195"
         ]
       }
     ],
     "source_ids": [
-      "foreclosure_notices_map"
+      "foreclosure_notices_map",
+      "tax_sale_lgbs"
     ]
   },
   {
     "additional_owner_names": [],
     "enrichment_status": "UNENRICHED",
     "evidence_ids": [
+      "ev_64ae84a6a1dca71c"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2023TA100418",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_64ae84a6a1dca71c"
+        ],
+        "instrument_numbers": [
+          "2023TA100418"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001394615"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_eeabc52f052b9502"
+    ],
+    "filer_entity": null,
+    "lead_id": "lead_unresolved_2023TA100546",
+    "multi_owner_status": "SINGLE_OWNER",
+    "owner_count": 1,
+    "owner_name": "tax_foreclosure_notice against unidentified party",
+    "owner_type": "UNKNOWN",
+    "owners": [
+      {
+        "confidence": null,
+        "is_primary": true,
+        "name": "tax_foreclosure_notice against unidentified party",
+        "name_type": null,
+        "notes": null,
+        "resolution_status": "REVIEW_REQUIRED",
+        "role": "unresolved",
+        "source_field": null
+      }
+    ],
+    "parcel_resolution_status": "REVIEW_REQUIRED",
+    "primary_owner_name": "tax_foreclosure_notice against unidentified party",
+    "primary_parcel_id": null,
+    "review_reason": "owner_not_on_document",
+    "signals": [
+      {
+        "aggregation_key": {
+          "canonical_doc_type": "tax_foreclosure_notice",
+          "parcel_id": null,
+          "signal_type": "tax_foreclosure_notice"
+        },
+        "canonical_doc_type": "tax_foreclosure_notice",
+        "count": 1,
+        "earliest_recorded_date": "2026-06-02",
+        "evidence_ids": [
+          "ev_eeabc52f052b9502"
+        ],
+        "instrument_numbers": [
+          "2023TA100546"
+        ],
+        "latest_recorded_date": "2026-06-02",
+        "recorded_date_range": [
+          "2026-06-02",
+          "2026-06-02"
+        ],
+        "signal_type": "tax_foreclosure_notice",
+        "source_ids": [
+          "tax_sale_lgbs"
+        ],
+        "source_urls": [
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1001384468"
+        ]
+      }
+    ],
+    "source_ids": [
+      "tax_sale_lgbs"
+    ]
+  },
+  {
+    "additional_owner_names": [],
+    "enrichment_status": "UNENRICHED",
+    "evidence_ids": [
+      "ev_5432fbae82f9dd45",
       "ev_77014565a18a174d"
     ],
     "filer_entity": null,
@@ -2460,6 +4422,7 @@
         "count": 1,
         "earliest_recorded_date": "2026-06-02",
         "evidence_ids": [
+          "ev_5432fbae82f9dd45",
           "ev_77014565a18a174d"
         ],
         "instrument_numbers": [
@@ -2472,15 +4435,18 @@
         ],
         "signal_type": "tax_foreclosure_notice",
         "source_ids": [
-          "foreclosure_notices_map"
+          "foreclosure_notices_map",
+          "tax_sale_lgbs"
         ],
         "source_urls": [
-          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272023TA100662%27&outFields=*&f=json"
+          "https://maps.bexar.org/arcgis/rest/services/CC/ForeclosuresProd/MapServer/1/query?where=DOC_NUMBER%3D%272023TA100662%27&outFields=*&f=json",
+          "https://taxsales.lgbs.com/api/property_sales/?uid=1003042071"
         ]
       }
     ],
     "source_ids": [
-      "foreclosure_notices_map"
+      "foreclosure_notices_map",
+      "tax_sale_lgbs"
     ]
   },
   {
