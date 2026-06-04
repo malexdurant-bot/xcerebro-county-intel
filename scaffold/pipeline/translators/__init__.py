@@ -158,3 +158,4 @@ from scaffold.pipeline.translators import foreclosure_notices  # noqa: E402, F40
 from scaffold.pipeline.translators import parcel_master  # noqa: E402, F401
 from scaffold.pipeline.translators import csv_static_list  # noqa: E402, F401
 from scaffold.pipeline.translators import publicsearch_clerk_recordings  # noqa: E402, F401
+from scaffold.pipeline.translators import tax_sale_lgbs  # noqa: E402, F401
