@@ -42,6 +42,7 @@ TESTS = [
     ("County-agnostic regression", TESTS_DIR / "test_county_agnostic_regression.py"),
     ("Atomic county config writer (v5.1.1-beta)", TESTS_DIR / "test_write_county_config.py"),
     ("Translator registry (v5.1.2-beta)", TESTS_DIR / "test_translator_registry.py"),
+    ("PII guard — operator code", TESTS_DIR / "test_no_pii_in_operator_code.py"),
 ]
 
 # v5.3.0+ — §16-§20 / §02 architecture-contract invariant tests. Auto-discovered
