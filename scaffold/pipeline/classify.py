@@ -106,6 +106,15 @@ def classify_deal_paths(stack: dict, attributes: list) -> list:
             "Vacant parcel facing distress (non-demolition); rehab flip "
             "candidate.")
 
+    # lis_pendens — pending litigation (may be foreclosure, partition, or
+    # quiet-title in judicial states; in non-judicial / deed-of-trust states
+    # it is NOT a foreclosure). Route to messy_title for curative work and
+    # to wholesale as a distress signal.
+    if "lis_pendens" in patterns:
+        add("messy_title", "moderate",
+            "Lis pendens filed — pending litigation clouds title; "
+            "curative work required before closing.")
+
     # wholesale — default path on any lead-generating distress pattern,
     # unless surplus_recovery already short-circuited the routing.
     distress_patterns = patterns - {"transfer"}

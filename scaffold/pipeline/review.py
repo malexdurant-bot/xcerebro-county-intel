@@ -8,6 +8,14 @@ REVIEW_REQUIRED leads; Operator View shows them with the flag set.
 
 from __future__ import annotations
 
+import re
+
+# Entity-name tokens matched as whole words to avoid false positives
+# (e.g. "VINCENT" should not match "INC").
+_ENTITY_RE = re.compile(
+    r"\bLLC\b|\bINC\b|\bCORP\b|\bLP\b|\bTRUST\b", re.IGNORECASE
+)
+
 
 def evaluate_review_queue(lead: dict, *, now: str | None = None) -> dict:
     # Preserve any preset review flags attached upstream (e.g. by a
@@ -31,6 +39,20 @@ def evaluate_review_queue(lead: dict, *, now: str | None = None) -> dict:
         flags.append("high_title_complexity_review")
     if not lead.get("patterns"):
         flags.append("no_pattern_fired")
+    # Lis-pendens hard guard: never auto-promote to dial-ready.
+    # Entity owners or non-residential parcels -> lis_pendens_commercial.
+    # Individual owners on residential parcels -> lis_pendens_review.
+    if "lis_pendens" in (lead.get("patterns") or []):
+        _pd = lead.get("parcel_display") or {}
+        _owner = (lead.get("owner_name") or "").upper()
+        _otype = lead.get("owner_type", "UNKNOWN")
+        _prop_class = (_pd.get("property_class") or "").upper()
+        _is_entity = _otype == "ENTITY" or bool(_ENTITY_RE.search(_owner))
+        _is_residential = "RESIDENT" in _prop_class or "SFR" in _prop_class
+        if _is_entity or (_prop_class and not _is_residential):
+            flags.append("lis_pendens_commercial")
+        else:
+            flags.append("lis_pendens_review")
     # Dedupe while preserving order.
     seen = set()
     deduped = []

@@ -80,6 +80,13 @@ from scaffold.pipeline.owner_name_patterns import (  # noqa: E402
 from scaffold.pipeline.translators import (  # noqa: E402
     lookup as lookup_translator,
 )
+from scaffold.pipeline.state_profile import mode_from_rule_family  # noqa: E402
+
+# Import county-side translator registrations if available.
+try:
+    import scrapers  # noqa: F401, E402
+except ImportError:
+    pass
 
 
 SYNTHETIC_DEFAULT_AS_OF = date(2026, 5, 14)
@@ -257,7 +264,7 @@ def _adapt_translator_signal(sig: dict, source_id: str) -> dict:
         adapted.setdefault("parcel_id", adapted["primary_parcel_id"])
     adapted.setdefault("source", sig.get("source_id", source_id))
     adapted.setdefault(
-        "subtype", sig.get("doc_type_subtype_label") or sig.get("doc_type")
+        "subtype", sig.get("doc_type") or sig.get("doc_type_subtype_label")
     )
     adapted.setdefault("case_number", sig.get("doc_number"))
     return adapted
@@ -297,6 +304,7 @@ def run_pipeline(
     county_id: str = "",
     county_name: str = "",
     state: str = "",
+    state_rule_family: str = "",
     scoring_overrides: Optional[dict] = None,
     as_of: Optional[date] = None,
     per_signal_meta: Optional[dict] = None,
@@ -364,6 +372,7 @@ def run_pipeline(
         enrichment_provider=enrichment_provider,
         approve_needs_review=approve_needs_review,
         scoring_overrides=scoring_overrides,
+        lis_pendens_mode=mode_from_rule_family(state_rule_family),
     )
 
     # --- dashboard payload + Two-Truths invariant -------------------------
@@ -636,6 +645,7 @@ def main() -> int:
             county_id=county_config.get("county_id", ""),
             county_name=county_config.get("county_name", ""),
             state=county_config.get("state", ""),
+            state_rule_family=county_config.get("state_rule_family", ""),
             scoring_overrides=county_config.get("scoring_overrides", {}),
             as_of=as_of,
             build_label=build_label, build_label_reason=build_label_reason,

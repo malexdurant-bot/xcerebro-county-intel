@@ -67,6 +67,7 @@ from scaffold.pipeline.doc_type_bridge import (
 from scaffold.pipeline.normalize import CANONICAL, derive_attributes
 from scaffold.pipeline.review import evaluate_review_queue
 from scaffold.pipeline.score import compute_score
+from scaffold.pipeline.state_profile import resolve_lis_pendens_pattern
 
 
 # ---------------------------------------------------------------------------
@@ -117,15 +118,27 @@ def canonical_doc_type_to_normalized(canonical_doc_type: str) -> Optional[str]:
     return None
 
 
-def pattern_for_canonical_doc_type(canonical_doc_type: str) -> Optional[str]:
+def pattern_for_canonical_doc_type(
+    canonical_doc_type: str, *, lis_pendens_mode: Optional[str] = None
+) -> Optional[str]:
     """Return the `lead_pattern` (foreclosure / tax / lien / estate / code / ...)
     for a lowercased canonical_doc_type, via canonical_doc_types.json's CANONICAL
-    table. Returns None when no pattern is associated (enrichment-only types)."""
+    table. Returns None when no pattern is associated (enrichment-only types).
+
+    When the canonical entry's lead_pattern is the sentinel "by_state_profile",
+    the actual pattern is resolved at runtime from the county's foreclosure
+    regime mode (state_profile.resolve_lis_pendens_pattern). The mode is a
+    per-county config fact (derived from `state_rule_family`), so the same
+    canonical_doc_types.json stays universal across judicial, non-judicial,
+    and hybrid regimes."""
     upper = canonical_doc_type_to_normalized(canonical_doc_type)
     if upper is None:
         return None
     entry = CANONICAL.get(upper, {})
-    return entry.get("lead_pattern")
+    lead_pattern = entry.get("lead_pattern")
+    if lead_pattern == "by_state_profile":
+        return resolve_lis_pendens_pattern(lis_pendens_mode)
+    return lead_pattern
 
 
 # ---------------------------------------------------------------------------
@@ -197,7 +210,9 @@ def _parse_iso_date(s: Optional[str]) -> Optional[date]:
         return None
 
 
-def adapt_matched_lead_to_stack(matched_lead: dict, *, as_of: date) -> dict:
+def adapt_matched_lead_to_stack(
+    matched_lead: dict, *, as_of: date, lis_pendens_mode: Optional[str] = None
+) -> dict:
     """Convert a matched_lead into a stack-shaped dict the retained
     score.compute_score / classify.classify_deal_paths / title_complexity
     helpers consume.
@@ -223,7 +238,9 @@ def adapt_matched_lead_to_stack(matched_lead: dict, *, as_of: date) -> dict:
     for group in signals:
         canonical = group.get("canonical_doc_type") or ""
         normalized = canonical_doc_type_to_normalized(canonical)
-        pattern = pattern_for_canonical_doc_type(canonical)
+        pattern = pattern_for_canonical_doc_type(
+            canonical, lis_pendens_mode=lis_pendens_mode
+        )
         canonical_entry = CANONICAL.get(normalized or "", {})
         document_priority = canonical_entry.get("document_priority", 0)
         latest = _parse_iso_date(group.get("latest_recorded_date"))
@@ -318,6 +335,7 @@ def _parcel_display_from(parcel: dict) -> Optional[dict]:
         "last_sale_price": parcel.get("last_sale_price"),
         "last_sale_date": parcel.get("last_sale_date"),
         "year_built": parcel.get("year_built"),
+        "property_class": parcel.get("property_class"),
     }
 
 
@@ -372,6 +390,7 @@ def score_matched_lead(
     enrichment_provider: Optional[EnrichmentProvider] = None,
     scoring_overrides: Optional[dict] = None,
     multi_property_ids: Optional[set] = None,
+    lis_pendens_mode: Optional[str] = None,
 ) -> dict:
     """Seam — score one matched_lead and emit a scored_lead record.
 
@@ -388,7 +407,9 @@ def score_matched_lead(
     The output is schema-validated; a non-conforming record raises ValueError.
     """
     as_of = as_of or date.today()
-    stack = adapt_matched_lead_to_stack(matched_lead, as_of=as_of)
+    stack = adapt_matched_lead_to_stack(
+        matched_lead, as_of=as_of, lis_pendens_mode=lis_pendens_mode
+    )
 
     # Enrichment (R3 iii) — optional.
     parcel: Optional[dict] = None
@@ -417,6 +438,15 @@ def score_matched_lead(
     deal_paths = classify_deal_paths(stack, attributes)
     title = title_complexity(stack)
 
+    # Hybrid-state lis pendens: a LIS_PENDENS signal whose state profile
+    # resolved to None (e.g. MD) has no pattern.  Detect this and seed a
+    # review flag so ALL such leads reach REVIEW_REQUIRED without the
+    # commercial/review entity split.
+    _has_unresolved_lp = any(
+        s.get("normalized_doc_type") == "LIS_PENDENS" and s.get("pattern") is None
+        for s in stack["active_signals"]
+    )
+
     # Run the retained review-queue evaluator over a lead-shaped dict so the
     # review-flag / lead_status transition matches the monolith's behavior.
     # The transient dict mirrors the monolith's `build_lead_from_stack`
@@ -425,6 +455,9 @@ def score_matched_lead(
         (s.get("event_date") for s in stack["active_signals"] if s.get("event_date")),
         default=None,
     )
+    _seed_flags = list(_seed_review_flags(matched_lead))
+    if _has_unresolved_lp:
+        _seed_flags.append("lis_pendens_unconfirmed_regime")
     transient = {
         "lead_id": matched_lead.get("lead_id"),
         "primary_parcel_id": matched_lead.get("primary_parcel_id"),
@@ -435,7 +468,12 @@ def score_matched_lead(
             "doc_type_review_required": False,
         },
         # Honor the matched_lead's REVIEW_REQUIRED routing reason, if any.
-        "review_flags": list(_seed_review_flags(matched_lead)),
+        "review_flags": _seed_flags,
+        # Carried so the review-queue evaluator can enforce lis_pendens
+        # routing (entity split) on non-judicial lis pendens.
+        "parcel_display": parcel_display,
+        "owner_name": matched_lead.get("owner_name", ""),
+        "owner_type": matched_lead.get("owner_type", "UNKNOWN"),
     }
     transient = evaluate_review_queue(transient, now=_now_iso())
 
@@ -550,6 +588,7 @@ def score_matched_leads(
     enrichment_provider: Optional[EnrichmentProvider] = None,
     scoring_overrides: Optional[dict] = None,
     multi_property_ids: Optional[set] = None,
+    lis_pendens_mode: Optional[str] = None,
 ) -> list:
     """Batch helper — call score_matched_lead over every matched_lead in
     deterministic order (sorted by lead_id), returning the scored_lead list."""
@@ -561,6 +600,7 @@ def score_matched_leads(
             enrichment_provider=enrichment_provider,
             scoring_overrides=scoring_overrides,
             multi_property_ids=multi_property_ids,
+            lis_pendens_mode=lis_pendens_mode,
         )
         for m in ordered
     ]

@@ -382,7 +382,7 @@
       "source_priority": "P0"
     },
     "LIS_PENDENS": {
-      "lead_pattern": "foreclosure",
+      "lead_pattern": "by_state_profile",
       "subtype": "lis_pendens",
       "source_class": "lead_generating",
       "default_confidence": 90,
