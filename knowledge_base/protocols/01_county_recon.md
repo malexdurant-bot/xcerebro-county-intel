@@ -1,4 +1,4 @@
-# 01. County Recon Protocol (v5.1.2-beta+)
+# 01. County Recon Protocol (v5.5.0)
 
 The county recon protocol is the deterministic procedure Claude Code follows during
 Phase 0 of a county build. It turns a freshly bootstrapped county run folder into a
@@ -16,13 +16,18 @@ amendment adds the lead type sweep and three mandatory Phase 0 sub-steps (PDF/sa
 inspection, documented API discovery, bulk-data availability classification) that apply
 WITHIN Phases 0.A–0.H, before any source is classified deferred or limited-coverage.
 
+**v5.5.0 amendment.** Phase 0.A now requires five additional mandatory search queries
+(§01.27) covering bankruptcy/federal courts, public notices, land bank/vacant property,
+property tax treasurer, and UCC/entity enrichment portals. The canonical lead type sweep
+expands from 27 to 29 types (adding Bankruptcy Notice and Public Notice — see §16.B).
+UCC/entity portals are classified as `ENRICHMENT_SOURCE` + `build_priority: future` —
+recon locates and records the portal URL but does not build an adapter.
+
 ---
 
 ## 01.0 Status and scope
 
-- **Version:** v5.1.2-beta+ (extends the framework as currently committed; does not
-  require any later patch to function).
-- **Date:** 2026-05-17.
+- **Version:** v5.5.0 (extends v5.3.0; does not require any later patch to function).\n- **Date:** 2026-06-26.
 - **Purpose:** a county-agnostic Phase 0 recon procedure.
 - **Authoritative for:** Phase 0 work for any new county, after
   `scaffold/bootstrap_county.py` has created the flat run folder and the user has
@@ -151,10 +156,8 @@ Required search queries, in priority order:
     10. "<state_name> appraisal district"  OR  "<state_name> property assessor"
         (state-dependent enrichment search)
 
-Optional additional queries may be derived from the state-specific event types
-described in `knowledge_base/domain/02_signals_and_sources.md`. The protocol itself
-contains no state-specific query text — additional queries are composed at runtime from
-domain knowledge, never hardcoded here.
+The five additional queries required by the v5.5.0 amendment (§01.27) are appended
+after the core ten above and run in the same Phase 0.A pass.
 
 For each candidate URL found:
 
@@ -580,13 +583,13 @@ that does not produce a complete matrix cannot proceed to Build Mode.
 
 ## 01.21 Lead Type Sweep requirement
 
-Every county recon MUST walk the full canonical lead type sweep — the 27 lead types
+Every county recon MUST walk the full canonical lead type sweep — the 29 lead types
 enumerated in `§16.B` (Foreclosure, Trustee Sale, Notice of Trustee Sale, Notice of
 Substitute Trustee Sale, Sheriff Sale, Tax Lien Foreclosure, Tax Sale, Tax Sale
 Certificate, Tax Delinquency, Lis Pendens, Civil Judgment, Abstract of Judgment,
 Mechanic Lien, Construction Lien, Federal Tax Lien, State Tax Lien, Probate, Affidavit
 of Heirship, Executor Deed, Administrator Deed, Code Lien, Demolition, Condemnation,
-Eviction, Divorce, Bankruptcy, Surplus).
+Eviction, Divorce, Bankruptcy, Surplus, Bankruptcy Notice, Public Notice).
 
 For each lead type, recon MUST answer: where is the official source of record? what is
 its URL? what is its access pattern? is it buildable? A recon that does not produce a
@@ -689,3 +692,74 @@ trustee-sale portals, foreclosure-listing portals, auction vendors, official ven
 portals, and posted-notices pages are all valid primary event sources. Recon does not
 halt merely because clerk or recorder access is blocked, provided another verified
 primary event source exists for at least one lead type.
+
+---
+
+## 01.27 v5.5.0 amendment — Additional mandatory Phase 0.A search queries
+
+v5.5.0 adds five mandatory search queries to Phase 0.A. These run after the core ten
+queries in §01.6 in the same Phase 0.A pass. Every new county recon MUST execute all
+fifteen queries before declaring source discovery complete.
+
+Required additional queries (11–15), in order:
+
+    11. "<county_name> <state_name> bankruptcy court federal district"
+        Purpose: locate the federal bankruptcy court district serving this county.
+        Source role: PRIMARY_LEAD_SOURCE (Bankruptcy Notice lead type).
+        Expected authority: U.S. Bankruptcy Court for the district; PACER.
+        Build priority: high_value — PACER requires a funded account; classify
+        access as LOGIN_REQUIRED or PAID_SUBSCRIPTION_REQUIRED and flag for
+        operator decision. Do not auto-resolve.
+
+    12. "<county_name> <state_name> public notices legal foreclosure estate"
+        Purpose: locate the county's official or state-designated public notice
+        publication (legal newspaper, state public notice portal, or official
+        county posting page).
+        Source role: PRIMARY_LEAD_SOURCE (Public Notice lead type); may also surface
+        Foreclosure, Sheriff Sale, Probate, and Tax Sale leads ahead of their
+        recorded counterparts — filing date precedes recording date.
+        Expected authority: official state public notice site (.gov or
+        state-designated), county-linked newspaper of record, or sheriff posting page.
+        Build priority: high_value.
+
+    13. "<county_name> <state_name> land bank vacant property"
+        Purpose: locate the county or city land bank and its available-property list.
+        Source role: PRIMARY_LEAD_SOURCE (Demolition, Condemnation, Eviction signals
+        for land-bank-owned or land-bank-eligible parcels).
+        Expected authority: municipal or county land bank authority (.gov or
+        official city/county link).
+        Build priority: high_value.
+
+    14. "<county_name> <state_name> property tax treasurer billing delinquent"
+        Purpose: locate the county treasurer's tax billing and delinquency portal,
+        DISTINCT from the tax sale portal already found in query 6.
+        Source role: PRIMARY_LEAD_SOURCE (Tax Delinquency lead type — active
+        delinquent balance, not yet in tax sale).
+        Expected authority: county treasurer or tax collector (.gov or official
+        county link).
+        Build priority: mvp_required when the tax sale portal does not expose
+        current delinquency balances; otherwise enrichment.
+
+    15. "<state_name> UCC lien search" AND "<county_name> <state_name> business entity
+        search"
+        Purpose: locate the state UCC filing portal and the state business entity /
+        LLC registry.
+        Source role: ENRICHMENT_SOURCE — UCC liens and entity lookups are NOT
+        lead-originating; they validate ownership structure and lien position after
+        a lead is generated from a primary source.
+        Build priority: future — recon MUST record the portal URL and access status
+        but MUST NOT build an adapter in the current phase. Classify as
+        `build_priority: future` in the county config.
+        Note: do NOT add UCC or entity sources to the P0 distress source count or
+        use them in the Build Eligibility Gate verdict. They are enrichment-only.
+
+Classification rules for the new queries:
+
+- Queries 11–14 follow the same verification pipeline as queries 1–10 (§01.7–§01.13).
+  Sources discovered via these queries are added to `source_discovery.md` and proceed
+  through all subsequent Phase 0 steps.
+- Query 15 (UCC/entity) produces ENRICHMENT_SOURCE entries only. They skip the
+  PRIMARY_LEAD_SOURCE verification path but are still recorded in
+  `source_role_classification.md` and fingerprinted.
+- All fifteen queries must be documented in `api_discovery_report.md` with the
+  outcome of each (source found / not found / blocked / enrichment-only).

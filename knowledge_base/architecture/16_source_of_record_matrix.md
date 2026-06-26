@@ -14,8 +14,8 @@ artifact list. The matrix *instances* are county-specific and live under
 
 ## 16.0 Status and scope
 
-- **Version:** v5.3.0 (Session A1 of the v5.3.0 patch cycle — Gaps 1, 2, 3 foundation).
-- **Date:** 2026-05-18.
+- **Version:** v5.5.0 (Session A1 of the v5.5.0 patch cycle — source category expansion).
+- **Date:** 2026-06-26.
 - **Authoritative for:** every county recon. No county may enter Build Mode without a
   complete Source-of-Record Matrix.
 - **Scope:** the matrix schema (mirrored in `config/counties/_schema.json`), the lead
@@ -47,7 +47,7 @@ Without a complete matrix, recon is incomplete and Build Mode cannot begin
 
 ## 16.B Required lead type sweep
 
-Every county recon MUST investigate the full canonical lead type sweep. The 27 canonical
+Every county recon MUST investigate the full canonical lead type sweep. The 29 canonical
 lead types:
 
     1.  Foreclosure
@@ -77,13 +77,32 @@ lead types:
     25. Divorce
     26. Bankruptcy
     27. Surplus
+    28. Bankruptcy Notice
+    29. Public Notice
 
 Each lead type is classified per-county. A lead type that does not exist in the county's
 state carries `state_applicability = NOT_APPLICABLE_IN_STATE`; one whose applicability
 cannot be determined carries `UNKNOWN`; otherwise `APPLICABLE`. Each lead type also
 carries a per-lead-type `status` (see §16.C). A recon that does not produce a complete
-sweep — an entry for every one of the 27 lead types — is incomplete and cannot proceed
+sweep — an entry for every one of the 29 lead types — is incomplete and cannot proceed
 to Build Mode.
+
+**v5.5.0 notes on the two new lead types:**
+
+- **Bankruptcy Notice (28)** — a federal court filing (Chapter 7, 11, 13) in the U.S.
+  Bankruptcy Court for the county's federal district. Distinct from the existing
+  `Bankruptcy` type (which covers recorded abstract-of-judgment instruments post-filing).
+  Expected authority: U.S. Bankruptcy Court / PACER. Typically `LOGIN_REQUIRED` or
+  `PAID_SUBSCRIPTION_REQUIRED`; flag for operator decision. Source role:
+  `PRIMARY_LEAD_SOURCE`.
+
+- **Public Notice (29)** — a legally-required published notice in the county's
+  newspaper of record, state public notice portal, or official county posting page.
+  Covers foreclosure notices, sheriff sale notices, estate notices, and tax notices
+  published before they appear in recorded instruments. Filing date precedes recording
+  date — this source may surface leads earlier than the recorder. Expected authority:
+  official state public notice site, county-linked newspaper of record, or sheriff
+  posting page. Source role: `PRIMARY_LEAD_SOURCE`.
 
 ---
 
