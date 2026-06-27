@@ -33,10 +33,14 @@ data/evidence/*.pdf
 
 # Per-county run logs and transient artifacts
 # The runs/<slug>/ folder itself IS committed (launch files, manifests, notes).
-# But per-county logs are scratch and not committed.
+# But per-county logs and generated pipeline output are scratch, not committed.
 runs/*/logs/
 runs/*/tmp/
 runs/*/.cache/
+runs/*/pipeline_output/
+
+# Generated dashboard payload (live data — not committed)
+dashboard/data/
 
 # Secrets — never commit
 .env

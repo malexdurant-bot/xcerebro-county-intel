@@ -233,6 +233,70 @@ def main() -> int:
           and sl_fail["parcel_display"] is None)
 
     # =======================================================================
+    # Part 4b — string monetary values from live assessor APIs do not crash
+    # derive_attributes (regression guard for TypeError in normalize.py).
+    # ArcGIS assessor responses may return SALE_PRICE / FCV_CUR as strings
+    # ("$325,000", "325000", "") or single-element lists.  All must coerce
+    # safely; an uncoercible value is treated as None (no high_equity attr).
+    # =======================================================================
+    def string_money_provider(pid):
+        return {
+            "parcel_id": pid,
+            "situs_address": "42 STRING MONEY ST",
+            "situs_state": "AZ",
+            "owner_mailing_address": "42 STRING MONEY ST",
+            "owner_mailing_city": "PHOENIX",
+            "owner_mailing_state": "AZ",
+            "owner_mailing_zip": "85001",
+            # String-formatted monetary fields — the crash case.
+            "assessed_value": "$650,000",
+            "last_sale_price": "325000",
+            "last_sale_date": "2008-03-01",
+            "year_built": 2001,
+        }
+
+    sl_str = seam.score_matched_lead(matched, as_of=date(2026, 5, 14),
+                                     enrichment_provider=string_money_provider)
+    check("score (string money): string monetary fields do not crash scoring",
+          sl_str["enrichment_status"] == "ENRICHED")
+    check("score (string money): parcel_display.assessed_value coerced to float "
+          "not str (schema requires number)",
+          isinstance(sl_str["parcel_display"]["assessed_value"], float))
+    check("score (string money): parcel_display.last_sale_price coerced to float "
+          "not str",
+          isinstance(sl_str["parcel_display"]["last_sale_price"], float))
+    check("score (string money): parcel_display.year_built coerced to int not str",
+          isinstance(sl_str["parcel_display"]["year_built"], int))
+    check("score (string money): high_equity fires when '$650,000' / '325000' "
+          "ratio >= 2.0 threshold",
+          "high_equity" in sl_str["attributes"])
+    check("score (string money): long_term_owned fires for 2008 sale vs 2026 as_of",
+          "long_term_owned" in sl_str["attributes"])
+
+    def string_money_invalid_provider(pid):
+        return {
+            "parcel_id": pid,
+            "situs_address": "1 INVALID MONEY LN",
+            "situs_state": "AZ",
+            "assessed_value": "N/A",
+            "last_sale_price": ["multiple", "values"],
+            "last_sale_date": None,
+            "year_built": "",
+        }
+
+    sl_inv = seam.score_matched_lead(matched, as_of=date(2026, 5, 14),
+                                     enrichment_provider=string_money_invalid_provider)
+    check("score (string money): invalid / multi-element values treated as None "
+          "— no crash, no high_equity",
+          sl_inv["enrichment_status"] == "ENRICHED"
+          and "high_equity" not in sl_inv["attributes"])
+    check("score (string money): unparseable parcel_display fields are null not str "
+          "(schema: number|null, integer|null)",
+          sl_inv["parcel_display"]["assessed_value"] is None
+          and sl_inv["parcel_display"]["last_sale_price"] is None
+          and sl_inv["parcel_display"]["year_built"] is None)
+
+    # =======================================================================
     # Part 5 — REVIEW_REQUIRED matched_lead → REVIEW_REQUIRED scored_lead.
     # =======================================================================
     matched_rr = _matched_lead(

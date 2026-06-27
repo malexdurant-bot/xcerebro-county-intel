@@ -80,6 +80,9 @@ EXCLUDED_DIR_COMPONENTS = {
     # gitignored raw pulls — belt-and-suspenders even though .gitignore covers
     # them, in case the test is run on a dirty tree before commit.
     "raw", "logs", "tmp", ".cache", "evidence",
+    # generated pipeline output (live matched_leads, scored_leads, etc.) —
+    # runtime artifacts, not operator-authored code; gitignored via .gitignore.
+    "pipeline_output",
 }
 
 # ---------------------------------------------------------------------------

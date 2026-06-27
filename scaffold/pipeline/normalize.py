@@ -313,8 +313,8 @@ def derive_attributes(
     # high_equity — assessed_value / last_sale_price >=
     # high_equity_assessed_to_sale_ratio (default 2.0).
     ratio_threshold = overrides.get("high_equity_assessed_to_sale_ratio", 2.0)
-    assessed = parcel.get("assessed_value") or 0
-    last_sale = parcel.get("last_sale_price") or 0
+    assessed = to_numeric(parcel.get("assessed_value"))
+    last_sale = to_numeric(parcel.get("last_sale_price"))
     if assessed and last_sale and assessed >= last_sale * ratio_threshold:
         attrs.add("high_equity")
 
@@ -370,4 +370,47 @@ def _parse_date(s):
     try:
         return date.fromisoformat(str(s)[:10])
     except (ValueError, TypeError):
+        return None
+
+
+def to_numeric(value) -> float | None:
+    """Coerce a parcel monetary/value field to float, or return None on failure.
+
+    Handles the formats live assessor APIs produce: plain numbers (int/float),
+    formatted strings ("$325,000" / "  258,800" / "325000"), single-element
+    lists from some ArcGIS responses, and empty/null values.  Returns None for
+    anything that cannot be safely interpreted as a number so callers can skip
+    comparisons rather than crash.
+    """
+    if value is None:
+        return None
+    # Single-element list from some ArcGIS FeatureServer responses.
+    if isinstance(value, (list, tuple)):
+        return to_numeric(value[0]) if len(value) == 1 else None
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        cleaned = value.strip().lstrip("$").replace(",", "").strip()
+        if not cleaned:
+            return None
+        try:
+            return float(cleaned)
+        except ValueError:
+            return None
+    return None
+
+
+def to_int(value) -> int | None:
+    """Coerce a parcel integer field (e.g. year_built) to int, or None.
+
+    Accepts int, float (truncates), or strings like "2000" or "2000.0".
+    Returns None for empty strings, None, multi-element lists, or values
+    that cannot be parsed as a whole number.
+    """
+    n = to_numeric(value)
+    if n is None:
+        return None
+    try:
+        return int(n)
+    except (ValueError, OverflowError):
         return None

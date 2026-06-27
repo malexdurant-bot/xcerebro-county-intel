@@ -64,7 +64,7 @@ from scaffold.pipeline.doc_type_bridge import (
     REGISTRY_LOWER_KEYS,
     REGISTRY_UPPER_KEYS,
 )
-from scaffold.pipeline.normalize import CANONICAL, derive_attributes
+from scaffold.pipeline.normalize import CANONICAL, derive_attributes, to_int, to_numeric
 from scaffold.pipeline.review import evaluate_review_queue
 from scaffold.pipeline.score import compute_score
 from scaffold.pipeline.state_profile import resolve_lis_pendens_pattern
@@ -320,7 +320,13 @@ is fine — the lead is still scored without it."""
 
 def _parcel_display_from(parcel: dict) -> Optional[dict]:
     """Project the parcel-master fields the dashboard renders. Returns None
-    when `parcel` is None — the UNENRICHED path."""
+    when `parcel` is None — the UNENRICHED path.
+
+    Monetary fields are coerced to float and year fields to int so that
+    parcel_display always satisfies the scored_lead_record.schema.json type
+    constraints regardless of how the enrichment_provider formatted them
+    (live assessor APIs may return strings like '$258,800' or '2000').
+    """
     if not parcel:
         return None
     return {
@@ -331,10 +337,10 @@ def _parcel_display_from(parcel: dict) -> Optional[dict]:
         "owner_mailing_city": parcel.get("owner_mailing_city"),
         "owner_mailing_state": parcel.get("owner_mailing_state"),
         "owner_mailing_zip": parcel.get("owner_mailing_zip"),
-        "assessed_value": parcel.get("assessed_value"),
-        "last_sale_price": parcel.get("last_sale_price"),
+        "assessed_value": to_numeric(parcel.get("assessed_value")),
+        "last_sale_price": to_numeric(parcel.get("last_sale_price")),
         "last_sale_date": parcel.get("last_sale_date"),
-        "year_built": parcel.get("year_built"),
+        "year_built": to_int(parcel.get("year_built")),
         "property_class": parcel.get("property_class"),
     }
 
