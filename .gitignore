@@ -30,6 +30,7 @@ Thumbs.db
 data/raw/
 data/cache/
 data/exports/
+data/state/
 data/runs/*/raw/
 data/evidence/*.pdf
 

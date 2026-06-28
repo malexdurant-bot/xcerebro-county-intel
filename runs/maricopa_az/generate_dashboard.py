@@ -19,17 +19,62 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+_THIS_DIR = Path(__file__).parent
+for _p in (str(REPO_ROOT), str(_THIS_DIR)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from scaffold.pipeline.run_pipeline_staged import build_dashboard_payload
 
 SCORED_LEADS_PATH = REPO_ROOT / "runs" / "maricopa_az" / "pipeline_output" / "scored_leads.json"
+LEAD_HISTORY_PATH = REPO_ROOT / "data" / "state" / "maricopa_lead_history.sqlite"
 OUT_DIR = REPO_ROOT / "dashboard" / "data"
 OUT_PATH = OUT_DIR / "leads.json"
+
+
+def _load_history_by_id() -> dict[str, dict]:
+    """Load history rows keyed by lead_id, if the history DB exists."""
+    if not LEAD_HISTORY_PATH.exists():
+        return {}
+    try:
+        from lead_history import LeadHistory
+        with LeadHistory(LEAD_HISTORY_PATH) as h:
+            return h.get_history_by_id()
+    except Exception as exc:
+        print(f"  NOTE: could not load lead history ({exc}) — temporal fields omitted")
+        return {}
+
+
+def _enrich_temporal(record: dict, history_by_id: dict[str, dict], today: str) -> dict:
+    """Add temporal dashboard fields from lead history."""
+    lead_id = record.get("lead_id") or ""
+    row = history_by_id.get(lead_id)
+    if not row:
+        return record
+
+    first_seen = row.get("first_seen_date") or today
+    last_seen = row.get("last_seen_date") or today
+    score_delta = row.get("score_delta") or 0
+
+    try:
+        days_since = (date.fromisoformat(today) - date.fromisoformat(first_seen)).days
+    except (ValueError, TypeError):
+        days_since = 0
+
+    return {
+        **record,
+        "first_seen_date": first_seen,
+        "last_seen_date": last_seen,
+        "is_new_today": first_seen == today,
+        "is_new_last_24h": first_seen >= today,
+        "days_since_first_seen": days_since,
+        "updated_today": last_seen == today and first_seen != today,
+        "score_delta": score_delta,
+    }
 
 
 def main() -> None:
@@ -40,6 +85,11 @@ def main() -> None:
     scored_leads: list[dict] = json.loads(SCORED_LEADS_PATH.read_text(encoding="utf-8"))
     print(f"Loaded {len(scored_leads)} scored leads from {SCORED_LEADS_PATH.name}")
 
+    today = date.today().isoformat()
+    history_by_id = _load_history_by_id()
+    if history_by_id:
+        print(f"  Loaded history for {len(history_by_id):,} leads → adding temporal fields")
+
     payload = build_dashboard_payload(
         scored_leads,
         semantic_verdict="DEPLOY_OK",
@@ -48,6 +98,12 @@ def main() -> None:
         mode="live",
         build_label="FULL_BUILD",
     )
+
+    if history_by_id:
+        payload["records"] = [
+            _enrich_temporal(r, history_by_id, today)
+            for r in (payload.get("records") or [])
+        ]
 
     # Add review_status_counts (not in build_dashboard_payload — computed here)
     review_counts: dict[str, int] = {}
