@@ -99,6 +99,7 @@ def load_eviction_jsonl(path: Path, max_records: int) -> list[dict]:
 
 def build_eviction_raw_events(
     raw_records: list[dict],
+    verbose: bool = False,
 ) -> list[dict]:
     """Convert eviction records to raw_event_records.
 
@@ -128,7 +129,8 @@ def build_eviction_raw_events(
         if party_name:
             parties = [{"name": party_name, "name_type": "OTHER"}]
 
-        print(f"  [EVICT {i+1}] case={case_number}  party_len={len(party_name or '')}  role=OTHER→REVIEW_REQUIRED")
+        if verbose:
+            print(f"  [EVICT {i+1}] party_len={len(party_name or '')}  role=OTHER→REVIEW_REQUIRED")
 
         raw_event: dict = {
             "raw_event_id": raw_rec["raw_record_id"],

@@ -143,7 +143,7 @@ def load_civil_jsonl(path: Path, max_records: int) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 
-def build_civil_raw_events(raw_records: list[dict]) -> list[dict]:
+def build_civil_raw_events(raw_records: list[dict], verbose: bool = False) -> list[dict]:
     """Convert civil case records to raw_event_records.
 
     Case type is inferred from the case_number prefix (LP/FC/CV/MC/SC →
@@ -174,7 +174,8 @@ def build_civil_raw_events(raw_records: list[dict]) -> list[dict]:
         class_counts[classification] = class_counts.get(classification, 0) + 1
 
         if classification == "noise":
-            print(f"  [CIVIL {i+1}] case={case_number}  classification=NOISE → skip")
+            if verbose:
+                print(f"  [CIVIL {i+1}] classification=NOISE → skip")
             continue
 
         # Build party list — skip portal privacy placeholders
@@ -187,10 +188,11 @@ def build_civil_raw_events(raw_records: list[dict]) -> list[dict]:
         else:
             party_tag = "no_party→REVIEW_REQUIRED"
 
-        print(
-            f"  [CIVIL {i+1}] case={case_number}  doc_type={canonical_doc_type}  "
-            f"class={classification}  party={party_tag}"
-        )
+        if verbose:
+            print(
+                f"  [CIVIL {i+1}] doc_type={canonical_doc_type}  "
+                f"class={classification}  party={party_tag}"
+            )
 
         raw_event: dict = {
             "raw_event_id": raw_rec["raw_record_id"],

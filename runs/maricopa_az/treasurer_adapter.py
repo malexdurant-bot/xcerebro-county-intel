@@ -81,6 +81,7 @@ def build_treasurer_raw_events(
     raw_records: list[dict],
     resolver: APNResolver,
     parcel_dict_from_attrs: Callable[[dict], dict],
+    verbose: bool = False,
 ) -> tuple[list[dict], dict[str, dict]]:
     """Convert treasurer records to raw_event_records + parcel_by_apn mapping.
 
@@ -107,7 +108,8 @@ def build_treasurer_raw_events(
         captured_at = raw_rec.get("source_fetched_at")
         apn_display = apn_dash or apn or "???"
 
-        print(f"  [TREAS {i+1}] {apn_display} ({layer_label})", end="")
+        if verbose:
+            print(f"  [TREAS {i+1}] {layer_label}", end="")
 
         # Assessor lookup by APN (direct — no name guessing)
         attrs: Optional[dict] = resolver.resolve_by_apn(apn_dash=apn_dash, apn=apn)
@@ -120,7 +122,8 @@ def build_treasurer_raw_events(
             if owner_name:
                 parties = [{"name": owner_name, "name_type": "TP"}]
                 assessor_hit += 1
-                print(f"  → owner resolved", end="")
+                if verbose:
+                    print("  → owner resolved", end="")
 
             # Use APN from assessor for consistency
             assessor_apn = (attrs.get("APN_DASH") or attrs.get("APN") or "").strip()
@@ -132,9 +135,11 @@ def build_treasurer_raw_events(
                 parcel_by_apn[resolved_apn] = parcel
         else:
             assessor_miss += 1
-            print(f"  → assessor miss", end="")
+            if verbose:
+                print("  → assessor miss", end="")
 
-        print()
+        if verbose:
+            print()
 
         raw_event: dict = {
             "raw_event_id": raw_rec["raw_record_id"],

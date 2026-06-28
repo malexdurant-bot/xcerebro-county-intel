@@ -186,6 +186,7 @@ def build_probate_raw_events(
     raw_records: list[dict],
     detail_by_id: dict[str, dict] | None = None,
     parcel_match_by_id: dict[str, dict] | None = None,
+    verbose: bool = False,
 ) -> list[dict]:
     """Convert probate case records to raw_event_records.
 
@@ -241,7 +242,8 @@ def build_probate_raw_events(
 
         if classification in ("noise", "unsupported"):
             class_counts["unsupported" if classification == "unsupported" else "noise_skipped"] += 1
-            print(f"  [PROBATE {i+1}] case_prefix=OTHER  classification={classification.upper()} → skip")
+            if verbose:
+                print(f"  [PROBATE {i+1}] classification={classification.upper()} → skip")
             continue
 
         # Merge detail if available
@@ -251,10 +253,8 @@ def build_probate_raw_events(
             # Skip confirmed noise cases (Guardianship / Conservatorship)
             if detail.get("is_noise_case"):
                 class_counts["noise_skipped"] += 1
-                print(
-                    f"  [PROBATE {i+1}] case={case_number}  "
-                    f"case_type={detail.get('case_type_raw')!r}  NOISE → skip"
-                )
+                if verbose:
+                    print(f"  [PROBATE {i+1}] case_type={detail.get('case_type_raw')!r}  NOISE → skip")
                 continue
 
             # Use detail-confirmed subtype if available
@@ -310,11 +310,11 @@ def build_probate_raw_events(
             elif conf == MATCH_AMBIGUOUS:
                 class_counts["parcel_ambiguous"] += 1
 
-        print(
-            f"  [PROBATE {i+1}] case={case_number}  "
-            f"doc_type={canonical_doc_type}  {party_tag}"
-            + (f"  parcel={parcel_match_meta.get('match_confidence', 'no_match')}" if match else "")
-        )
+        if verbose:
+            print(
+                f"  [PROBATE {i+1}] doc_type={canonical_doc_type}  {party_tag}"
+                + (f"  parcel={parcel_match_meta.get('match_confidence', 'no_match')}" if match else "")
+            )
 
         raw_event: dict = {
             "raw_event_id": raw_rec["raw_record_id"],

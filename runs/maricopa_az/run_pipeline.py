@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -83,6 +84,7 @@ CIVIL_JSONL_PATH = REPO_ROOT / "data" / "raw" / "superior_court_civil.jsonl"
 PROBATE_JSONL_PATH = REPO_ROOT / "data" / "raw" / "superior_court_probate.jsonl"
 PROBATE_DETAIL_JSONL_PATH = REPO_ROOT / "data" / "raw" / "superior_court_probate_detail.jsonl"
 PARCEL_INDEX_PATH = REPO_ROOT / "data" / "cache" / "parcel_owner_index.jsonl"
+PROBATE_MATCH_CACHE_PATH = REPO_ROOT / "data" / "cache" / "probate_parcel_match_cache.json"
 OUT_DIR = Path(__file__).parent / "pipeline_output"
 
 # ---------------------------------------------------------------------------
@@ -209,6 +211,30 @@ def _recorder_to_raw_event(
     }
 
 
+def _load_probate_match_cache() -> Optional[dict]:
+    """Return cached probate parcel matches, or None if stale/missing."""
+    if not PROBATE_MATCH_CACHE_PATH.exists():
+        return None
+    cache_mtime = PROBATE_MATCH_CACHE_PATH.stat().st_mtime
+    if PARCEL_INDEX_PATH.exists() and PARCEL_INDEX_PATH.stat().st_mtime > cache_mtime:
+        print("  Probate match cache stale (parcel index updated) — will recompute")
+        return None
+    if PROBATE_DETAIL_JSONL_PATH.exists() and PROBATE_DETAIL_JSONL_PATH.stat().st_mtime > cache_mtime:
+        print("  Probate match cache stale (detail file updated) — will recompute")
+        return None
+    try:
+        with open(PROBATE_MATCH_CACHE_PATH, encoding="utf-8") as fh:
+            return json.load(fh)
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _save_probate_match_cache(payload: dict) -> None:
+    PROBATE_MATCH_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(PROBATE_MATCH_CACHE_PATH, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh)
+
+
 def _load_jsonl(path: Path, max_records: int) -> list[dict]:
     records = []
     with open(path, encoding="utf-8") as fh:
@@ -230,64 +256,77 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--max-records", type=int, default=5,
-        help="Max NOTS records to process (default: 5, per bounded-test rule)",
+        help="Max records per source (default: 5, per bounded-test rule)",
+    )
+    ap.add_argument(
+        "--verbose", action="store_true", default=False,
+        help="Print per-record debug lines (APNs/case numbers suppressed by default)",
     )
     args = ap.parse_args()
 
-    print(f"=== Maricopa Combined Pipeline (NOTS + Treasurer + Eviction + Civil + Probate, max_records={args.max_records}) ===")
-    print(f"NOTS input:       {NOTS_JSONL_PATH}")
-    print(f"Treasurer input:  {TREASURER_JSONL_PATH}")
-    print(f"Eviction input:   {EVICTION_JSONL_PATH}")
-    print(f"Civil input:      {CIVIL_JSONL_PATH}")
-    print(f"Probate input:    {PROBATE_JSONL_PATH}")
-    print(f"Output:           {OUT_DIR}")
+    _t_wall = time.perf_counter()
+    _stage_times: dict[str, float] = {}
+
+    def _log_stage(name: str, t_start: float) -> float:
+        elapsed = time.perf_counter() - t_start
+        _stage_times[name] = elapsed
+        print(f"  [timing] {name}: {elapsed:.2f}s")
+        return time.perf_counter()
+
+    print(f"=== Maricopa Combined Pipeline (max_records={args.max_records}) ===")
+    print(f"Output: {OUT_DIR}")
     print()
 
-    # Step 1 — Load bounded samples
+    # -------------------------------------------------------------------------
+    # Stage 1 — Raw source loading
+    # -------------------------------------------------------------------------
     if not NOTS_JSONL_PATH.exists():
         print(f"ERROR: {NOTS_JSONL_PATH} not found. Run the recorder scraper first.")
         sys.exit(1)
 
+    t = time.perf_counter()
     nots_raw_records = _load_jsonl(NOTS_JSONL_PATH, args.max_records)
-    print(f"Loaded {len(nots_raw_records)} NOTS records from {NOTS_JSONL_PATH.name}")
+    print(f"Loaded {len(nots_raw_records):,} NOTS records")
 
     treasurer_raw_records: list[dict] = []
     if TREASURER_JSONL_PATH.exists():
         treasurer_raw_records = load_treasurer_jsonl(TREASURER_JSONL_PATH, args.max_records)
-        print(f"Loaded {len(treasurer_raw_records)} treasurer records from {TREASURER_JSONL_PATH.name}")
+        print(f"Loaded {len(treasurer_raw_records):,} treasurer records")
     else:
-        print(f"NOTE: {TREASURER_JSONL_PATH.name} not found — run fetch_treasurer.cmd first.")
+        print(f"NOTE: {TREASURER_JSONL_PATH.name} not found — skipping treasurer")
 
     eviction_raw_records: list[dict] = []
     if EVICTION_JSONL_PATH.exists():
         eviction_raw_records = load_eviction_jsonl(EVICTION_JSONL_PATH, args.max_records)
-        print(f"Loaded {len(eviction_raw_records)} eviction records from {EVICTION_JSONL_PATH.name}")
+        print(f"Loaded {len(eviction_raw_records):,} eviction records")
     else:
-        print(f"NOTE: {EVICTION_JSONL_PATH.name} not found — run fetch_evictions.cmd first.")
+        print(f"NOTE: {EVICTION_JSONL_PATH.name} not found — skipping eviction")
 
     civil_raw_records: list[dict] = []
     if CIVIL_JSONL_PATH.exists():
         civil_raw_records = load_civil_jsonl(CIVIL_JSONL_PATH, args.max_records)
-        print(f"Loaded {len(civil_raw_records)} civil records from {CIVIL_JSONL_PATH.name}")
+        print(f"Loaded {len(civil_raw_records):,} civil records")
     else:
-        print(f"NOTE: {CIVIL_JSONL_PATH.name} not found — run fetch_civil.cmd first.")
+        print(f"NOTE: {CIVIL_JSONL_PATH.name} not found — skipping civil")
 
     probate_raw_records: list[dict] = []
     if PROBATE_JSONL_PATH.exists():
         probate_raw_records = load_probate_jsonl(PROBATE_JSONL_PATH, args.max_records)
-        print(f"Loaded {len(probate_raw_records)} probate records from {PROBATE_JSONL_PATH.name}")
+        print(f"Loaded {len(probate_raw_records):,} probate records")
     else:
-        print(f"NOTE: {PROBATE_JSONL_PATH.name} not found — run fetch_probate.cmd first.")
+        print(f"NOTE: {PROBATE_JSONL_PATH.name} not found — skipping probate")
+
+    t = _log_stage("raw_source_loading", t)
     print()
 
-    # Step 2 — APN resolution + raw_event conversion
-    # Collect assessor parcel data keyed by APN for the enrichment_provider.
+    # -------------------------------------------------------------------------
+    # Stage 2a — NOTS APN resolution
+    # -------------------------------------------------------------------------
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     resolver = APNResolver(cache_path=OUT_DIR / "assessor_cache.json")
 
     parcel_by_apn: dict[str, dict] = {}
     raw_events: list[dict] = []
-
     apn_stats: dict[str, int] = {
         CONFIDENCE_CONFIRMED: 0,
         CONFIDENCE_POSSIBLE: 0,
@@ -295,48 +334,37 @@ def main() -> None:
         CONFIDENCE_UNRESOLVED: 0,
     }
 
-    for i, raw_rec in enumerate(nots_raw_records):
+    print(f"=== NOTS APN resolution ({len(nots_raw_records)} records) ===")
+    t = time.perf_counter()
+    for raw_rec in nots_raw_records:
         payload = raw_rec.get("raw_payload", {})
         names: list[str] = payload.get("names") or []
-        rec_num = payload.get("recording_number")
-        print(f"[{i+1}] Recording {rec_num} — names: {names}")
-
         individual_names = [
             n for n in names
             if debtor_party_engine.classify_owner_type(n) in ("INDIVIDUAL", "ESTATE", "TRUST")
         ]
-        print(f"     Individual names: {individual_names}")
-
         apn_result = resolver.resolve(individual_names)
         conf = apn_result["confidence"]
         resolved_apn: Optional[str] = apn_result.get("apn")
         parcel_attrs: Optional[dict] = apn_result.get("attrs")
-
         apn_stats[conf] = apn_stats.get(conf, 0) + 1
-
-        if conf in (CONFIDENCE_CONFIRMED, CONFIDENCE_POSSIBLE):
-            matched = apn_result.get("matched_name")
-            strategy = apn_result.get("strategy_used")
-            phys_addr = (parcel_attrs or {}).get("PHYSICAL_ADDRESS")
-            print(f"     APN={resolved_apn}  conf={conf}  strategy={strategy}  name={matched!r}  addr={phys_addr}")
-        elif conf == CONFIDENCE_AMBIGUOUS:
-            n_cands = len(apn_result.get("candidates") or [])
-            print(f"     APN: AMBIGUOUS ({n_cands} candidates) — skipping enrichment")
-        else:
-            print(f"     APN: UNRESOLVED — no assessor match")
-
-        # Cache parcel data for enrichment_provider
         if resolved_apn and parcel_attrs:
             parcel_by_apn[resolved_apn] = _parcel_dict_from_attrs(parcel_attrs)
-
-        # Build raw_event_record
         phys_addr_str = (parcel_attrs.get("PHYSICAL_ADDRESS") if parcel_attrs else None)
         raw_event = _recorder_to_raw_event(raw_rec, resolved_apn, phys_addr_str)
         raw_events.append(raw_event)
-        print()
 
-    # Step 2b — Treasurer records: resolve owner via assessor APN lookup
-    print(f"=== Treasurer APN → Assessor resolution ===")
+    t = _log_stage("nots_apn_resolution", t)
+    print(f"  APN stats: {apn_stats}")
+    print(f"  Resolved (CONFIRMED+POSSIBLE): "
+          f"{apn_stats[CONFIDENCE_CONFIRMED] + apn_stats[CONFIDENCE_POSSIBLE]}/{len(nots_raw_records)}")
+    print()
+
+    # -------------------------------------------------------------------------
+    # Stage 2b — Treasurer APN resolution
+    # -------------------------------------------------------------------------
+    print(f"=== Treasurer APN resolution ({len(treasurer_raw_records)} records) ===")
+    t = time.perf_counter()
     treasurer_raw_events: list[dict] = []
     treasurer_parcel_by_apn: dict[str, dict] = {}
     if treasurer_raw_records:
@@ -344,117 +372,150 @@ def main() -> None:
             treasurer_raw_records,
             resolver=resolver,
             parcel_dict_from_attrs=_parcel_dict_from_attrs,
+            verbose=args.verbose,
         )
+    t = _log_stage("treasurer_resolution", t)
     print()
 
-    # Step 2c — Eviction records: no APN lookup possible (no address in listing)
-    print(f"=== Eviction records ===")
+    # -------------------------------------------------------------------------
+    # Stage 2c — Eviction processing
+    # -------------------------------------------------------------------------
+    print(f"=== Eviction processing ({len(eviction_raw_records)} records) ===")
+    t = time.perf_counter()
     eviction_raw_events: list[dict] = []
     if eviction_raw_records:
-        eviction_raw_events = build_eviction_raw_events(eviction_raw_records)
+        eviction_raw_events = build_eviction_raw_events(eviction_raw_records, verbose=args.verbose)
     else:
-        print(f"  No eviction records loaded.")
+        print("  No eviction records loaded.")
+    t = _log_stage("eviction_processing", t)
     print()
 
-    # Step 2d — Civil records: case type inferred from case_number prefix; no APN lookup
-    print(f"=== Civil records ===")
+    # -------------------------------------------------------------------------
+    # Stage 2d — Civil processing
+    # -------------------------------------------------------------------------
+    print(f"=== Civil processing ({len(civil_raw_records)} records) ===")
+    t = time.perf_counter()
     civil_raw_events: list[dict] = []
     if civil_raw_records:
-        civil_raw_events = build_civil_raw_events(civil_raw_records)
+        civil_raw_events = build_civil_raw_events(civil_raw_records, verbose=args.verbose)
     else:
-        print(f"  No civil records loaded.")
+        print("  No civil records loaded.")
+    t = _log_stage("civil_processing", t)
     print()
 
-    # Step 2e — Probate records: merge detail + local parcel matching if available
-    print(f"=== Probate records ===")
+    # -------------------------------------------------------------------------
+    # Stage 2e — Probate: detail + parcel matching (cache avoids 657 MB reload)
+    # -------------------------------------------------------------------------
+    print(f"=== Probate processing ({len(probate_raw_records)} records) ===")
     probate_raw_events: list[dict] = []
     probate_parcel_by_apn: dict[str, dict] = {}
     probate_match_stats: dict[str, int] = {}
+    parcel_match_by_id: dict[str, dict] = {}
+    probate_detail: dict = {}
 
     if probate_raw_records:
+        t = time.perf_counter()
         probate_detail = load_probate_detail_jsonl(PROBATE_DETAIL_JSONL_PATH)
+        t = _log_stage("probate_detail_loading", t)
         if probate_detail:
-            print(f"  Detail index loaded: {len(probate_detail)} enriched records")
+            print(f"  Detail index: {len(probate_detail)} enriched records")
         else:
-            print(f"  No detail file found — all records route to REVIEW_REQUIRED")
-            print(f"  (run enrich_probate_detail.cmd to enable decedent resolution)")
+            print("  No detail file — all records route to REVIEW_REQUIRED")
 
-        # Load local parcel index for decedent-to-parcel matching (CONFIRMED only)
-        parcel_match_by_id: dict[str, dict] = {}
         if probate_detail and PARCEL_INDEX_PATH.exists():
-            try:
-                from local_parcel_index import LocalParcelIndex
-                from probate_parcel_matcher import (
-                    match_record as _pm_match,
-                    MATCH_CONFIRMED as _PM_CONFIRMED,
-                )
-                _idx = LocalParcelIndex().load(PARCEL_INDEX_PATH)
-                _probate_resolver = APNResolver(fetch_fn=_idx.fetch_fn)
-                for rid, det in probate_detail.items():
-                    try:
-                        res = _pm_match(det, _probate_resolver)
-                        parcel_match_by_id[rid] = res
-                        _c = res["match_confidence"]
-                        probate_match_stats[_c] = probate_match_stats.get(_c, 0) + 1
-                        if _c == _PM_CONFIRMED:
-                            apn = res.get("apn")
-                            if apn:
-                                attrs = _probate_resolver.resolve_by_apn(apn=apn)
-                                if attrs:
-                                    probate_parcel_by_apn[apn] = _parcel_dict_from_attrs(attrs)
-                    except Exception:
-                        pass
-                print(f"  Parcel index loaded: {_idx.record_count:,} residential records")
-                print(f"  Parcel match stats:  {probate_match_stats}")
-            except ImportError:
-                print("  local_parcel_index not available — skipping probate parcel matching")
-        elif probate_detail:
-            print(f"  No local parcel index found ({PARCEL_INDEX_PATH.name}) — skipping matching")
-            print(f"  (run pull_parcel_owner_index.cmd to build the index)")
+            t = time.perf_counter()
+            cached = _load_probate_match_cache()
+            if cached is not None:
+                parcel_match_by_id = cached.get("parcel_match_by_id", {})
+                probate_parcel_by_apn = cached.get("probate_parcel_by_apn", {})
+                # Reconstruct match stats from cached results
+                for res in parcel_match_by_id.values():
+                    _c = res.get("match_confidence", "")
+                    probate_match_stats[_c] = probate_match_stats.get(_c, 0) + 1
+                print(f"  Parcel match cache hit: {len(parcel_match_by_id)} entries "
+                      f"({len(probate_parcel_by_apn)} confirmed APNs) — index load skipped")
+                t = _log_stage("probate_parcel_matching_cached", t)
+            else:
+                try:
+                    from local_parcel_index import LocalParcelIndex
+                    from probate_parcel_matcher import (
+                        match_record as _pm_match,
+                        MATCH_CONFIRMED as _PM_CONFIRMED,
+                    )
+                    print(f"  Loading parcel index ({PARCEL_INDEX_PATH.stat().st_size // 1024 // 1024} MB)…")
+                    _idx = LocalParcelIndex().load(PARCEL_INDEX_PATH)
+                    t = _log_stage("parcel_index_loading", t)
+                    print(f"  Index loaded: {_idx.record_count:,} residential records")
 
+                    t = time.perf_counter()
+                    _probate_resolver = APNResolver(fetch_fn=_idx.fetch_fn)
+                    for rid, det in probate_detail.items():
+                        try:
+                            res = _pm_match(det, _probate_resolver)
+                            parcel_match_by_id[rid] = res
+                            _c = res["match_confidence"]
+                            probate_match_stats[_c] = probate_match_stats.get(_c, 0) + 1
+                            if _c == _PM_CONFIRMED:
+                                apn = res.get("apn")
+                                if apn:
+                                    attrs = _probate_resolver.resolve_by_apn(apn=apn)
+                                    if attrs:
+                                        probate_parcel_by_apn[apn] = _parcel_dict_from_attrs(attrs)
+                        except Exception:
+                            pass
+                    t = _log_stage("probate_match_loop", t)
+                    print(f"  Match stats: {probate_match_stats}")
+                    _save_probate_match_cache({
+                        "parcel_match_by_id": parcel_match_by_id,
+                        "probate_parcel_by_apn": probate_parcel_by_apn,
+                    })
+                    print(f"  Match cache saved ({len(parcel_match_by_id)} entries) → "
+                          f"{PROBATE_MATCH_CACHE_PATH.name}")
+                except ImportError:
+                    print("  local_parcel_index not available — skipping probate parcel matching")
+        elif probate_detail:
+            print(f"  No local parcel index found — skipping matching")
+
+        t = time.perf_counter()
         probate_raw_events = build_probate_raw_events(
             probate_raw_records,
             detail_by_id=probate_detail,
             parcel_match_by_id=parcel_match_by_id or None,
+            verbose=args.verbose,
         )
+        t = _log_stage("probate_event_building", t)
     else:
-        print(f"  No probate records loaded.")
+        print("  No probate records loaded.")
     print()
 
-    # Merge parcel maps: NOTS wins on collision, then probate CONFIRMED, then treasurer
+    # -------------------------------------------------------------------------
+    # Merge and combine
+    # -------------------------------------------------------------------------
+    resolver.save_cache()
+    # NOTS wins on collision, then probate CONFIRMED, then treasurer
     combined_parcel_by_apn = {**treasurer_parcel_by_apn, **probate_parcel_by_apn, **parcel_by_apn}
 
-    resolver.save_cache()
-    print(f"=== NOTS APN resolution summary ===")
-    print(f"  {apn_stats}")
-    print(f"  Resolved (CONFIRMED+POSSIBLE): {apn_stats[CONFIDENCE_CONFIRMED] + apn_stats[CONFIDENCE_POSSIBLE]}/{len(nots_raw_records)}")
-    print()
-
-    # Combine raw events from all five sources
     all_raw_events = (
         raw_events + treasurer_raw_events + eviction_raw_events
         + civil_raw_events + probate_raw_events
     )
-    print(f"Total raw events for pipeline: {len(all_raw_events)} "
+    print(f"Total raw events: {len(all_raw_events)} "
           f"({len(raw_events)} NOTS + {len(treasurer_raw_events)} treasurer "
           f"+ {len(eviction_raw_events)} eviction + {len(civil_raw_events)} civil"
           f" + {len(probate_raw_events)} probate)")
     print()
 
-    # Step 3 — Build enrichment_provider closure over combined parcel_by_apn
+    # -------------------------------------------------------------------------
+    # Stage 3/4 — Staged pipeline
+    # -------------------------------------------------------------------------
     def enrichment_provider(parcel_id: Optional[str]) -> Optional[dict]:
         if not parcel_id:
             return None
         return combined_parcel_by_apn.get(str(parcel_id).strip())
 
-    # Step 4 — Run staged pipeline (both sources in one call)
-    print(f"Running staged pipeline on {len(all_raw_events)} events...")
-    print(f"  debtor_party_rules: combined (UNIVERSAL + notice_of_sale override)")
+    print(f"=== Staged pipeline ({len(all_raw_events)} events) ===")
     print(f"  enrichment_provider: {len(combined_parcel_by_apn)} parcels cached")
-    print(f"  approve_needs_review: True")
-    print(f"  sources: NOTS + Treasurer + Eviction + Civil + Probate")
-    print()
-
+    t = time.perf_counter()
     result = run_staged_pipeline(
         all_raw_events,
         workdir=OUT_DIR,
@@ -462,26 +523,27 @@ def main() -> None:
         enrichment_provider=enrichment_provider,
         approve_needs_review=True,
     )
+    t = _log_stage("staged_pipeline", t)
+    print()
 
-    # Step 5 — Report summary (no unredacted personal data in transcript)
+    # -------------------------------------------------------------------------
+    # Results
+    # -------------------------------------------------------------------------
     debtor_resolved = result.get("debtor_resolved") or []
     matched_leads = result.get("matched_leads") or []
     scored_leads = result.get("scored_leads") or []
     semantic_verdict = result.get("semantic_verdict", "?")
 
-    # Count multi-signal leads (parcel in both NOTS and treasurer)
     multi_signal_count = sum(
         1 for sl in scored_leads
         if len(sl.get("signals") or []) >= 2
     )
-    # Count per-source contributions in scored leads
     source_signal_counts: dict[str, int] = {}
     for sl in scored_leads:
         for sig in (sl.get("signals") or []):
             for src in (sig.get("source_ids") or []):
                 source_signal_counts[src] = source_signal_counts.get(src, 0) + 1
 
-    # Count court-only leads (signals exclusively from court sources, no NOTS/Treasurer)
     _court_sources = {"justice_court_evictions", "superior_court_civil", "superior_court_probate"}
     court_only_count = sum(
         1 for sl in scored_leads
@@ -494,7 +556,6 @@ def main() -> None:
         )
     )
 
-    # Probate-specific signal counts
     _probate_src = "superior_court_probate"
     probate_scored = sum(
         1 for sl in scored_leads
@@ -537,63 +598,65 @@ def main() -> None:
     )
 
     print("=== Pipeline Results ===")
-    print(f"  Raw events fed:                {len(all_raw_events)} "
+    print(f"  raw_events:           {len(all_raw_events)} "
           f"({len(raw_events)} NOTS + {len(treasurer_raw_events)} treasurer "
           f"+ {len(eviction_raw_events)} eviction + {len(civil_raw_events)} civil"
           f" + {len(probate_raw_events)} probate)")
-    print(f"  §17 debtor_resolved:           {len(debtor_resolved)}")
-    print(f"  §19 matched_leads:             {len(matched_leads)}")
-    print(f"  §20 semantic_verdict:          {semantic_verdict}")
-    print(f"  Scored leads:                  {len(scored_leads)}")
-    print(f"  Multi-signal leads:            {multi_signal_count}  (parcel in 2+ sources)")
-    print(f"  Court-only leads:              {court_only_count}  (eviction/civil/probate, no NOTS/Treasurer)")
-    print(f"  REVIEW_REQUIRED total:         {review_required_total}")
-    print(f"  Source signal counts:          {source_signal_counts}")
+    print(f"  debtor_resolved:      {len(debtor_resolved)}")
+    print(f"  matched_leads:        {len(matched_leads)}")
+    print(f"  semantic_verdict:     {semantic_verdict}")
+    print(f"  scored_leads:         {len(scored_leads)}")
+    print(f"  multi_signal_leads:   {multi_signal_count}")
+    print(f"  court_only_leads:     {court_only_count}")
+    print(f"  review_required:      {review_required_total}")
+    print(f"  source_signal_counts: {source_signal_counts}")
     print()
     print("=== Probate Parcel Match Results ===")
-    print(f"  probate_parcel_matches_loaded: {len(parcel_match_by_id) if probate_raw_records else 0}")
-    print(f"  confirmed_probate_parcel_links:{probate_match_stats.get('CONFIRMED_DECEDENT_OWNER_MATCH', 0)}")
-    print(f"  possible_review_candidates:    {probate_match_stats.get('POSSIBLE_DECEDENT_OWNER_MATCH', 0)}")
-    print(f"  ambiguous_review_candidates:   {probate_match_stats.get('AMBIGUOUS_OWNER_MATCH', 0)}")
-    print(f"  probate_scored_leads:          {probate_scored}")
-    print(f"  probate_enriched_leads:        {probate_enriched}")
-    print(f"  probate_tax_overlaps:          {probate_tax_overlaps}")
-    print(f"  probate_nots_overlaps:         {probate_nots_overlaps}")
+    print(f"  parcel_matches_loaded:{len(parcel_match_by_id)}")
+    print(f"  confirmed_matches:    {probate_match_stats.get('CONFIRMED_DECEDENT_OWNER_MATCH', 0)}")
+    print(f"  possible_candidates:  {probate_match_stats.get('POSSIBLE_DECEDENT_OWNER_MATCH', 0)}")
+    print(f"  ambiguous_candidates: {probate_match_stats.get('AMBIGUOUS_OWNER_MATCH', 0)}")
+    print(f"  probate_scored:       {probate_scored}")
+    print(f"  probate_enriched:     {probate_enriched}")
+    print(f"  probate_tax_overlaps: {probate_tax_overlaps}")
+    print(f"  probate_nots_overlaps:{probate_nots_overlaps}")
     print()
 
-    # Per-record summary
-    print("=== Per-record summary ===")
+    # Debtor resolution status counts (no PII)
+    status_summary: dict[str, int] = {}
     for dr in debtor_resolved:
-        status = dr.get("debtor_resolution_status")
-        method = dr.get("debtor_extraction_method")
-        owner_type = dr.get("owner_type")
-        parcel_id = (dr.get("property_refs") or {}).get("parcel_id")
-        instr = dr.get("instrument_number")
-        review_reason = dr.get("review_reason")
-        apn_tag = f"APN:{parcel_id}" if parcel_id else "APN:unresolved"
-        if status == "DEBTOR_RESOLVED":
-            print(f"  {instr}  status={status}  type={owner_type}  method={method}  {apn_tag}")
-        else:
-            print(f"  {instr}  status={status}  reason={review_reason!r}  {apn_tag}")
-
+        s = dr.get("debtor_resolution_status", "?")
+        status_summary[s] = status_summary.get(s, 0) + 1
+    print(f"  debtor_status_counts: {status_summary}")
     print()
-    print("=== Scored leads summary ===")
-    for sl in scored_leads:
-        lead_id = sl.get("lead_id")
-        score = sl.get("score")
-        enrich_status = sl.get("enrichment_status")
-        primary_parcel = sl.get("primary_parcel_id")
-        attrs = sl.get("attributes") or []
-        print(f"  lead_id={lead_id}  score={score}  enrichment={enrich_status}  "
-              f"parcel={primary_parcel}  attrs={attrs}")
 
+    print(f"Outputs: {OUT_DIR}")
+    for p in [result.get("scored_leads_path"), result.get("matched_leads_path"),
+              *(result.get("leads_base_paths") or [])]:
+        if p:
+            print(f"  {p}")
     print()
-    print(f"Outputs written to: {OUT_DIR}")
-    print(f"  {result.get('scored_leads_path')}")
-    print(f"  {result.get('matched_leads_path')}")
-    leads_base_paths = result.get("leads_base_paths") or []
-    for p in leads_base_paths:
-        print(f"  {p}")
+
+    # -------------------------------------------------------------------------
+    # Timing summary
+    # -------------------------------------------------------------------------
+    total_elapsed = time.perf_counter() - _t_wall
+    slowest = max(_stage_times, key=_stage_times.__getitem__) if _stage_times else "n/a"
+    print("=== Timing Summary ===")
+    for stage, elapsed in sorted(_stage_times.items(), key=lambda kv: -kv[1]):
+        pct = int(elapsed / total_elapsed * 20) if total_elapsed > 0 else 0
+        bar = "█" * max(1, pct)
+        print(f"  {stage:<40} {elapsed:6.2f}s  {bar}")
+    print(f"  {'TOTAL':<40} {total_elapsed:6.2f}s")
+    print()
+    print("=== Run Summary ===")
+    print(f"  max_records:      {args.max_records}")
+    print(f"  total_runtime:    {total_elapsed:.2f}s")
+    print(f"  lead_count:       {len(scored_leads)}")
+    print(f"  semantic_verdict: {semantic_verdict}")
+    print(f"  slowest_stage:    {slowest} ({_stage_times.get(slowest, 0):.2f}s)")
+    blocker = slowest if _stage_times.get(slowest, 0) > 30 else "none"
+    print(f"  blocker:          {blocker}")
 
 
 if __name__ == "__main__":
