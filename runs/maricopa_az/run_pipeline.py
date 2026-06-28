@@ -82,6 +82,7 @@ EVICTION_JSONL_PATH = REPO_ROOT / "data" / "raw" / "justice_court_evictions.json
 CIVIL_JSONL_PATH = REPO_ROOT / "data" / "raw" / "superior_court_civil.jsonl"
 PROBATE_JSONL_PATH = REPO_ROOT / "data" / "raw" / "superior_court_probate.jsonl"
 PROBATE_DETAIL_JSONL_PATH = REPO_ROOT / "data" / "raw" / "superior_court_probate_detail.jsonl"
+PARCEL_INDEX_PATH = REPO_ROOT / "data" / "cache" / "parcel_owner_index.jsonl"
 OUT_DIR = Path(__file__).parent / "pipeline_output"
 
 # ---------------------------------------------------------------------------
@@ -364,9 +365,12 @@ def main() -> None:
         print(f"  No civil records loaded.")
     print()
 
-    # Step 2e — Probate records: merge detail if available; noise cases filtered
+    # Step 2e — Probate records: merge detail + local parcel matching if available
     print(f"=== Probate records ===")
     probate_raw_events: list[dict] = []
+    probate_parcel_by_apn: dict[str, dict] = {}
+    probate_match_stats: dict[str, int] = {}
+
     if probate_raw_records:
         probate_detail = load_probate_detail_jsonl(PROBATE_DETAIL_JSONL_PATH)
         if probate_detail:
@@ -374,14 +378,51 @@ def main() -> None:
         else:
             print(f"  No detail file found — all records route to REVIEW_REQUIRED")
             print(f"  (run enrich_probate_detail.cmd to enable decedent resolution)")
-        probate_raw_events = build_probate_raw_events(probate_raw_records, detail_by_id=probate_detail)
+
+        # Load local parcel index for decedent-to-parcel matching (CONFIRMED only)
+        parcel_match_by_id: dict[str, dict] = {}
+        if probate_detail and PARCEL_INDEX_PATH.exists():
+            try:
+                from local_parcel_index import LocalParcelIndex
+                from probate_parcel_matcher import (
+                    match_record as _pm_match,
+                    MATCH_CONFIRMED as _PM_CONFIRMED,
+                )
+                _idx = LocalParcelIndex().load(PARCEL_INDEX_PATH)
+                _probate_resolver = APNResolver(fetch_fn=_idx.fetch_fn)
+                for rid, det in probate_detail.items():
+                    try:
+                        res = _pm_match(det, _probate_resolver)
+                        parcel_match_by_id[rid] = res
+                        _c = res["match_confidence"]
+                        probate_match_stats[_c] = probate_match_stats.get(_c, 0) + 1
+                        if _c == _PM_CONFIRMED:
+                            apn = res.get("apn")
+                            if apn:
+                                attrs = _probate_resolver.resolve_by_apn(apn=apn)
+                                if attrs:
+                                    probate_parcel_by_apn[apn] = _parcel_dict_from_attrs(attrs)
+                    except Exception:
+                        pass
+                print(f"  Parcel index loaded: {_idx.record_count:,} residential records")
+                print(f"  Parcel match stats:  {probate_match_stats}")
+            except ImportError:
+                print("  local_parcel_index not available — skipping probate parcel matching")
+        elif probate_detail:
+            print(f"  No local parcel index found ({PARCEL_INDEX_PATH.name}) — skipping matching")
+            print(f"  (run pull_parcel_owner_index.cmd to build the index)")
+
+        probate_raw_events = build_probate_raw_events(
+            probate_raw_records,
+            detail_by_id=probate_detail,
+            parcel_match_by_id=parcel_match_by_id or None,
+        )
     else:
         print(f"  No probate records loaded.")
     print()
 
-    # Merge parcel maps (treasurer APN hits supplement NOTS hits; NOTS wins on collision)
-    # Court records (eviction/civil/probate) add nothing to parcel_by_apn (no APN from listing)
-    combined_parcel_by_apn = {**treasurer_parcel_by_apn, **parcel_by_apn}
+    # Merge parcel maps: NOTS wins on collision, then probate CONFIRMED, then treasurer
+    combined_parcel_by_apn = {**treasurer_parcel_by_apn, **probate_parcel_by_apn, **parcel_by_apn}
 
     resolver.save_cache()
     print(f"=== NOTS APN resolution summary ===")
@@ -453,18 +494,71 @@ def main() -> None:
         )
     )
 
+    # Probate-specific signal counts
+    _probate_src = "superior_court_probate"
+    probate_scored = sum(
+        1 for sl in scored_leads
+        if any(
+            _probate_src in (sig.get("source_ids") or [])
+            for sig in (sl.get("signals") or [])
+        )
+    )
+    probate_enriched = sum(
+        1 for sl in scored_leads
+        if sl.get("primary_parcel_id") and any(
+            _probate_src in (sig.get("source_ids") or [])
+            for sig in (sl.get("signals") or [])
+        )
+    )
+    probate_tax_overlaps = sum(
+        1 for sl in scored_leads
+        if any(
+            _probate_src in (sig.get("source_ids") or [])
+            for sig in (sl.get("signals") or [])
+        ) and any(
+            "treasurer_tax_lien" in (sig.get("source_ids") or [])
+            for sig in (sl.get("signals") or [])
+        )
+    )
+    probate_nots_overlaps = sum(
+        1 for sl in scored_leads
+        if any(
+            _probate_src in (sig.get("source_ids") or [])
+            for sig in (sl.get("signals") or [])
+        ) and any(
+            "recorder_maricopa" in (sig.get("source_ids") or [])
+            for sig in (sl.get("signals") or [])
+        )
+    )
+    review_required_total = sum(
+        1 for sl in scored_leads
+        if sl.get("enrichment_status") == "REVIEW_REQUIRED"
+        or (sl.get("debtor_resolution_status") or "") == "REVIEW_REQUIRED"
+    )
+
     print("=== Pipeline Results ===")
-    print(f"  Raw events fed:       {len(all_raw_events)} "
+    print(f"  Raw events fed:                {len(all_raw_events)} "
           f"({len(raw_events)} NOTS + {len(treasurer_raw_events)} treasurer "
           f"+ {len(eviction_raw_events)} eviction + {len(civil_raw_events)} civil"
           f" + {len(probate_raw_events)} probate)")
-    print(f"  §17 debtor_resolved:  {len(debtor_resolved)}")
-    print(f"  §19 matched_leads:    {len(matched_leads)}")
-    print(f"  §20 semantic_verdict: {semantic_verdict}")
-    print(f"  Scored leads:         {len(scored_leads)}")
-    print(f"  Multi-signal leads:   {multi_signal_count}  (parcel in 2+ sources)")
-    print(f"  Court-only leads:     {court_only_count}  (eviction/civil/probate, no NOTS/Treasurer)")
-    print(f"  Source signal counts: {source_signal_counts}")
+    print(f"  §17 debtor_resolved:           {len(debtor_resolved)}")
+    print(f"  §19 matched_leads:             {len(matched_leads)}")
+    print(f"  §20 semantic_verdict:          {semantic_verdict}")
+    print(f"  Scored leads:                  {len(scored_leads)}")
+    print(f"  Multi-signal leads:            {multi_signal_count}  (parcel in 2+ sources)")
+    print(f"  Court-only leads:              {court_only_count}  (eviction/civil/probate, no NOTS/Treasurer)")
+    print(f"  REVIEW_REQUIRED total:         {review_required_total}")
+    print(f"  Source signal counts:          {source_signal_counts}")
+    print()
+    print("=== Probate Parcel Match Results ===")
+    print(f"  probate_parcel_matches_loaded: {len(parcel_match_by_id) if probate_raw_records else 0}")
+    print(f"  confirmed_probate_parcel_links:{probate_match_stats.get('CONFIRMED_DECEDENT_OWNER_MATCH', 0)}")
+    print(f"  possible_review_candidates:    {probate_match_stats.get('POSSIBLE_DECEDENT_OWNER_MATCH', 0)}")
+    print(f"  ambiguous_review_candidates:   {probate_match_stats.get('AMBIGUOUS_OWNER_MATCH', 0)}")
+    print(f"  probate_scored_leads:          {probate_scored}")
+    print(f"  probate_enriched_leads:        {probate_enriched}")
+    print(f"  probate_tax_overlaps:          {probate_tax_overlaps}")
+    print(f"  probate_nots_overlaps:         {probate_nots_overlaps}")
     print()
 
     # Per-record summary

@@ -25,11 +25,27 @@ enriched fields for each record:
   personal_representative — party with Relationship in PR/Executor/Administrator
   earliest_filing_date    — minimum filing date across Case Documents
   case_subtype_inferred   — letters_testamentary / letters_of_administration /
-                            determination_of_heirship / muniment_of_title
+                            determination_of_heirship | muniment_of_title
   is_estate_case    — True if decedent found AND not a guardianship/conservatorship
   is_noise_case     — True for Guardianship, Conservatorship, Mental Health
 
-Still NOT available from detail page: property_address, APN.
+=== Parcel matching — CONFIRMED only ===
+
+When parcel_match_by_id is provided (from local_parcel_index + probate_parcel_matcher),
+the adapter populates property_refs.parcel_id exclusively for
+CONFIRMED_DECEDENT_OWNER_MATCH results. All other confidence levels
+(POSSIBLE, AMBIGUOUS, NO_OWNER_MATCH) leave parcel_id None.
+
+Match metadata (confidence, strategy, candidate_count) is attached to each
+raw_event as parcel_match for review without containing PII.
+
+  CONFIRMED → parcel_id set; lead can participate in APN stacking
+  POSSIBLE  → parcel_id None; parcel_match has confidence + strategy for review
+  AMBIGUOUS → parcel_id None; parcel_match has candidate_count for review
+  NO_MATCH  → parcel_id None; parcel_match has reject_reason
+
+Petitioner, attorney, and filer names are NEVER used to create parcel links.
+This guard is enforced in probate_parcel_matcher.match_record().
 
 === Canonical doc type mapping ===
 
@@ -57,17 +73,6 @@ Without a confirmed decedent (or with no detail file), document_body_text=None
 Guardianship and Conservatorship cases are NOT property-distress signals. When
 detail confirms is_noise_case=True, the record is skipped entirely (not emitted
 as a raw_event). This prevents guardianship cases from appearing in the dashboard.
-
-=== Multi-signal stacking ===
-
-Not possible from any available data — no property address or APN on the detail
-page. property_refs.parcel_id is None for all probate records.
-
-=== Future enhancement ===
-
-Obtain property address from filed document images (requires image access beyond
-the docket page) → APNResolver lookup → parcel enrichment and multi-signal
-stacking with NOTS / Treasurer.
 """
 
 from __future__ import annotations
@@ -82,6 +87,13 @@ _REPO_ROOT = _THIS_DIR.parents[1]
 for _p in (str(_REPO_ROOT), str(_THIS_DIR)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
+
+from probate_parcel_matcher import (  # noqa: E402 — local module
+    MATCH_CONFIRMED,
+    MATCH_POSSIBLE,
+    MATCH_AMBIGUOUS,
+    MATCH_NONE,
+)
 
 # ---------------------------------------------------------------------------
 # Case number prefix mapping
@@ -173,6 +185,7 @@ def load_probate_detail_jsonl(path: Path) -> dict[str, dict]:
 def build_probate_raw_events(
     raw_records: list[dict],
     detail_by_id: dict[str, dict] | None = None,
+    parcel_match_by_id: dict[str, dict] | None = None,
 ) -> list[dict]:
     """Convert probate case records to raw_event_records.
 
@@ -182,12 +195,21 @@ def build_probate_raw_events(
       - Confirmed case subtype replaces the default canonical_doc_type.
       - Earliest filing date populates recorded_date.
 
+    When parcel_match_by_id is provided (from LocalParcelIndex + probate_parcel_matcher):
+      - CONFIRMED_DECEDENT_OWNER_MATCH: property_refs.parcel_id is populated.
+      - POSSIBLE / AMBIGUOUS / NO_OWNER_MATCH: parcel_id remains None.
+      - All cases: parcel_match metadata (confidence, strategy, candidate_count)
+        is attached to the raw_event for review purposes only.
+      - Petitioner/attorney names NEVER populate parcel_id (enforced in matcher).
+
     Without detail: all records route to REVIEW_REQUIRED (DOCUMENT_BODY=None).
 
     Returns list of raw_event_records.
     """
     if detail_by_id is None:
         detail_by_id = {}
+    if parcel_match_by_id is None:
+        parcel_match_by_id = {}
 
     raw_events: list[dict] = []
     class_counts: dict[str, int] = {
@@ -196,6 +218,9 @@ def build_probate_raw_events(
         "review_required_no_detail": 0,
         "review_required_no_decedent": 0,
         "unsupported": 0,
+        "parcel_confirmed": 0,
+        "parcel_possible": 0,
+        "parcel_ambiguous": 0,
     }
 
     for i, raw_rec in enumerate(raw_records):
@@ -261,9 +286,34 @@ def build_probate_raw_events(
         if party_name and not _is_protected_party(party_name):
             parties = [{"name": party_name, "name_type": "OTHER"}]
 
+        # Parcel match — only CONFIRMED populates parcel_id
+        rid = raw_rec.get("raw_record_id") or ""
+        match = parcel_match_by_id.get(rid)
+        parcel_id: str | None = None
+        situs_address: str | None = None
+        parcel_match_meta: dict = {}
+
+        if match:
+            conf = match.get("match_confidence", MATCH_NONE)
+            parcel_match_meta = {
+                "match_confidence": conf,
+                "strategy_used": match.get("strategy_used"),
+                "candidate_count": match.get("candidate_count", 0),
+                "reject_reason": match.get("reject_reason"),
+            }
+            if conf == MATCH_CONFIRMED:
+                parcel_id = match.get("apn")
+                situs_address = match.get("situs_address")
+                class_counts["parcel_confirmed"] += 1
+            elif conf == MATCH_POSSIBLE:
+                class_counts["parcel_possible"] += 1
+            elif conf == MATCH_AMBIGUOUS:
+                class_counts["parcel_ambiguous"] += 1
+
         print(
             f"  [PROBATE {i+1}] case={case_number}  "
             f"doc_type={canonical_doc_type}  {party_tag}"
+            + (f"  parcel={parcel_match_meta.get('match_confidence', 'no_match')}" if match else "")
         )
 
         raw_event: dict = {
@@ -277,14 +327,15 @@ def build_probate_raw_events(
             "source_url": source_url,
             "parties": parties,
             "property_refs": {
-                "parcel_id": None,
-                "situs_address": None,
+                "parcel_id": parcel_id,
+                "situs_address": situs_address,
                 "legal_description": None,
                 "case_number": case_number,
             },
             "document_body_text": document_body_text,
             "parser_confidence": raw_rec.get("parser_confidence"),
             "captured_at": raw_rec.get("source_fetched_at"),
+            "parcel_match": parcel_match_meta or None,
         }
         raw_events.append(raw_event)
 
@@ -292,8 +343,15 @@ def build_probate_raw_events(
     noise = class_counts["noise_skipped"]
     rr = class_counts["review_required_no_detail"] + class_counts["review_required_no_decedent"]
     unsup = class_counts["unsupported"]
+    pc = class_counts["parcel_confirmed"]
+    pp = class_counts["parcel_possible"]
+    pa = class_counts["parcel_ambiguous"]
     print(
         f"  Probate records: {len(raw_events)} emitted "
         f"(usable={usable}, review_required={rr}, noise_skipped={noise}, unsupported={unsup})"
     )
+    if parcel_match_by_id:
+        print(
+            f"  Parcel matches: confirmed={pc}, possible={pp}, ambiguous={pa}"
+        )
     return raw_events

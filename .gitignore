@@ -28,6 +28,7 @@ Thumbs.db
 # Build artifacts that DO NOT belong in version control
 # (Phase 1+ may generate these; tracked separately by run manifests)
 data/raw/
+data/cache/
 data/runs/*/raw/
 data/evidence/*.pdf
 
