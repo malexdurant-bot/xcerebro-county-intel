@@ -45,9 +45,11 @@ if (-not (Test-Path $WrapperPs1)) {
 
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
+$TaskArg = '-NonInteractive -ExecutionPolicy Bypass -File "' + $WrapperPs1 + '"'
+
 $Action = New-ScheduledTaskAction `
     -Execute "powershell.exe" `
-    -Argument "-NonInteractive -ExecutionPolicy Bypass -File `"$WrapperPs1`"" `
+    -Argument $TaskArg `
     -WorkingDirectory $RepoRoot
 
 $Trigger = New-ScheduledTaskTrigger -Daily -At $TriggerTime
@@ -69,10 +71,10 @@ try {
         -Settings $Settings -Principal $Principal -Force | Out-Null
 
     $LogonMethod = "S4U (runs whether logged in or not)"
-    Write-Host "  Logon type: S4U — task runs even when logged out."
+    Write-Host "  Logon type: S4U -- task runs even when logged out."
 }
 catch {
-    Write-Warning "S4U failed: $_ — falling back to InteractiveToken."
+    Write-Warning "S4U failed -- falling back to InteractiveToken."
 
     $Principal = New-ScheduledTaskPrincipal `
         -UserId $CurrentUser -LogonType InteractiveToken -RunLevel Limited
@@ -82,7 +84,7 @@ catch {
         -Settings $Settings -Principal $Principal -Force | Out-Null
 
     $LogonMethod = "InteractiveToken (runs only when logged in)"
-    Write-Host "  Logon type: InteractiveToken — task runs only while logged in."
+    Write-Host "  Logon type: InteractiveToken -- task runs only while logged in."
 }
 
 $Task     = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
@@ -97,12 +99,12 @@ Write-Host "  Logon      : $LogonMethod"
 Write-Host "  Trigger    : Daily at $TriggerTime"
 Write-Host "  Next run   : $NextRun"
 Write-Host "  Execute    : powershell.exe"
-Write-Host "  Argument   : -NonInteractive -ExecutionPolicy Bypass -File `"$WrapperPs1`""
+Write-Host ("  Argument   : " + $TaskArg)
 Write-Host "  WorkingDir : $RepoRoot"
 Write-Host "  Log dir    : $LogDir"
 Write-Host ""
-Write-Host "=== Manage ==="
-Write-Host "  Run now    : Start-ScheduledTask -TaskName '$TaskName'"
-Write-Host "  GUI        : taskschd.msc"
-Write-Host "  Uninstall  : powershell -ExecutionPolicy Bypass -File .\runs\maricopa_az\uninstall_daily_task.ps1"
+Write-Host '=== Manage ==='
+Write-Host '  Run now    : Start-ScheduledTask -TaskName MaricopaDailyLeadRun'
+Write-Host '  GUI        : taskschd.msc'
+Write-Host '  Uninstall  : powershell -ExecutionPolicy Bypass -File .\runs\maricopa_az\uninstall_daily_task.ps1'
 Write-Host ""
