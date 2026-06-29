@@ -21,7 +21,7 @@ import argparse
 import json
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -219,7 +219,7 @@ def main() -> None:
     args = ap.parse_args()
 
     t_wall = time.perf_counter()
-    run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    run_date = date.today().isoformat()
 
     history = LeadHistory(LEAD_HISTORY_PATH)
 
