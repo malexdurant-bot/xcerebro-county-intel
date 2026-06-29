@@ -57,8 +57,7 @@ $Trigger = New-ScheduledTaskTrigger -Daily -At $TriggerTime
 $Settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -ExecutionTimeLimit (New-TimeSpan -Hours 6) `
-    -MultipleInstances IgnoreNew `
-    -WakeToRun $false
+    -MultipleInstances IgnoreNew
 
 $LogonMethod = ""
 
