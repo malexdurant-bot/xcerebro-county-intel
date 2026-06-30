@@ -55,9 +55,10 @@ NOTS_JSONL_PATH = REPO_ROOT / "data" / "raw" / "recorder_maricopa.jsonl"
 TREASURER_JSONL_PATH = REPO_ROOT / "data" / "raw" / "treasurer_tax_lien.jsonl"
 EVICTION_JSONL_PATH = REPO_ROOT / "data" / "raw" / "justice_court_evictions.jsonl"
 CIVIL_JSONL_PATH = REPO_ROOT / "data" / "raw" / "superior_court_civil.jsonl"
-OUT_DIR = _THIS_DIR / "pipeline_output"
+OUT_DIR = _THIS_DIR / "pipeline_output"               # shared cache lives here
+INCREMENTAL_OUT_DIR = OUT_DIR / "incremental"         # delta output — never overwrites full production scored_leads.json
 LEAD_HISTORY_PATH = REPO_ROOT / "data" / "state" / "maricopa_lead_history.sqlite"
-SCORED_LEADS_PATH = OUT_DIR / "scored_leads.json"
+SCORED_LEADS_PATH = OUT_DIR / "scored_leads.json"     # full production — read by generate_dashboard.py
 
 # ---------------------------------------------------------------------------
 # Debtor-party rules — identical to run_pipeline.py
@@ -274,6 +275,7 @@ def main() -> None:
     # Stage 2 — APN resolution (live API; small daily batch)
     # ------------------------------------------------------------------
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    INCREMENTAL_OUT_DIR.mkdir(parents=True, exist_ok=True)
     resolver = APNResolver(cache_path=OUT_DIR / "assessor_cache.json")
 
     parcel_by_apn: dict[str, dict] = {}
@@ -353,7 +355,7 @@ def main() -> None:
     t = time.perf_counter()
     result = run_staged_pipeline(
         all_events,
-        workdir=OUT_DIR,
+        workdir=INCREMENTAL_OUT_DIR,
         debtor_party_rules=_COMBINED_DEBTOR_RULES,
         enrichment_provider=enrichment_provider,
         approve_needs_review=True,
