@@ -368,13 +368,53 @@ def main() -> None:
     print()
 
     # ------------------------------------------------------------------
-    # Stage 4 — History update
+    # Stage 4 — Merge delta into master scored_leads.json
+    #
+    # The master file is the cumulative dataset read by generate_dashboard.py.
+    # New lead_ids are appended; existing ones are updated in place.
+    # The full production 159K dataset is never rebuilt just for daily runs.
+    # ------------------------------------------------------------------
+    master: list[dict] = []
+    if SCORED_LEADS_PATH.exists():
+        try:
+            master = json.loads(SCORED_LEADS_PATH.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            master = []
+
+    master_by_id: dict[str, int] = {
+        lead.get("lead_id"): i
+        for i, lead in enumerate(master)
+        if lead.get("lead_id")
+    }
+
+    added = updated_master = 0
+    for lead in scored_leads:
+        lid = lead.get("lead_id")
+        if not lid:
+            continue
+        if lid in master_by_id:
+            master[master_by_id[lid]] = lead
+            updated_master += 1
+        else:
+            master_by_id[lid] = len(master)
+            master.append(lead)
+            added += 1
+
+    SCORED_LEADS_PATH.write_text(
+        json.dumps(master, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    print(f"=== Master scored_leads.json ===")
+    print(f"  total: {len(master):,}  (+{added} new, {updated_master} updated)")
+    print()
+
+    # ------------------------------------------------------------------
+    # Stage 5 — History update
     # ------------------------------------------------------------------
     counts = history.upsert_leads(scored_leads, run_date)
     print(f"  lead_history: +{counts['new']} new, {counts['updated']} updated")
 
     # ------------------------------------------------------------------
-    # Stage 5 — Daily CSV export (new leads only: first_seen_date == today)
+    # Stage 6 — Daily CSV export (new leads only: first_seen_date == today)
     # ------------------------------------------------------------------
     history_by_id = history.get_history_by_id()
     new_leads = [
@@ -397,7 +437,7 @@ def main() -> None:
     # ------------------------------------------------------------------
     total_s = time.perf_counter() - t_wall
     history.log_run(
-        run_date, "daily", len(scored_leads),
+        run_date, "daily", len(master),
         counts["new"], counts["updated"], total_s
     )
     history.set_last_run_date(run_date)
@@ -405,13 +445,14 @@ def main() -> None:
 
     print()
     print("=== Run Summary ===")
-    print(f"  run_date:      {run_date}")
-    print(f"  last_run:      {last_run or '(none)'}")
-    print(f"  delta_events:  {len(all_events)}")
-    print(f"  scored_leads:  {len(scored_leads)}")
-    print(f"  new_today:     {counts['new']}")
-    print(f"  updated:       {counts['updated']}")
-    print(f"  runtime:       {total_s:.1f}s")
+    print(f"  run_date:        {run_date}")
+    print(f"  last_run:        {last_run or '(none)'}")
+    print(f"  delta_events:    {len(all_events)}")
+    print(f"  delta_leads:     {len(scored_leads)}")
+    print(f"  master_total:    {len(master):,}")
+    print(f"  new_today:       {counts['new']}")
+    print(f"  updated:         {counts['updated']}")
+    print(f"  runtime:         {total_s:.1f}s")
 
 
 if __name__ == "__main__":
