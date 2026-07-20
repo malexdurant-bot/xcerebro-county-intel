@@ -396,3 +396,92 @@ class APNResolver:
             return first_ambiguous
 
         return _result(None, CONFIDENCE_UNRESOLVED, None, None, None, [])
+
+
+# ---------------------------------------------------------------------------
+# Post-resolution disambiguation — name similarity scoring
+# ---------------------------------------------------------------------------
+
+_NON_WORD = re.compile(r"[^A-Z0-9 ]")
+
+
+def _name_tokens(name: str) -> set[str]:
+    """Normalise name to a set of tokens, dropping short noise tokens."""
+    tokens = _NON_WORD.sub("", name.upper()).split()
+    return {t for t in tokens if len(t) >= 3}
+
+
+def _name_score(recorder_name: str, candidate_owner: str) -> tuple[int, int]:
+    """Score one candidate against the recorder grantor name.
+
+    Checks the full owner string (all co-owner parts separated by "/") so
+    no tokens are lost when the assessor stores multiple owners in one field.
+
+    Returns (overlap, -extra) where:
+      overlap  = recorder tokens found anywhere in the full candidate string
+      extra    = tokens in the candidate's BEST-matching part not in recorder
+    """
+    rec_tokens = _name_tokens(recorder_name)
+    # Flatten all co-owner parts into one token pool for overlap counting,
+    # but use the best-matching individual part for the extra-token penalty.
+    parts = [(candidate_owner or "").split("/")]
+    all_cand_tokens = _name_tokens(candidate_owner or "")
+    overlap = len(rec_tokens & all_cand_tokens)
+    # Extra = tokens in the primary (first) part beyond what the recorder has.
+    primary_tokens = _name_tokens((candidate_owner or "").split("/")[0])
+    extra = len(primary_tokens - rec_tokens)
+    return (overlap, -extra)
+
+
+def disambiguate_by_name_score(apn_result: dict) -> dict:
+    """Promote AMBIGUOUS to CONFIRMED when one candidate is a uniquely better match.
+
+    Scoring per candidate:
+      overlap  — recorder tokens found in the assessor owner string (higher = better)
+      extra    — tokens in the candidate primary name not in the recorder (lower = better)
+
+    Two conditions must both hold for promotion:
+      1. Exactly one candidate has the best (overlap, -extra) score.
+      2. The winning overlap equals len(recorder tokens) — ALL recorder tokens
+         are present in the winner.  This prevents a partial-match candidate
+         from being promoted when the true owner is absent from the assessor.
+    """
+    if apn_result.get("confidence") != CONFIDENCE_AMBIGUOUS:
+        return apn_result
+
+    matched_name: str = apn_result.get("matched_name") or ""
+    candidates: list[dict] = apn_result.get("candidates") or []
+    if not candidates or not matched_name:
+        return apn_result
+
+    rec_tokens = _name_tokens(matched_name)
+    if not rec_tokens:
+        return apn_result
+
+    scored = [
+        (_name_score(matched_name, c.get("OWNER_NAME", "")), c)
+        for c in candidates
+    ]
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    best_score = scored[0][0]
+    best_overlap = best_score[0]
+
+    # Require ALL recorder tokens to be found in the winner.
+    if best_overlap < len(rec_tokens):
+        return apn_result
+
+    best_count = sum(1 for s, _ in scored if s == best_score)
+    if best_count != 1:
+        return apn_result  # tie — cannot pick
+
+    attrs = scored[0][1]
+    base_strategy = apn_result.get("strategy_used") or "unknown"
+    return _result(
+        apn=attrs.get("APN"),
+        confidence=CONFIDENCE_CONFIRMED,
+        strategy=base_strategy + "+name_score",
+        matched_name=matched_name,
+        attrs=attrs,
+        candidates=[],
+    )

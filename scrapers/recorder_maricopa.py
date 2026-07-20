@@ -34,8 +34,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import shutil
 import ssl
 import sys
+import tempfile
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -315,6 +319,107 @@ def _search_document_type(
 
 
 # ---------------------------------------------------------------------------
+# Playwright name enrichment — uses real Chrome profile to bypass Cloudflare
+# ---------------------------------------------------------------------------
+
+_DEFAULT_CHROME_PROFILE = str(
+    Path.home() / "AppData" / "Local" / "Google" / "Chrome" / "User Data"
+)
+CHROME_PROFILE = os.environ.get("CHROME_PROFILE", _DEFAULT_CHROME_PROFILE)
+
+
+def _playwright_batch_fetch_names(
+    recording_numbers: list[str],
+    chrome_profile: str = CHROME_PROFILE,
+) -> dict[str, list[str]]:
+    """
+    Fetch party names for a batch of recording numbers via real Chrome.
+
+    Copies only the Cookies/Preferences from the user's Chrome profile to a
+    temp dir so Chrome does not need to be closed. Returns a dict mapping
+    recording_number -> list[str] names (empty list if unavailable).
+    """
+    results: dict[str, list[str]] = {n: [] for n in recording_numbers}
+    if not recording_numbers:
+        return results
+
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return results
+
+    tmp = tempfile.mkdtemp(prefix="recorder_chrome_")
+    try:
+        # Copy only the files Cloudflare cares about
+        src_default = Path(chrome_profile) / "Default"
+        dst_default = Path(tmp) / "Default"
+        dst_default.mkdir(parents=True, exist_ok=True)
+        for fname in ("Cookies", "Preferences"):
+            src_f = src_default / fname
+            if src_f.exists():
+                try:
+                    shutil.copy2(src_f, dst_default / fname)
+                except OSError:
+                    pass
+        top_state = Path(chrome_profile) / "Local State"
+        if top_state.exists():
+            try:
+                shutil.copy2(top_state, Path(tmp) / "Local State")
+            except OSError:
+                pass
+
+        with sync_playwright() as p:
+            ctx = p.chromium.launch_persistent_context(
+                user_data_dir=tmp,
+                channel="chrome",
+                headless=False,
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--start-minimized",
+                ],
+                ignore_https_errors=True,
+            )
+            page = ctx.new_page()
+
+            # Warm up — establish session cookies
+            try:
+                page.goto(PORTAL_URL, wait_until="networkidle", timeout=30_000)
+                time.sleep(2)
+            except Exception:
+                pass
+
+            for rec_num in recording_numbers:
+                url = (
+                    "https://recorder.maricopa.gov/recording/document-details.html"
+                    f"?recordingNumber={rec_num}&suffix="
+                )
+                try:
+                    page.goto(url, wait_until="networkidle", timeout=45_000)
+                    title = page.title().lower()
+                    if "just a moment" in title or "cloudflare" in title:
+                        time.sleep(15)
+                        page.wait_for_load_state("networkidle", timeout=30_000)
+
+                    # Names are in the first <td> of the details table
+                    tds = page.locator("td").all_inner_texts()
+                    if tds and tds[0].strip():
+                        raw = tds[0].strip()
+                        names = [n.strip() for n in raw.split("\n\n") if n.strip()]
+                        results[rec_num] = names
+                except Exception:
+                    pass  # leave as empty list
+
+            ctx.close()
+
+    except Exception:
+        pass
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    return results
+
+
+# ---------------------------------------------------------------------------
 # Prior / merge
 # ---------------------------------------------------------------------------
 
@@ -379,6 +484,7 @@ def run(
     probe_doc_types: bool = False,
     max_features: Optional[int] = None,
     fetch_detail: bool = True,
+    enrich_names: bool = True,
     # Legacy params accepted for API consistency but unused
     headless: bool = True,
     slow_mo: int = 0,
@@ -482,6 +588,31 @@ def run(
             deduped.append(rec)
     current = deduped
 
+    # Playwright name enrichment — fetch names for records still missing them
+    if enrich_names:
+        needs_names = [
+            r for r in current
+            if not r["raw_payload"].get("names")
+        ]
+        if needs_names:
+            print(
+                f"  [playwright] fetching names for {len(needs_names)} records "
+                f"with empty names...",
+                flush=True,
+            )
+            rec_nums = [r["raw_payload"]["recording_number"] for r in needs_names]
+            name_map = _playwright_batch_fetch_names(rec_nums)
+            enriched = 0
+            for rec in needs_names:
+                rec_num = rec["raw_payload"]["recording_number"]
+                names = name_map.get(rec_num) or []
+                if names:
+                    rec["raw_payload"]["names"] = names
+                    rec["raw_payload"]["grantor"] = names[0]
+                    rec["raw_payload"]["grantee"] = names[-1] if len(names) > 1 else None
+                    enriched += 1
+            print(f"  [playwright] enriched {enriched}/{len(needs_names)} records", flush=True)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prior = _load_prior(output_path)
     merged = merge_with_prior(current, prior)
@@ -562,6 +693,15 @@ def main() -> int:
         ),
     )
     parser.add_argument(
+        "--no-enrich-names",
+        action="store_true",
+        help=(
+            "Skip the Playwright name enrichment step (no Chrome window). "
+            "Enrichment is on by default and uses your real Chrome profile to "
+            "fetch grantor/grantee names from recorder.maricopa.gov."
+        ),
+    )
+    parser.add_argument(
         "--probe-doc-types",
         action="store_true",
         help=(
@@ -589,6 +729,7 @@ def main() -> int:
         probe_doc_types=args.probe_doc_types,
         max_features=args.max_features,
         fetch_detail=not args.no_fetch_detail,
+        enrich_names=not args.no_enrich_names,
     )
     if not args.probe_doc_types:
         print(json.dumps(stats, indent=2))

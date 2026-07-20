@@ -16,12 +16,14 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo [2/5] Fetching treasurer tax lien records (full dataset)...
-python -X utf8 scrapers\treasurer_tax_lien_maricopa.py
-if %ERRORLEVEL% neq 0 (
-    echo ERROR: treasurer scraper failed ^(exit code %ERRORLEVEL%^).
-    exit /b 1
-)
+echo [2/5] Treasurer tax lien fetch — SKIPPED by default (169K records, ~30 min).
+echo        To enable: uncomment the block below and re-run.
+REM echo [2/5] Fetching treasurer tax lien records (full dataset)...
+REM python -X utf8 scrapers\treasurer_tax_lien_maricopa.py
+REM if %ERRORLEVEL% neq 0 (
+REM     echo ERROR: treasurer scraper failed ^(exit code %ERRORLEVEL%^).
+REM     exit /b 1
+REM )
 
 echo.
 echo [3/5] Running full pipeline with local parcel index...

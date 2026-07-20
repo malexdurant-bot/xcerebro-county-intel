@@ -5,8 +5,8 @@ cd /d "C:\Users\makia\OneDrive\Documents\GitHub\xcerebro-county-intel"
 echo === Maricopa Daily Incremental: %DATE% %TIME% ===
 echo.
 
-echo [1/3] Fetching new NOTS records (last 24h)...
-python -X utf8 scrapers\recorder_maricopa.py --days-back 1
+echo [1/3] Fetching NOTS records (last 10 days, catches delayed name indexing)...
+python -X utf8 scrapers\recorder_maricopa.py --days-back 10
 if %ERRORLEVEL% neq 0 (
     echo ERROR: recorder scraper failed ^(exit code %ERRORLEVEL%^).
     exit /b 1

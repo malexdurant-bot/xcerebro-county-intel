@@ -122,7 +122,7 @@ try {
     $null = [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime]
 
     $ToastXml = [Windows.Data.Xml.Dom.XmlDocument]::new()
-    $ToastXml.LoadXml(@'
+    $ToastXmlStr = @'
 <toast duration="long">
   <visual>
     <binding template="ToastGeneric">
@@ -131,7 +131,9 @@ try {
     </binding>
   </visual>
 </toast>
-'@ -replace 'NEWCOUNT', $NewCount -replace 'LEADTOTAL', $LeadTotal)
+'@
+    $ToastXmlStr = $ToastXmlStr -replace 'NEWCOUNT', $NewCount -replace 'LEADTOTAL', $LeadTotal
+    $ToastXml.LoadXml($ToastXmlStr)
 
     $Toast = [Windows.UI.Notifications.ToastNotification]::new($ToastXml)
     [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("Windows PowerShell").Show($Toast)

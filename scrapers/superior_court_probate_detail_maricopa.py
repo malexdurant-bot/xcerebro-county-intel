@@ -339,7 +339,7 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def _load_base_jsonl(path: Path, max_records: int) -> list[dict]:
+def _load_base_jsonl(path: Path, max_records: Optional[int]) -> list[dict]:
     records: list[dict] = []
     with open(path, encoding="utf-8") as fh:
         for line in fh:
@@ -353,7 +353,7 @@ def _load_base_jsonl(path: Path, max_records: int) -> list[dict]:
             if rec.get("change_status") == "DISAPPEARED":
                 continue
             records.append(rec)
-            if len(records) >= max_records:
+            if max_records is not None and len(records) >= max_records:
                 break
     return records
 
@@ -380,10 +380,10 @@ def _load_prior_detail(path: Path) -> dict[str, dict]:
 def run(
     base_jsonl: Path = BASE_JSONL,
     output_path: Path = DETAIL_JSONL,
-    max_records: int = 50,
+    max_records: Optional[int] = None,
     delay_seconds: float = 1.0,
 ) -> dict:
-    """Fetch detail pages for up to max_records base records. Returns stats."""
+    """Fetch detail pages for all base records (or up to max_records if set). Returns stats."""
     if not base_jsonl.exists():
         raise FileNotFoundError(f"Base JSONL not found: {base_jsonl}")
 
@@ -507,8 +507,8 @@ def _tally_stats(detail: dict, stats: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--max-records", type=int, default=18, metavar="N",
-                        help="Max base records to enrich (default: 18)")
+    parser.add_argument("--max-records", type=int, default=None, metavar="N",
+                        help="Max base records to enrich (default: None = no limit)")
     parser.add_argument("--delay", type=float, default=1.0, metavar="SECS",
                         help="Seconds between requests (default: 1.0)")
     parser.add_argument("--base-jsonl", default=None,

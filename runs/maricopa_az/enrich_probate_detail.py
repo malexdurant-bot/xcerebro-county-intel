@@ -30,8 +30,8 @@ from scrapers.superior_court_probate_detail_maricopa import (
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--max-records", type=int, default=18,
-                    help="Max base records to enrich (default: 18)")
+    ap.add_argument("--max-records", type=int, default=None,
+                    help="Max base records to enrich (default: None = no limit)")
     ap.add_argument("--delay", type=float, default=1.0,
                     help="Seconds between requests (default: 1.0)")
     args = ap.parse_args()

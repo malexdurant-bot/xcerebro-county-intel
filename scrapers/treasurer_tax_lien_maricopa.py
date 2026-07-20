@@ -184,18 +184,40 @@ def merge_with_prior(current: list, prior_by_id: dict) -> list:
 # ---------------------------------------------------------------------------
 
 
+def _delinquent_tax_where(min_years: int) -> str:
+    """WHERE clause for DelinquentTax: only records delinquent >= min_years.
+
+    DeedNumber format: YYYYXXXXXXX (11 digits, 4-digit year prefix).
+    Cutoff: year <= (current_year - min_years), i.e. DeedNumber < '{cutoff}0000000'.
+    Example: 2026 run, min_years=3 → DeedNumber < '20240000000' (years ≤ 2023).
+    """
+    cutoff_year = datetime.now().year - min_years + 1
+    return f"DeedNumber < '{cutoff_year}0000000'"
+
+
 def fetch_all(
     server: ArcGISFeatureServer,
     *,
     where: str = "1=1",
+    min_years_delinquent: int = 3,
     max_features: int | None = None,
 ) -> Iterable[dict]:
-    """Yield normalized raw records across all three lien layers."""
+    """Yield normalized raw records across all three lien layers.
+
+    DelinquentTax layer is filtered to records >= min_years_delinquent years old
+    (default 3) via a DeedNumber prefix comparison. Set min_years_delinquent=0 to
+    disable the filter and pull the full layer.
+    """
     now = _now_iso()
     for layer in LAYERS:
+        if layer["layer_name"] == "DelinquentTax" and min_years_delinquent > 0:
+            dt_filter = _delinquent_tax_where(min_years_delinquent)
+            layer_where = dt_filter if where == "1=1" else f"({where}) AND {dt_filter}"
+        else:
+            layer_where = where
         for feat in server.iter_features(
             layer_id=layer["layer_id"],
-            where=where,
+            where=layer_where,
             out_fields="*",
             return_geometry=True,
             max_features=max_features,
@@ -212,6 +234,7 @@ def run(
     *,
     output_path: Path | None = None,
     where: str = "1=1",
+    min_years_delinquent: int = 3,
     max_features: int | None = None,
     fetch_fn=None,
 ) -> dict:
@@ -227,7 +250,7 @@ def run(
         fetch_fn=fetch_fn,
     )
 
-    current = list(fetch_all(server, where=where, max_features=max_features))
+    current = list(fetch_all(server, where=where, min_years_delinquent=min_years_delinquent, max_features=max_features))
     prior = _load_prior(output_path)
     merged = merge_with_prior(current, prior)
 
@@ -295,12 +318,24 @@ def main() -> int:
         default=None,
         help="Cap on records pulled per layer (useful for testing).",
     )
+    parser.add_argument(
+        "--min-years-delinquent",
+        type=int,
+        default=3,
+        dest="min_years_delinquent",
+        help=(
+            "For DelinquentTax layer: only include records delinquent for this many "
+            "years or more, based on DeedNumber year prefix (default: 3). "
+            "Set to 0 to disable the filter and pull the full layer."
+        ),
+    )
     args = parser.parse_args()
 
     out = Path(args.out) if args.out else None
     stats = run(
         output_path=out,
         where=args.where,
+        min_years_delinquent=args.min_years_delinquent,
         max_features=args.max_features,
     )
     print(json.dumps(stats, indent=2))

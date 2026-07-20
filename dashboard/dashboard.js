@@ -60,7 +60,7 @@
       stack_depth: new Set(),
     },
     sort: { key: "display_score", dir: -1 },
-    mode: "client", // "client" or "operator"
+    mode: "operator", // "client" or "operator"
     precannedView: null,
   };
 

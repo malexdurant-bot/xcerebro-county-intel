@@ -1,7 +1,7 @@
 """
 Maricopa County — Daily incremental pipeline.
 
-Processes only new/updated source records (change_status == NEW or UPDATED)
+Processes only new/updated source records (change_status == NEW, NEW_RECORD, or UPDATED)
 since the last successful run. Updates the lead history store and exports
 daily CSVs. Designed for unattended daily execution via Task Scheduler.
 
@@ -37,7 +37,7 @@ _THIS_DIR = Path(__file__).parent
 if str(_THIS_DIR) not in sys.path:
     sys.path.insert(0, str(_THIS_DIR))
 
-from apn_resolver import APNResolver  # noqa: E402
+from apn_resolver import APNResolver, disambiguate_by_name_score  # noqa: E402
 from treasurer_adapter import build_treasurer_raw_events  # noqa: E402
 from eviction_adapter import build_eviction_raw_events  # noqa: E402
 from civil_adapter import build_civil_raw_events  # noqa: E402
@@ -160,7 +160,7 @@ def _recorder_to_raw_event(
 
 
 def _load_new_records(path: Path) -> list[dict]:
-    """Load records with change_status NEW or UPDATED, skipping DISAPPEARED/SAME."""
+    """Load records with change_status NEW, NEW_RECORD, or UPDATED, skipping DISAPPEARED/SAME."""
     records: list[dict] = []
     if not path.exists():
         return records
@@ -173,7 +173,7 @@ def _load_new_records(path: Path) -> list[dict]:
                 rec = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            if rec.get("change_status") in ("NEW", "UPDATED"):
+            if rec.get("change_status") in ("NEW", "NEW_RECORD", "UPDATED"):
                 records.append(rec)
     return records
 
@@ -217,6 +217,14 @@ def main() -> None:
             "Does not re-fetch sources or re-run the pipeline."
         ),
     )
+    ap.add_argument(
+        "--skip-treasurer", action="store_true",
+        help=(
+            "Skip loading treasurer JSONL records entirely. "
+            "Useful when treasurer data has not been refreshed or "
+            "when running without the full 169K dataset."
+        ),
+    )
     args = ap.parse_args()
 
     t_wall = time.perf_counter()
@@ -249,14 +257,18 @@ def main() -> None:
     # ------------------------------------------------------------------
     t = time.perf_counter()
     nots_new = _load_new_records(NOTS_JSONL_PATH)
-    treas_new = _load_new_records(TREASURER_JSONL_PATH)
+    if args.skip_treasurer:
+        treas_new: list[dict] = []
+        print("  [--skip-treasurer] Treasurer records skipped.")
+    else:
+        treas_new = _load_new_records(TREASURER_JSONL_PATH)
     eviction_new = _load_new_records(EVICTION_JSONL_PATH)
     civil_new = _load_new_records(CIVIL_JSONL_PATH)
     load_s = time.perf_counter() - t
 
-    print("New source records (change_status=NEW/UPDATED):")
+    print("New source records (change_status=NEW/NEW_RECORD/UPDATED):")
     print(f"  NOTS:      {len(nots_new):>6,}")
-    print(f"  Treasurer: {len(treas_new):>6,}")
+    print(f"  Treasurer: {len(treas_new):>6,}{'  (skipped)' if args.skip_treasurer else ''}")
     print(f"  Eviction:  {len(eviction_new):>6,}")
     print(f"  Civil:     {len(civil_new):>6,}")
     print(f"  [timing] source_loading: {load_s:.2f}s")
@@ -283,6 +295,7 @@ def main() -> None:
     apn_stats: dict[str, int] = {}
 
     print(f"=== NOTS APN resolution ({len(nots_new)} records) ===")
+    name_score_disambig = 0
     t = time.perf_counter()
     for raw_rec in nots_new:
         payload = raw_rec.get("raw_payload", {})
@@ -292,6 +305,11 @@ def main() -> None:
             if debtor_party_engine.classify_owner_type(n) in ("INDIVIDUAL", "ESTATE", "TRUST")
         ]
         apn_result = resolver.resolve(individual_names)
+        if apn_result["confidence"] == "AMBIGUOUS":
+            disambig = disambiguate_by_name_score(apn_result)
+            if disambig["confidence"] == "CONFIRMED":
+                name_score_disambig += 1
+            apn_result = disambig
         conf = apn_result["confidence"]
         resolved_apn = apn_result.get("apn")
         parcel_attrs = apn_result.get("attrs")
@@ -301,7 +319,8 @@ def main() -> None:
         situs = parcel_attrs.get("PHYSICAL_ADDRESS") if parcel_attrs else None
         raw_events.append(_recorder_to_raw_event(raw_rec, resolved_apn, situs))
     nots_s = time.perf_counter() - t
-    print(f"  APN stats: {apn_stats}")
+    disambig_note = f"  ({name_score_disambig} promoted via name-score)" if name_score_disambig else ""
+    print(f"  APN stats: {apn_stats}{disambig_note}")
     print(f"  [timing] nots_apn_resolution: {nots_s:.2f}s")
     print()
 

@@ -81,6 +81,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from typing import Optional
 
 _THIS_DIR = Path(__file__).parent
 _REPO_ROOT = _THIS_DIR.parents[1]
@@ -137,8 +138,8 @@ def _infer_doc_type_from_prefix(case_number: str) -> tuple[str | None, str]:
 # ---------------------------------------------------------------------------
 
 
-def load_probate_jsonl(path: Path, max_records: int) -> list[dict]:
-    """Load up to max_records ACTIVE (non-DISAPPEARED) base listing records."""
+def load_probate_jsonl(path: Path, max_records: Optional[int] = None) -> list[dict]:
+    """Load ACTIVE (non-DISAPPEARED) base listing records. Pass max_records to cap."""
     records: list[dict] = []
     with open(path, encoding="utf-8") as fh:
         for line in fh:
@@ -152,7 +153,7 @@ def load_probate_jsonl(path: Path, max_records: int) -> list[dict]:
             if rec.get("change_status") == "DISAPPEARED":
                 continue
             records.append(rec)
-            if len(records) >= max_records:
+            if max_records is not None and len(records) >= max_records:
                 break
     return records
 

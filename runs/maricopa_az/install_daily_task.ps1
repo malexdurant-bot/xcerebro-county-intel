@@ -73,17 +73,17 @@ try {
     Write-Host "  Logon type: S4U -- task runs even when logged out."
 }
 catch {
-    Write-Warning "S4U failed -- falling back to InteractiveToken."
+    Write-Warning "S4U failed -- falling back to Interactive."
 
     $Principal = New-ScheduledTaskPrincipal `
-        -UserId $CurrentUser -LogonType InteractiveToken -RunLevel Limited
+        -UserId $CurrentUser -LogonType Interactive -RunLevel Limited
 
     Register-ScheduledTask `
         -TaskName $TaskName -Action $Action -Trigger $Trigger `
         -Settings $Settings -Principal $Principal -Force | Out-Null
 
-    $LogonMethod = "InteractiveToken (runs only when logged in)"
-    Write-Host "  Logon type: InteractiveToken -- task runs only while logged in."
+    $LogonMethod = "Interactive (runs only when logged in)"
+    Write-Host "  Logon type: Interactive -- task runs only while logged in."
 }
 
 $Task     = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop

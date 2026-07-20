@@ -235,14 +235,21 @@ def _save_probate_match_cache(payload: dict) -> None:
         json.dump(payload, fh)
 
 
-def _load_jsonl(path: Path, max_records: int) -> list[dict]:
+def _load_jsonl(path: Path, max_records: Optional[int]) -> list[dict]:
     records = []
     with open(path, encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
-            if line:
-                records.append(json.loads(line))
-            if len(records) >= max_records:
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if rec.get("change_status") == "DISAPPEARED":
+                continue
+            records.append(rec)
+            if max_records is not None and len(records) >= max_records:
                 break
     return records
 
@@ -255,12 +262,21 @@ def _load_jsonl(path: Path, max_records: int) -> list[dict]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
-        "--max-records", type=int, default=5,
-        help="Max records per source (default: 5, per bounded-test rule)",
+        "--max-records", type=int, default=None,
+        help="Max records per source (default: None = no limit, loads all records)",
     )
     ap.add_argument(
         "--verbose", action="store_true", default=False,
         help="Print per-record debug lines (APNs/case numbers suppressed by default)",
+    )
+    ap.add_argument(
+        "--use-local-index", action="store_true", default=False,
+        help=(
+            "Load the local parcel index (data/cache/parcel_owner_index.jsonl) "
+            "as the resolver backend. Required for production runs: treasurer APN "
+            "lookups become O(1) dict hits; NOTS name scans become in-memory only. "
+            "Adds ~234s startup but eliminates live API calls for all 169K+ records."
+        ),
     )
     args = ap.parse_args()
 
@@ -320,10 +336,35 @@ def main() -> None:
     print()
 
     # -------------------------------------------------------------------------
-    # Stage 2a — NOTS APN resolution
+    # Stage 2a — Local parcel index (optional, for production-scale runs)
     # -------------------------------------------------------------------------
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    resolver = APNResolver(cache_path=OUT_DIR / "assessor_cache.json")
+    _local_idx = None
+
+    if args.use_local_index:
+        if not PARCEL_INDEX_PATH.exists():
+            print(f"ERROR: --use-local-index set but {PARCEL_INDEX_PATH} not found.")
+            sys.exit(1)
+        from local_parcel_index import LocalParcelIndex
+        mb = PARCEL_INDEX_PATH.stat().st_size // 1024 // 1024
+        print(f"Loading local parcel index ({mb} MB) for bulk resolution…")
+        t = time.perf_counter()
+        _local_idx = LocalParcelIndex().load(PARCEL_INDEX_PATH)
+        t = _log_stage("parcel_index_loading", t)
+        print(f"  {_local_idx.record_count:,} residential records indexed")
+        print()
+
+    if _local_idx is not None:
+        resolver = APNResolver(
+            cache_path=OUT_DIR / "assessor_cache.json",
+            fetch_fn=_local_idx.fetch_fn,
+        )
+    else:
+        resolver = APNResolver(cache_path=OUT_DIR / "assessor_cache.json")
+
+    # -------------------------------------------------------------------------
+    # Stage 2b — NOTS APN resolution
+    # -------------------------------------------------------------------------
 
     parcel_by_apn: dict[str, dict] = {}
     raw_events: list[dict] = []
@@ -437,15 +478,19 @@ def main() -> None:
                 t = _log_stage("probate_parcel_matching_cached", t)
             else:
                 try:
-                    from local_parcel_index import LocalParcelIndex
                     from probate_parcel_matcher import (
                         match_record as _pm_match,
                         MATCH_CONFIRMED as _PM_CONFIRMED,
                     )
-                    print(f"  Loading parcel index ({PARCEL_INDEX_PATH.stat().st_size // 1024 // 1024} MB)…")
-                    _idx = LocalParcelIndex().load(PARCEL_INDEX_PATH)
-                    t = _log_stage("parcel_index_loading", t)
-                    print(f"  Index loaded: {_idx.record_count:,} residential records")
+                    if _local_idx is not None:
+                        _idx = _local_idx
+                        print(f"  Reusing already-loaded parcel index ({_idx.record_count:,} records)")
+                    else:
+                        from local_parcel_index import LocalParcelIndex
+                        print(f"  Loading parcel index ({PARCEL_INDEX_PATH.stat().st_size // 1024 // 1024} MB)…")
+                        _idx = LocalParcelIndex().load(PARCEL_INDEX_PATH)
+                        t = _log_stage("parcel_index_loading", t)
+                        print(f"  Index loaded: {_idx.record_count:,} residential records")
 
                     t = time.perf_counter()
                     _probate_resolver = APNResolver(fetch_fn=_idx.fetch_fn)
