@@ -539,15 +539,35 @@ def run_scraper(
 
         browser.close()
 
-    # Deduplicate by raw_record_id
-    seen: set = set()
-    deduped: list[dict] = []
+    # Merge rows for the same case: A-Z sweep returns one row per party, so a
+    # single case may appear multiple times with different party_type values.
+    # Build one record per case_number, extracting plaintiff from PLAINTIFF rows
+    # and defendant from DEFENDANT rows.  Attorney rows are skipped.
+    by_case: dict[str, dict] = {}
     for rec in current:
         rid = rec["raw_record_id"]
-        if rid not in seen:
-            seen.add(rid)
-            deduped.append(rec)
-    current = deduped
+        pt = ((rec.get("raw_payload") or {}).get("party_type") or "").upper()
+        # Skip attorney rows — they pollute the plaintiff slot
+        if "ATTORNEY" in pt:
+            continue
+        if rid not in by_case:
+            by_case[rid] = rec
+        else:
+            existing = by_case[rid]
+            ep = existing["raw_payload"]
+            rp = rec["raw_payload"]
+            # Fill in plaintiff from a PLAINTIFF row
+            if "PLAINTIFF" in pt and not ep.get("plaintiff"):
+                ep["plaintiff"] = rp.get("party_name")
+                ep["party_name"] = rp.get("party_name")
+                ep["party_type"] = rp.get("party_type")
+            # Fill in defendant from a DEFENDANT row
+            if pt == "DEFENDANT" and not ep.get("defendant"):
+                ep["defendant"] = rp.get("party_name")
+            # Use filing_date if not yet set
+            if not ep.get("filing_date") and rp.get("filing_date"):
+                ep["filing_date"] = rp["filing_date"]
+    current = list(by_case.values())
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prior = _load_prior(prior_path)
