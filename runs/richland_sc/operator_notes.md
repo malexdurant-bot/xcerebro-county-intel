@@ -47,14 +47,10 @@ knowledge surfaces. Each entry should be:
 
 ## register_of_deeds_sms
 
-**2026-07-19T23:55:00Z** — BLOCKED pending operator account creation.
+**2026-07-20T00:00:00Z** — CLOSED. Paid subscription required — not viable.
 
-- Operator must create a free account at https://www7.richlandcountysc.gov/SMS_External/Login.aspx and answer:
-  1. Does free account allow index-level search (name, date range, doc type)?
-  2. Are document images viewable on free tier, or is paid subscription required?
-  3. Does the system support date-range bulk search (e.g. all lis pendens filed in past 7 days)?
-  4. What is daily/weekly subscription cost?
-- User guide at: https://www7.richlandcountysc.gov/SMS_External/Documents/SMS_User_Guide.pdf
+- Operator confirmed: the SMS system requires a paid subscription for bulk index access.
+- Source is EXCLUDED from this build. Columbia Star public notices remain the lis pendens signal source.
 - Custom county system ("SMS"), NOT Tyler/GovOS/Fidlar.
 - Records from 2/19/1998 with images; pre-1998 index-only.
 
