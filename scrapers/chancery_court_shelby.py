@@ -335,25 +335,36 @@ def _extract_results_from_page(
         cells = row.get("cells") or []
         href = (row.get("href") or "").strip()
 
-        # 5-column table: ID | Name/Corporation | Address | Party Type | Filing Date
-        # cells[0] = "Case: <case_number>" (contains docket link; link text = case number)
-        # cells[1] = party/case name (may be "PLAINTIFF V DEFENDANT" or just party name)
-        # cells[2] = address (often empty in case rows)
-        # cells[3] = party type e.g. "PLAINTIFF" or "DEFENDANT"
-        # cells[4] = filing date e.g. "13-JUL-2026"
+        # Chancery CourtConnect has 7 columns (differs from GS Civil's 5):
+        # cells[0] = party record ID e.g. "@151821"
+        # cells[1] = party name e.g. "GRANT, LEDERRIUS TRAMALE"
+        # cells[2] = "Case: CH-26-0944 PLAINTIFF V DEFENDANT" (contains docket link)
+        # cells[3] = party type e.g. "Defendant" or "Plaintiff"
+        # cells[4] = (empty — possibly address)
+        # cells[5] = filing date e.g. "09-JUL-2026"
+        # cells[6] = case status e.g. "INITIAL-Initial case filing"
         party_name = cells[1].strip() if len(cells) > 1 else ""
         party_type = cells[3].strip() if len(cells) > 3 else None
-        filing_date = cells[4].strip() if len(cells) > 4 else None
+        filing_date = cells[5].strip() if len(cells) > 5 else None
+
+        # Parse case caption from cells[2]: "Case: CH-26-0944 SMITH V JONES"
+        case_cell = cells[2].strip() if len(cells) > 2 else ""
+        caption = case_cell
+        # Strip "Case: <case_num> " prefix if present
+        import re as _re
+        m = _re.match(r'^Case:\s*\S+\s+(.*)', case_cell, _re.IGNORECASE)
+        if m:
+            caption = m.group(1).strip()
 
         plaintiff = None
         defendant = None
-        if " V " in party_name:
-            parts = party_name.split(" V ", 1)
+        if " V " in caption:
+            parts = caption.split(" V ", 1)
             plaintiff = parts[0].strip()
             defendant = parts[1].strip()
-        elif party_type == "PLAINTIFF":
+        elif (party_type or "").upper() == "PLAINTIFF":
             plaintiff = party_name
-        elif party_type == "DEFENDANT":
+        elif (party_type or "").upper() == "DEFENDANT":
             defendant = party_name
         else:
             plaintiff = party_name
@@ -361,6 +372,7 @@ def _extract_results_from_page(
         raw_payload: dict = {
             "case_number": case_number,
             "case_type": case_type_label,
+            "case_caption": caption,
             "party_name": party_name,
             "plaintiff": plaintiff,
             "defendant": defendant,
