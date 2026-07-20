@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -138,6 +139,29 @@ def main() -> None:
     if not raw_events:
         print("[richland_sc] No raw events — pipeline up to date. Exiting.")
         return
+
+    # ------------------------------------------------------------------
+    # Step 2b — DealMachine skip-trace for estate leads (no parcel ID)
+    # ------------------------------------------------------------------
+    from scrapers.richland_skiptrace_dealmachine import enrich_estate_raw_events  # noqa: PLC0415
+
+    estate_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") == "letters_testamentary"
+        and not (e.get("property_refs") or {}).get("parcel_id")
+    )
+    raw_events = enrich_estate_raw_events(raw_events)
+    estate_newly_enriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") == "letters_testamentary"
+        and (e.get("property_refs") or {}).get("_enriched_via") == "dealmachine_skiptrace"
+    )
+    dm_key_status = "set" if os.environ.get("DEALMACHINE_API_KEY") else "not set"
+    print(
+        f"[richland_sc] DealMachine skip-trace: "
+        f"{estate_newly_enriched}/{estate_unenriched} estate events enriched "
+        f"(DEALMACHINE_API_KEY {dm_key_status})"
+    )
 
     # ------------------------------------------------------------------
     # Step 3 — Staged pipeline
