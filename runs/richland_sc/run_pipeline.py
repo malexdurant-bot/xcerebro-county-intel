@@ -234,6 +234,34 @@ def main() -> None:
     print(f"[richland_sc] Lead total:          {payload['lead_total']}")
     print(f"[richland_sc] Score tiers:         {payload['score_tier_distribution']}")
     print(f"[richland_sc] Patterns:            {payload['pattern_counts']}")
+
+    # ------------------------------------------------------------------
+    # Step 5 — Publish to GitHub Pages (malexdurant-bot fork)
+    # ------------------------------------------------------------------
+    import subprocess  # noqa: PLC0415
+    try:
+        subprocess.run(
+            ["git", "add", str(static_dash_path)],
+            cwd=str(ROOT), check=True, capture_output=True,
+        )
+        subprocess.run(
+            ["git", "commit", "-m",
+             f"data(richland_sc): dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
+            cwd=str(ROOT), check=True, capture_output=True,
+        )
+        subprocess.run(
+            ["git", "push", "pages", "main"],
+            cwd=str(ROOT), check=True, capture_output=True, timeout=60,
+        )
+        print("[richland_sc] GitHub Pages updated → https://malexdurant-bot.github.io/xcerebro-county-intel/dashboard/")
+    except subprocess.CalledProcessError as exc:
+        # Non-fatal — pipeline succeeded even if publish fails
+        stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
+        if "nothing to commit" in stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):
+            print("[richland_sc] GitHub Pages: no changes to publish")
+        else:
+            print(f"[richland_sc] GitHub Pages publish failed (non-fatal): {stderr[:200]}")
+
     print(
         f"[richland_sc] Pipeline complete — "
         f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}"
