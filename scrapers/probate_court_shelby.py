@@ -1,56 +1,39 @@
 """
-Shelby County Probate Court — case search scraper.
+Shelby County Probate Court — case search scraper (requests-based).
 
 Portal: https://probatedata.shelbycountytn.gov/ProbateCourt/
-(Redirects from original pls URL to JSF app)
+Search: https://probatedata.shelbycountytn.gov/ProbateCourt/faces/app/search.xhtml
 
-Architecture: JavaServer Faces (JSF) app — NOT CourtConnect.
-Direct page navigation to:
-  https://probatedata.shelbycountytn.gov/ProbateCourt/faces/app/search.xhtml
+Flow discovered 2026-07-21:
+  1. GET search.xhtml  →  extract ViewState
+  2. POST radio AJAX   →  set customRadio=1 (name search)
+  3. POST pSub AJAX    →  server runs search + stores results in session;
+                          returns EvaluationException (JSF render-phase NPE, harmless)
+  4. GET root page     →  extract root ViewState + DataTable rowCount from JS
+  5. POST DataTable pagination AJAX  →  5 rows per call; repeat for all pages
 
-Form fields (CONFIRMED by probe):
-  - searchForm                 : hidden, value "searchForm"
-  - searchForm:customRadio     : radio — "1" = name search, "2" = case number search
-  - searchForm:opt1Input       : text — last name (for radio=1)
-  - searchForm:opt1Input1      : text — first name (for radio=1)
-  - searchForm:opt2Input       : text — case number (for radio=2)
-  - searchForm:opt2Input2      : text — additional case field (for radio=2)
-  - searchForm:value1_input    : checkbox — "Admin: No" (leave unchecked)
-  - javax.faces.ViewState      : hidden — JSF ViewState (must be read from page each time)
-  - Submit: button element in the form
+  Note: opt1Input (lastName) IS processed by JSF because after step 2 the
+  server-side component tree marks it as enabled. Different names return
+  different result sets via LIKE '%name%' match. Empty string returns all cases.
 
-Search strategy:
-  - This portal ONLY supports name-based or case-number-based search.
-  - No date-range bulk search available.
-  - For bulk use: search by last_name="%", but server may reject wildcard.
-  - Fallback: return 0 records with SEARCH_ONLY_NO_BULK note in stats.
-
-Requires: pip install playwright && playwright install chromium
+Date filtering: the DataTable is sorted by case number ASC (oldest first).
+We request pages from the END (highest first-row offset) and work backwards,
+stopping when Date Filed < cutoff.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
-# ---------------------------------------------------------------------------
-# Playwright import guard
-# ---------------------------------------------------------------------------
-
-try:
-    from playwright.sync_api import sync_playwright
-    PLAYWRIGHT_AVAILABLE = True
-except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
-
-_PLAYWRIGHT_INSTALL_MSG = (
-    "playwright not installed. Run: pip install playwright && playwright install chromium"
-)
+import requests
+from bs4 import BeautifulSoup
 
 # ---------------------------------------------------------------------------
 # Repo bootstrap
@@ -67,9 +50,7 @@ if str(REPO_ROOT) not in sys.path:
 SOURCE_ID = "probate_court_shelby"
 
 PORTAL_URL = "https://probatedata.shelbycountytn.gov/ProbateCourt/"
-SEARCH_URL = (
-    "https://probatedata.shelbycountytn.gov/ProbateCourt/faces/app/search.xhtml"
-)
+SEARCH_URL = "https://probatedata.shelbycountytn.gov/ProbateCourt/faces/app/search.xhtml"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -77,10 +58,13 @@ USER_AGENT = (
     "Chrome/124.0.0.0 Safari/537.36"
 )
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+ROWS_PER_PAGE = 5
 
+_DATE_FMTS = ("%m-%d-%Y", "%m/%d/%Y", "%Y-%m-%d")
+
+# ---------------------------------------------------------------------------
+# Date helpers
+# ---------------------------------------------------------------------------
 
 def _now_iso() -> str:
     return (
@@ -90,6 +74,25 @@ def _now_iso() -> str:
     )
 
 
+def _parse_date(s: str) -> Optional[date]:
+    s = s.strip()
+    for fmt in _DATE_FMTS:
+        try:
+            return datetime.strptime(s, fmt).date()
+        except ValueError:
+            pass
+    return None
+
+
+def _is_placeholder_date(s: str) -> bool:
+    """01-01-1901 is the portal's null-date placeholder."""
+    return s.strip() in ("01-01-1901", "01/01/1901")
+
+
+# ---------------------------------------------------------------------------
+# Record helpers
+# ---------------------------------------------------------------------------
+
 def _raw_record_id(case_number: str) -> str:
     safe = (case_number or "").strip().upper().replace(" ", "_")
     return f"shelby_pb_{safe}"
@@ -98,7 +101,6 @@ def _raw_record_id(case_number: str) -> str:
 # ---------------------------------------------------------------------------
 # Prior / merge
 # ---------------------------------------------------------------------------
-
 
 def _load_prior(path: Path) -> dict:
     if not path.exists():
@@ -119,7 +121,7 @@ def _load_prior(path: Path) -> dict:
     return out
 
 
-def merge_with_prior(current: list, prior_by_id: dict) -> list:
+def _merge_with_prior(current: list, prior_by_id: dict) -> list:
     out: list = []
     current_ids: set = set()
     for rec in current:
@@ -147,471 +149,384 @@ def merge_with_prior(current: list, prior_by_id: dict) -> list:
 
 
 # ---------------------------------------------------------------------------
-# Playwright helpers
+# HTTP session helpers
 # ---------------------------------------------------------------------------
 
-
-def _wait_settled(page, timeout: int = 30_000) -> None:
-    try:
-        page.wait_for_load_state("networkidle", timeout=timeout)
-    except Exception:
-        try:
-            page.wait_for_load_state("domcontentloaded", timeout=10_000)
-        except Exception:
-            pass
-
-
-def _load_search_page(page, verbose: bool) -> bool:
-    """Load the JSF search page. Returns True on success."""
-    if verbose:
-        print(f"  [Probate] Loading search page: {SEARCH_URL}", flush=True)
-
-    try:
-        page.goto(SEARCH_URL, wait_until="domcontentloaded", timeout=60_000)
-        _wait_settled(page)
-    except Exception as exc:
-        if verbose:
-            print(f"  [Probate] WARNING: page load error: {exc}", flush=True)
-        # Try portal root instead
-        try:
-            page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=30_000)
-            _wait_settled(page)
-            # Navigate to search page
-            try:
-                page.click('a[href*="search"]', timeout=5_000)
-                _wait_settled(page)
-            except Exception:
-                pass
-        except Exception as exc2:
-            if verbose:
-                print(f"  [Probate] ERROR: fallback load failed: {exc2}", flush=True)
-            return False
-
-    # Verify we're on the search page — look for the form
-    try:
-        page.wait_for_selector(
-            'input[id*="opt1Input"], input[name*="opt1Input"], '
-            'input[id*="customRadio"], form[id*="searchForm"]',
-            timeout=15_000,
-        )
-        return True
-    except Exception:
-        if verbose:
-            page_url = page.url
-            print(
-                f"  [Probate] WARNING: search form not found at {page_url}", flush=True
-            )
-        return False
+def _make_session() -> requests.Session:
+    s = requests.Session()
+    s.headers.update({
+        "User-Agent": USER_AGENT,
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+    })
+    return s
 
 
-def _fill_and_submit_name_search(
-    page, last_name: str, first_name: str, verbose: bool
-) -> bool:
+_AJAX_HEADERS = {
+    "Accept": "application/xml, text/xml, */*; q=0.01",
+    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "Faces-Request": "partial/ajax",
+    "X-Requested-With": "XMLHttpRequest",
+    "Origin": "https://probatedata.shelbycountytn.gov",
+}
+
+
+def _extract_viewstate(html: str) -> Optional[str]:
+    m = re.search(r'<input[^>]+name="javax\.faces\.ViewState"[^>]+value="([^"]+)"', html)
+    return m.group(1) if m else None
+
+
+def _extract_viewstate_from_ajax(xml: str) -> Optional[str]:
+    m = re.search(r'<update id="[^"]*ViewState[^"]*"><!\[CDATA\[([^\]]+)', xml)
+    return m.group(1).strip() if m else None
+
+
+# ---------------------------------------------------------------------------
+# Portal search flow
+# ---------------------------------------------------------------------------
+
+def _setup_search(session: requests.Session, last_name: str = "", verbose: bool = False):
     """
-    Fill and submit a name-based search on the JSF probate search form.
-    Returns True if submission appeared successful.
+    Execute the full search flow and return (root_viewstate, row_count).
+
+    last_name: search term; empty string returns ALL cases (LIKE '%%').
     """
-    # Select radio button for name search (value="1")
-    try:
-        # JSF radio buttons typically have id="searchForm:customRadio:0" for value=1
-        # Try multiple selector strategies
-        radio_selected = False
-        for selector in (
-            'input[id*="customRadio"][value="1"]',
-            'input[name*="customRadio"][value="1"]',
-            'input[type="radio"][value="1"]',
-        ):
-            try:
-                el = page.query_selector(selector)
-                if el:
-                    el.click()
-                    radio_selected = True
-                    break
-            except Exception:
-                pass
+    # Step 1: GET search.xhtml
+    r = session.get(
+        SEARCH_URL, timeout=20,
+        headers={"Accept": "text/html,application/xhtml+xml"},
+    )
+    r.raise_for_status()
+    vs = _extract_viewstate(r.text)
+    if not vs:
+        raise RuntimeError("No ViewState found on search.xhtml")
 
-        if not radio_selected and verbose:
-            print(
-                "  [Probate] WARNING: could not select name search radio button",
-                flush=True,
-            )
-    except Exception as exc:
-        if verbose:
-            print(f"  [Probate] WARNING: radio selection error: {exc}", flush=True)
+    # Step 2: Radio AJAX — set customRadio=1 (name search)
+    r_radio = session.post(
+        SEARCH_URL,
+        headers={**_AJAX_HEADERS, "Referer": SEARCH_URL},
+        timeout=15,
+        data={
+            "javax.faces.partial.ajax": "true",
+            "javax.faces.source": "searchForm:customRadio",
+            "javax.faces.partial.execute": "searchForm:customRadio",
+            "javax.faces.partial.render": "searchForm",
+            "javax.faces.behavior.event": "change",
+            "javax.faces.partial.event": "change",
+            "searchForm": "searchForm",
+            "searchForm:customRadio": "1",
+            "javax.faces.ViewState": vs,
+        },
+    )
+    r_radio.raise_for_status()
+    vs2 = _extract_viewstate_from_ajax(r_radio.text) or vs
 
-    time.sleep(0.3)
+    # Step 3: pSub AJAX — executes search; EvaluationException is expected
+    session.post(
+        SEARCH_URL,
+        headers={**_AJAX_HEADERS, "Referer": SEARCH_URL},
+        timeout=25,
+        data={
+            "javax.faces.partial.ajax": "true",
+            "javax.faces.source": "searchForm:pSub",
+            "javax.faces.partial.execute": "@all",
+            "javax.faces.partial.render": "@all",
+            "searchForm:pSub": "searchForm:pSub",
+            "searchForm": "searchForm",
+            "searchForm:customRadio": "1",
+            "searchForm:opt1Input": last_name,
+            "searchForm:opt1Input1": "",
+            "javax.faces.ViewState": vs2,
+        },
+    )
+    # Response is EvaluationException XML — ignore it; results are in session
 
-    # Fill last name field
-    last_name_filled = False
-    for selector in (
-        'input[id*="opt1Input"]:not([id*="opt1Input1"])',
-        'input[name*="opt1Input"]:not([name*="opt1Input1"])',
-        '#searchForm\\:opt1Input',
-        'input[id="searchForm:opt1Input"]',
-    ):
-        try:
-            el = page.query_selector(selector)
-            if el:
-                el.fill(last_name)
-                last_name_filled = True
-                break
-        except Exception:
-            pass
+    # Step 4: GET root page → fresh ViewState + rowCount
+    r_root = session.get(
+        PORTAL_URL, timeout=20,
+        headers={
+            "Accept": "text/html,application/xhtml+xml",
+            "Referer": SEARCH_URL,
+        },
+    )
+    r_root.raise_for_status()
+    root_html = r_root.text
 
-    if not last_name_filled:
-        # Try getting all text inputs and fill the first visible one
-        try:
-            inputs = page.query_selector_all('input[type="text"], input[type=""]')
-            for inp in inputs:
-                if inp.is_visible():
-                    inp.fill(last_name)
-                    last_name_filled = True
-                    break
-        except Exception:
-            pass
+    root_vs = _extract_viewstate(root_html)
+    if not root_vs:
+        raise RuntimeError("No ViewState found on root page after search")
 
-    if not last_name_filled and verbose:
-        print(
-            "  [Probate] WARNING: could not fill last name field",
-            flush=True,
-        )
-
-    # Fill first name field (opt1Input1)
-    if first_name:
-        for selector in (
-            'input[id*="opt1Input1"]',
-            'input[name*="opt1Input1"]',
-            'input[id="searchForm:opt1Input1"]',
-        ):
-            try:
-                el = page.query_selector(selector)
-                if el:
-                    el.fill(first_name)
-                    break
-            except Exception:
-                pass
+    rc_match = re.search(r"rowCount:(\d+)", root_html)
+    row_count = int(rc_match.group(1)) if rc_match else 0
 
     if verbose:
         print(
-            f"  [Probate] Submitting name search: last_name={last_name!r}, "
-            f"first_name={first_name!r}",
+            f"  [Probate] search={last_name!r} rowCount={row_count}",
             flush=True,
         )
 
-    # Click submit button
-    submitted = False
-    for selector in (
-        'input[type="submit"]',
-        'button[type="submit"]',
-        'input[id*="search"]',
-        'button[id*="search"]',
-        'button[id*="j_idt"]',
-        'input[value*="Search"]',
-        'button:has-text("Search")',
-    ):
-        try:
-            el = page.query_selector(selector)
-            if el and el.is_visible():
-                el.click()
-                submitted = True
-                break
-        except Exception:
-            pass
-
-    if not submitted:
-        # Fallback: press Enter on the last name field
-        try:
-            el = page.query_selector('input[id*="opt1Input"]')
-            if el:
-                el.press("Enter")
-                submitted = True
-        except Exception:
-            pass
-
-    if not submitted and verbose:
-        print("  [Probate] WARNING: could not submit form", flush=True)
-
-    _wait_settled(page)
-    time.sleep(1)
-
-    return submitted
+    return root_vs, row_count
 
 
-def _extract_probate_results(page, verbose: bool) -> list[dict]:
+def _fetch_page(
+    session: requests.Session,
+    vs: str,
+    first_row: int,
+    rows: int = ROWS_PER_PAGE,
+) -> list[dict]:
     """
-    Extract case rows from the JSF Probate Court results page.
+    Request one page of DataTable results. Returns parsed row dicts.
+
+    Row dict: {case_number, name, case_type, date_filed, date_of_death}
+    Raises ValueError if the response looks like a ViewState expiry (no CDATA).
     """
-    now = _now_iso()
+    r = session.post(
+        SEARCH_URL,
+        headers={**_AJAX_HEADERS, "Referer": PORTAL_URL},
+        timeout=20,
+        data={
+            "javax.faces.partial.ajax": "true",
+            "javax.faces.source": "searchForm:gilistTable",
+            "javax.faces.partial.execute": "searchForm:gilistTable",
+            "javax.faces.partial.render": "searchForm:gilistTable",
+            "searchForm:gilistTable_pagination": "true",
+            "searchForm:gilistTable_first": str(first_row),
+            "searchForm:gilistTable_rows": str(rows),
+            "searchForm:gilistTable_skipChildren": "true",
+            "searchForm:gilistTable_encodeFeature": "true",
+            "searchForm": "searchForm",
+            "javax.faces.ViewState": vs,
+        },
+    )
+    r.raise_for_status()
+    result = _parse_datatable_ajax(r.text)
+    # A small response with no CDATA indicates ViewState/session expiry
+    if not result and len(r.content) < 1000:
+        raise ValueError(f"ViewState likely expired (response {len(r.content)}b, no rows)")
+    return result
+
+
+def _parse_datatable_ajax(xml: str) -> list[dict]:
+    """Extract row dicts from DataTable AJAX partial-response XML."""
+    cdata = re.search(
+        r'<update id="searchForm:gilistTable"><!\[CDATA\[(.*?)\]\]>',
+        xml,
+        re.DOTALL,
+    )
+    if not cdata:
+        return []
+    html = cdata.group(1)
+    soup = BeautifulSoup(html, "html.parser")
+    rows = []
+    for tr in soup.find_all("tr", {"data-ri": True}):
+        tds = tr.find_all("td")
+        if len(tds) < 5:
+            continue
+        cells = [td.get_text(strip=True) for td in tds]
+        rows.append({
+            "case_number": cells[0],
+            "name":        cells[1],
+            "case_type":   cells[2],
+            "date_filed":  cells[3],
+            "date_of_death": cells[4],
+        })
+    return rows
+
+
+# ---------------------------------------------------------------------------
+# Sweep terms: empty/None search_term → sweep these vowels to cover all names
+# (Every English last name contains at least one vowel.)
+# ---------------------------------------------------------------------------
+
+_SWEEP_TERMS = ["A", "E", "I", "O", "U"]
+
+
+# ---------------------------------------------------------------------------
+# _scrape_term — internal: one search term, backwards pagination
+# ---------------------------------------------------------------------------
+
+def _scrape_term(
+    search_term: str,
+    cutoff: Optional[date],
+    now: str,
+    *,
+    max_pages: int = 0,
+    verbose: bool = True,
+) -> tuple[list[dict], list[str], int, int]:
+    """
+    Run one search term, paginate backwards, stop at cutoff.
+    Returns (records, errors, pages_fetched, row_count).
+    """
+    session = _make_session()
     records: list[dict] = []
+    errors: list[str] = []
 
-    # Check for "no results" message
     try:
-        page_text = page.inner_text("body") or ""
-        if any(
-            phrase in page_text.lower()
-            for phrase in (
-                "no records",
-                "no results",
-                "0 records",
-                "no cases found",
-                "search returned no",
-            )
-        ):
-            if verbose:
-                print("  [Probate] No records found", flush=True)
-            return []
-
-        # Check for error messages
-        if any(
-            phrase in page_text.lower()
-            for phrase in ("invalid search", "error", "exception")
-        ):
-            if verbose:
-                print(
-                    f"  [Probate] Server returned error/invalid search: "
-                    f"{page_text[:200]}",
-                    flush=True,
-                )
-    except Exception:
-        pass
-
-    # Extract rows using JavaScript
-    try:
-        rows_data = page.evaluate("""
-            () => {
-                const results = [];
-                // JSF results are typically in a datatable or panel
-                // Look for links that go to case details
-                const links = document.querySelectorAll(
-                    'a[href*="case"], a[href*="detail"], a[onclick*="case"]'
-                );
-                for (const link of links) {
-                    const row = link.closest('tr') || link.closest('.ui-datatable-row');
-                    if (!row) continue;
-
-                    const cells = row.querySelectorAll('td');
-                    const cellTexts = Array.from(cells).map(
-                        c => c.innerText.trim().replace(/\\s+/g, ' ')
-                    );
-                    const href = new URL(
-                        link.getAttribute('href') || '#',
-                        document.baseURI
-                    ).href;
-
-                    results.push({
-                        case_number: link.innerText.trim(),
-                        href: href,
-                        cells: cellTexts,
-                    });
-                }
-
-                // Also try extracting from any data table rows directly
-                if (results.length === 0) {
-                    const tables = document.querySelectorAll(
-                        '.ui-datatable table, table[id*="result"], table[id*="case"]'
-                    );
-                    for (const table of tables) {
-                        const rows = table.querySelectorAll('tbody tr');
-                        for (const row of rows) {
-                            const cells = row.querySelectorAll('td');
-                            if (cells.length < 2) continue;
-                            const link = row.querySelector('a');
-                            const cellTexts = Array.from(cells).map(
-                                c => c.innerText.trim().replace(/\\s+/g, ' ')
-                            );
-                            results.push({
-                                case_number: link ? link.innerText.trim() : cellTexts[0],
-                                href: link
-                                    ? new URL(
-                                        link.getAttribute('href') || '#',
-                                        document.baseURI
-                                    ).href
-                                    : '',
-                                cells: cellTexts,
-                            });
-                        }
-                    }
-                }
-
-                return results;
-            }
-        """)
+        root_vs, row_count = _setup_search(session, search_term, verbose=verbose)
     except Exception as exc:
-        if verbose:
-            print(f"  [Probate] JS extraction error: {exc}", flush=True)
-        rows_data = []
+        return [], [str(exc)], 0, 0
 
-    if verbose:
-        print(f"  [Probate] Raw rows extracted: {len(rows_data)}", flush=True)
+    if row_count == 0:
+        return [], [], 0, 0
 
-    for row in rows_data:
-        case_number = (row.get("case_number") or "").strip()
-        if not case_number or case_number.lower() in ("search", "reset", ""):
+    pages_fetched = 0
+    stop_early = False
+    last_first = ((row_count - 1) // ROWS_PER_PAGE) * ROWS_PER_PAGE
+    consecutive_errors = 0
+
+    for first_row in range(last_first, -1, -ROWS_PER_PAGE):
+        if stop_early:
+            break
+        if max_pages > 0 and pages_fetched >= max_pages:
+            break
+
+        try:
+            page_rows = _fetch_page(session, root_vs, first_row)
+            consecutive_errors = 0
+        except ValueError as exc:
+            # ViewState/session expiry — re-establish the session
+            if verbose:
+                print(f"  [Probate] session refresh at first_row={first_row}: {exc}", flush=True)
+            try:
+                root_vs, _ = _setup_search(session, search_term, verbose=False)
+                page_rows = _fetch_page(session, root_vs, first_row)
+                consecutive_errors = 0
+            except Exception as exc2:
+                msg = f"term={search_term!r} page first={first_row} (retry): {exc2}"
+                errors.append(msg)
+                if verbose:
+                    print(f"  [Probate] {msg}", flush=True)
+                consecutive_errors += 1
+                if consecutive_errors >= 3:
+                    break
+                time.sleep(2)
+                continue
+        except Exception as exc:
+            msg = f"term={search_term!r} page first={first_row}: {exc}"
+            errors.append(msg)
+            if verbose:
+                print(f"  [Probate] {msg}", flush=True)
+            consecutive_errors += 1
+            if consecutive_errors >= 3:
+                break
+            time.sleep(1)
             continue
 
-        cells = row.get("cells") or []
-        href = (row.get("href") or "").strip()
-        if href == "#" or not href:
-            href = SEARCH_URL
+        pages_fetched += 1
 
-        # Column mapping: JSF Probate table typically shows:
-        # [0] Case Number | [1] Case Name/Decedent | [2] Filing Date | [3] Status
-        # (exact layout TBD from live probe — we extract best-effort)
-        case_name = cells[1] if len(cells) > 1 else None
-        filing_date = cells[2] if len(cells) > 2 else None
-        case_status = cells[3] if len(cells) > 3 else None
-        personal_rep = cells[4] if len(cells) > 4 else None
+        for row in reversed(page_rows):
+            case_num = (row.get("case_number") or "").strip()
+            if not case_num:
+                continue
 
-        raw_payload: dict = {
-            "case_number": case_number,
-            "case_name": case_name,
-            "filing_date": filing_date,
-            "personal_rep": personal_rep,
-            "case_status": case_status,
-            "all_cells": cells,
-        }
+            date_filed_str = (row.get("date_filed") or "").strip()
+            filing_date = _parse_date(date_filed_str) if date_filed_str else None
 
-        records.append({
-            "raw_record_id": _raw_record_id(case_number),
-            "source_id": SOURCE_ID,
-            "source_url": href,
-            "source_fetched_at": now,
-            "raw_payload": raw_payload,
-            "raw_text": None,
-            "first_seen_at": now,
-            "last_seen_at": now,
-            "change_status": "NEW_RECORD",
-            "parser_confidence": 75,
-        })
+            if cutoff and filing_date and filing_date < cutoff:
+                stop_early = True
+                break
 
-    return records
+            raw_payload: dict = {
+                "case_number":   case_num,
+                "name":          (row.get("name") or "").strip(),
+                "case_type":     (row.get("case_type") or "").strip(),
+                "date_filed":    date_filed_str,
+                "date_of_death": (row.get("date_of_death") or "").strip(),
+            }
+            records.append({
+                "raw_record_id":    _raw_record_id(case_num),
+                "source_id":        SOURCE_ID,
+                "source_url":       PORTAL_URL,
+                "source_fetched_at": now,
+                "raw_payload":      raw_payload,
+                "raw_text":         None,
+                "first_seen_at":    now,
+                "last_seen_at":     now,
+                "change_status":    "NEW_RECORD",
+                "parser_confidence": 80,
+            })
+
+        time.sleep(0.15)
+
+    return records, errors, pages_fetched, row_count
 
 
 # ---------------------------------------------------------------------------
 # run_scraper — public API
 # ---------------------------------------------------------------------------
 
-
 def run_scraper(
     output_path: Path,
     *,
-    last_name: str = "%",
-    first_name: str = "",
+    days_back: int = 0,
     existing_path: Optional[Path] = None,
     verbose: bool = True,
-    headless: bool = True,
+    search_term: Optional[str] = None,
+    max_pages: int = 0,
 ) -> dict:
     """
-    Scrape Shelby County Probate Court by name search.
+    Scrape Shelby County Probate Court.
 
-    LIMITATION: This portal only supports name-based or case-number-based search.
-    Bulk date-range search is not available. The wildcard "%" for last_name may
-    be rejected by the server. If rejected, returns 0 records with
-    search_limitation note in stats.
+    NOTE: This portal is a historical archive (cases through ~Sep 2013).
+    The default days_back=0 collects all available records.
+
+    When search_term is None or "" (default), sweeps vowels A/E/I/O/U so that
+    every English last name is matched by at least one search pass.  Supply an
+    explicit search_term to restrict to one name-contains query.
 
     Parameters
     ----------
-    output_path:
-        JSONL path to write.
-    last_name:
-        Last name to search. Use "%" for wildcard (may be rejected by server).
-    first_name:
-        First name to search (leave empty for broad search).
-    existing_path:
-        Path to prior JSONL for merge (defaults to output_path).
-    verbose:
-        Print progress messages.
-    headless:
-        Run Playwright in headless mode.
-
-    Returns
-    -------
-    Stats dict with counts and errors.
+    output_path     : JSONL path to write.
+    days_back       : Calendar days back from today to keep. 0 = keep all (default).
+    existing_path   : Prior JSONL for merge (defaults to output_path).
+    verbose         : Print progress.
+    search_term     : Name search term. None/"" → vowel sweep (recommended).
+    max_pages       : Safety cap per term. 0 = no cap.
     """
-    if not PLAYWRIGHT_AVAILABLE:
-        raise RuntimeError(_PLAYWRIGHT_INSTALL_MSG)
-
     prior_path = existing_path if existing_path is not None else output_path
+    today = date.today()
+    cutoff = (today - timedelta(days=days_back)) if days_back > 0 else None
+
+    sweep_mode = not search_term  # True when None or ""
+    terms = _SWEEP_TERMS if sweep_mode else [search_term]
 
     if verbose:
+        mode = f"vowel sweep {_SWEEP_TERMS}" if sweep_mode else f"term={search_term!r}"
         print(
-            f"[Probate] Scraping {SOURCE_ID}: last_name={last_name!r}, "
-            f"first_name={first_name!r}",
+            f"[Probate] Scraping {SOURCE_ID}: {mode}, "
+            f"days_back={days_back}, cutoff={cutoff}",
             flush=True,
         )
 
-    current: list[dict] = []
-    errors: list[str] = []
-    search_limitation: Optional[str] = None
+    now = _now_iso()
+    all_records: dict[str, dict] = {}  # raw_record_id → record (dedup)
+    all_errors: list[str] = []
+    total_pages = 0
+    row_counts: dict[str, int] = {}
 
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=headless)
-        context = browser.new_context(
-            user_agent=USER_AGENT,
-            viewport={"width": 1280, "height": 900},
+    for term in terms:
+        recs, errs, pages, rc = _scrape_term(
+            term, cutoff, now, max_pages=max_pages, verbose=verbose
         )
-        page = context.new_page()
+        row_counts[term] = rc
+        total_pages += pages
+        all_errors.extend(errs)
+        for rec in recs:
+            rid = rec["raw_record_id"]
+            if rid not in all_records:
+                all_records[rid] = rec
+        if verbose:
+            print(
+                f"  [Probate] term={term!r} rowCount={rc} pages={pages} "
+                f"new_this_term={len(recs)} unique_total={len(all_records)}",
+                flush=True,
+            )
 
-        try:
-            form_loaded = _load_search_page(page, verbose)
-            if not form_loaded:
-                errors.append("Could not load JSF search form")
-                search_limitation = (
-                    "SEARCH_ONLY_NO_BULK: JSF form could not be loaded via Playwright. "
-                    "This portal requires a valid session to access the search page."
-                )
-            else:
-                submitted = _fill_and_submit_name_search(
-                    page, last_name, first_name, verbose
-                )
-                if not submitted:
-                    errors.append("Form submission failed")
-                    search_limitation = (
-                        "SEARCH_ONLY_NO_BULK: Could not submit the JSF search form. "
-                        "Wildcard or empty search may have been rejected."
-                    )
-                else:
-                    records = _extract_probate_results(page, verbose)
-                    current.extend(records)
-
-                    if len(records) == 0 and not errors:
-                        # Check if wildcard was rejected
-                        try:
-                            page_text = page.inner_text("body") or ""
-                            if any(
-                                p in page_text.lower()
-                                for p in ("invalid", "required", "enter a name")
-                            ):
-                                search_limitation = (
-                                    "SEARCH_ONLY_NO_BULK: Server rejected wildcard search "
-                                    f"for last_name={last_name!r}. "
-                                    "This source requires a specific last name. "
-                                    "Use a seeded name list for bulk extraction."
-                                )
-                        except Exception:
-                            pass
-
-        except Exception as exc:
-            msg = f"scrape_error: {exc}"
-            errors.append(msg)
-            if verbose:
-                print(f"  [Probate] ERROR: {msg}", flush=True)
-
-        browser.close()
-
-    # Deduplicate
-    seen: set = set()
-    deduped: list[dict] = []
-    for rec in current:
-        rid = rec["raw_record_id"]
-        if rid not in seen:
-            seen.add(rid)
-            deduped.append(rec)
-    current = deduped
+    records = list(all_records.values())
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prior = _load_prior(prior_path)
-    merged = merge_with_prior(current, prior)
+    merged = _merge_with_prior(records, prior)
 
     tmp = output_path.with_suffix(".jsonl.tmp")
     with open(tmp, "w", encoding="utf-8") as fh:
@@ -620,27 +535,25 @@ def run_scraper(
     tmp.replace(output_path)
 
     stats: dict = {
-        "source_id": SOURCE_ID,
-        "portal_url": PORTAL_URL,
-        "search_url": SEARCH_URL,
-        "last_name_searched": last_name,
-        "first_name_searched": first_name,
-        "records_pulled": len(current),
-        "prior_count": len(prior),
-        "total_after_merge": len(merged),
-        "new_record_count": sum(1 for r in merged if r["change_status"] == "NEW_RECORD"),
-        "same_record_count": sum(1 for r in merged if r["change_status"] == "SAME"),
-        "updated_record_count": sum(1 for r in merged if r["change_status"] == "UPDATED"),
-        "disappeared_record_count": sum(
-            1 for r in merged if r["change_status"] == "DISAPPEARED"
-        ),
-        "output_path": str(output_path),
-        "errors": errors,
-        "playwright_available": PLAYWRIGHT_AVAILABLE,
+        "source_id":              SOURCE_ID,
+        "portal_url":             PORTAL_URL,
+        "search_url":             SEARCH_URL,
+        "days_back":              days_back,
+        "cutoff_date":            str(cutoff) if cutoff else None,
+        "sweep_mode":             sweep_mode,
+        "search_terms":           terms,
+        "row_counts_per_term":    row_counts,
+        "total_pages_fetched":    total_pages,
+        "records_pulled":         len(records),
+        "prior_count":            len(prior),
+        "total_after_merge":      len(merged),
+        "new_record_count":       sum(1 for r in merged if r["change_status"] == "NEW_RECORD"),
+        "same_record_count":      sum(1 for r in merged if r["change_status"] == "SAME"),
+        "updated_record_count":   sum(1 for r in merged if r["change_status"] == "UPDATED"),
+        "disappeared_record_count": sum(1 for r in merged if r["change_status"] == "DISAPPEARED"),
+        "output_path":            str(output_path),
+        "errors":                 all_errors,
     }
-    if search_limitation:
-        stats["search_limitation"] = search_limitation
-
     return stats
 
 
@@ -648,24 +561,19 @@ def run_scraper(
 # CLI
 # ---------------------------------------------------------------------------
 
-
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Shelby County Probate Court case scraper (Playwright). "
-            "Searches by party name (date-range bulk search not available). "
-            "Requires: pip install playwright && playwright install chromium."
+            "Shelby County Probate Court scraper (requests-based). "
+            "Does a name search then paginates the DataTable backwards "
+            "(newest-first) until the date cutoff."
         )
     )
     parser.add_argument(
-        "--last-name",
-        default="%",
-        help="Last name to search. Use %% for wildcard (may be rejected by server).",
-    )
-    parser.add_argument(
-        "--first-name",
-        default="",
-        help="First name to search (default: empty).",
+        "--days-back",
+        type=int,
+        default=0,
+        help="Calendar days back from today to keep (default 0 = all; portal is historical through ~2013).",
     )
     parser.add_argument(
         "--out",
@@ -673,86 +581,36 @@ def main() -> int:
         help="Output JSONL path. Default: data/raw/probate_court_shelby.jsonl",
     )
     parser.add_argument(
-        "--no-headless",
-        action="store_true",
-        help="Run Playwright in visible (non-headless) mode for debugging.",
+        "--search-term",
+        default=None,
+        help='Name search term (default: None = vowel sweep A/E/I/O/U).',
     )
     parser.add_argument(
-        "--probe-fields",
+        "--max-pages",
+        type=int,
+        default=0,
+        help="Max DataTable pages to fetch (default: 0 = no cap).",
+    )
+    parser.add_argument(
+        "--probe",
         action="store_true",
-        help=(
-            "Load the search form via Playwright and print all discovered form "
-            "field names, then exit."
-        ),
+        help="Run one search page and print first 10 rows, then exit.",
     )
     args = parser.parse_args()
 
-    if args.probe_fields:
-        if not PLAYWRIGHT_AVAILABLE:
-            print(f"ERROR: {_PLAYWRIGHT_INSTALL_MSG}", file=sys.stderr)
-            return 1
-
-        print(f"[probe] Loading JSF search page: {SEARCH_URL}", flush=True)
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=not args.no_headless)
-            context = browser.new_context(
-                user_agent=USER_AGENT,
-                viewport={"width": 1280, "height": 900},
-            )
-            page = context.new_page()
-            page.goto(SEARCH_URL, wait_until="domcontentloaded", timeout=60_000)
-            _wait_settled(page)
-            time.sleep(2)
-
-            fields_info: dict = {
-                "portal_url": PORTAL_URL,
-                "search_url": SEARCH_URL,
-                "probe_mode": True,
-                "final_url": page.url,
-            }
-            try:
-                fields = page.evaluate("""
-                    () => {
-                        const inputs = document.querySelectorAll(
-                            'input, select, textarea, button'
-                        );
-                        return Array.from(inputs).map(el => ({
-                            tag: el.tagName.toLowerCase(),
-                            name: el.name || '',
-                            id: el.id || '',
-                            type: el.type || '',
-                            value: el.value || '',
-                            checked: el.checked || false,
-                            visible: el.offsetParent !== null,
-                        }));
-                    }
-                """)
-                fields_info["fields"] = fields
-                fields_info["field_count"] = len(fields)
-
-                # Also get hidden ViewState
-                vs = page.evaluate("""
-                    () => {
-                        const el = document.querySelector(
-                            'input[name="javax.faces.ViewState"]'
-                        );
-                        return el ? el.value.substring(0, 50) + '...' : null;
-                    }
-                """)
-                fields_info["javax_faces_viewstate_present"] = vs is not None
-                fields_info["javax_faces_viewstate_prefix"] = vs
-
-            except Exception as exc:
-                fields_info["error"] = str(exc)
-
-            browser.close()
-
-        print(json.dumps(fields_info, indent=2))
+    if args.probe:
+        probe_term = args.search_term or "E"
+        session = _make_session()
+        print(f"[probe] Searching: term={probe_term!r}", flush=True)
+        root_vs, row_count = _setup_search(session, probe_term, verbose=True)
+        print(f"[probe] rowCount={row_count}, fetching last 2 pages...")
+        last_first = ((row_count - 1) // ROWS_PER_PAGE) * ROWS_PER_PAGE
+        for fi in [last_first, max(0, last_first - ROWS_PER_PAGE)]:
+            rows = _fetch_page(session, root_vs, fi)
+            print(f"  page first={fi}:")
+            for r in rows:
+                print(f"    {r}")
         return 0
-
-    if not PLAYWRIGHT_AVAILABLE:
-        print(f"ERROR: {_PLAYWRIGHT_INSTALL_MSG}", file=sys.stderr)
-        return 1
 
     out = (
         Path(args.out)
@@ -761,9 +619,10 @@ def main() -> int:
     )
     stats = run_scraper(
         out,
-        last_name=args.last_name,
-        first_name=args.first_name,
-        headless=not args.no_headless,
+        days_back=args.days_back,
+        search_term=args.search_term,
+        max_pages=args.max_pages,
+        verbose=True,
     )
     print(json.dumps(stats, indent=2))
     return 0

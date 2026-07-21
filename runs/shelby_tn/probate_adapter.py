@@ -61,9 +61,14 @@ def build_probate_raw_events(
         payload = raw_rec.get("raw_payload") or {}
         case_number = (payload.get("case_number") or "").strip() or None
         case_type = (payload.get("case_type") or "").strip() or None
-        decedent = (payload.get("decedent_name") or "").strip() or None
-        petitioner = (payload.get("petitioner_name") or "").strip() or None
-        filing_date = (payload.get("filing_date") or "").strip() or None
+        # Support both new key names and legacy fallbacks from older scraper runs
+        decedent = (
+            payload.get("decedent_name") or payload.get("case_name") or payload.get("name") or ""
+        ).strip() or None
+        petitioner = (
+            payload.get("petitioner_name") or payload.get("personal_rep") or ""
+        ).strip() or None
+        filing_date = (payload.get("filing_date") or payload.get("date_filed") or "").strip() or None
         source_url = raw_rec.get("source_url") or ""
         captured_at = raw_rec.get("source_fetched_at")
         confidence = raw_rec.get("parser_confidence", 70)
