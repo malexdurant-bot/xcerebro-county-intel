@@ -1,30 +1,30 @@
 {
-  "generated_at": "2026-08-08T14:23:03Z",
+  "generated_at": "2026-08-14T19:38:08Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
   "state": "SC",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 80,
+  "lead_total": 73,
   "enrichment_breakdown": {
     "ENRICHED": 0,
-    "UNENRICHED": 80
+    "UNENRICHED": 73
   },
   "pattern_counts": {
-    "estate": 68,
-    "lis_pendens": 12
+    "estate": 58,
+    "lis_pendens": 15
   },
   "attribute_counts": {},
   "stack_depth_distribution": {
-    "1": 80
+    "1": 73
   },
   "score_tier_distribution": {
-    "Low": 12,
-    "Workable": 68
+    "Low": 15,
+    "Workable": 58
   },
   "deal_path_distribution": {
-    "messy_title": 12,
-    "wholesale": 80
+    "messy_title": 15,
+    "wholesale": 73
   },
   "records": [
     {
@@ -85,68 +85,11 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_2026CP4004603",
-      "scored_lead_id": "scored_8ae280771984243f",
+      "lead_id": "lead_unresolved_25ES4001849",
+      "scored_lead_id": "scored_c5bd2bd6a568120b",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_25ES4001848",
-      "scored_lead_id": "scored_9b88b853690bd800",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "PAMELA",
+      "display_owner": "THEODORE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -189,11 +132,11 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_25ES4001849",
-      "scored_lead_id": "scored_c5bd2bd6a568120b",
+      "lead_id": "lead_unresolved_25ES4002067",
+      "scored_lead_id": "scored_cbc6c9daf89ab852",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "THEODORE",
+      "display_owner": "JEARLINE N",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -659,100 +602,6 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4000763",
-      "scored_lead_id": "scored_aeeb618d2700606e",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "MARCIA E",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000783",
-      "scored_lead_id": "scored_90c28e3d73a40ea8",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "WINNIE D",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
       "lead_id": "lead_unresolved_26ES4000819",
       "scored_lead_id": "scored_dbbbfd1013997708",
       "primary_parcel_id": null,
@@ -800,11 +649,152 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4000902",
-      "scored_lead_id": "scored_bc5c33abb0a20ba3",
+      "lead_id": "lead_unresolved_26ES4000852",
+      "scored_lead_id": "scored_c587dd5188557ebd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JEAN SATURNIN KWAKU MISSOH",
+      "display_owner": "MARY ELLEN",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4000858",
+      "scored_lead_id": "scored_faf18b02782a5249",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "VERNA CAROL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4000900",
+      "scored_lead_id": "scored_7fd1877ce77c7741",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "SUEJANE",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4000916",
+      "scored_lead_id": "scored_4cb60f8328285320",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "WILLIAM DENNIS BECKHAM",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -941,246 +931,11 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4000949",
-      "scored_lead_id": "scored_f4d21c3db1bd6a74",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "DOROTHY B",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
       "lead_id": "lead_unresolved_26ES4000969",
       "scored_lead_id": "scored_a45830051fd9163e",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "TRESSIE",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000974",
-      "scored_lead_id": "scored_26a0d0ad9a6ad2a0",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "THADDEOUS",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000976",
-      "scored_lead_id": "scored_d32ea54231f703a3",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "ROBERT MEMBREY PACHAK",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000987",
-      "scored_lead_id": "scored_ec61b0f5f5e05589",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "CAROLYN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000994",
-      "scored_lead_id": "scored_8cdcd1a4971a6a5a",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "BETTE JANE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -1317,58 +1072,11 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4001016",
-      "scored_lead_id": "scored_b48daf88ff12455d",
+      "lead_id": "lead_unresolved_26ES4001017",
+      "scored_lead_id": "scored_a616a4303dbb9c73",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIAM",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001040",
-      "scored_lead_id": "scored_598040fa2b39c59b",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "MOLLYE Y",
+      "display_owner": "CHARLES",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -1599,53 +1307,6 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4001051",
-      "scored_lead_id": "scored_f6fb6266643e1082",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "LILLIE MCALLISTER",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001058",
       "scored_lead_id": "scored_3a7f9986e5d11028",
       "primary_parcel_id": null,
@@ -1693,199 +1354,11 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4001063",
-      "scored_lead_id": "scored_7a419c459a1d904e",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "SAMUEL HARRIS JONES",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001064",
-      "scored_lead_id": "scored_8e809f8f034209e7",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "MARGARET",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001066",
-      "scored_lead_id": "scored_ee8c3f249a010df9",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "JEFFERSON",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001069",
       "scored_lead_id": "scored_294a6604b0247c5a",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "SHERRY",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001072",
-      "scored_lead_id": "scored_5d26963d815693fb",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "FLORA MAE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -2069,100 +1542,6 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4001107",
-      "scored_lead_id": "scored_2d6d767baa709338",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "OPAL MARIE",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001108",
-      "scored_lead_id": "scored_3d5466593bfe81dd",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "PAULINE DUNBAR HALL",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001110",
       "scored_lead_id": "scored_6acf3a88ea598424",
       "primary_parcel_id": null,
@@ -2210,105 +1589,11 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4001111",
-      "scored_lead_id": "scored_39c871bcb8152973",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "FRANCES CULBREATH HUGGINS",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001112",
       "scored_lead_id": "scored_155464f30d22c86e",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "JOSIE JONES",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001116",
-      "scored_lead_id": "scored_994fa8357a358174",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "JUDY M. CATO",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -2445,100 +1730,6 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4001121",
-      "scored_lead_id": "scored_bd59d565a57ee31b",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "JOHN EMORY",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001123",
-      "scored_lead_id": "scored_25bfaf09331de670",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "JOANNE",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001130",
       "scored_lead_id": "scored_2382d3a392841dac",
       "primary_parcel_id": null,
@@ -2633,11 +1824,105 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_26ES4001158",
-      "scored_lead_id": "scored_e11bf16620519e5b",
+      "lead_id": "lead_unresolved_26ES4001146",
+      "scored_lead_id": "scored_bf530c9cd960d969",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "RUDY ARLINGTON HARRIS",
+      "display_owner": "GENE FERDINAND",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001159",
+      "scored_lead_id": "scored_3892b14c622a4d3c",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "WILLIE EAVES",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001163",
+      "scored_lead_id": "scored_2bc4d0d1a30fb59c",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "WILLIE J",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -3197,11 +2482,152 @@
       "enrichment_status": "UNENRICHED"
     },
     {
+      "lead_id": "lead_unresolved_26ES4001220",
+      "scored_lead_id": "scored_25a21e17b03d6606",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "BETTY HALL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001229",
+      "scored_lead_id": "scored_2096f6b9e33a84a9",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "LINDA TUCKER",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
       "lead_id": "lead_unresolved_26ES4001231",
       "scored_lead_id": "scored_847e5605742c459c",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "LINDA W. ROSE",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001232",
+      "scored_lead_id": "scored_6afb8000bf8165cc",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "CHARLES R",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -3291,6 +2717,53 @@
       "enrichment_status": "UNENRICHED"
     },
     {
+      "lead_id": "lead_unresolved_26ES4001248",
+      "scored_lead_id": "scored_808827433e6e02f1",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "GERALDINE",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
       "lead_id": "lead_unresolved_26ES401055",
       "scored_lead_id": "scored_5e06d77b3e46b063",
       "primary_parcel_id": null,
@@ -3338,8 +2811,8 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_LP-1832-1",
-      "scored_lead_id": "scored_4c5c6ae4ad672310",
+      "lead_id": "lead_unresolved_LP-1834-1",
+      "scored_lead_id": "scored_8ac75107b7d67222",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "lis_pendens against unidentified party",
@@ -3395,236 +2868,8 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_LP-1832-10",
-      "scored_lead_id": "scored_e13e566bd5b0671a",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_LP-1832-11",
-      "scored_lead_id": "scored_1f885baf5d86dc38",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_LP-1832-2",
-      "scored_lead_id": "scored_45742b8b472679a6",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_LP-1832-3",
-      "scored_lead_id": "scored_db9d50c79a9db4de",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED"
-    },
-    {
-      "lead_id": "lead_unresolved_LP-1832-5",
-      "scored_lead_id": "scored_c063b3e562eb8b8d",
+      "lead_id": "lead_unresolved_LP-1834-11",
+      "scored_lead_id": "scored_3d52b07dba50dbe3",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "lis_pendens against unidentified party",
@@ -3680,8 +2925,8 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_LP-1832-6",
-      "scored_lead_id": "scored_7af3e8866cad43e2",
+      "lead_id": "lead_unresolved_LP-1834-12",
+      "scored_lead_id": "scored_e64d658e678def28",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "lis_pendens against unidentified party",
@@ -3737,8 +2982,8 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_LP-1832-7",
-      "scored_lead_id": "scored_2940c6478745cbb0",
+      "lead_id": "lead_unresolved_LP-1834-13",
+      "scored_lead_id": "scored_2e1991542a30aba4",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "lis_pendens against unidentified party",
@@ -3794,8 +3039,8 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_LP-1832-8",
-      "scored_lead_id": "scored_b2130df935a0d0f4",
+      "lead_id": "lead_unresolved_LP-1834-14",
+      "scored_lead_id": "scored_027f39ff68b8d750",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "lis_pendens against unidentified party",
@@ -3851,8 +3096,464 @@
       "enrichment_status": "UNENRICHED"
     },
     {
-      "lead_id": "lead_unresolved_LP-1832-9",
-      "scored_lead_id": "scored_21da88f801e3c9f7",
+      "lead_id": "lead_unresolved_LP-1834-15",
+      "scored_lead_id": "scored_05758ae7072c47a8",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-2",
+      "scored_lead_id": "scored_f46198d75798e2b0",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-3",
+      "scored_lead_id": "scored_efd5ff1038e820c6",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-4",
+      "scored_lead_id": "scored_a05c747a24e09d13",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-5",
+      "scored_lead_id": "scored_4e9e7abd19f9e632",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-6",
+      "scored_lead_id": "scored_98bb3c7b994ba579",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2021-06-11",
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-7",
+      "scored_lead_id": "scored_c318a258dc2f1938",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-8",
+      "scored_lead_id": "scored_47d5726539d3a6ef",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "lis_pendens against unidentified party",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED"
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1834-9",
+      "scored_lead_id": "scored_91af7b5682925de5",
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "lis_pendens against unidentified party",
