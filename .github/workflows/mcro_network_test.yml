@@ -1,0 +1,69 @@
+name: MCRO network-origin test (Hennepin MN)
+
+# Manually-triggered diagnostic only. Tests whether GitHub Actions' network
+# egress gets past the WAF block that Hennepin County's MCRO adapter hit when
+# run from the original build environment (see scrapers/mcro_hennepin.py
+# module docstring for the full finding). This is NOT the production scraper
+# — it just runs one real search and uploads whatever comes back so we can
+# tell whether the block is network-origin-based.
+
+on:
+  workflow_dispatch:
+    inputs:
+      last_name:
+        description: "Wildcard-eligible last name to search (e.g. SMITH*)"
+        required: true
+        default: "SMITH*"
+      case_category:
+        description: "MCRO case category"
+        required: true
+        default: "CV"
+        type: choice
+        options:
+          - CV
+          - PR
+          - FAM
+
+jobs:
+  test-mcro-access:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Run MCRO search (Playwright path)
+        id: run_mcro
+        continue-on-error: true
+        run: |
+          python scrapers/mcro_hennepin.py \
+            --playwright \
+            --last-name "${{ inputs.last_name }}" \
+            --case-category "${{ inputs.case_category }}" \
+            --out mcro_result.html
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Report outcome
+        run: |
+          echo "Script exit code: ${{ steps.run_mcro.outcome }}"
+          if [ -f mcro_result.html ]; then
+            echo "--- mcro_result.html (first 2000 bytes) ---"
+            head -c 2000 mcro_result.html
+          else
+            echo "No mcro_result.html was written."
+          fi
+
+      - name: Upload result HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcro-result
+          path: mcro_result.html
+          if-no-files-found: warn
