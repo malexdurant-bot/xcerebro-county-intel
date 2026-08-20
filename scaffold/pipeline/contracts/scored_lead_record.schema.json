@@ -173,6 +173,11 @@
       "minItems": 1,
       "description": "Distinct source_ids contributing to this scored_lead — carried forward from matched_lead."
     },
+    "source_urls": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Distinct source proof URLs carried forward from matched_lead.source_urls — deep links back to the original postings/case pages for client/operator review. Optional for backward compatibility with scored leads built before this field existed."
+    },
     "primary_event_date": {
       "type": ["string", "null"],
       "format": "date",

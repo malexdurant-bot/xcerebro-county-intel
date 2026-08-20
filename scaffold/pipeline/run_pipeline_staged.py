@@ -227,6 +227,7 @@ def project_scored_lead(scored_lead: dict) -> dict:
         "primary_event_date": scored_lead.get("primary_event_date"),
         "review_flags": list(scored_lead.get("review_flags") or []),
         "enrichment_status": scored_lead.get("enrichment_status"),
+        "primary_source_urls": list(scored_lead.get("source_urls") or []),
     }
 
 

@@ -107,6 +107,19 @@
       label: "Needs review",
       filter: (row) => row.display_lead_status === "REVIEW_REQUIRED",
     },
+    {
+      id: "skiptrace_needs_review",
+      label: "Skip-trace unresolved (ambiguous / no address match)",
+      filter: (row) =>
+        (row.review_flags || []).some((f) =>
+          [
+            "parcel_match_ambiguous_common_name",
+            "parcel_match_not_found",
+            "parcel_match_low_confidence",
+            "skiptrace_unconfirmed",
+          ].includes(f)
+        ),
+    },
   ];
 
   // -------------------------------------------------------------------

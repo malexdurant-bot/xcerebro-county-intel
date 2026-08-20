@@ -510,6 +510,7 @@ def score_matched_lead(
         "enrichment_status": enrichment_status,
         "evidence_ids": list(matched_lead.get("evidence_ids") or []),
         "source_ids": list(matched_lead.get("source_ids") or []),
+        "source_urls": list(matched_lead.get("source_urls") or []),
         "primary_event_date": primary_event,
         "match_confidence": None,  # populated by a matcher-aware caller
         "doc_type_normalization": {

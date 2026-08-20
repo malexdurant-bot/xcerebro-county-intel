@@ -381,11 +381,21 @@ def _cross_ref_tps_addresses(
     return None, None
 
 
+_PARCEL_MATCH_REVIEW_FLAGS: dict[str, str] = {
+    "ambiguous_name": "parcel_match_ambiguous_common_name",
+    "no_candidates": "parcel_match_not_found",
+    "low_confidence_match": "parcel_match_low_confidence",
+    "name_too_short": "parcel_match_name_too_short",
+    "lookup_error": "parcel_match_lookup_error",
+}
+
+
 def _enrich_probate_contacts(
     scored_leads: list[dict],
     probate_name_map: dict[str, dict],
     cache_path: Path,
     verbose: bool,
+    match_status: dict[str, str] | None = None,
 ) -> None:
     """
     Post-pipeline TruePeopleSearch enrichment for probate scored leads.
@@ -396,9 +406,14 @@ def _enrich_probate_contacts(
          to confirm property ownership
       3. Search TPS for executor name -> collect phone numbers
       4. Attach contact_info dict to the scored lead in place
+      5. Tag review_flags with *why* the parcel/skip-trace match failed
+         (ambiguous common name, no candidates, TPS blocked, etc.) so these
+         leads stay visible for manual client review instead of just
+         showing a blank address.
 
     Modifies scored_leads in place; never raises (failures logged and skipped).
     """
+    match_status = match_status or {}
     try:
         from scrapers.truepeoplesearch_shelby import batch_enrich_leads
     except ImportError as exc:
@@ -476,6 +491,17 @@ def _enrich_probate_contacts(
         if confirmed_parcel_id and not lead.get("primary_parcel_id"):
             lead["tps_confirmed_parcel_id"] = confirmed_parcel_id
 
+        flags = list(lead.get("review_flags") or [])
+        parcel_flag = _PARCEL_MATCH_REVIEW_FLAGS.get(
+            match_status.get(decedent_name.upper(), "")
+        )
+        if parcel_flag and parcel_flag not in flags:
+            flags.append(parcel_flag)
+        if not lead["contact_info"]["tps_enriched"] and not confirmed_address:
+            if "skiptrace_unconfirmed" not in flags:
+                flags.append("skiptrace_unconfirmed")
+        lead["review_flags"] = flags
+
         enriched += 1
 
     print(
@@ -485,25 +511,66 @@ def _enrich_probate_contacts(
     )
 
 
+# Name suffixes that must never be mistaken for a surname. Decedent names
+# arrive in two different conventions from the court docket ("SPEARS II" /
+# "GRIFFITH JR" with no comma, and "MILLER, SR." / "HURT, SR." where the
+# comma sets off the suffix rather than separating last-from-first) — both
+# need the suffix stripped before the true last name is taken.
+_NAME_SUFFIXES = frozenset({"JR", "SR", "II", "III", "IV", "V"})
+
+
+def _extract_last_name(decedent_name: str) -> str:
+    """
+    Best-effort last-name extraction across the court docket's inconsistent
+    name formats: "LASTNAME, FIRST MIDDLE" (comma = true last-name split),
+    "FIRST MIDDLE LASTNAME, SUFFIX" (comma sets off a suffix, not the name),
+    and "FIRST MIDDLE LASTNAME [SUFFIX]" (no comma at all).
+    """
+    name = decedent_name.strip()
+    if "," in name:
+        before, after = name.split(",", 1)
+        after_tok = after.strip().rstrip(".").upper()
+        if after_tok in _NAME_SUFFIXES:
+            parts = before.strip().split()
+            return parts[-1] if parts else ""
+        return before.strip()
+
+    parts = name.split()
+    while parts and parts[-1].rstrip(".").upper() in _NAME_SUFFIXES:
+        parts.pop()
+    return parts[-1] if parts else ""
+
+
 def _enrich_probate_by_name(
     probate_events: list[dict],
     resolver: "ParcelResolver",
     verbose: bool,
-) -> None:
+) -> dict[str, str]:
     """
-    For each probate raw event, query the parcel layer by decedent last name.
-    On a confident match, sets property_refs.parcel_id and caches the parcel
-    attrs so the main enrichment_provider call hits cache instead of the API.
+    For each probate raw event, query the parcel layer (the county tax roll)
+    by decedent last name and disambiguate against the full candidate set —
+    this IS the "search the tax roll for an address" path for probate leads
+    that have no address in the source posting.
 
     Confidence rules:
       - Query uses 'LASTNAME ' (trailing space) so '%SMALL %' won't match SMALLWOOD
-      - Skip if >10 candidates (common name, too ambiguous)
-      - Score by # of meaningful name tokens (len > 1) found in OWNER field
-      - Require score >= 2 (last name + at least one meaningful first/middle name token)
+      - Pull up to 200 candidates (the tax roll's own cap) — do NOT bail out
+        early just because a common surname returns a lot of rows; score
+        every candidate instead of giving up before looking.
+      - Score by # of meaningful name tokens (len > 1) shared with OWNER
+      - Require best score >= 2 (last name + at least one other name token)
+        AND a *unique* top scorer — a tie at the best score is genuine
+        ambiguity (two same-named owners), not a resolvable match.
+
+    Returns {decedent_name_upper: reason} for every event that did NOT get a
+    parcel match, so callers can surface *why* a lead has no address instead
+    of leaving it silently blank (reason in "ambiguous_name" / "no_candidates"
+    / "low_confidence_match" / "name_too_short").
     """
     from scrapers.parcel_master_shelby import lookup_by_owner
 
     enriched = 0
+    match_status: dict[str, str] = {}
     for event in probate_events:
         decedent_name = None
         for party in event.get("parties", []):
@@ -512,62 +579,82 @@ def _enrich_probate_by_name(
                 break
         if not decedent_name:
             continue
+        decedent_key = decedent_name.upper()
 
-        # Extract last name
-        if "," in decedent_name:
-            last_name = decedent_name.split(",")[0].strip()
-        else:
-            parts = decedent_name.split()
-            last_name = parts[-1] if parts else ""
+        last_name = _extract_last_name(decedent_name)
 
         if len(last_name) < 3:
+            match_status[decedent_key] = "name_too_short"
             continue
 
         # Add trailing space so '%LASTNAME %' won't match LASTNAMEMORE (e.g. SMALL vs SMALLWOOD)
         try:
-            candidates = lookup_by_owner(last_name + " ", max_results=20)
+            candidates = lookup_by_owner(last_name + " ", max_results=200)
         except Exception as exc:
             if verbose:
                 print(f"  [Probate Enrich] lookup error for {last_name!r}: {exc}", flush=True)
+            match_status[decedent_key] = "lookup_error"
             continue
 
         if not candidates:
-            continue
-        if len(candidates) > 10:
-            if verbose:
-                print(f"  [Probate Enrich] {last_name!r}: {len(candidates)} hits — ambiguous, skip", flush=True)
+            match_status[decedent_key] = "no_candidates"
             continue
 
-        # Score by meaningful token overlap (exclude single-char initials)
+        # Score every candidate by meaningful token overlap (exclude single-char
+        # initials) — never bail out on candidate count alone; a large tax-roll
+        # hit set is fine as long as full-name overlap narrows it to one owner.
         name_tokens = {
             t for t in decedent_name.upper().replace(",", "").replace(".", "").split()
             if len(t) > 1
         }
-        best, best_score = None, 0
+        scored: list[tuple[int, dict]] = []
         for cand in candidates:
             owner_tokens = {
                 t for t in (cand.get("OWNER") or "").upper().replace(",", "").replace(".", "").split()
                 if len(t) > 1
             }
             score = len(name_tokens & owner_tokens)
-            if score > best_score:
-                best_score, best = score, cand
+            if score > 0:
+                scored.append((score, cand))
 
-        if best_score >= 2 and best:
-            parcel_id = (best.get("PARCELID") or "").strip()
-            if parcel_id:
-                event["property_refs"]["parcel_id"] = parcel_id
-                resolver._cache[parcel_id] = best
-                enriched += 1
-                if verbose:
-                    print(
-                        f"  [Probate Enrich] {decedent_name} -> {parcel_id} "
-                        f"{best.get('PAR_ADDR1','')} (score={best_score})",
-                        flush=True,
-                    )
+        if not scored:
+            match_status[decedent_key] = "low_confidence_match"
+            continue
+
+        best_score = max(s for s, _ in scored)
+        top = [c for s, c in scored if s == best_score]
+
+        if best_score < 2:
+            match_status[decedent_key] = "low_confidence_match"
+            continue
+        if len(top) > 1:
+            if verbose:
+                print(
+                    f"  [Probate Enrich] {decedent_name!r}: {len(top)} candidates tied "
+                    f"at score={best_score} of {len(candidates)} '{last_name}' hits — ambiguous, skip",
+                    flush=True,
+                )
+            match_status[decedent_key] = "ambiguous_name"
+            continue
+
+        best = top[0]
+        parcel_id = (best.get("PARCELID") or "").strip()
+        if parcel_id:
+            event["property_refs"]["parcel_id"] = parcel_id
+            resolver._cache[parcel_id] = best
+            enriched += 1
+            if verbose:
+                print(
+                    f"  [Probate Enrich] {decedent_name} -> {parcel_id} "
+                    f"{best.get('PAR_ADDR1','')} (score={best_score} of {len(candidates)} '{last_name}' hits)",
+                    flush=True,
+                )
+        else:
+            match_status[decedent_key] = "low_confidence_match"
 
     if verbose:
         print(f"  [Probate Enrich] {enriched}/{len(probate_events)} events matched to parcels", flush=True)
+    return match_status
 
 
 # Words that indicate a business entity — skip name-based parcel lookup for these
@@ -992,13 +1079,14 @@ def run_pipeline(
     # Phase 2 — Probate Court
     probate_events: list[dict] = []
     probate_name_map: dict = {}
+    probate_match_status: dict[str, str] = {}
     probate_records = load_probate_jsonl(PROBATE_JSONL, max_records=max_records)
     if probate_records:
         print(f"\n[ADAPT] Probate Court: {len(probate_records)} records...")
         probate_events = build_probate_raw_events(probate_records, verbose=verbose)
         print(f"  Built {len(probate_events)} raw events")
         print(f"  Enriching probate events by decedent name -> parcel lookup...")
-        _enrich_probate_by_name(probate_events, resolver, verbose=verbose)
+        probate_match_status = _enrich_probate_by_name(probate_events, resolver, verbose=verbose)
         probate_name_map = _build_probate_name_map(probate_events)
         all_raw_events.extend(probate_events)
 
@@ -1050,6 +1138,7 @@ def run_pipeline(
             probate_name_map,
             cache_path=tps_cache,
             verbose=verbose,
+            match_status=probate_match_status,
         )
 
     # --- Re-write scored_leads.json to include contact_info from enrichment --

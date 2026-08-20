@@ -386,7 +386,18 @@ def _extract_results(content_frame, verbose: bool) -> list[dict]:
     except Exception:
         pass
 
-    # Extract rows from the confirmed results table
+    # Extract rows from the confirmed results table.
+    #
+    # The portal's #results table is a CLIENT-SIDE DataTables instance
+    # (serverSide: false, iDisplayLength: 100) — the full result set (which
+    # can run into the hundreds for a wide date range) is already loaded into
+    # the page; DataTables just detaches all but the current page's <tr>
+    # elements from the visible <tbody>. Querying the DOM directly therefore
+    # silently truncates to 100 rows. dt.rows().nodes() returns every row's
+    # node regardless of pagination, at zero extra network cost, so pull
+    # through the DataTables API when the table is one; fall back to a plain
+    # DOM query for any results table that isn't (defensive, keeps this
+    # working if the portal changes).
     try:
         rows_data = content_frame.evaluate("""
             () => {
@@ -394,7 +405,15 @@ def _extract_results(content_frame, verbose: bool) -> list[dict]:
                 const tbl = document.getElementById('results') ||
                             document.querySelector('table.dataTable');
                 if (!tbl) return [];
-                const rows = Array.from(tbl.querySelectorAll('tbody tr'));
+
+                let rows;
+                if (window.jQuery && jQuery.fn.dataTable &&
+                    jQuery.fn.dataTable.isDataTable(tbl)) {
+                    rows = jQuery(tbl).DataTable().rows().nodes().toArray();
+                } else {
+                    rows = Array.from(tbl.querySelectorAll('tbody tr'));
+                }
+
                 return rows.map(row => {
                     const cells = Array.from(row.querySelectorAll('td'));
                     const cellTexts = cells.map(
@@ -418,7 +437,7 @@ def _extract_results(content_frame, verbose: bool) -> list[dict]:
 
     if verbose:
         print(
-            f"  [Register] Raw rows extracted from DOM: {len(rows_data)}", flush=True
+            f"  [Register] Raw rows extracted from DataTable: {len(rows_data)}", flush=True
         )
 
     # Confirmed column indices (0-based)

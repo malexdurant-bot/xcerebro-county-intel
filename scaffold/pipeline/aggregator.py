@@ -270,6 +270,7 @@ def _build_matched_lead(property_identity: tuple, signal_groups: list) -> dict:
 
     source_ids = sorted({s for sig in signals for s in sig["source_ids"]})
     evidence_ids = sorted({e for sig in signals for e in sig["evidence_ids"]})
+    source_urls = sorted({u for sig in signals for u in sig["source_urls"]})
 
     record = {
         "lead_id": lead_id,
@@ -285,6 +286,7 @@ def _build_matched_lead(property_identity: tuple, signal_groups: list) -> dict:
         "signals": signals,
         "source_ids": source_ids,
         "evidence_ids": evidence_ids,
+        "source_urls": source_urls,
     }
     # v5.4.0 Session 7A — carry the representative leads-base record's
     # multi-owner block onto the matched lead; derive SINGLE_OWNER for a pre-7A

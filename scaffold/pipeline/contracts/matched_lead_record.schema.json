@@ -150,6 +150,11 @@
       "items": { "type": "string" },
       "description": "Union of all evidence ledger entry ids across this lead's signals."
     },
+    "source_urls": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Union of all signals[].source_urls across this lead — the deep links back to the original postings/case pages, surfaced on the dashboard so leads can be checked against the source document. Optional for backward compatibility with matched leads built before this field existed."
+    },
     "lead_status": {
       "type": ["string", "null"],
       "enum": [
