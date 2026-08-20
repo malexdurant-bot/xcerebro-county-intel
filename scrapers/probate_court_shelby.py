@@ -1,24 +1,29 @@
 """
-Shelby County Probate Court — case search scraper (requests-based).
+Shelby County Probate Court — CourtConnect case scraper.
 
-Portal: https://probatedata.shelbycountytn.gov/ProbateCourt/
-Search: https://probatedata.shelbycountytn.gov/ProbateCourt/faces/app/search.xhtml
+Portal: https://prdata.shelbycountytn.gov/prweb/ck_public_qry_main.cp_main_idx
+Covers: October 2013 – present
 
-Flow discovered 2026-07-21:
-  1. GET search.xhtml  →  extract ViewState
-  2. POST radio AJAX   →  set customRadio=1 (name search)
-  3. POST pSub AJAX    →  server runs search + stores results in session;
-                          returns EvaluationException (JSF render-phase NPE, harmless)
-  4. GET root page     →  extract root ViewState + DataTable rowCount from JS
-  5. POST DataTable pagination AJAX  →  5 rows per call; repeat for all pages
+Architecture:
+  - CourtConnect (ACS/Neumo) — direct GET requests, no Playwright needed
+  - Results URL: prweb/ck_public_qry_cpty.cp_personcase_srch_details
+    params: last_name (required), begin_date, end_date, case_type, partial_ind=checked
+  - A–Z name sweep to work around the required last_name field
+  - One row per party per case; merge to one record per case_number
 
-  Note: opt1Input (lastName) IS processed by JSF because after step 2 the
-  server-side component tree marks it as enabled. Different names return
-  different result sets via LIKE '%name%' match. Empty string returns all cases.
+Result table columns (confirmed):
+  0: ID           — party ID (internal)
+  1: Name         — party name (Last, First)
+  2: Case ID      — "Case: PR036236 IN THE MATTER OF: ..." or "IN RE: ..."
+  3: Party Type   — PETITIONER | RE: MATTER | ATTORNEY
+  4: Party End Date (usually empty)
+  5: Filing Date  — DD-MON-YYYY
+  6: Case Status  — OPEN-OPEN | CLOSED-CLOSED etc.
 
-Date filtering: the DataTable is sorted by case number ASC (oldest first).
-We request pages from the END (highest first-row offset) and work backwards,
-stopping when Date Filed < cutoff.
+Target case types (estate/death-related):
+  01 — Probate of Will
+  02 — Administration (intestate)
+  05 — Administration, CTA
 """
 
 from __future__ import annotations
@@ -27,13 +32,16 @@ import argparse
 import json
 import re
 import sys
-import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
-import requests
-from bs4 import BeautifulSoup
+try:
+    import requests
+    from bs4 import BeautifulSoup
+    _REQUESTS_AVAILABLE = True
+except ImportError:
+    _REQUESTS_AVAILABLE = False
 
 # ---------------------------------------------------------------------------
 # Repo bootstrap
@@ -49,8 +57,9 @@ if str(REPO_ROOT) not in sys.path:
 
 SOURCE_ID = "probate_court_shelby"
 
-PORTAL_URL = "https://probatedata.shelbycountytn.gov/ProbateCourt/"
-SEARCH_URL = "https://probatedata.shelbycountytn.gov/ProbateCourt/faces/app/search.xhtml"
+PORTAL_URL = "https://prdata.shelbycountytn.gov/prweb/ck_public_qry_main.cp_main_idx"
+BASE_URL = "https://prdata.shelbycountytn.gov/prweb/"
+RESULTS_PATH = "ck_public_qry_cpty.cp_personcase_srch_details"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -58,13 +67,25 @@ USER_AGENT = (
     "Chrome/124.0.0.0 Safari/537.36"
 )
 
-ROWS_PER_PAGE = 5
+CASE_TYPE_LABELS: dict[str, str] = {
+    "01": "PROBATE OF WILL",
+    "02": "ADMINISTRATION",
+    "03": "GUARDIANSHIP (MINOR)",
+    "05": "ADMINISTRATION, CTA",
+    "06": "CONSERVATORSHIP",
+}
 
-_DATE_FMTS = ("%m-%d-%Y", "%m/%d/%Y", "%Y-%m-%d")
+DEFAULT_CASE_TYPES = ["01", "02", "05"]
+
+_CASE_ID_RE = re.compile(
+    r"Case:\s*(\S+)\s+(?:IN\s+THE\s+MATTER\s+OF:|IN\s+RE:)\s*(.*)",
+    re.IGNORECASE,
+)
 
 # ---------------------------------------------------------------------------
-# Date helpers
+# Helpers
 # ---------------------------------------------------------------------------
+
 
 def _now_iso() -> str:
     return (
@@ -74,33 +95,36 @@ def _now_iso() -> str:
     )
 
 
-def _parse_date(s: str) -> Optional[date]:
-    s = s.strip()
-    for fmt in _DATE_FMTS:
-        try:
-            return datetime.strptime(s, fmt).date()
-        except ValueError:
-            pass
-    return None
-
-
-def _is_placeholder_date(s: str) -> bool:
-    """01-01-1901 is the portal's null-date placeholder."""
-    return s.strip() in ("01-01-1901", "01/01/1901")
-
-
-# ---------------------------------------------------------------------------
-# Record helpers
-# ---------------------------------------------------------------------------
-
 def _raw_record_id(case_number: str) -> str:
     safe = (case_number or "").strip().upper().replace(" ", "_")
-    return f"shelby_pb_{safe}"
+    return f"shelby_pr_{safe}"
+
+
+def _format_date_cc(dt: datetime) -> str:
+    return dt.strftime("%d-%b-%Y").upper()
+
+
+def _parse_case_cell(text: str) -> tuple[str, str]:
+    """Return (case_number, decedent_from_title) from the Case ID cell text."""
+    m = _CASE_ID_RE.search(text)
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    # Fallback: grab first token after "Case:"
+    parts = text.split()
+    if len(parts) >= 2 and parts[0].upper() == "CASE:":
+        return parts[1], ""
+    return "", ""
+
+
+def _normalize_status(raw: str) -> str:
+    """'OPEN-OPEN' → 'OPEN', 'CLOSED-CLOSED' → 'CLOSED'."""
+    return raw.split("-")[0].strip() if raw else raw
 
 
 # ---------------------------------------------------------------------------
 # Prior / merge
 # ---------------------------------------------------------------------------
+
 
 def _load_prior(path: Path) -> dict:
     if not path.exists():
@@ -149,384 +173,283 @@ def _merge_with_prior(current: list, prior_by_id: dict) -> list:
 
 
 # ---------------------------------------------------------------------------
-# HTTP session helpers
+# HTTP fetch
 # ---------------------------------------------------------------------------
 
-def _make_session() -> requests.Session:
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": USER_AGENT,
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
+
+def _fetch_results(
+    session: "requests.Session",
+    last_name: str,
+    begin_date: str,
+    end_date: str,
+    case_type: str,
+    page: int = 1,
+) -> str:
+    from urllib.parse import urlencode
+    params = urlencode({
+        "backto": "P",
+        "soundex_ind": "",
+        "partial_ind": "checked",
+        "last_name": last_name,
+        "first_name": "",
+        "middle_name": "",
+        "begin_date": begin_date,
+        "end_date": end_date,
+        "case_type": case_type,
+        "id_code": "",
+        "PageNo": str(page),
     })
-    return s
-
-
-_AJAX_HEADERS = {
-    "Accept": "application/xml, text/xml, */*; q=0.01",
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-    "Faces-Request": "partial/ajax",
-    "X-Requested-With": "XMLHttpRequest",
-    "Origin": "https://probatedata.shelbycountytn.gov",
-}
-
-
-def _extract_viewstate(html: str) -> Optional[str]:
-    m = re.search(r'<input[^>]+name="javax\.faces\.ViewState"[^>]+value="([^"]+)"', html)
-    return m.group(1) if m else None
-
-
-def _extract_viewstate_from_ajax(xml: str) -> Optional[str]:
-    m = re.search(r'<update id="[^"]*ViewState[^"]*"><!\[CDATA\[([^\]]+)', xml)
-    return m.group(1).strip() if m else None
+    url = BASE_URL + RESULTS_PATH + "?" + params
+    r = session.get(url, timeout=20)
+    r.raise_for_status()
+    return r.text
 
 
 # ---------------------------------------------------------------------------
-# Portal search flow
+# Parse
 # ---------------------------------------------------------------------------
 
-def _setup_search(session: requests.Session, last_name: str = "", verbose: bool = False):
+
+def _parse_page(html: str, case_type_label: str, now: str) -> list[dict]:
     """
-    Execute the full search flow and return (root_viewstate, row_count).
-
-    last_name: search term; empty string returns ALL cases (LIKE '%%').
+    Parse one results page into a list of partial records (one row per party).
+    Caller merges rows for the same case_number.
     """
-    # Step 1: GET search.xhtml
-    r = session.get(
-        SEARCH_URL, timeout=20,
-        headers={"Accept": "text/html,application/xhtml+xml"},
-    )
-    r.raise_for_status()
-    vs = _extract_viewstate(r.text)
-    if not vs:
-        raise RuntimeError("No ViewState found on search.xhtml")
-
-    # Step 2: Radio AJAX — set customRadio=1 (name search)
-    r_radio = session.post(
-        SEARCH_URL,
-        headers={**_AJAX_HEADERS, "Referer": SEARCH_URL},
-        timeout=15,
-        data={
-            "javax.faces.partial.ajax": "true",
-            "javax.faces.source": "searchForm:customRadio",
-            "javax.faces.partial.execute": "searchForm:customRadio",
-            "javax.faces.partial.render": "searchForm",
-            "javax.faces.behavior.event": "change",
-            "javax.faces.partial.event": "change",
-            "searchForm": "searchForm",
-            "searchForm:customRadio": "1",
-            "javax.faces.ViewState": vs,
-        },
-    )
-    r_radio.raise_for_status()
-    vs2 = _extract_viewstate_from_ajax(r_radio.text) or vs
-
-    # Step 3: pSub AJAX — executes search; EvaluationException is expected
-    session.post(
-        SEARCH_URL,
-        headers={**_AJAX_HEADERS, "Referer": SEARCH_URL},
-        timeout=25,
-        data={
-            "javax.faces.partial.ajax": "true",
-            "javax.faces.source": "searchForm:pSub",
-            "javax.faces.partial.execute": "@all",
-            "javax.faces.partial.render": "@all",
-            "searchForm:pSub": "searchForm:pSub",
-            "searchForm": "searchForm",
-            "searchForm:customRadio": "1",
-            "searchForm:opt1Input": last_name,
-            "searchForm:opt1Input1": "",
-            "javax.faces.ViewState": vs2,
-        },
-    )
-    # Response is EvaluationException XML — ignore it; results are in session
-
-    # Step 4: GET root page → fresh ViewState + rowCount
-    r_root = session.get(
-        PORTAL_URL, timeout=20,
-        headers={
-            "Accept": "text/html,application/xhtml+xml",
-            "Referer": SEARCH_URL,
-        },
-    )
-    r_root.raise_for_status()
-    root_html = r_root.text
-
-    root_vs = _extract_viewstate(root_html)
-    if not root_vs:
-        raise RuntimeError("No ViewState found on root page after search")
-
-    rc_match = re.search(r"rowCount:(\d+)", root_html)
-    row_count = int(rc_match.group(1)) if rc_match else 0
-
-    if verbose:
-        print(
-            f"  [Probate] search={last_name!r} rowCount={row_count}",
-            flush=True,
-        )
-
-    return root_vs, row_count
-
-
-def _fetch_page(
-    session: requests.Session,
-    vs: str,
-    first_row: int,
-    rows: int = ROWS_PER_PAGE,
-) -> list[dict]:
-    """
-    Request one page of DataTable results. Returns parsed row dicts.
-
-    Row dict: {case_number, name, case_type, date_filed, date_of_death}
-    Raises ValueError if the response looks like a ViewState expiry (no CDATA).
-    """
-    r = session.post(
-        SEARCH_URL,
-        headers={**_AJAX_HEADERS, "Referer": PORTAL_URL},
-        timeout=20,
-        data={
-            "javax.faces.partial.ajax": "true",
-            "javax.faces.source": "searchForm:gilistTable",
-            "javax.faces.partial.execute": "searchForm:gilistTable",
-            "javax.faces.partial.render": "searchForm:gilistTable",
-            "searchForm:gilistTable_pagination": "true",
-            "searchForm:gilistTable_first": str(first_row),
-            "searchForm:gilistTable_rows": str(rows),
-            "searchForm:gilistTable_skipChildren": "true",
-            "searchForm:gilistTable_encodeFeature": "true",
-            "searchForm": "searchForm",
-            "javax.faces.ViewState": vs,
-        },
-    )
-    r.raise_for_status()
-    result = _parse_datatable_ajax(r.text)
-    # A small response with no CDATA indicates ViewState/session expiry
-    if not result and len(r.content) < 1000:
-        raise ValueError(f"ViewState likely expired (response {len(r.content)}b, no rows)")
-    return result
-
-
-def _parse_datatable_ajax(xml: str) -> list[dict]:
-    """Extract row dicts from DataTable AJAX partial-response XML."""
-    cdata = re.search(
-        r'<update id="searchForm:gilistTable"><!\[CDATA\[(.*?)\]\]>',
-        xml,
-        re.DOTALL,
-    )
-    if not cdata:
-        return []
-    html = cdata.group(1)
     soup = BeautifulSoup(html, "html.parser")
-    rows = []
-    for tr in soup.find_all("tr", {"data-ri": True}):
-        tds = tr.find_all("td")
-        if len(tds) < 5:
+
+    # Find the results table (has th headers ID/Name/Case ID/Party Type/...)
+    results_table = None
+    for tbl in soup.find_all("table"):
+        ths = [th.get_text(strip=True) for th in tbl.find_all("th")]
+        if "Party Type" in ths and "Filing Date" in ths:
+            results_table = tbl
+            break
+
+    if results_table is None:
+        return []
+
+    records = []
+    for row in results_table.find_all("tr"):
+        cells = [td.get_text(" ", strip=True) for td in row.find_all("td")]
+        if len(cells) < 6:
             continue
-        cells = [td.get_text(strip=True) for td in tds]
-        rows.append({
-            "case_number": cells[0],
-            "name":        cells[1],
-            "case_type":   cells[2],
-            "date_filed":  cells[3],
-            "date_of_death": cells[4],
+
+        party_type = cells[3].strip().upper() if len(cells) > 3 else ""
+        # Skip pagination rows, header rows, attorney rows
+        if not party_type or party_type == "ATTORNEY":
+            continue
+        if cells[0].startswith("Page:"):
+            continue
+
+        case_cell = cells[2].strip() if len(cells) > 2 else ""
+        case_number, decedent_from_title = _parse_case_cell(case_cell)
+        if not case_number:
+            continue
+
+        party_name = cells[1].strip() if len(cells) > 1 else ""
+        filing_date = cells[5].strip() if len(cells) > 5 else ""
+        case_status = _normalize_status(cells[6].strip() if len(cells) > 6 else "")
+
+        link = row.find("a")
+        href = ""
+        if link and link.get("href"):
+            raw_href = link["href"]
+            if raw_href.startswith("http"):
+                href = raw_href
+            else:
+                href = BASE_URL + raw_href.lstrip("/")
+
+        records.append({
+            "_case_number": case_number,
+            "_party_type": party_type,
+            "_party_name": party_name,
+            "_decedent_from_title": decedent_from_title,
+            "_filing_date": filing_date,
+            "_case_status": case_status,
+            "_href": href,
+            "_case_type_label": case_type_label,
+            "_now": now,
         })
-    return rows
+
+    return records
+
+
+def _has_next_page(html: str) -> bool:
+    """Check if the results page shows a 'Next' pagination link."""
+    soup = BeautifulSoup(html, "html.parser")
+    return bool(soup.find("a", string=re.compile(r"Next", re.I)))
 
 
 # ---------------------------------------------------------------------------
-# Sweep terms: empty/None search_term → sweep these vowels to cover all names
-# (Every English last name contains at least one vowel.)
+# Merge party rows → one record per case
 # ---------------------------------------------------------------------------
 
-_SWEEP_TERMS = ["A", "E", "I", "O", "U"]
 
-
-# ---------------------------------------------------------------------------
-# _scrape_term — internal: one search term, backwards pagination
-# ---------------------------------------------------------------------------
-
-def _scrape_term(
-    search_term: str,
-    cutoff: Optional[date],
-    now: str,
-    *,
-    max_pages: int = 0,
-    verbose: bool = True,
-) -> tuple[list[dict], list[str], int, int]:
+def _build_records(party_rows: list[dict]) -> list[dict]:
     """
-    Run one search term, paginate backwards, stop at cutoff.
-    Returns (records, errors, pages_fetched, row_count).
+    Collapse multiple party rows for the same case into one record.
+    RE: MATTER row → decedent_name
+    PETITIONER row → petitioner_name
     """
-    session = _make_session()
-    records: list[dict] = []
-    errors: list[str] = []
+    by_case: dict[str, dict] = {}
 
-    try:
-        root_vs, row_count = _setup_search(session, search_term, verbose=verbose)
-    except Exception as exc:
-        return [], [str(exc)], 0, 0
-
-    if row_count == 0:
-        return [], [], 0, 0
-
-    pages_fetched = 0
-    stop_early = False
-    last_first = ((row_count - 1) // ROWS_PER_PAGE) * ROWS_PER_PAGE
-    consecutive_errors = 0
-
-    for first_row in range(last_first, -1, -ROWS_PER_PAGE):
-        if stop_early:
-            break
-        if max_pages > 0 and pages_fetched >= max_pages:
-            break
-
-        try:
-            page_rows = _fetch_page(session, root_vs, first_row)
-            consecutive_errors = 0
-        except ValueError as exc:
-            # ViewState/session expiry — re-establish the session
-            if verbose:
-                print(f"  [Probate] session refresh at first_row={first_row}: {exc}", flush=True)
-            try:
-                root_vs, _ = _setup_search(session, search_term, verbose=False)
-                page_rows = _fetch_page(session, root_vs, first_row)
-                consecutive_errors = 0
-            except Exception as exc2:
-                msg = f"term={search_term!r} page first={first_row} (retry): {exc2}"
-                errors.append(msg)
-                if verbose:
-                    print(f"  [Probate] {msg}", flush=True)
-                consecutive_errors += 1
-                if consecutive_errors >= 3:
-                    break
-                time.sleep(2)
-                continue
-        except Exception as exc:
-            msg = f"term={search_term!r} page first={first_row}: {exc}"
-            errors.append(msg)
-            if verbose:
-                print(f"  [Probate] {msg}", flush=True)
-            consecutive_errors += 1
-            if consecutive_errors >= 3:
-                break
-            time.sleep(1)
-            continue
-
-        pages_fetched += 1
-
-        for row in reversed(page_rows):
-            case_num = (row.get("case_number") or "").strip()
-            if not case_num:
-                continue
-
-            date_filed_str = (row.get("date_filed") or "").strip()
-            filing_date = _parse_date(date_filed_str) if date_filed_str else None
-
-            if cutoff and filing_date and filing_date < cutoff:
-                stop_early = True
-                break
-
-            raw_payload: dict = {
-                "case_number":   case_num,
-                "name":          (row.get("name") or "").strip(),
-                "case_type":     (row.get("case_type") or "").strip(),
-                "date_filed":    date_filed_str,
-                "date_of_death": (row.get("date_of_death") or "").strip(),
+    for row in party_rows:
+        cn = row["_case_number"]
+        if cn not in by_case:
+            by_case[cn] = {
+                "case_number": cn,
+                "case_type": row["_case_type_label"],
+                "decedent_name": None,
+                "petitioner_name": None,
+                "filing_date": row["_filing_date"],
+                "case_status": row["_case_status"],
+                "href": row["_href"],
+                "now": row["_now"],
             }
-            records.append({
-                "raw_record_id":    _raw_record_id(case_num),
-                "source_id":        SOURCE_ID,
-                "source_url":       PORTAL_URL,
-                "source_fetched_at": now,
-                "raw_payload":      raw_payload,
-                "raw_text":         None,
-                "first_seen_at":    now,
-                "last_seen_at":     now,
-                "change_status":    "NEW_RECORD",
-                "parser_confidence": 80,
-            })
+        rec = by_case[cn]
 
-        time.sleep(0.15)
+        pt = row["_party_type"]
+        name = row["_party_name"]
 
-    return records, errors, pages_fetched, row_count
+        if "RE: MATTER" in pt or "IN RE" in pt:
+            if not rec["decedent_name"]:
+                rec["decedent_name"] = name
+        elif "PETITIONER" in pt:
+            if not rec["petitioner_name"]:
+                rec["petitioner_name"] = name
+
+        # Prefer RE: MATTER decedent; fall back to title extraction
+        if not rec["decedent_name"] and row["_decedent_from_title"]:
+            rec["decedent_name"] = row["_decedent_from_title"]
+
+        if not rec["filing_date"] and row["_filing_date"]:
+            rec["filing_date"] = row["_filing_date"]
+
+    now = next(iter(by_case.values()), {}).get("now", _now_iso()) if by_case else _now_iso()
+    records = []
+    for cn, rec in by_case.items():
+        confidence = 85 if (rec["decedent_name"] and rec["filing_date"]) else 65
+        raw_payload = {
+            "case_number": rec["case_number"],
+            "case_type": rec["case_type"],
+            "decedent_name": rec["decedent_name"],
+            "petitioner_name": rec["petitioner_name"],
+            "filing_date": rec["filing_date"],
+            "case_status": rec["case_status"],
+        }
+        records.append({
+            "raw_record_id": _raw_record_id(cn),
+            "source_id": SOURCE_ID,
+            "source_url": rec["href"] or PORTAL_URL,
+            "source_fetched_at": rec["now"],
+            "raw_payload": raw_payload,
+            "raw_text": None,
+            "first_seen_at": rec["now"],
+            "last_seen_at": rec["now"],
+            "change_status": "NEW_RECORD",
+            "parser_confidence": confidence,
+        })
+    return records
 
 
 # ---------------------------------------------------------------------------
 # run_scraper — public API
 # ---------------------------------------------------------------------------
 
+
 def run_scraper(
     output_path: Path,
     *,
-    days_back: int = 0,
+    days_back: int = 10,
+    case_types: Optional[list[str]] = None,
     existing_path: Optional[Path] = None,
     verbose: bool = True,
-    search_term: Optional[str] = None,
-    max_pages: int = 0,
+    max_records: Optional[int] = None,
 ) -> dict:
     """
-    Scrape Shelby County Probate Court.
-
-    NOTE: This portal is a historical archive (cases through ~Sep 2013).
-    The default days_back=0 collects all available records.
-
-    When search_term is None or "" (default), sweeps vowels A/E/I/O/U so that
-    every English last name is matched by at least one search pass.  Supply an
-    explicit search_term to restrict to one name-contains query.
+    Scrape Shelby County Probate Court (CourtConnect) for estate cases.
 
     Parameters
     ----------
-    output_path     : JSONL path to write.
-    days_back       : Calendar days back from today to keep. 0 = keep all (default).
-    existing_path   : Prior JSONL for merge (defaults to output_path).
-    verbose         : Print progress.
-    search_term     : Name search term. None/"" → vowel sweep (recommended).
-    max_pages       : Safety cap per term. 0 = no cap.
+    output_path:
+        JSONL path to write.
+    days_back:
+        Number of calendar days back from today for the date range.
+    case_types:
+        List of case type codes. Defaults to ["01", "02", "05"].
+        Valid: "01" (Probate of Will), "02" (Administration),
+               "05" (Admin CTA), "06" (Conservatorship).
+    existing_path:
+        Path to prior JSONL for merge (defaults to output_path).
+    verbose:
+        Print progress messages.
+    max_records:
+        Cap on total records returned (for testing).
     """
-    prior_path = existing_path if existing_path is not None else output_path
-    today = date.today()
-    cutoff = (today - timedelta(days=days_back)) if days_back > 0 else None
+    if not _REQUESTS_AVAILABLE:
+        raise RuntimeError("requests and beautifulsoup4 required: pip install requests beautifulsoup4")
 
-    sweep_mode = not search_term  # True when None or ""
-    terms = _SWEEP_TERMS if sweep_mode else [search_term]
+    resolved_types = case_types if case_types is not None else DEFAULT_CASE_TYPES
+    prior_path = existing_path if existing_path is not None else output_path
+
+    today = datetime.now(timezone.utc)
+    begin_dt = today - timedelta(days=days_back)
+    begin_date = _format_date_cc(begin_dt)
+    end_date = _format_date_cc(today)
 
     if verbose:
-        mode = f"vowel sweep {_SWEEP_TERMS}" if sweep_mode else f"term={search_term!r}"
         print(
-            f"[Probate] Scraping {SOURCE_ID}: {mode}, "
-            f"days_back={days_back}, cutoff={cutoff}",
+            f"[Probate] Scraping {SOURCE_ID}: {begin_date} -> {end_date}, "
+            f"case_types={resolved_types}",
             flush=True,
         )
 
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": USER_AGENT,
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+    })
+
     now = _now_iso()
-    all_records: dict[str, dict] = {}  # raw_record_id → record (dedup)
-    all_errors: list[str] = []
-    total_pages = 0
-    row_counts: dict[str, int] = {}
+    all_party_rows: list[dict] = []
+    errors: list[str] = []
 
-    for term in terms:
-        recs, errs, pages, rc = _scrape_term(
-            term, cutoff, now, max_pages=max_pages, verbose=verbose
-        )
-        row_counts[term] = rc
-        total_pages += pages
-        all_errors.extend(errs)
-        for rec in recs:
-            rid = rec["raw_record_id"]
-            if rid not in all_records:
-                all_records[rid] = rec
-        if verbose:
-            print(
-                f"  [Probate] term={term!r} rowCount={rc} pages={pages} "
-                f"new_this_term={len(recs)} unique_total={len(all_records)}",
-                flush=True,
-            )
+    for ct in resolved_types:
+        ct_label = CASE_TYPE_LABELS.get(ct, ct)
+        for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+            page_num = 1
+            while True:
+                try:
+                    html = _fetch_results(session, letter, begin_date, end_date, ct, page_num)
+                    rows = _parse_page(html, ct_label, now)
+                    all_party_rows.extend(rows)
+                    if verbose and rows:
+                        print(
+                            f"  [Probate] {ct_label} {letter!r} p{page_num}: {len(rows)} party rows",
+                            flush=True,
+                        )
+                    if not _has_next_page(html):
+                        break
+                    page_num += 1
+                except Exception as exc:
+                    msg = f"fetch_error(ct={ct!r}, letter={letter!r}, page={page_num}): {exc}"
+                    errors.append(msg)
+                    if verbose:
+                        print(f"  [Probate] ERROR: {msg}", flush=True)
+                    break
 
-    records = list(all_records.values())
+    current = _build_records(all_party_rows)
+
+    if max_records is not None:
+        current = current[:max_records]
+
+    if verbose:
+        print(f"[Probate] {len(current)} cases pulled", flush=True)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prior = _load_prior(prior_path)
-    merged = _merge_with_prior(records, prior)
+    merged = _merge_with_prior(current, prior)
 
     tmp = output_path.with_suffix(".jsonl.tmp")
     with open(tmp, "w", encoding="utf-8") as fh:
@@ -535,24 +458,21 @@ def run_scraper(
     tmp.replace(output_path)
 
     stats: dict = {
-        "source_id":              SOURCE_ID,
-        "portal_url":             PORTAL_URL,
-        "search_url":             SEARCH_URL,
-        "days_back":              days_back,
-        "cutoff_date":            str(cutoff) if cutoff else None,
-        "sweep_mode":             sweep_mode,
-        "search_terms":           terms,
-        "row_counts_per_term":    row_counts,
-        "total_pages_fetched":    total_pages,
-        "records_pulled":         len(records),
-        "prior_count":            len(prior),
-        "total_after_merge":      len(merged),
-        "new_record_count":       sum(1 for r in merged if r["change_status"] == "NEW_RECORD"),
-        "same_record_count":      sum(1 for r in merged if r["change_status"] == "SAME"),
-        "updated_record_count":   sum(1 for r in merged if r["change_status"] == "UPDATED"),
+        "source_id": SOURCE_ID,
+        "portal_url": PORTAL_URL,
+        "days_back": days_back,
+        "date_from": begin_date,
+        "date_to": end_date,
+        "case_types": resolved_types,
+        "records_pulled": len(current),
+        "prior_count": len(prior),
+        "total_after_merge": len(merged),
+        "new_record_count": sum(1 for r in merged if r["change_status"] == "NEW_RECORD"),
+        "same_record_count": sum(1 for r in merged if r["change_status"] == "SAME"),
+        "updated_record_count": sum(1 for r in merged if r["change_status"] == "UPDATED"),
         "disappeared_record_count": sum(1 for r in merged if r["change_status"] == "DISAPPEARED"),
-        "output_path":            str(output_path),
-        "errors":                 all_errors,
+        "output_path": str(output_path),
+        "errors": errors,
     }
     return stats
 
@@ -561,19 +481,38 @@ def run_scraper(
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Shelby County Probate Court scraper (requests-based). "
-            "Does a name search then paginates the DataTable backwards "
-            "(newest-first) until the date cutoff."
+            "Shelby County Probate Court scraper (CourtConnect / requests). "
+            "Fetches estate cases by date range. No Playwright required."
         )
     )
     parser.add_argument(
         "--days-back",
         type=int,
-        default=0,
-        help="Calendar days back from today to keep (default 0 = all; portal is historical through ~2013).",
+        default=10,
+        metavar="N",
+        help="Number of calendar days back from today (default 10).",
+    )
+    parser.add_argument(
+        "--case-type",
+        action="append",
+        dest="case_types",
+        default=[],
+        metavar="CODE",
+        help=(
+            "Case type code (repeatable). Valid: 01 02 05 06. "
+            "Default: 01 02 05 (Probate of Will, Administration, Admin CTA)."
+        ),
+    )
+    parser.add_argument(
+        "--max-records",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Cap on total records returned (for testing).",
     )
     parser.add_argument(
         "--out",
@@ -581,48 +520,48 @@ def main() -> int:
         help="Output JSONL path. Default: data/raw/probate_court_shelby.jsonl",
     )
     parser.add_argument(
-        "--search-term",
-        default=None,
-        help='Name search term (default: None = vowel sweep A/E/I/O/U).',
-    )
-    parser.add_argument(
-        "--max-pages",
-        type=int,
-        default=0,
-        help="Max DataTable pages to fetch (default: 0 = no cap).",
-    )
-    parser.add_argument(
         "--probe",
         action="store_true",
-        help="Run one search page and print first 10 rows, then exit.",
+        help="Fetch one page (last_name=A, case_type=01) and print raw rows, then exit.",
     )
     args = parser.parse_args()
 
     if args.probe:
-        probe_term = args.search_term or "E"
-        session = _make_session()
-        print(f"[probe] Searching: term={probe_term!r}", flush=True)
-        root_vs, row_count = _setup_search(session, probe_term, verbose=True)
-        print(f"[probe] rowCount={row_count}, fetching last 2 pages...")
-        last_first = ((row_count - 1) // ROWS_PER_PAGE) * ROWS_PER_PAGE
-        for fi in [last_first, max(0, last_first - ROWS_PER_PAGE)]:
-            rows = _fetch_page(session, root_vs, fi)
-            print(f"  page first={fi}:")
-            for r in rows:
-                print(f"    {r}")
+        if not _REQUESTS_AVAILABLE:
+            print("ERROR: pip install requests beautifulsoup4", file=sys.stderr)
+            return 1
+        today = datetime.now(timezone.utc)
+        begin = _format_date_cc(today - timedelta(days=30))
+        end = _format_date_cc(today)
+        session = requests.Session()
+        session.headers.update({"User-Agent": USER_AGENT})
+        html = _fetch_results(session, "A", begin, end, "01")
+        rows = _parse_page(html, "PROBATE OF WILL", _now_iso())
+        print(f"party rows: {len(rows)}")
+        for r in rows[:10]:
+            print(f"  {r['_case_number']} | {r['_party_type']} | {r['_party_name']} | {r['_filing_date']}")
+        records = _build_records(rows)
+        print(f"cases: {len(records)}")
+        for r in records[:5]:
+            p = r["raw_payload"]
+            print(f"  {p['case_number']} | {p['decedent_name']} | {p['filing_date']} | {p['case_status']}")
         return 0
+
+    if not _REQUESTS_AVAILABLE:
+        print("ERROR: pip install requests beautifulsoup4", file=sys.stderr)
+        return 1
 
     out = (
         Path(args.out)
         if args.out
         else REPO_ROOT / "data" / "raw" / "probate_court_shelby.jsonl"
     )
+    ct = args.case_types if args.case_types else None
     stats = run_scraper(
         out,
         days_back=args.days_back,
-        search_term=args.search_term,
-        max_pages=args.max_pages,
-        verbose=True,
+        case_types=ct,
+        max_records=args.max_records,
     )
     print(json.dumps(stats, indent=2))
     return 0

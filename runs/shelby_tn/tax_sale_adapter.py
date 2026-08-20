@@ -41,8 +41,21 @@ _SOURCE_URL_BASE = "http://gis.register.shelby.tn.us/?parcelid="
 # JSONL loader
 # ---------------------------------------------------------------------------
 
-def load_tax_sale_jsonl(path: Path, max_records: Optional[int] = None) -> list[dict]:
-    """Load ACTIVE (non-DISAPPEARED) tax sale records from JSONL."""
+def load_tax_sale_jsonl(
+    path: Path,
+    max_records: Optional[int] = None,
+    new_only: bool = True,
+) -> list[dict]:
+    """Load tax sale records from JSONL.
+
+    new_only=True (default): only return NEW_RECORD entries — properties that
+    newly appeared on the tax sale list since the previous scrape run.  This
+    is the correct mode for a daily incremental pipeline; the full static list
+    (~2,000 entries) is bulk noise with no event date.
+
+    new_only=False: return all non-DISAPPEARED records (original behaviour,
+    useful for a one-time full export).
+    """
     records: list[dict] = []
     with open(path, encoding="utf-8") as fh:
         for line in fh:
@@ -53,7 +66,10 @@ def load_tax_sale_jsonl(path: Path, max_records: Optional[int] = None) -> list[d
                 rec = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            if rec.get("change_status") == "DISAPPEARED":
+            status = rec.get("change_status")
+            if status == "DISAPPEARED":
+                continue
+            if new_only and status != "NEW_RECORD":
                 continue
             records.append(rec)
             if max_records is not None and len(records) >= max_records:

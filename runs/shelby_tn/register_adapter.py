@@ -5,10 +5,12 @@ Reads data/raw/register_shelby.jsonl (written by scrapers/register_shelby.py)
 and converts each record into a raw_event_record.
 
 Document type -> canonical_doc_type mapping:
-  APPT -> appointment_of_substitute_trustee  (pre-foreclosure signal; §17 rule
-          inherits from "foreclosure_notice" via BROAD_KEY_REGISTRY_ALIASES)
-  IRS  -> federal_tax_lien  (taxpayer = GR; IRS = GE)
-  LIEN -> judgment_lien     (debtor = GR; creditor = GE)
+  APPT -> appointment_of_substitute_trustee  (pre-foreclosure; GR=lender GE=sub trustee)
+  IRS  -> federal_tax_lien       (taxpayer = GR; IRS = GE)
+  LIEN -> judgment_lien          (debtor = GR; creditor = GE)
+  NCTS -> county_tax_sale_notice (county trustee = GR; delinquent owner = GE)
+  TNTX -> state_tax_lien         (taxpayer = GR; TN Dept of Revenue = GE)
+  STR  -> sub_trustees_deed      (sub trustee = GR; foreclosure buyer = GE)
 """
 
 from __future__ import annotations
@@ -30,6 +32,9 @@ _DOC_TYPE_MAP: dict[str, str] = {
     "APPT": "appointment_of_substitute_trustee",
     "IRS": "federal_tax_lien",
     "LIEN": "judgment_lien",
+    "NCTS": "county_tax_sale_notice",
+    "TNTX": "state_tax_lien",
+    "STR": "sub_trustees_deed",
 }
 
 
@@ -60,6 +65,27 @@ def _parties_for_doc_type(raw_doc_type: str, grantor: Optional[str], grantee: Op
             parties.append({"name": grantor, "name_type": "GR", "raw_role": "JUDGMENT_DEBTOR"})
         if grantee:
             parties.append({"name": grantee, "name_type": "GE", "raw_role": "JUDGMENT_CREDITOR"})
+
+    elif dt == "NCTS":
+        # Notice of County Tax Sale: GR = county trustee (filer); GE = delinquent owner
+        if grantor:
+            parties.append({"name": grantor, "name_type": "GR", "raw_role": "COUNTY_TRUSTEE"})
+        if grantee:
+            parties.append({"name": grantee, "name_type": "GE", "raw_role": "DELINQUENT_TAXPAYER"})
+
+    elif dt == "TNTX":
+        # State Tax Lien: GR = taxpayer (debtor); GE = TN Dept of Revenue
+        if grantor:
+            parties.append({"name": grantor, "name_type": "GR", "raw_role": "TAXPAYER"})
+        if grantee:
+            parties.append({"name": grantee, "name_type": "GE", "raw_role": "TN_DEPT_OF_REVENUE"})
+
+    elif dt == "STR":
+        # Sub Trustees Deed (completed foreclosure): GR = sub trustee; GE = buyer at sale
+        if grantor:
+            parties.append({"name": grantor, "name_type": "GR", "raw_role": "SUBSTITUTE_TRUSTEE"})
+        if grantee:
+            parties.append({"name": grantee, "name_type": "GE", "raw_role": "FORECLOSURE_BUYER"})
 
     else:
         # Generic fallback
@@ -108,6 +134,7 @@ def build_register_raw_events(
         grantee = (payload.get("grantee") or "").strip() or None
         recording_date = (payload.get("recording_date") or "").strip() or None
         prop_desc = (payload.get("prop_description") or "").strip() or None
+        cross_references = (payload.get("cross_references") or "").strip() or None
 
         canonical_doc_type = _DOC_TYPE_MAP.get(raw_doc_type or "", "appointment_of_substitute_trustee")
         source_url = raw_rec.get("source_url") or ""
@@ -138,6 +165,7 @@ def build_register_raw_events(
             "document_body_text": None,
             "parser_confidence": confidence,
             "captured_at": captured_at,
+            "cross_references": cross_references,
         }
         raw_events.append(raw_event)
 

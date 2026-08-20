@@ -353,6 +353,7 @@
           <td>${escapeHtml(r.expected_sale_date || r.primary_event_date || "")}</td>
           <td>${flagsCell}</td>
           <td>${(r.primary_source_urls || []).map((u) => `<a href="${escapeAttr(u)}" target="_blank" rel="noopener">link</a>`).join(" ") || "—"}</td>
+          <td>${renderContact(r)}</td>
         </tr>`;
       })
       .join("");
@@ -448,6 +449,44 @@
       a.remove();
     }, 100);
     return { rows: rows.length, columns: CSV_COLUMNS.length };
+  }
+
+  // -------------------------------------------------------------------
+  // Contact info renderer (probate leads only)
+  // -------------------------------------------------------------------
+
+  function renderContact(r) {
+    const ci = r.contact_info;
+    if (!ci) return "—";
+
+    const lines = [];
+
+    // Executor + phone
+    const phone = ci.executor_phone || null;
+    const exec = ci.executor_name || null;
+    if (exec || phone) {
+      const nameStr = exec ? escapeHtml(exec) : "";
+      const phoneStr = phone
+        ? `<a href="tel:${escapeAttr(phone.replace(/\D/g, ""))}">${escapeHtml(phone)}</a>`
+        : "";
+      const sep = nameStr && phoneStr ? " / " : "";
+      lines.push(`<div class="contact-executor">${nameStr}${sep}${phoneStr}</div>`);
+    }
+
+    // Confirmed property address from parcel cross-reference
+    const addr = ci.confirmed_address || r.tps_confirmed_address || null;
+    if (addr) {
+      lines.push(
+        `<div class="contact-addr">Property: ${escapeHtml(addr)} <span class="contact-confirmed" title="Confirmed via county parcel records">&#10003;</span></div>`
+      );
+    } else if (ci.tps_decedent_addresses && ci.tps_decedent_addresses.length) {
+      // Show TPS addresses that could not be parcel-confirmed (unverified)
+      lines.push(
+        `<div class="contact-addr contact-unverified">Listed: ${escapeHtml(ci.tps_decedent_addresses[0])}</div>`
+      );
+    }
+
+    return lines.length ? lines.join("") : "—";
   }
 
   // -------------------------------------------------------------------

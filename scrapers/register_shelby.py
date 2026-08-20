@@ -11,8 +11,11 @@ Architecture:
 
 Target document types:
   - APPT  : Appointment of Substitute Trustee (ASOT) — pre-foreclosure signal in TN
-  - IRS   : Federal Tax Lien — bonus signal
-  - LIEN  : Judgment lien
+  - IRS   : Federal Tax Lien — federal tax distress signal
+  - LIEN  : Judgment lien — creditor distress signal
+  - NCTS  : Notice of County Tax Sale — county tax delinquency, near auction
+  - TNTX  : State Tax Lien — TN Dept of Revenue lien against taxpayer
+  - STR   : Sub Trustees Deed — completed foreclosure (post-sale deed)
 
 Form key fields (all in content_frame):
   - start_date, end_date    : text, MM/DD/YYYY format
@@ -100,9 +103,12 @@ DOC_TYPE_KEYS = {
     "APPT": "APPT",   # Appointment of Substitute Trustee
     "IRS": "IRS",     # Federal Tax Lien
     "LIEN": "LIEN",   # Judgment Lien
+    "NCTS": "NCTS",   # Notice of County Tax Sale
+    "TNTX": "TNTX",   # State Tax Lien (TN Dept of Revenue)
+    "STR": "STR",     # Sub Trustees Deed (completed foreclosure)
 }
 
-DEFAULT_DOC_TYPES = ["APPT"]
+DEFAULT_DOC_TYPES = ["APPT", "IRS", "LIEN", "NCTS", "TNTX", "STR"]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -289,10 +295,11 @@ def _fill_search_form(
     for dt in doc_types:
         checked = False
 
-        # Strategy 1: name contains the doc type code (e.g. instDocType[0][APPT])
+        # Strategy 1: name contains "[CODE]" (bracket-wrapped) to avoid substring
+        # collisions like IRS matching IRSA/IRSP/IRSR/IRSC/IRSSA/IRSW.
         try:
             cbs = content_frame.query_selector_all(
-                f'input[type="checkbox"][name*="{dt}"]'
+                f'input[type="checkbox"][name*="[{dt}]"]'
             )
             for cb in cbs:
                 if not cb.is_checked():
@@ -609,6 +616,250 @@ def _pw_search(
 
 
 # ---------------------------------------------------------------------------
+# Playwright: look up a single instrument by number and return prop_description
+# ---------------------------------------------------------------------------
+
+
+def _pw_lookup_inst_num(content_frame, inst_num: str, verbose: bool) -> Optional[str]:
+    """
+    Fill the inst_num field in content_frame and submit; return prop_description
+    from the first result row, or None if not found.
+
+    Assumes content_frame already has the search form loaded.
+    """
+    import time as _time
+
+    try:
+        content_frame.wait_for_selector(
+            'form[name="davidson_form"], form[id="davidson_form"]',
+            timeout=10_000,
+        )
+    except Exception:
+        return None
+
+    # Clear all name/date fields so only inst_num is active
+    for field_name in ("grantor_last_name", "grantee_last_name", "both_last_name",
+                       "start_date", "end_date", "inst_num"):
+        try:
+            el = content_frame.query_selector(f'[name="{field_name}"]')
+            if el:
+                el.fill("")
+        except Exception:
+            pass
+
+    # Fill inst_num
+    try:
+        inst_el = content_frame.query_selector('[name="inst_num"], #inst_num')
+        if not inst_el:
+            return None
+        inst_el.fill(inst_num)
+    except Exception as exc:
+        if verbose:
+            print(f"  [Register TD] Could not fill inst_num for {inst_num}: {exc}", flush=True)
+        return None
+
+    # Submit via the JS submit link.  Use no_wait_after=True so the click returns
+    # immediately without blocking on the resulting frame navigation — navigation
+    # can take 60-90 s for slow portal searches.  We wait explicitly below.
+    try:
+        link = content_frame.query_selector('a[onclick*="submitSearch"]')
+        if link:
+            link.click(no_wait_after=True)
+        else:
+            content_frame.evaluate("document.getElementById('davidson_form').submit()")
+    except Exception:
+        try:
+            content_frame.evaluate("document.getElementById('davidson_form').submit()")
+        except Exception:
+            return None
+
+    # Brief pause to let the POST request begin before we start watching for results
+    _time.sleep(2)
+
+    # After form submit, the content_frame's server processes the search and returns
+    # results HTML.  Portal searches can take 20-90s server-side depending on the
+    # age and specificity of the query.  Use a 120s timeout to cover slow searches
+    # while still being bounded (instruments genuinely absent time out cleanly).
+    _found_results = False
+    try:
+        content_frame.wait_for_selector(
+            "table#results tbody tr",
+            timeout=120_000,
+        )
+        _found_results = True
+    except Exception:
+        pass  # timeout or no rows — treat as not found
+
+    if not _found_results:
+        if verbose:
+            print(f"  [Register TD] {inst_num}: not found (timeout or no rows)", flush=True)
+        return None
+
+    # Extract prop_description from result rows using locators (avoids evaluate() blocking)
+    try:
+        rows = content_frame.locator("table#results tbody tr").all()
+    except Exception:
+        rows = []
+
+    rows_data = []
+    for row_locator in rows:
+        try:
+            cells = row_locator.locator("td").all()
+            rows_data.append([c.inner_text(timeout=3_000).strip() for c in cells])
+        except Exception:
+            pass
+
+    if not rows_data:
+        if verbose:
+            print(f"  [Register TD] {inst_num}: no results", flush=True)
+        return None
+
+    # Column order (per _extract_results): 0=inst_num, 1=rec_date, 2=grantor,
+    # 3=grantee, 4=doc_type, 5=prop_description, 6=cross_refs, 7=consideration
+    for row in rows_data:
+        if len(row) >= 6:
+            # Normalize: collapse newlines and extra spaces in multi-line addresses
+            prop_desc = " ".join(row[5].split()).strip()
+            if prop_desc:
+                if verbose:
+                    print(f"  [Register TD] {inst_num}: {prop_desc!r}", flush=True)
+                return prop_desc
+
+    return None
+
+
+def _pw_navigate_new_search(page, verbose: bool):
+    """
+    Reset to a fresh portal search form by reloading the main page.
+
+    Reloading the full main page is the most reliable reset strategy: it creates
+    a new content_frame with a fresh random session token.
+
+    Returns the new content_frame reference, or None on failure.
+    """
+    import time as _time
+
+    page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=45_000)
+    _wait_settled(page)
+
+    # Retry finding the iframe — it loads asynchronously after the main page
+    for _ in range(8):
+        for frame in page.frames:
+            if frame.name == "content_frame" or "content.php" in (frame.url or ""):
+                if "about:blank" not in (frame.url or ""):
+                    return frame
+        _time.sleep(0.5)
+
+    return None
+
+
+def batch_lookup_td_addresses(
+    inst_nums: list[str],
+    headless: bool = True,
+    verbose: bool = False,
+    cache_path: Optional[Path] = None,
+) -> dict[str, str]:
+    """
+    Look up a list of instrument numbers in the Register of Deeds portal and
+    return a dict of {instrument_number: prop_description}.
+
+    Uses a disk cache (JSON) so subsequent runs don't re-fetch known instruments.
+    Missing = instrument not found in portal; cached miss stored as empty string.
+    """
+    if not PLAYWRIGHT_AVAILABLE:
+        if verbose:
+            print("  [Register TD] Playwright not available — skipping TD address lookup", flush=True)
+        return {}
+
+    import time as _time
+
+    # Load cache
+    cache: dict[str, str] = {}
+    if cache_path and cache_path.exists():
+        try:
+            cache = json.loads(cache_path.read_text(encoding="utf-8"))
+        except Exception:
+            cache = {}
+
+    # Filter to uncached
+    to_fetch = [n for n in inst_nums if n not in cache]
+
+    results: dict[str, str] = {k: v for k, v in cache.items() if k in inst_nums}
+
+    if not to_fetch:
+        if verbose:
+            print(f"  [Register TD] All {len(inst_nums)} instruments already cached", flush=True)
+        return results
+
+    if verbose:
+        print(
+            f"  [Register TD] Fetching {len(to_fetch)} instrument addresses "
+            f"({len(inst_nums) - len(to_fetch)} cached)...",
+            flush=True,
+        )
+
+    # Use a fresh browser session per instrument.  Re-using a single browser
+    # and resetting the search form between lookups is fragile (frame identity
+    # can be lost after POST navigation).  One browser per instrument costs an
+    # extra ~30s of startup but is completely reliable and cache makes it a
+    # one-time cost per instrument.
+    for inst_num in to_fetch:
+        prop_desc = None
+        try:
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch(headless=headless)
+                context = browser.new_context(
+                    user_agent=USER_AGENT,
+                    viewport={"width": 1280, "height": 900},
+                    ignore_https_errors=True,
+                )
+                page = context.new_page()
+
+                page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=60_000)
+                _wait_settled(page)
+                _time.sleep(1)
+
+                # Find content_frame (retry up to 5 times — loads asynchronously)
+                content_frame = None
+                for _ in range(5):
+                    for frame in page.frames:
+                        if frame.name == "content_frame" or "content.php" in (frame.url or ""):
+                            if "about:blank" not in (frame.url or ""):
+                                content_frame = frame
+                                break
+                    if content_frame:
+                        break
+                    _time.sleep(0.5)
+
+                if content_frame:
+                    prop_desc = _pw_lookup_inst_num(content_frame, inst_num, verbose)
+
+                browser.close()
+        except Exception as exc:
+            if verbose:
+                print(f"  [Register TD] {inst_num}: browser error: {exc}", flush=True)
+
+        val = prop_desc or ""
+        cache[inst_num] = val
+        results[inst_num] = val
+
+        # Persist cache after each instrument so partial results survive crashes
+        if cache_path:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(
+                json.dumps(cache, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            )
+
+    fetched = sum(1 for n in to_fetch if results.get(n))
+    if verbose:
+        print(
+            f"  [Register TD] Fetched {fetched}/{len(to_fetch)} addresses", flush=True
+        )
+
+    return results
+
+
+# ---------------------------------------------------------------------------
 # run_scraper — public API
 # ---------------------------------------------------------------------------
 
@@ -633,9 +884,11 @@ def run_scraper(
     days_back:
         Number of calendar days back from today for the date range.
     doc_types:
-        List of document type codes. Defaults to ["APPT"].
+        List of document type codes. Defaults to all six types.
         Valid codes: "APPT" (Appointment of Substitute Trustee),
-        "IRS" (Federal Tax Lien), "LIEN" (Judgment Lien).
+        "IRS" (Federal Tax Lien), "LIEN" (Judgment Lien),
+        "NCTS" (Notice of County Tax Sale), "TNTX" (State Tax Lien),
+        "STR" (Sub Trustees Deed / completed foreclosure).
     existing_path:
         Path to prior JSONL for merge (defaults to output_path).
     verbose:
@@ -761,7 +1014,8 @@ def main() -> int:
         metavar="CODE",
         help=(
             "Document type codes to search (space-separated). "
-            "Valid: APPT IRS LIEN. Default: APPT."
+            "Valid: APPT IRS LIEN NCTS TNTX STR. "
+            "Default: all six types."
         ),
     )
     parser.add_argument(

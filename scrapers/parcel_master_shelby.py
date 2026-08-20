@@ -116,6 +116,27 @@ def lookup_by_parcelid(parcel_id: str) -> Optional[dict]:
     return results[0]
 
 
+def lookup_by_address(address_fragment: str, max_results: int = 20) -> list[dict]:
+    """Return parcels whose PAR_ADDR1 contains address_fragment (case-insensitive).
+
+    Useful for cross-referencing a TruePeopleSearch address against county
+    parcel records.  Pass just the street portion (e.g. '123 MAIN ST').
+    """
+    safe = address_fragment.replace("'", "''").upper()
+    where = f"UPPER(PAR_ADDR1) LIKE '%{safe}%'"
+    results: list[dict] = []
+    offset = 0
+    while len(results) < max_results:
+        batch = _query(where, count=min(_PAGE_SIZE, max_results - len(results)), offset=offset)
+        if not batch:
+            break
+        results.extend(batch)
+        if len(batch) < _PAGE_SIZE:
+            break
+        offset += len(batch)
+    return results
+
+
 def lookup_by_owner(owner_fragment: str, max_results: int = 200) -> list[dict]:
     """Return attributes for all parcels whose OWNER contains owner_fragment.
 

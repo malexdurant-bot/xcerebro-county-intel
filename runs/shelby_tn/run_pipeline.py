@@ -4,8 +4,8 @@ Shelby County, TN — distress lead pipeline.
 Phase 1 (MVP) sources:
   trustee_tax_sale  — Tax sale property list (CSV from S3, CONFIRMED accessible)
 
-Phase 2 sources (REQUIRES_PLAYWRIGHT — not yet active):
-  register_shelby           — Register of Deeds (ASOT, Lis Pendens, etc.)
+Phase 2 sources (REQUIRES_PLAYWRIGHT):
+  register_shelby           — Register of Deeds (APPT/IRS/LIEN/NCTS/TNTX/STR)
   chancery_court_shelby     — Chancery Court (Lis Pendens, partition, quiet title)
   general_sessions_shelby   — General Sessions Civil (evictions / FED)
   probate_court_shelby      — Probate Court (estates, letters testamentary)
@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from datetime import datetime, timezone
@@ -68,7 +69,7 @@ from scaffold.pipeline.run_pipeline_staged import (  # noqa: E402
 #
 # tax_sale_certificate: taxpayer (TP) is the debtor.
 # TP is supplied by the ArcGIS parcel lookup (same as Maricopa treasurer).
-# Records without an ArcGIS hit emit empty parties → §17 routes to
+# Records without an ArcGIS hit emit empty parties -> §17 routes to
 # REVIEW_REQUIRED "owner_not_on_document".
 # ---------------------------------------------------------------------------
 
@@ -91,24 +92,812 @@ _DEBTOR_RULES: dict = {
         "known_filer_role": "plaintiff claiming clear title",
         "missing_debtor_review_reason": "owner_not_on_document",
     },
+    # Probate — override DOCUMENT_BODY fan-out rule so the decedent name (GR)
+    # is used directly as the debtor instead of requiring document body text.
+    "letters_testamentary": {
+        "expected_debtor_name_type": "GR",
+        "fallback_debtor_name_type": None,
+        "filer_name_types": ["OTHER"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "personal representative / executor",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    # Shelby Register of Deeds — overrides for universal rules that expect TP/DF
+    # but the Register adapter emits GR (grantor) for the debtor party because
+    # TN Register of Deeds records use Grantor/Grantee headers, not PL/DF.
+    "judgment_lien": {
+        "expected_debtor_name_type": "GR",   # JUDGMENT_DEBTOR is the Grantor
+        "fallback_debtor_name_type": "GE",
+        "filer_name_types": ["GE"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "judgment creditor",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    "federal_tax_lien": {
+        "expected_debtor_name_type": "GR",   # TAXPAYER is the Grantor
+        "fallback_debtor_name_type": "GE",
+        "filer_name_types": ["GE"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "federal taxing authority (IRS)",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    "state_tax_lien": {
+        "expected_debtor_name_type": "GR",   # TAXPAYER is the Grantor
+        "fallback_debtor_name_type": "GE",
+        "filer_name_types": ["GE"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "state taxing authority (TN DOR)",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    # APPT / STR: homeowner not on document — we inject parcel owner via
+    # _enrich_events_by_address before the pipeline runs.
+    "appointment_of_substitute_trustee": {
+        "expected_debtor_name_type": "GR",   # injected parcel owner (first GR)
+        "fallback_debtor_name_type": None,
+        "filer_name_types": ["GE"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "lender / mortgagee appointing substitute trustee",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    "sub_trustees_deed": {
+        "expected_debtor_name_type": "GR",   # injected parcel owner (first GR)
+        "fallback_debtor_name_type": None,
+        "filer_name_types": ["GE"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "substitute trustee (completed foreclosure)",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    # County tax sale notice — GE = delinquent taxpayer
+    "county_tax_sale_notice": {
+        "expected_debtor_name_type": "GE",
+        "fallback_debtor_name_type": "GR",
+        "filer_name_types": [],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "county trustee / taxing authority",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
 }
 
 
 # ---------------------------------------------------------------------------
-# Parcel dict builder (maps ArcGIS parcel fields → scoring seam shape)
+# Parcel dict builder (maps ArcGIS parcel fields -> scoring seam shape)
 # ---------------------------------------------------------------------------
 
-def _make_enrichment_provider(parcel_by_id: dict[str, dict]):
+def _enrich_events_by_address(
+    register_events: list[dict],
+    resolver: "ParcelResolver",
+    verbose: bool,
+) -> None:
+    """
+    For each raw event that has an address in property_refs.legal_description,
+    look it up in the Shelby County parcel layer and:
+      1. Set property_refs.parcel_id so the scoring seam can enrich the lead.
+      2. For APPT / STR doc types (where the homeowner is NOT listed in the
+         document parties), prepend the parcel OWNER as a GR party so the
+         debtor_party_engine can resolve the owner_name.
+
+    Works for Register of Deeds events and eviction events (both store the
+    property address in legal_description after their respective adapters run).
+    Address format: "530 MARIANNA ST MEMPHIS, TN 38111" or "1446 HARRISON ST Memphis TN 38108"
+    """
+    from scrapers.parcel_master_shelby import lookup_by_address
+
+    _NEEDS_OWNER_INJECT = {"appointment_of_substitute_trustee", "sub_trustees_deed"}
+
+    # Regex to extract "number + street name + suffix" without trailing city name.
+    # Handles addresses like "530 MARIANNA ST MEMPHIS" -> "530 MARIANNA ST".
+    _STREET_RE = re.compile(
+        r"^(\d+(?:\s+\S+){1,6}?\s+(?:ST|AVE|RD|DR|LN|CT|BLVD|WAY|PL|TER|CIR|HWY|PKWY|"
+        r"CV|COVE|PIKE|RUN|TRL|TRAIL|LOOP|XING|BND|PT|HTS|GLEN|VIEW|WALK|PASS|GROVE|ROW))\b",
+        re.IGNORECASE,
+    )
+    # Matches: number, optional single-word directional, then first word of street name
+    _NUM_WORD_RE = re.compile(
+        r"^(\d+)\s+(?:N|S|E|W|NE|NW|SE|SW)\s+(\S+)|^(\d+)\s+(\S+)", re.IGNORECASE
+    )
+
+    def _normalize_street(s: str) -> str:
+        """Expand-to-abbreviate: ArcGIS stores abbreviated directionals and suffixes."""
+        for full, abbr in [
+            ("EAST", "E"), ("WEST", "W"), ("NORTH", "N"), ("SOUTH", "S"),
+            ("PLACE", "PL"), ("DRIVE", "DR"), ("COURT", "CT"), ("COVE", "CV"),
+            ("BOULEVARD", "BLVD"), ("TERRACE", "TER"), ("AVENUE", "AVE"),
+            ("STREET", "ST"), ("HIGHWAY", "HWY"), ("PARKWAY", "PKWY"),
+        ]:
+            s = re.sub(r"\b" + full + r"\b", abbr, s, flags=re.IGNORECASE)
+        return s.strip()
+
+    def _lookup_with_fallbacks(street: str) -> list[dict]:
+        """Try ArcGIS lookup with normalization and number+first-word fallback."""
+        candidates = lookup_by_address(street, max_results=8)
+        if candidates:
+            return candidates
+        norm = _normalize_street(street)
+        if norm.upper() != street.upper():
+            candidates = lookup_by_address(norm, max_results=8)
+            if candidates:
+                return candidates
+        # Last resort: just number + first non-directional word of street name
+        m2 = _NUM_WORD_RE.match(street)
+        if m2:
+            num = m2.group(1) or m2.group(3)
+            word = m2.group(2) or m2.group(4)
+            frag = f"{num} {word}"
+            if len(frag) > 5:
+                candidates = lookup_by_address(frag, max_results=8)
+        return candidates
+
+    enriched = 0
+    for event in register_events:
+        refs = event.get("property_refs", {})
+        legal_desc = (refs.get("legal_description") or "").strip()
+        if not legal_desc or refs.get("parcel_id"):
+            continue
+
+        # Parse the street address (drop city/state/zip after first comma)
+        raw_street = legal_desc.split(",")[0].strip().upper()
+        # Further extract just number+name+suffix, dropping trailing city name
+        m = _STREET_RE.match(raw_street)
+        street = m.group(1).strip() if m else raw_street
+        if len(street) < 6:
+            continue
+
+        try:
+            candidates = _lookup_with_fallbacks(street)
+        except Exception as exc:
+            if verbose:
+                print(f"  [Reg Addr] lookup error for {street!r}: {exc}", flush=True)
+            continue
+
+        if not candidates:
+            continue
+
+        # Pick best candidate: prefer exact street-number prefix match
+        best = None
+        num_prefix = re.match(r"^(\d+)\s", street)
+        if num_prefix and len(candidates) > 1:
+            num = num_prefix.group(1)
+            for cand in candidates:
+                par_addr = (cand.get("PAR_ADDR1") or "").strip().upper()
+                if par_addr.startswith(num + " "):
+                    best = cand
+                    break
+        if best is None and len(candidates) == 1:
+            best = candidates[0]
+        if best is None:
+            continue
+
+        parcel_id = (best.get("PARCELID") or "").strip()
+        if not parcel_id:
+            continue
+
+        refs["parcel_id"] = parcel_id
+        resolver._cache[parcel_id] = best
+        enriched += 1
+
+        # For APPT/STR: inject parcel owner as first GR party so debtor rule resolves
+        doc_type = event.get("canonical_doc_type", "")
+        if doc_type in _NEEDS_OWNER_INJECT:
+            owner = (best.get("OWNER") or "").strip()
+            if owner:
+                event["parties"].insert(0, {
+                    "name": owner,
+                    "name_type": "GR",
+                    "raw_role": "PROPERTY_OWNER_FROM_PARCEL",
+                })
+                if verbose:
+                    print(
+                        f"  [Reg Addr] {doc_type} {street!r} -> {parcel_id} owner={owner!r}",
+                        flush=True,
+                    )
+
+    if verbose:
+        print(f"  [Reg Addr] {enriched}/{len(register_events)} events matched to parcels", flush=True)
+
+
+def _build_probate_name_map(probate_events: list[dict]) -> dict[str, dict]:
+    """
+    Return {decedent_name_upper: {"executor_name": str, "case_number": str}}
+    from the raw probate events so the post-pipeline contact enrichment can
+    retrieve the executor name for a given scored lead (which only carries
+    the decedent as owner_name).
+    """
+    out: dict[str, dict] = {}
+    for ev in probate_events:
+        decedent = None
+        executor = None
+        for party in ev.get("parties", []):
+            if party.get("raw_role") == "DECEDENT":
+                decedent = party.get("name", "").strip()
+            elif party.get("raw_role") == "PERSONAL_REPRESENTATIVE":
+                executor = party.get("name", "").strip()
+        if decedent:
+            out[decedent.upper()] = {
+                "executor_name": executor or "",
+                "case_number": ev.get("property_refs", {}).get("case_number", ""),
+            }
+    return out
+
+
+def _cross_ref_tps_addresses(
+    addresses: list[str],
+    decedent_name: str,
+    verbose: bool,
+) -> tuple[Optional[str], Optional[str]]:
+    """
+    For each address returned by TruePeopleSearch, look it up in the Shelby
+    County parcel layer and check whether the owner name matches the decedent.
+
+    Returns (confirmed_address_str, confirmed_parcel_id) or (None, None).
+    """
+    from scrapers.parcel_master_shelby import lookup_by_address
+
+    def _tokens(s: str) -> set[str]:
+        return {t for t in re.sub(r"[^A-Z ]", "", s.upper()).split() if len(t) > 1}
+
+    decedent_tokens = _tokens(decedent_name)
+
+    for raw_addr in addresses:
+        # Extract street portion for ArcGIS query
+        street_match = re.search(
+            r"\d{1,5}\s+[A-Z][A-Za-z ]{2,30}"
+            r"(?:St|Ave|Rd|Dr|Ln|Ct|Blvd|Way|Pl|Ter|Cir|Hwy|Pkwy|Pike)\b",
+            raw_addr,
+            re.IGNORECASE,
+        )
+        if not street_match:
+            # Fallback: first segment before comma
+            street = raw_addr.split(",")[0].strip().upper()
+        else:
+            street = street_match.group(0).strip().upper()
+
+        if len(street) < 5:
+            continue
+
+        try:
+            candidates = lookup_by_address(street, max_results=15)
+        except Exception as exc:
+            if verbose:
+                print(f"    [CrossRef] Parcel lookup error for {street!r}: {exc}", flush=True)
+            continue
+
+        for cand in candidates:
+            owner = (cand.get("OWNER") or "").strip().upper()
+            owner_tokens = _tokens(owner)
+            overlap = len(decedent_tokens & owner_tokens)
+            if overlap >= 2:
+                situs = (cand.get("PAR_ADDR1") or "").strip()
+                city = (cand.get("MUNI") or "Memphis").strip()
+                confirmed = f"{situs}, {city}, TN" if situs else None
+                parcel_id = (cand.get("PARCELID") or "").strip() or None
+                if verbose:
+                    print(
+                        f"    [CrossRef] Confirmed: {decedent_name!r} -> "
+                        f"{confirmed} (overlap={overlap})",
+                        flush=True,
+                    )
+                return confirmed, parcel_id
+
+    return None, None
+
+
+def _enrich_probate_contacts(
+    scored_leads: list[dict],
+    probate_name_map: dict[str, dict],
+    cache_path: Path,
+    verbose: bool,
+) -> None:
+    """
+    Post-pipeline TruePeopleSearch enrichment for probate scored leads.
+
+    For each probate lead:
+      1. Search TPS for decedent name -> collect listed addresses
+      2. Cross-reference each address with Shelby County parcel layer
+         to confirm property ownership
+      3. Search TPS for executor name -> collect phone numbers
+      4. Attach contact_info dict to the scored lead in place
+
+    Modifies scored_leads in place; never raises (failures logged and skipped).
+    """
+    try:
+        from scrapers.truepeoplesearch_shelby import batch_enrich_leads
+    except ImportError as exc:
+        print(f"  [CONTACT] TruePeopleSearch scraper unavailable: {exc}", flush=True)
+        return
+
+    probate_leads = [
+        lead for lead in scored_leads
+        if "probate_court_shelby" in lead.get("source_ids", [])
+    ]
+
+    if not probate_leads:
+        return
+
+    print(
+        f"\n[CONTACT] TruePeopleSearch enrichment for {len(probate_leads)} probate leads "
+        f"(cache: {cache_path.name})...",
+        flush=True,
+    )
+
+    # Build the batch input list (always includes executor_name from CourtConnect)
+    batch_input = []
+    for lead in probate_leads:
+        decedent_name = lead.get("owner_name", "").strip()
+        if not decedent_name:
+            continue
+        name_info = probate_name_map.get(decedent_name.upper(), {})
+        executor_name = name_info.get("executor_name", "")
+        batch_input.append({"decedent_name": decedent_name, "executor_name": executor_name})
+
+    # Run single-browser batch (4s inter-lead delay)
+    try:
+        tps_results = batch_enrich_leads(
+            batch_input,
+            city_state="Memphis TN",
+            inter_lead_delay=4.0,
+            cache_path=cache_path,
+            verbose=verbose,
+        )
+    except Exception as exc:
+        if verbose:
+            print(f"  [CONTACT] TPS batch error: {exc}", flush=True)
+        tps_results = {}
+
+    # Apply results to scored leads
+    enriched = 0
+    for lead in probate_leads:
+        decedent_name = lead.get("owner_name", "").strip()
+        if not decedent_name:
+            continue
+
+        name_info = probate_name_map.get(decedent_name.upper(), {})
+        executor_name = name_info.get("executor_name", "")
+        tps = tps_results.get(decedent_name.upper())
+
+        confirmed_address, confirmed_parcel_id = None, None
+        if tps:
+            confirmed_address, confirmed_parcel_id = _cross_ref_tps_addresses(
+                tps.get("tps_decedent_addresses", []),
+                decedent_name,
+                verbose,
+            )
+
+        lead["contact_info"] = {
+            "executor_name": executor_name or None,
+            "executor_phone": tps.get("executor_phone") if tps else None,
+            "confirmed_address": confirmed_address,
+            "confirmed_parcel_id": confirmed_parcel_id,
+            "tps_decedent_addresses": tps.get("tps_decedent_addresses", []) if tps else [],
+            "tps_enriched": bool(tps and tps.get("tps_enriched")),
+        }
+
+        if confirmed_address and not lead.get("parcel_display"):
+            lead["tps_confirmed_address"] = confirmed_address
+        if confirmed_parcel_id and not lead.get("primary_parcel_id"):
+            lead["tps_confirmed_parcel_id"] = confirmed_parcel_id
+
+        enriched += 1
+
+    print(
+        f"  [CONTACT] Enriched {enriched}/{len(probate_leads)} probate leads "
+        f"(TPS hits: {sum(1 for r in tps_results.values() if r.get('tps_enriched'))})",
+        flush=True,
+    )
+
+
+def _enrich_probate_by_name(
+    probate_events: list[dict],
+    resolver: "ParcelResolver",
+    verbose: bool,
+) -> None:
+    """
+    For each probate raw event, query the parcel layer by decedent last name.
+    On a confident match, sets property_refs.parcel_id and caches the parcel
+    attrs so the main enrichment_provider call hits cache instead of the API.
+
+    Confidence rules:
+      - Query uses 'LASTNAME ' (trailing space) so '%SMALL %' won't match SMALLWOOD
+      - Skip if >10 candidates (common name, too ambiguous)
+      - Score by # of meaningful name tokens (len > 1) found in OWNER field
+      - Require score >= 2 (last name + at least one meaningful first/middle name token)
+    """
+    from scrapers.parcel_master_shelby import lookup_by_owner
+
+    enriched = 0
+    for event in probate_events:
+        decedent_name = None
+        for party in event.get("parties", []):
+            if party.get("raw_role") == "DECEDENT":
+                decedent_name = party.get("name", "").strip()
+                break
+        if not decedent_name:
+            continue
+
+        # Extract last name
+        if "," in decedent_name:
+            last_name = decedent_name.split(",")[0].strip()
+        else:
+            parts = decedent_name.split()
+            last_name = parts[-1] if parts else ""
+
+        if len(last_name) < 3:
+            continue
+
+        # Add trailing space so '%LASTNAME %' won't match LASTNAMEMORE (e.g. SMALL vs SMALLWOOD)
+        try:
+            candidates = lookup_by_owner(last_name + " ", max_results=20)
+        except Exception as exc:
+            if verbose:
+                print(f"  [Probate Enrich] lookup error for {last_name!r}: {exc}", flush=True)
+            continue
+
+        if not candidates:
+            continue
+        if len(candidates) > 10:
+            if verbose:
+                print(f"  [Probate Enrich] {last_name!r}: {len(candidates)} hits — ambiguous, skip", flush=True)
+            continue
+
+        # Score by meaningful token overlap (exclude single-char initials)
+        name_tokens = {
+            t for t in decedent_name.upper().replace(",", "").replace(".", "").split()
+            if len(t) > 1
+        }
+        best, best_score = None, 0
+        for cand in candidates:
+            owner_tokens = {
+                t for t in (cand.get("OWNER") or "").upper().replace(",", "").replace(".", "").split()
+                if len(t) > 1
+            }
+            score = len(name_tokens & owner_tokens)
+            if score > best_score:
+                best_score, best = score, cand
+
+        if best_score >= 2 and best:
+            parcel_id = (best.get("PARCELID") or "").strip()
+            if parcel_id:
+                event["property_refs"]["parcel_id"] = parcel_id
+                resolver._cache[parcel_id] = best
+                enriched += 1
+                if verbose:
+                    print(
+                        f"  [Probate Enrich] {decedent_name} -> {parcel_id} "
+                        f"{best.get('PAR_ADDR1','')} (score={best_score})",
+                        flush=True,
+                    )
+
+    if verbose:
+        print(f"  [Probate Enrich] {enriched}/{len(probate_events)} events matched to parcels", flush=True)
+
+
+# Words that indicate a business entity — skip name-based parcel lookup for these
+# since entities are too ambiguous (multiple properties, common partial names).
+_ENTITY_WORDS = frozenset({
+    "LLC", "INC", "CORP", "CORPORATION", "ASSOCIATION", "TRUST",
+    "LP", "LLP", "LTD", "CO", "GROUP", "HOLDINGS", "PROPERTIES",
+    "REALTY", "INVESTMENTS", "MANAGEMENT", "SERVICES", "ENTERPRISES",
+})
+
+# Register doc types that don't include a property address but ARE linked to a
+# specific debtor name — look up the debtor in the parcel layer to find what they own.
+_REGISTER_NAME_LOOKUP_TYPES = frozenset({
+    "federal_tax_lien",
+    "state_tax_lien",
+    "judgment_lien",
+    "county_tax_sale_notice",
+})
+
+
+def _enrich_register_by_owner_name(
+    register_events: list[dict],
+    resolver: "ParcelResolver",
+    verbose: bool,
+) -> None:
+    """
+    For register tax/lien events that have no property address in the posting,
+    look up the debtor (GR party) by last name in the Shelby County parcel layer.
+
+    A tax lien attaches to all real property the debtor owns, so finding their
+    parcel gives us the property the lien is secured against.
+
+    Same confidence rules as _enrich_probate_by_name:
+      - Skip entity names (LLC, INC, etc.)
+      - Trailing space on last name to avoid prefix matches
+      - Skip if > 10 candidates (common name)
+      - Token overlap score >= 2 required
+    """
+    from scrapers.parcel_master_shelby import lookup_by_owner
+
+    enriched = 0
+    attempted = 0
+    for event in register_events:
+        if event.get("canonical_doc_type") not in _REGISTER_NAME_LOOKUP_TYPES:
+            continue
+        if (event.get("property_refs") or {}).get("parcel_id"):
+            continue  # already resolved by address lookup
+
+        # Get the GR (grantor/debtor) party name
+        debtor_name = next(
+            (p["name"].strip() for p in event.get("parties", []) if p.get("name_type") == "GR"),
+            None,
+        )
+        if not debtor_name:
+            continue
+
+        # Skip entity names — too ambiguous for single-property matching
+        name_upper_words = set(debtor_name.upper().split())
+        if name_upper_words & _ENTITY_WORDS:
+            continue
+
+        attempted += 1
+
+        # Register names are "LASTNAME FIRSTNAME [MIDDLE]" (no comma)
+        # Probate names may be "LAST, FIRST" — handle both
+        if "," in debtor_name:
+            last_name = debtor_name.split(",")[0].strip()
+        else:
+            last_name = debtor_name.split()[0].strip()
+
+        if len(last_name) < 3:
+            continue
+
+        try:
+            candidates = lookup_by_owner(last_name + " ", max_results=20)
+        except Exception as exc:
+            if verbose:
+                print(f"  [Reg Name] lookup error for {last_name!r}: {exc}", flush=True)
+            continue
+
+        if not candidates:
+            continue
+
+        # If too many results for last name alone, retry with last + first name.
+        # ArcGIS OWNER format is "LASTNAME FIRSTNAME", so "DAVIS SAMUEL" is specific.
+        if len(candidates) > 10:
+            name_parts = debtor_name.replace(",", "").split()
+            if len(name_parts) >= 2:
+                full_query = f"{name_parts[0]} {name_parts[1]}"
+                try:
+                    candidates = lookup_by_owner(full_query, max_results=10)
+                except Exception:
+                    candidates = []
+            if not candidates or len(candidates) > 10:
+                continue
+
+        # Score by meaningful token overlap
+        name_tokens = {
+            t for t in debtor_name.upper().replace(",", "").replace(".", "").split()
+            if len(t) > 1
+        }
+        best, best_score = None, 0
+        for cand in candidates:
+            owner_tokens = {
+                t for t in (cand.get("OWNER") or "").upper().replace(",", "").replace(".", "").split()
+                if len(t) > 1
+            }
+            score = len(name_tokens & owner_tokens)
+            if score > best_score:
+                best_score, best = score, cand
+
+        if best_score >= 1 and best:
+            parcel_id = (best.get("PARCELID") or "").strip()
+            if parcel_id:
+                event["property_refs"]["parcel_id"] = parcel_id
+                resolver._cache[parcel_id] = best
+                enriched += 1
+                if verbose:
+                    print(
+                        f"  [Reg Name] {debtor_name!r} -> {parcel_id} "
+                        f"{best.get('PAR_ADDR1','')} (score={best_score})",
+                        flush=True,
+                    )
+
+    print(f"  [Reg Name] {enriched}/{attempted} individual debtors matched to parcels", flush=True)
+
+
+def _enrich_lien_by_hoa_subdivision(
+    register_events: list[dict],
+    resolver: "ParcelResolver",
+    verbose: bool,
+) -> None:
+    """
+    For judgment lien events where the creditor is an HOA/condo association,
+    query the ArcGIS parcel layer by subdivision name (SUBDIV field) and match
+    the debtor to a parcel by name token overlap.
+
+    HOA liens only exist on property inside that HOA — far more precise than a
+    county-wide owner name search.  Works even when the county-wide name search
+    fails because the debtor's last name is too common or slightly mis-spelled.
+    """
+    from scrapers.parcel_master_shelby import _query as _arcgis_query
+
+    _HOA_SUFFIX_RE = re.compile(
+        r"\s+(HOMEOWNERS?\s+ASSOC(?:IATION)?S?|HOMEOWNERS?|ASSOC(?:IATION)?S?|"
+        r"HOA|CONDOMINUIMS?|CONDOMINIUM?S?|SUBDIVISION|"
+        r"INC(?:ORPORATED)?|LLC|LLP|LP|ASSN|OWNERS\s+ASSOC(?:IATION)?)\b.*$",
+        re.IGNORECASE,
+    )
+
+    def _extract_subdiv_fragment(grantee: str) -> Optional[str]:
+        upper = grantee.upper()
+        if not any(kw in upper for kw in ("HOMEOWNER", "ASSOCIATION", "HOA", "CONDO", "SUBDIVISION")):
+            return None
+        fragment = _HOA_SUFFIX_RE.sub("", grantee.strip()).strip()
+        if len(fragment) < 4:
+            return None
+        return " ".join(fragment.split()[:3]).upper()
+
+    subdiv_cache: dict[str, list[dict]] = {}
+
+    def _get_subdiv_parcels(fragment: str) -> list[dict]:
+        if fragment in subdiv_cache:
+            return subdiv_cache[fragment]
+        safe = fragment.replace("'", "''")
+        parcels: list[dict] = []
+        offset = 0
+        while True:
+            batch = _arcgis_query(f"UPPER(SUBDIV) LIKE '%{safe}%'", count=100, offset=offset)
+            if not batch:
+                break
+            parcels.extend(batch)
+            if len(batch) < 100:
+                break
+            offset += len(batch)
+        subdiv_cache[fragment] = parcels
+        return parcels
+
+    enriched = 0
+    for event in register_events:
+        if event.get("canonical_doc_type") != "judgment_lien":
+            continue
+        if (event.get("property_refs") or {}).get("parcel_id"):
+            continue
+
+        debtor_name = next(
+            (p["name"].strip() for p in event.get("parties", []) if p.get("name_type") == "GR"),
+            None,
+        )
+        if not debtor_name:
+            continue
+
+        creditor_name = next(
+            (p["name"].strip() for p in event.get("parties", []) if p.get("name_type") == "GE"),
+            None,
+        )
+        if not creditor_name:
+            continue
+
+        subdiv_frag = _extract_subdiv_fragment(creditor_name)
+        if not subdiv_frag:
+            continue
+
+        parcels = _get_subdiv_parcels(subdiv_frag)
+        if not parcels:
+            if verbose:
+                print(f"  [HOA Subdiv] {subdiv_frag!r}: no parcels found in ArcGIS", flush=True)
+            continue
+
+        name_tokens = {
+            t for t in debtor_name.upper().replace(",", "").replace(".", "").split()
+            if len(t) > 1
+        }
+        best, best_score = None, 0
+        for cand in parcels:
+            owner_tokens = {
+                t for t in (cand.get("OWNER") or "").upper().replace(",", "").replace(".", "").split()
+                if len(t) > 1
+            }
+            score = len(name_tokens & owner_tokens)
+            if score > best_score:
+                best_score, best = score, cand
+
+        if best_score >= 2 and best:
+            parcel_id = (best.get("PARCELID") or "").strip()
+            if parcel_id:
+                event["property_refs"]["parcel_id"] = parcel_id
+                resolver._cache[parcel_id] = best
+                enriched += 1
+                if verbose:
+                    print(
+                        f"  [HOA Subdiv] {debtor_name!r} in {subdiv_frag!r} -> "
+                        f"{parcel_id} {best.get('PAR_ADDR1', '')} (score={best_score})",
+                        flush=True,
+                    )
+
+    print(f"  [HOA Subdiv] {enriched} HOA lien debtors matched via subdivision", flush=True)
+
+
+def _fetch_appt_td_addresses(
+    register_events: list[dict],
+    verbose: bool,
+) -> int:
+    """
+    For APPT raw events that have no property address but have a cross_reference
+    to a TD (Trust Deed) or MTG (Mortgage) instrument, fetch the original
+    instrument from the Register portal to get the property address.
+
+    Sets legal_description (and situs_address) on matching events so that
+    _enrich_events_by_address can then do an ArcGIS parcel lookup.
+
+    Returns the number of events that received an address.
+    """
+    try:
+        from scrapers.register_shelby import batch_lookup_td_addresses
+    except ImportError as exc:
+        print(f"  [APPT TD] register_shelby import failed: {exc}", flush=True)
+        return 0
+
+    _XREF_RE = re.compile(r"^(\d{5,12})-(?:TD|MTG|MOD)$", re.IGNORECASE)
+
+    # Collect events that need TD lookup
+    needs_lookup: list[tuple[dict, str]] = []  # (event, inst_num)
+    for event in register_events:
+        if event.get("canonical_doc_type") != "appointment_of_substitute_trustee":
+            continue
+        refs = event.get("property_refs") or {}
+        if refs.get("legal_description") or refs.get("parcel_id"):
+            continue  # already enriched
+
+        xref = (event.get("cross_references") or "").strip()
+        m = _XREF_RE.match(xref)
+        if not m:
+            continue
+        needs_lookup.append((event, m.group(1)))
+
+    if not needs_lookup:
+        return 0
+
+    inst_nums = list({inst for _, inst in needs_lookup})
+    print(
+        f"  [APPT TD] Looking up {len(inst_nums)} trust deed / mortgage instruments "
+        f"for {len(needs_lookup)} APPT events...",
+        flush=True,
+    )
+
+    cache_path = REPO_ROOT / "data" / "cache" / "register_td_cache_shelby.json"
+    td_addresses = batch_lookup_td_addresses(
+        inst_nums,
+        headless=True,
+        verbose=verbose,
+        cache_path=cache_path,
+    )
+
+    enriched = 0
+    for event, inst_num in needs_lookup:
+        addr = td_addresses.get(inst_num, "").strip()
+        if not addr:
+            continue
+        refs = event.setdefault("property_refs", {})
+        refs["legal_description"] = addr
+        refs["situs_address"] = addr
+        enriched += 1
+
+    print(f"  [APPT TD] {enriched}/{len(needs_lookup)} APPT events received TD address", flush=True)
+    return enriched
+
+
+def _make_enrichment_provider(
+    parcel_by_id: dict[str, dict],
+    resolver_cache: Optional[dict] = None,
+):
     """Return an EnrichmentProvider callable: parcel_id -> parcel dict | None.
 
-    The scoring seam (scoring_seam.EnrichmentProvider) expects a plain callable
-    that takes the primary_parcel_id string and returns the raw parcel dict.
-    The seam applies its own _parcel_display_from projection internally.
+    parcel_by_id stores normalized parcel dicts (from resolve_parcel_dict).
+    resolver._cache stores raw ArcGIS attribute dicts — must normalize before
+    returning so the scoring seam gets the expected field names.
     """
+    from scrapers.parcel_master_shelby import normalize_parcel_attrs
+
     def enrichment_provider(parcel_id: Optional[str]) -> Optional[dict]:
         if not parcel_id:
             return None
-        return parcel_by_id.get(str(parcel_id).strip())
+        key = str(parcel_id).strip()
+        if key in parcel_by_id:
+            return parcel_by_id[key]
+        raw = (resolver_cache or {}).get(key)
+        if raw:
+            return normalize_parcel_attrs(raw)
+        return None
     return enrichment_provider
 
 
@@ -171,16 +960,26 @@ def run_pipeline(
     if register_records:
         print(f"\n[ADAPT] Register of Deeds: {len(register_records)} records...")
         reg_events = build_register_raw_events(register_records, verbose=verbose)
-        all_raw_events.extend(reg_events)
         print(f"  Built {len(reg_events)} raw events")
+        print(f"  Fetching TD/MTG addresses for APPT events via Register portal...")
+        _fetch_appt_td_addresses(reg_events, verbose=verbose)
+        print(f"  Enriching register events by address -> parcel lookup...")
+        _enrich_events_by_address(reg_events, resolver, verbose=verbose)
+        print(f"  Enriching tax/lien events by debtor name -> parcel lookup...")
+        _enrich_register_by_owner_name(reg_events, resolver, verbose=verbose)
+        print(f"  Enriching HOA lien events by subdivision -> parcel lookup...")
+        _enrich_lien_by_hoa_subdivision(reg_events, resolver, verbose=verbose)
+        all_raw_events.extend(reg_events)
 
     # Phase 2 — General Sessions Civil (evictions)
     eviction_records = load_eviction_jsonl(GENERAL_SESSIONS_JSONL, max_records=max_records)
     if eviction_records:
         print(f"\n[ADAPT] General Sessions Civil (evictions): {len(eviction_records)} records...")
         eviction_events = build_eviction_raw_events(eviction_records, verbose=verbose)
-        all_raw_events.extend(eviction_events)
         print(f"  Built {len(eviction_events)} raw events")
+        print(f"  Enriching eviction events by address -> parcel lookup...")
+        _enrich_events_by_address(eviction_events, resolver, verbose=verbose)
+        all_raw_events.extend(eviction_events)
 
     # Phase 2 — Chancery Court
     chancery_records = load_chancery_jsonl(CHANCERY_JSONL, max_records=max_records)
@@ -191,12 +990,17 @@ def run_pipeline(
         print(f"  Built {len(chancery_events)} raw events")
 
     # Phase 2 — Probate Court
+    probate_events: list[dict] = []
+    probate_name_map: dict = {}
     probate_records = load_probate_jsonl(PROBATE_JSONL, max_records=max_records)
     if probate_records:
         print(f"\n[ADAPT] Probate Court: {len(probate_records)} records...")
         probate_events = build_probate_raw_events(probate_records, verbose=verbose)
-        all_raw_events.extend(probate_events)
         print(f"  Built {len(probate_events)} raw events")
+        print(f"  Enriching probate events by decedent name -> parcel lookup...")
+        _enrich_probate_by_name(probate_events, resolver, verbose=verbose)
+        probate_name_map = _build_probate_name_map(probate_events)
+        all_raw_events.extend(probate_events)
 
     if not all_raw_events:
         print("  No raw events produced — check scraper output.")
@@ -207,9 +1011,23 @@ def run_pipeline(
     resolver.print_stats()
 
     # --- Build enrichment provider (callable: parcel_id -> parcel dict) ----
-    enrichment_provider = _make_enrichment_provider(parcel_by_id)
+    enrichment_provider = _make_enrichment_provider(parcel_by_id, resolver._cache)
 
-    # --- Staged pipeline §17 → §18 → §19 → §20 → scoring ----------------
+    # Collect posting addresses before the pipeline strips property_refs.
+    # Unresolved lead_id = "lead_unresolved_{identity}" where identity is
+    # instrument_number (for Register events) or raw_event_id (for other sources).
+    # We key by both so the lookup works regardless of which identity was used.
+    _addr_by_event_id: dict[str, str] = {}
+    for _ev in all_raw_events:
+        _refs = _ev.get("property_refs") or {}
+        _addr = (_refs.get("situs_address") or _refs.get("legal_description") or "").strip()
+        if _addr:
+            _addr_by_event_id[_ev["raw_event_id"]] = _addr
+            _instr = (_ev.get("instrument_number") or "").strip()
+            if _instr:
+                _addr_by_event_id[_instr] = _addr
+
+    # --- Staged pipeline §17 -> §18 -> §19 -> §20 -> scoring ----------------
     print(f"\n[PIPELINE] Running staged pipeline on {len(all_raw_events)} raw events...")
     result = run_staged_pipeline(
         all_raw_events,
@@ -224,6 +1042,24 @@ def run_pipeline(
     print(f"\n[RESULT] {len(scored_leads)} scored leads written to {result['scored_leads_path']}")
     print(f"  Semantic verdict: {result['semantic_verdict']}")
 
+    # --- Post-pipeline: TruePeopleSearch contact enrichment for probate ----
+    if probate_events:
+        tps_cache = REPO_ROOT / "data" / "cache" / "tps_shelby.json"
+        _enrich_probate_contacts(
+            scored_leads,
+            probate_name_map,
+            cache_path=tps_cache,
+            verbose=verbose,
+        )
+
+    # --- Re-write scored_leads.json to include contact_info from enrichment --
+    if probate_events:
+        scored_leads_path = result["scored_leads_path"]
+        Path(scored_leads_path).write_text(
+            json.dumps(scored_leads, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
     # --- Build dashboard payload ------------------------------------------
     dashboard = build_dashboard_payload(
         scored_leads,
@@ -233,12 +1069,61 @@ def run_pipeline(
         mode="production",
         build_label="PARTIAL_BUILD",
     )
+
+    # Patch contact_info + tps_confirmed_address onto dashboard records.
+    # project_scored_lead (in the universal scaffold) doesn't know about
+    # Shelby probate enrichment fields; we merge them here.
+    _scored_by_id = {s["scored_lead_id"]: s for s in scored_leads}
+    for rec in dashboard.get("records", []):
+        _s = _scored_by_id.get(rec.get("scored_lead_id"))
+        if not _s:
+            continue
+        if _s.get("contact_info"):
+            rec["contact_info"] = _s["contact_info"]
+        if _s.get("tps_confirmed_address"):
+            rec["tps_confirmed_address"] = _s["tps_confirmed_address"]
+        if _s.get("tps_confirmed_parcel_id"):
+            rec["tps_confirmed_parcel_id"] = _s["tps_confirmed_parcel_id"]
+
+    # Add primary_source_urls to each record (TPS detail URL for probate leads)
+    for rec in dashboard.get("records", []):
+        _s = _scored_by_id.get(rec.get("scored_lead_id"))
+        if _s and _s.get("source_urls") and "primary_source_urls" not in rec:
+            rec["primary_source_urls"] = _s["source_urls"]
+
+    # Patch display_address from the original posting when parcel enrichment missed.
+    # Unresolved leads use lead_id = "lead_unresolved_{raw_event_id}" so we can
+    # recover the event's posting address without touching the scaffold.
+    _UNRESOLVED_PREFIX = "lead_unresolved_"
+    for rec in dashboard.get("records", []):
+        if rec.get("display_address"):
+            continue
+        _s = _scored_by_id.get(rec.get("scored_lead_id"))
+        if not _s:
+            continue
+        lead_id = _s.get("lead_id", "")
+        if lead_id.startswith(_UNRESOLVED_PREFIX):
+            raw_ev_id = lead_id[len(_UNRESOLVED_PREFIX):]
+            raw_addr = _addr_by_event_id.get(raw_ev_id, "")
+            if raw_addr:
+                # Strip state/zip suffix to keep it clean for skip-tracing
+                # "1446 HARRISON ST Memphis TN 38108" -> keep as-is (full address)
+                rec["display_address"] = raw_addr
+                rec["display_address_source"] = "posting"  # distinguish from ArcGIS
+
     dashboard_path = OUTPUT_DIR / "dashboard.json"
     dashboard_path.write_text(
         json.dumps(dashboard, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     print(f"  Dashboard payload: {dashboard_path}")
+
+    # Mirror to the dashboard server's live data file so the browser reloads immediately
+    import shutil as _shutil
+    _live_dash = REPO_ROOT / "dashboard" / "data" / "leads.json"
+    _live_dash.parent.mkdir(parents=True, exist_ok=True)
+    _shutil.copy(dashboard_path, _live_dash)
+    print(f"  Live dashboard updated: {_live_dash}")
 
     elapsed = round(time.time() - t0, 1)
     print(f"\n[DONE] Shelby County pipeline complete in {elapsed}s")

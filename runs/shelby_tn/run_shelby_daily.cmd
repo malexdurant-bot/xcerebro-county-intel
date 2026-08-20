@@ -13,7 +13,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo [2/6] Register of Deeds ^(APPT / IRS / LIEN, last 10 days^)...
+echo [2/6] Register of Deeds ^(APPT / IRS / LIEN / NCTS / TNTX / STR, last 10 days^)...
 python -X utf8 scrapers\register_shelby.py --days-back 10
 if %ERRORLEVEL% neq 0 (
     echo ERROR: register scraper failed ^(exit code %ERRORLEVEL%^).
@@ -37,8 +37,8 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo [5/6] Probate Court ^(vowel sweep, check last 10 pages per term for new cases^)...
-python -X utf8 scrapers\probate_court_shelby.py --max-pages 10
+echo [5/6] Probate Court ^(CourtConnect, estate cases last 10 days^)...
+python -X utf8 scrapers\probate_court_shelby.py --days-back 10
 if %ERRORLEVEL% neq 0 (
     echo ERROR: probate scraper failed ^(exit code %ERRORLEVEL%^).
     exit /b 1
