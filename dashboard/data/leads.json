@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T09:32:01Z",
+  "generated_at": "2026-08-23T16:04:42Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Richland",
@@ -7,8 +7,8 @@
   "semantic_verdict": "DEPLOY_OK",
   "lead_total": 349,
   "enrichment_breakdown": {
-    "ENRICHED": 43,
-    "UNENRICHED": 306
+    "ENRICHED": 57,
+    "UNENRICHED": 292
   },
   "pattern_counts": {
     "estate": 215,
@@ -17,12 +17,13 @@
     "tax": 16
   },
   "attribute_counts": {
-    "absentee": 24,
+    "absentee": 26,
     "entity_owned": 10,
-    "free_and_clear": 6,
-    "high_equity": 14,
-    "long_term_owned": 14,
-    "out_of_state": 6
+    "free_and_clear": 7,
+    "high_equity": 19,
+    "long_term_owned": 17,
+    "out_of_state": 6,
+    "senior_owner": 1
   },
   "stack_depth_distribution": {
     "1": 348,
@@ -31,11 +32,12 @@
   "score_tier_distribution": {
     "Hot": 1,
     "Low": 78,
-    "Strong": 19,
-    "Workable": 251
+    "Strong": 20,
+    "Workable": 250
   },
   "deal_path_distribution": {
     "messy_title": 78,
+    "partial_interest": 3,
     "sub_to": 17,
     "wholesale": 349
   },
@@ -397,6 +399,130 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_M90011-11-29",
+      "scored_lead_id": "scored_392c2ffd21860ee0",
+      "primary_parcel_id": "M90011-11-29",
+      "display_address": "1641 LORICK RD, BLYTHEWOOD, SC",
+      "display_owner": "EDDIE KERWIN STEVENS",
+      "display_score": 64,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "absentee",
+        "long_term_owned",
+        "senior_owner"
+      ],
+      "display_deal_paths": [
+        "partial_interest",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 10000.0,
+      "display_last_sale_price": 8250.0,
+      "display_last_sale_date": "1995-08-21",
+      "display_year_built": 1995,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 9
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-889/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R02409-01-03",
+      "scored_lead_id": "scored_af8dbf9151fe4279",
+      "primary_parcel_id": "R02409-01-03",
+      "display_address": "1204 MARINA RD, IRMO, SC",
+      "display_owner": "CHARLES SAMUEL FULMER",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 345400.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2020-01-11",
+      "display_year_built": 1967,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-889/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R031169-05-15",
       "scored_lead_id": "scored_c288024b7644b95a",
       "primary_parcel_id": "R031169-05-15",
@@ -446,6 +572,57 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-299/",
         "https://www.thecolumbiastar.com/articles/masters-sales-300/",
         "https://www.thecolumbiastar.com/articles/masters-sales-301/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R03206-01-69",
+      "scored_lead_id": "scored_e3933c6598c2a197",
+      "primary_parcel_id": "R03206-01-69",
+      "display_address": "413 LEAMINGTON WAY, IRMO, SC",
+      "display_owner": "LINDA GRIST HAYES",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 304800.0,
+      "display_last_sale_price": 265000.0,
+      "display_last_sale_date": "2022-06-01",
+      "display_year_built": 1999,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/"
       ]
     },
     {
@@ -684,6 +861,58 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R04005-06-05",
+      "scored_lead_id": "scored_a5016e5e33efa4ff",
+      "primary_parcel_id": "R04005-06-05",
+      "display_address": "418 CHARING CROSS RD, IRMO, SC",
+      "display_owner": "PATRICIA ANN GEIGER",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 153200.0,
+      "display_last_sale_price": 125000.0,
+      "display_last_sale_date": "2013-09-18",
+      "display_year_built": 1972,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-889/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R04203-03-02",
       "scored_lead_id": "scored_f064df1d355bb272",
       "primary_parcel_id": "R04203-03-02",
@@ -857,6 +1086,64 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R07403-01-22",
+      "scored_lead_id": "scored_cbc051b2731bd0c4",
+      "primary_parcel_id": "R07403-01-22",
+      "display_address": "1521 NUNAMAKER DR, COLUMBIA, SC",
+      "display_owner": "MARIAN T. DUNMORE",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 114300.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2022-04-18",
+      "display_year_built": 1967,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-893/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R07506-05-17",
       "scored_lead_id": "scored_b7be33703183eeb2",
       "primary_parcel_id": "R07506-05-17",
@@ -977,6 +1264,63 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-299/",
         "https://www.thecolumbiastar.com/articles/masters-sales-300/",
         "https://www.thecolumbiastar.com/articles/masters-sales-301/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R09212-10-17",
+      "scored_lead_id": "scored_08eaa68e99f2c052",
+      "primary_parcel_id": "R09212-10-17",
+      "display_address": "509 LAKESIDE AVE, COLUMBIA, SC",
+      "display_owner": "WILLIAM DENNIS BECKHAM",
+      "display_score": 58,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "absentee"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 33300.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1949,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -1266,6 +1610,72 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R11707-08-06",
+      "scored_lead_id": "scored_9584553eceb647fd",
+      "primary_parcel_id": "R11707-08-06",
+      "display_address": "705 OAKLAND AVE, COLUMBIA, SC",
+      "display_owner": "RONNIE DALE THOMPSON",
+      "display_score": 66,
+      "display_tier": "Strong",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "free_and_clear",
+        "high_equity",
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "partial_interest",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 48900.0,
+      "display_last_sale_price": 1.0,
+      "display_last_sale_date": "2006-01-03",
+      "display_year_built": 1950,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 11
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-893/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R11812-01-35",
       "scored_lead_id": "scored_bfd66b62a0f2e855",
       "primary_parcel_id": "R11812-01-35",
@@ -1320,6 +1730,110 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R13604-07-10",
+      "scored_lead_id": "scored_f49b11163e9971c5",
+      "primary_parcel_id": "R13604-07-10",
+      "display_address": "17 ASTER ST, COLUMBIA, SC",
+      "display_owner": "EVELYN MACK CALDWELL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 42300.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1970,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-893/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R13904-13-11",
+      "scored_lead_id": "scored_0df8f925b6b96898",
+      "primary_parcel_id": "R13904-13-11",
+      "display_address": "1416 SHERWOOD RD, COLUMBIA, SC",
+      "display_owner": "RICHARD DIUGUID MOSS",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 265100.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1977,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -1433,6 +1947,70 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R16401-04-04",
+      "scored_lead_id": "scored_fc61b93584bee1a1",
+      "primary_parcel_id": "R16401-04-04",
+      "display_address": "515 VETERANS RD, COLUMBIA, SC",
+      "display_owner": "NANCY ANN MOORE",
+      "display_score": 58,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "partial_interest",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 126400.0,
+      "display_last_sale_price": 100000.0,
+      "display_last_sale_date": "2011-12-27",
+      "display_year_built": 1956,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-891/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-892/"
       ]
     },
     {
@@ -1565,6 +2143,58 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R19107-01-01",
+      "scored_lead_id": "scored_f0e9ede66def91eb",
+      "primary_parcel_id": "R19107-01-01",
+      "display_address": "7634 BURDELL DR, COLUMBIA, SC",
+      "display_owner": "LINDA W. ROSE",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 79200.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1966,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R19701-04-08",
       "scored_lead_id": "scored_c31605d9103cb7a5",
       "primary_parcel_id": "R19701-04-08",
@@ -1662,6 +2292,116 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R19906-03-21",
+      "scored_lead_id": "scored_bd140e4b8d1db491",
+      "primary_parcel_id": "R19906-03-21",
+      "display_address": "2913 BANCROFF RD, COLUMBIA, SC",
+      "display_owner": "DONALD L. MORRIS",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 149800.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2024-08-11",
+      "display_year_built": 1972,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-891/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-892/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R19906-05-02",
+      "scored_lead_id": "scored_c8c8b29e0630a07f",
+      "primary_parcel_id": "R19906-05-02",
+      "display_address": "2816 BANCROFF RD, COLUMBIA, SC",
+      "display_owner": "TERESA H. SMITH",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 155400.0,
+      "display_last_sale_price": 147000.0,
+      "display_last_sale_date": "2016-02-09",
+      "display_year_built": 1977,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -2191,6 +2931,64 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-299/",
         "https://www.thecolumbiastar.com/articles/masters-sales-300/",
         "https://www.thecolumbiastar.com/articles/masters-sales-301/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R23309-01-07",
+      "scored_lead_id": "scored_9ee21bbcbd8123ac",
+      "primary_parcel_id": "R23309-01-07",
+      "display_address": "123 SILVERWOOD TRL, COLUMBIA, SC",
+      "display_owner": "RUTH MAE ROSS",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 283700.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2020-03-17",
+      "display_year_built": 2004,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -3624,7 +4422,7 @@
       "scored_lead_id": "scored_9b88b853690bd800",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "PAMELA",
+      "display_owner": "PAMELA ELAINE SIMS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -3676,7 +4474,7 @@
       "scored_lead_id": "scored_c5bd2bd6a568120b",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "THEODORE",
+      "display_owner": "THEODORE ALLEN RIGGS SR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -3728,7 +4526,7 @@
       "scored_lead_id": "scored_816e2c8cdcee8a33",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ELVIA AUDINE",
+      "display_owner": "ELVIA AUDINE DEJARNETT",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -3780,7 +4578,7 @@
       "scored_lead_id": "scored_cbc6c9daf89ab852",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JEARLINE N",
+      "display_owner": "JEARLINE N. JAMES",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -3831,7 +4629,7 @@
       "scored_lead_id": "scored_767d07173af846cd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WALTER",
+      "display_owner": "WALTER JEROME JENKINS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -3987,7 +4785,7 @@
       "scored_lead_id": "scored_55357a1ad6379234",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JAMELLA",
+      "display_owner": "JAMELLA MAREE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4294,7 +5092,7 @@
       "scored_lead_id": "scored_65354a0ef2ddc796",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DEBRA A",
+      "display_owner": "DEBRA A. JONES",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4344,7 +5142,7 @@
       "scored_lead_id": "scored_07f307d962f75dc4",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "KIMBERLY",
+      "display_owner": "KIMBERLY ANN BOWERS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4396,7 +5194,7 @@
       "scored_lead_id": "scored_22af3d30cdde1b9e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BARBARA J",
+      "display_owner": "BARBARA J. CROSS RUMPH",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4500,7 +5298,7 @@
       "scored_lead_id": "scored_c5c90cc21d54121c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SAMUEL RAY",
+      "display_owner": "SAMUEL RAY RUDOLPH",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4550,7 +5348,7 @@
       "scored_lead_id": "scored_95f663ada013c682",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LILLIAN",
+      "display_owner": "LILLIAN FRANCES HORAN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4602,7 +5400,7 @@
       "scored_lead_id": "scored_cebfc929ac70a546",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIAM T",
+      "display_owner": "WILLIAM T. RHODES",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4652,7 +5450,7 @@
       "scored_lead_id": "scored_875b7c76067326bb",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BRUCE LEROY",
+      "display_owner": "BRUCE LEROY GRAHAM",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4756,7 +5554,7 @@
       "scored_lead_id": "scored_621c64d016e48cb4",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "GEORGIA ANN",
+      "display_owner": "GEORGIA ANN WHEELER GREEN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4807,7 +5605,7 @@
       "scored_lead_id": "scored_8122a8d742e05de6",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ROBERT E",
+      "display_owner": "ROBERT E. ROBINSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4909,7 +5707,7 @@
       "scored_lead_id": "scored_f10154f109010ad5",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "VERLEEN",
+      "display_owner": "VERLEEN WILLIAMS STRONG",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4961,7 +5759,7 @@
       "scored_lead_id": "scored_846b593e9003f957",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SANDRA KAY",
+      "display_owner": "SANDRA KAY THOMPSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5013,7 +5811,7 @@
       "scored_lead_id": "scored_a1fa7d24d6207361",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CHANCELLOR",
+      "display_owner": "CHANCELLOR O. KAIM",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5065,7 +5863,7 @@
       "scored_lead_id": "scored_d287b32a7af30e47",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "STANFORD",
+      "display_owner": "STANFORD RICKY MCCLEASE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5116,7 +5914,7 @@
       "scored_lead_id": "scored_1953ee2e92a577da",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "OSWALD",
+      "display_owner": "OSWALD THOMAS BLACKWELL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5271,7 +6069,7 @@
       "scored_lead_id": "scored_19688df27567978b",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ANTOINETTE",
+      "display_owner": "ANTOINETTE SINISGALLI",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5315,58 +6113,6 @@
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000666",
-      "scored_lead_id": "scored_b2eaac1b514450cc",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "PATRICIA ANN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-889/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/"
       ]
     },
     {
@@ -5426,7 +6172,7 @@
       "scored_lead_id": "scored_18dbc47fb2444f01",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "TOMMY",
+      "display_owner": "TOMMY HASKERL CANNON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5478,7 +6224,7 @@
       "scored_lead_id": "scored_df2701c40d652d89",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "GEORGE",
+      "display_owner": "GEORGE EDWARD FLOWERS JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5530,7 +6276,7 @@
       "scored_lead_id": "scored_b2622f4061855b63",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARRIAN",
+      "display_owner": "MARRIAN JEANETTE GOODWIN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5581,7 +6327,7 @@
       "scored_lead_id": "scored_a9b5403fe696a255",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LINDA RAE",
+      "display_owner": "LINDA RAE ANDERSEN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5684,7 +6430,7 @@
       "scored_lead_id": "scored_354ebb0de022e935",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DANN JAMES",
+      "display_owner": "DANN JAMES AGOSTINI",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5785,7 +6531,7 @@
       "scored_lead_id": "scored_d5f9392cde805f42",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ANDREA",
+      "display_owner": "ANDREA BROOME CLARY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5837,7 +6583,7 @@
       "scored_lead_id": "scored_92daf59c9e7a201a",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JERRY",
+      "display_owner": "JERRY THOMAS JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5889,7 +6635,7 @@
       "scored_lead_id": "scored_7403c48de08e88cd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SARAH N",
+      "display_owner": "SARAH N. BEESLEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5941,7 +6687,7 @@
       "scored_lead_id": "scored_676a320df3b97f11",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "TERRY JOSEPH",
+      "display_owner": "TERRY JOSEPH MUELLER",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -5993,7 +6739,7 @@
       "scored_lead_id": "scored_28c3edddcf280773",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "GARLAND",
+      "display_owner": "GARLAND BERNARD HUFFMAN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6045,7 +6791,7 @@
       "scored_lead_id": "scored_4faab1b03a5adebd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BONNIE W",
+      "display_owner": "BONNIE W. LUTZ",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6096,7 +6842,7 @@
       "scored_lead_id": "scored_aeeb618d2700606e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARCIA E",
+      "display_owner": "MARCIA E. STINE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6200,7 +6946,7 @@
       "scored_lead_id": "scored_5a93e828a60b018c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ELIZABETH",
+      "display_owner": "ELIZABETH MARIE SISK",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6247,63 +6993,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4000775",
-      "scored_lead_id": "scored_5a7882c51992c96f",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "CHARLES",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-889/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4000777",
       "scored_lead_id": "scored_0a1e9e2fa6efe00f",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SARA LOUISE",
+      "display_owner": "SARA LOUISE WHITE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6355,7 +7049,7 @@
       "scored_lead_id": "scored_5ccde91cfe201550",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BETTY LOU",
+      "display_owner": "BETTY LOU MAYFIELD",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6407,7 +7101,7 @@
       "scored_lead_id": "scored_90c28e3d73a40ea8",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WINNIE D",
+      "display_owner": "WINNIE D. JONES",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6459,7 +7153,7 @@
       "scored_lead_id": "scored_137252e7330f1a11",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "INEZ SMITH",
+      "display_owner": "INEZ SMITH SPEAKS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6562,7 +7256,7 @@
       "scored_lead_id": "scored_d38db25a6a1640b7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "RICHARD",
+      "display_owner": "RICHARD LEMOX",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6613,7 +7307,7 @@
       "scored_lead_id": "scored_72b19b896a333d48",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "FRANCES",
+      "display_owner": "FRANCES OWINGS MAY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6715,7 +7409,7 @@
       "scored_lead_id": "scored_fad4a34c7a76de3e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "THOMAS",
+      "display_owner": "THOMAS EUGENE DAYS SR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6767,7 +7461,7 @@
       "scored_lead_id": "scored_1c763e81d10bcd28",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ELIZABETH",
+      "display_owner": "ELIZABETH WHITAKER CLARK",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6819,7 +7513,7 @@
       "scored_lead_id": "scored_75192cd980d07717",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WALTRAUD",
+      "display_owner": "WALTRAUD FIEDLER ISLE BAUM",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6871,7 +7565,7 @@
       "scored_lead_id": "scored_db292b96b9e3b0d1",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JAMES",
+      "display_owner": "JAMES WILLIAM OWINGS JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -6970,63 +7664,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4000821",
-      "scored_lead_id": "scored_b5e272de285ea849",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "EDDIE KERWIN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-889/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4000825",
       "scored_lead_id": "scored_9555e08cee87f381",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARIANN F",
+      "display_owner": "MARIANN F. MURPHY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7076,7 +7718,7 @@
       "scored_lead_id": "scored_4c22a4363bfe385f",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "GERALD",
+      "display_owner": "GERALD EDWARD BRAZELL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7126,7 +7768,7 @@
       "scored_lead_id": "scored_213e02831eff10b9",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "GREGORY",
+      "display_owner": "GREGORY MCKENNA",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7176,58 +7818,7 @@
       "scored_lead_id": "scored_68703129f49f8e0c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ALLAN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000829",
-      "scored_lead_id": "scored_02e986d9697570b4",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "LINDA GRIST",
+      "display_owner": "ALLAN MICHAEL LINDSEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7330,7 +7921,7 @@
       "scored_lead_id": "scored_8ceaef418332b1df",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CLAUDE",
+      "display_owner": "CLAUDE SANDERS MOBLEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7380,7 +7971,7 @@
       "scored_lead_id": "scored_f6a9920d43e6a9cb",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "THOMAS",
+      "display_owner": "THOMAS CHARLES SALANE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7481,7 +8072,7 @@
       "scored_lead_id": "scored_846b9522a333c08e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARTHA",
+      "display_owner": "MARTHA MCCORD NEDZEL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7532,7 +8123,7 @@
       "scored_lead_id": "scored_c587dd5188557ebd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARY ELLEN",
+      "display_owner": "MARY ELLEN SLOCUM",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7583,7 +8174,7 @@
       "scored_lead_id": "scored_9e3e71e8c202b5d0",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ELIZABETH A",
+      "display_owner": "ELIZABETH A. GARRISON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7686,7 +8277,7 @@
       "scored_lead_id": "scored_faf18b02782a5249",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "VERNA CAROL",
+      "display_owner": "VERNA CAROL BRANTLEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7737,7 +8328,7 @@
       "scored_lead_id": "scored_47300578e4133c3c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BOBBIE JEAN",
+      "display_owner": "BOBBIE JEAN MYERS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7788,7 +8379,7 @@
       "scored_lead_id": "scored_d01af694e78978cd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LEONARD LEE",
+      "display_owner": "LEONARD LEE GOFF JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7839,7 +8430,7 @@
       "scored_lead_id": "scored_3d7d8db209349370",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "PAUL EDWARD",
+      "display_owner": "PAUL EDWARD ROGERS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -7994,7 +8585,7 @@
       "scored_lead_id": "scored_cffbacb4aff63929",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOSEPH",
+      "display_owner": "JOSEPH ANTHONY EDWARD DUDZIK",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8098,7 +8689,7 @@
       "scored_lead_id": "scored_7374a3eac06e35db",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "HELEN",
+      "display_owner": "HELEN MCKENZIE TRULUCK",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8149,7 +8740,7 @@
       "scored_lead_id": "scored_3316e22bc044358a",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIAM",
+      "display_owner": "WILLIAM HAPPY HAYS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8304,7 +8895,7 @@
       "scored_lead_id": "scored_b961657ca3c092d5",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARYANN S",
+      "display_owner": "MARYANN S. CREWS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8356,7 +8947,7 @@
       "scored_lead_id": "scored_9f5920d68155d87c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIAM",
+      "display_owner": "WILLIAM LESTER BRANNON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8459,7 +9050,7 @@
       "scored_lead_id": "scored_ae050744b490251a",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIAM",
+      "display_owner": "WILLIAM EVERETT PEAKE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8511,7 +9102,7 @@
       "scored_lead_id": "scored_1922a69e057a0451",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CURTIS R",
+      "display_owner": "CURTIS R. HUTCHINSON JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8562,7 +9153,7 @@
       "scored_lead_id": "scored_7fd1877ce77c7741",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SUEJANE",
+      "display_owner": "SUEJANE JOHNSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8613,7 +9204,7 @@
       "scored_lead_id": "scored_4c563bace8fb892e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CECELIA",
+      "display_owner": "CECELIA EADON MOONEYHAN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8769,7 +9360,7 @@
       "scored_lead_id": "scored_4b666651bbd386f9",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CAROLYN G",
+      "display_owner": "CAROLYN G. FRICK",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8821,7 +9412,7 @@
       "scored_lead_id": "scored_337780427572a978",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOSIAH JUSTIN",
+      "display_owner": "JOSIAH JUSTIN EVAN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8873,7 +9464,7 @@
       "scored_lead_id": "scored_1e2dd1e4898abe97",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "RUTH LILIAN",
+      "display_owner": "RUTH LILIAN PARSONS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -8921,62 +9512,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4000916",
-      "scored_lead_id": "scored_4cb60f8328285320",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "WILLIAM DENNIS BECKHAM",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4000918",
       "scored_lead_id": "scored_00eedc2be29c6617",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOHN ROMAN",
+      "display_owner": "JOHN ROMAN LORKA",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9028,7 +9568,7 @@
       "scored_lead_id": "scored_313946d44460af3f",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ROBERT LEE",
+      "display_owner": "ROBERT LEE WORLEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9076,63 +9616,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4000921",
-      "scored_lead_id": "scored_55dfcadde3f9dd36",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "MARIAN T",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-893/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4000922",
       "scored_lead_id": "scored_351682417bb50049",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LILLIE",
+      "display_owner": "LILLIE EDMOND PHELPS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9182,7 +9670,7 @@
       "scored_lead_id": "scored_7dacab4dfe94d752",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JAMES",
+      "display_owner": "JAMES THOMAS WISE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9234,7 +9722,7 @@
       "scored_lead_id": "scored_a17c8b5623625035",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WALTER H",
+      "display_owner": "WALTER H. PETERS III",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9338,7 +9826,7 @@
       "scored_lead_id": "scored_1bd91493226388f2",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "FENWICK",
+      "display_owner": "FENWICK HALL MURRAY OLIPHANT",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9442,7 +9930,7 @@
       "scored_lead_id": "scored_03e615b02055c4dd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JAMES EDWIN",
+      "display_owner": "JAMES EDWIN MCDONALD IV",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9494,7 +9982,7 @@
       "scored_lead_id": "scored_a294269c05a82427",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ROBERT",
+      "display_owner": "ROBERT BRYAN VAN METRE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9598,7 +10086,7 @@
       "scored_lead_id": "scored_f4d21c3db1bd6a74",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DOROTHY B",
+      "display_owner": "DOROTHY B. BYRD",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9702,7 +10190,7 @@
       "scored_lead_id": "scored_6ff81cca236a76df",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LADSON",
+      "display_owner": "LADSON HAYES SR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9752,7 +10240,7 @@
       "scored_lead_id": "scored_4155f42549266458",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JERRY LENLY",
+      "display_owner": "JERRY LENLY GREENE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9856,7 +10344,7 @@
       "scored_lead_id": "scored_d482b4e2f7197f82",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "PAUL USHER",
+      "display_owner": "PAUL USHER SR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9908,7 +10396,7 @@
       "scored_lead_id": "scored_04ae5ea17ed5ba9e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "FRANCES",
+      "display_owner": "FRANCES LENORA NELSON BLANDING",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -9960,7 +10448,7 @@
       "scored_lead_id": "scored_a3a96c1d20a0f1ee",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JENIFER",
+      "display_owner": "JENIFER IRVETTE JACKSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10008,63 +10496,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4000965",
-      "scored_lead_id": "scored_5d142c177bd9c2e3",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "DONALD L",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-891/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-892/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4000969",
       "scored_lead_id": "scored_a45830051fd9163e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "TRESSIE",
+      "display_owner": "TRESSIE GRAINGER MCNEIL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10116,7 +10552,7 @@
       "scored_lead_id": "scored_26a0d0ad9a6ad2a0",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "THADDEOUS",
+      "display_owner": "THADDEOUS TAYLOR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10168,7 +10604,7 @@
       "scored_lead_id": "scored_c6820c65daf5338f",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DONALD L",
+      "display_owner": "DONALD L. JOHNSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10272,7 +10708,7 @@
       "scored_lead_id": "scored_6bd0e6eef78c8eb0",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ROGER ALLEN",
+      "display_owner": "ROGER ALLEN SIMPSON SR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10324,7 +10760,7 @@
       "scored_lead_id": "scored_ba5ea01083085182",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LOLA MARIE",
+      "display_owner": "LOLA MARIE BANKS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10376,7 +10812,7 @@
       "scored_lead_id": "scored_ec61b0f5f5e05589",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CAROLYN",
+      "display_owner": "CAROLYN HAND TIPPINS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10428,7 +10864,7 @@
       "scored_lead_id": "scored_8cdcd1a4971a6a5a",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BETTE JANE",
+      "display_owner": "BETTE JANE COMPO",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10584,7 +11020,7 @@
       "scored_lead_id": "scored_dff5fe51db863837",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ROBERT",
+      "display_owner": "ROBERT STEWART BOND",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10636,7 +11072,7 @@
       "scored_lead_id": "scored_c7fb590a78fdfea2",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "FRANCIS M",
+      "display_owner": "FRANCIS M. BROOKS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10688,7 +11124,7 @@
       "scored_lead_id": "scored_2309c3af8a6954bd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DAVID BRUCE",
+      "display_owner": "DAVID BRUCE HORTON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10740,7 +11176,7 @@
       "scored_lead_id": "scored_9e3ee8ddd1a775ca",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SYLVIA MUNN",
+      "display_owner": "SYLVIA MUNN GREENE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10792,7 +11228,7 @@
       "scored_lead_id": "scored_06c0b1805d176c7f",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CLAUDIA",
+      "display_owner": "CLAUDIA MOSELEY BEASLEY AKA ELAINE MOSELEY BEASLEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10844,7 +11280,7 @@
       "scored_lead_id": "scored_9bced66f3ffe131b",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOYCE PITTS",
+      "display_owner": "JOYCE PITTS NOBLES",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10896,7 +11332,7 @@
       "scored_lead_id": "scored_b48daf88ff12455d",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIAM",
+      "display_owner": "WILLIAM HENRY WHITAKER",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10948,7 +11384,7 @@
       "scored_lead_id": "scored_a616a4303dbb9c73",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CHARLES",
+      "display_owner": "CHARLES WADE BLAKELY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -10999,7 +11435,7 @@
       "scored_lead_id": "scored_3ec41d2d1d4b7b4b",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "FRANK",
+      "display_owner": "FRANK EDWARD KIRK",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11047,63 +11483,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4001031",
-      "scored_lead_id": "scored_9158fdaf73bcc9ef",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "NANCY ANN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-891/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-892/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001033",
       "scored_lead_id": "scored_e1126e26648d3b7d",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ROBERT",
+      "display_owner": "ROBERT THOMAS HAMMOND",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11155,7 +11539,7 @@
       "scored_lead_id": "scored_e23a0cbe068f73db",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARY WILLIS",
+      "display_owner": "MARY WILLIS HELLAMS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11207,7 +11591,7 @@
       "scored_lead_id": "scored_0b6d5f530e1c3c21",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JULIA RILEY",
+      "display_owner": "JULIA RILEY TUCKER",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11259,7 +11643,7 @@
       "scored_lead_id": "scored_598040fa2b39c59b",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MOLLYE Y",
+      "display_owner": "MOLLYE Y. PAULING",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11359,115 +11743,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4001044",
-      "scored_lead_id": "scored_69ef6b304b2c99c8",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "TERESA H",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001045",
       "scored_lead_id": "scored_48b14592e1914bdd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JUDITH ELLEN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-893/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001047",
-      "scored_lead_id": "scored_078cb845b930db70",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "RONNIE DALE",
+      "display_owner": "JUDITH ELLEN BJORN AUCOIN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11519,7 +11799,7 @@
       "scored_lead_id": "scored_43171a8f5ae54a7f",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SAMANTHA",
+      "display_owner": "SAMANTHA REED",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11623,7 +11903,7 @@
       "scored_lead_id": "scored_3a7f9986e5d11028",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CAROLYN E",
+      "display_owner": "CAROLYN E. ODLE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11779,7 +12059,7 @@
       "scored_lead_id": "scored_8e809f8f034209e7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARGARET",
+      "display_owner": "MARGARET JONES BELL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11831,7 +12111,7 @@
       "scored_lead_id": "scored_ee8c3f249a010df9",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JEFFERSON",
+      "display_owner": "JEFFERSON HUNT GRAYDON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11883,7 +12163,7 @@
       "scored_lead_id": "scored_294a6604b0247c5a",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SHERRY",
+      "display_owner": "SHERRY BELLEFONTAINE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11935,7 +12215,7 @@
       "scored_lead_id": "scored_5d26963d815693fb",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "FLORA MAE",
+      "display_owner": "FLORA MAE MCCULLOUGH WILSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -11987,7 +12267,7 @@
       "scored_lead_id": "scored_2085f42a1afc7497",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ALRIC",
+      "display_owner": "ALRIC CHRISTOPHER BLAKE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12039,7 +12319,7 @@
       "scored_lead_id": "scored_3c59bd84f9ad7a54",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JAMES HENRY",
+      "display_owner": "JAMES HENRY KETCHUM",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12091,7 +12371,7 @@
       "scored_lead_id": "scored_5171ef8695fa86bf",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "TOBY R",
+      "display_owner": "TOBY R. BURLESON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12195,7 +12475,7 @@
       "scored_lead_id": "scored_2136d7988cdc92ed",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "IRVIN",
+      "display_owner": "IRVIN LAWRENCE BOWMAN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12247,7 +12527,7 @@
       "scored_lead_id": "scored_b017ab081d185858",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOSEPHINE",
+      "display_owner": "JOSEPHINE JACKSON NEAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12299,7 +12579,7 @@
       "scored_lead_id": "scored_2d6d767baa709338",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "OPAL MARIE",
+      "display_owner": "OPAL MARIE VARNEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12403,7 +12683,7 @@
       "scored_lead_id": "scored_682ff05c71d669eb",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARY MOORE",
+      "display_owner": "MARY MOORE MCNAIR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12453,7 +12733,7 @@
       "scored_lead_id": "scored_6acf3a88ea598424",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CHRISTOPHER",
+      "display_owner": "CHRISTOPHER MATTHEW HUTSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12557,7 +12837,7 @@
       "scored_lead_id": "scored_155464f30d22c86e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOSIE JONES",
+      "display_owner": "JOSIE JONES MIMS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12661,7 +12941,7 @@
       "scored_lead_id": "scored_474d27e2f8407c0d",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SHIVER CORNELIUS HUTCHINSON",
+      "display_owner": "SHIVER CORNELIUS HUTCHINSON JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12711,7 +12991,7 @@
       "scored_lead_id": "scored_cac46b1b7b6f8f00",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SAMUEL A",
+      "display_owner": "SAMUEL A. GREER",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12763,7 +13043,7 @@
       "scored_lead_id": "scored_fcb80eecd62bf795",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BEVERLY",
+      "display_owner": "BEVERLY VAUGHN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12815,7 +13095,7 @@
       "scored_lead_id": "scored_bd59d565a57ee31b",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOHN EMORY",
+      "display_owner": "JOHN EMORY HOLLER",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12867,7 +13147,7 @@
       "scored_lead_id": "scored_25bfaf09331de670",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "JOANNE",
+      "display_owner": "JOANNE YOUNG MYERS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12919,7 +13199,7 @@
       "scored_lead_id": "scored_2382d3a392841dac",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DEBORAH F",
+      "display_owner": "DEBORAH F. SMITH",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -12971,7 +13251,7 @@
       "scored_lead_id": "scored_ffb4d30f7c3a9a72",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "PAMELA",
+      "display_owner": "PAMELA HITCHCOCK EARGLE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13126,7 +13406,7 @@
       "scored_lead_id": "scored_3892b14c622a4d3c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIE EAVES",
+      "display_owner": "WILLIE EAVES SR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13177,7 +13457,7 @@
       "scored_lead_id": "scored_2bc4d0d1a30fb59c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLIE J",
+      "display_owner": "WILLIE J. WHITE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13228,7 +13508,7 @@
       "scored_lead_id": "scored_4f58649c68a343b7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "SUSAN",
+      "display_owner": "SUSAN FRANCES MASON ROUNDS",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13280,7 +13560,7 @@
       "scored_lead_id": "scored_b55e4fad3a71b59e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BILLY JOE",
+      "display_owner": "BILLY JOE HAMLIN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13332,7 +13612,7 @@
       "scored_lead_id": "scored_7aa625d58d66ec13",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LAWRENCE",
+      "display_owner": "LAWRENCE LOFTLEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13384,7 +13664,7 @@
       "scored_lead_id": "scored_b794ce000f73b6eb",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "THEODORE",
+      "display_owner": "THEODORE BENEDICT KOHN JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13434,7 +13714,7 @@
       "scored_lead_id": "scored_f2a5e098c62e60cb",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MOSES ISIAH",
+      "display_owner": "MOSES ISIAH MCDANIEL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13486,7 +13766,7 @@
       "scored_lead_id": "scored_64df326cb1d7957c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "MARTHA HOPE",
+      "display_owner": "MARTHA HOPE MCLURE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13538,7 +13818,7 @@
       "scored_lead_id": "scored_4b276ca13b740e86",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CYNTHIA BYRD",
+      "display_owner": "CYNTHIA BYRD BUNDRICK",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13580,58 +13860,6 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001192",
-      "scored_lead_id": "scored_d6848e75356aaae8",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "RICHARD",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
@@ -13640,7 +13868,7 @@
       "scored_lead_id": "scored_d66c17f709beaecb",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DAVID JERALD",
+      "display_owner": "DAVID JERALD KEMPER",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13692,7 +13920,7 @@
       "scored_lead_id": "scored_1a37b4e4708aff79",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ROBERT JAMES",
+      "display_owner": "ROBERT JAMES KEEN JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13744,7 +13972,7 @@
       "scored_lead_id": "scored_a47da6c8eb02cccd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "THOMAS C",
+      "display_owner": "THOMAS C. CLAMP JR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13794,7 +14022,7 @@
       "scored_lead_id": "scored_0673480d6cba7dc8",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "WILLISTINE",
+      "display_owner": "WILLISTINE LAWSON MITCHELLLAGREE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -13896,59 +14124,7 @@
       "scored_lead_id": "scored_75f1c95ac1baab49",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "FRANK CARL",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001218",
-      "scored_lead_id": "scored_12b12a40d0e020f6",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "RUTH MAE",
+      "display_owner": "FRANK CARL MOORE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14000,7 +14176,7 @@
       "scored_lead_id": "scored_25a21e17b03d6606",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "BETTY HALL",
+      "display_owner": "BETTY HALL TEMPLETON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14051,7 +14227,7 @@
       "scored_lead_id": "scored_2096f6b9e33a84a9",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "LINDA TUCKER",
+      "display_owner": "LINDA TUCKER BENJAMIN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14093,58 +14269,6 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001231",
-      "scored_lead_id": "scored_847e5605742c459c",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "LINDA W. ROSE",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
@@ -14154,7 +14278,7 @@
       "scored_lead_id": "scored_6afb8000bf8165cc",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CHARLES R",
+      "display_owner": "CHARLES R. DUNBAR",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14205,7 +14329,7 @@
       "scored_lead_id": "scored_0e8bcb88304b3860",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "HOWARD JOEL",
+      "display_owner": "HOWARD JOEL GREENWALD",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14257,7 +14381,7 @@
       "scored_lead_id": "scored_808827433e6e02f1",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "GERALDINE",
+      "display_owner": "GERALDINE ANN RHODARMER",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14308,7 +14432,7 @@
       "scored_lead_id": "scored_9e9a365148af1729",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "DAVID",
+      "display_owner": "DAVID EUGENE RICHARDSON",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14358,7 +14482,7 @@
       "scored_lead_id": "scored_538851d8fc9f4b4e",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "GRACIE WHITE",
+      "display_owner": "GRACIE WHITE SCOTT",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14408,7 +14532,7 @@
       "scored_lead_id": "scored_124b415d106ba0c3",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "ANNA KHOURI",
+      "display_owner": "ANNA KHOURI RUMSEY",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14508,7 +14632,7 @@
       "scored_lead_id": "scored_1eb32bc6308be6bc",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "CHRISTINE",
+      "display_owner": "CHRISTINE ANN BUIE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14558,7 +14682,7 @@
       "scored_lead_id": "scored_3ef572cc608b263d",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "RALPHETTA",
+      "display_owner": "RALPHETTA LOMINICK CHAPPELL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14601,58 +14725,6 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES401055",
-      "scored_lead_id": "scored_5e06d77b3e46b063",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "EVELYN MACK",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-893/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/"
       ]
     },
     {
