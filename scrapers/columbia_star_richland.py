@@ -165,11 +165,38 @@ _PL_ROLE_SUFFIX_RE = re.compile(r",\s*Plaintiff\b.*$", re.IGNORECASE)
 # Pendens section actually uses ("<name>, Plaintiff, vs. <name>,
 # Defendant(s)."), confirmed against real article text: none of these
 # records use "in the case of X vs. Y" (that phrasing is Master's Sales
-# only), so _IN_CASE_OF_RE never matched a single one of them.
+# only), so _IN_CASE_OF_RE never matched a single one of them. "Petitioner"
+# covers probate-style captions (e.g. a petition to sell estate real
+# property) that use the same "vs." structure with a different plaintiff
+# label. The defendant group is capped generously (1500, not 400) because
+# foreclosures against a deceased owner's unknown heirs routinely list
+# 5-10 named individuals before reaching "Defendant(s)." — see
+# _HEIRS_OF_DECEASED_RE below, which extracts the one name from that list
+# that actually matters (the deceased original owner) rather than trusting
+# whichever name happens to come first in a multi-hundred-word caption.
 _LP_PLAINTIFF_VS_RE = re.compile(
-    r"(.{3,300}?),?\s*Plaintiff,?\s*vs\.?\s+"
-    r"(.{3,400}?),?\s*Defendants?(?:\(s\))?\b",
+    r"(.{3,300}?),?\s*(?:Plaintiff|Petitioner),?\s*vs\.?\s+"
+    # [,(]? — code-enforcement notices write "vs. NAME (Defendant)" with no
+    # comma at all; without allowing the open-paren here too, it gets
+    # swept into the captured name ("Kingsugi Properties, LLC (").
+    r"(.{3,1500}?)[,(]?\s*Defendants?(?:\(s\))?\b",
     re.IGNORECASE | re.DOTALL,
+)
+# Strip a leading case-caption prefix ("C/A No.: 2026-CP-40-02434 ") that
+# gets swept into the plaintiff capture when the block starts right at the
+# case heading with nothing shorter for the lazy group to anchor to.
+_CASE_PREFIX_RE = re.compile(
+    r"^.*?C/A\s+No\.?:?\s*[\w-]+\s*", re.IGNORECASE | re.DOTALL
+)
+# Very common SC foreclosure caption for a deceased original owner: "Any
+# heirs-at-law or devisees of <NAME>, [Deceased | their heirs...]". The
+# decedent, not whichever named heir happens to appear first in the list
+# that follows, is the actual debtor identity / property connection here —
+# same idea as a probate lead.
+_HEIRS_OF_DECEASED_RE = re.compile(
+    r"heirs[\s-]+at[\s-]+law\s+or\s+devisees\s+of\s+"
+    r"([A-Z][A-Za-z.,'\s]+?),?\s+(?:deceased|their\s+heirs)",
+    re.IGNORECASE,
 )
 # Fallback for the mortgage-foreclosure boilerplate lis pendens notices that
 # don't use the Plaintiff/Defendant caption at all: "...mortgage ... given
@@ -286,10 +313,25 @@ def _parse_masters_sales(text: str, article_num: int, article_url: str, captured
 
 # --- Lis Pendens parser ---
 
-_LP_SECTION_RE = re.compile(
-    r"LIS\s+PENDENS(.*?)(?=LIS\s+PENDENS|\Z|SUMMONS AND COMPLAINT|ORDER APPOINTING|FAMILY COURT)",
-    re.IGNORECASE | re.DOTALL,
-)
+# The "Public Notices" article type bundles many unrelated notice kinds
+# together (foreclosure summonses, probate petitions, name changes,
+# negligence suits, demolition orders...) with no "LIS PENDENS" section
+# heading anywhere in the actual text — that was a wrong assumption in the
+# original version of this parser (confirmed live: every real case caption
+# is a "C/A No.: <case> <plaintiff>, Plaintiff, vs. <defendant>,
+# Defendant(s)." block, and the word "Lis Pendens" typically only shows up
+# later, mentioned in passing inside a "NOTICE OF FILING OF COMPLAINT"
+# paragraph — splitting on that phrase cut every block off before the
+# caption it needed). Split on "C/A No" instead, the same boundary Master's
+# Sales already uses successfully.
+_CASE_BLOCK_RE = re.compile(r"(?=(?:^|\n)\s*C/A\s+No\.?:?)", re.IGNORECASE)
+_CASE_NUMBER_RE = re.compile(r"C/A\s+No\.?:?\s*([\dA-Z-]{6,20})", re.IGNORECASE)
+
+
+def _split_into_case_blocks(text: str) -> list[str]:
+    """Split article text into one block per case caption ("C/A No...")."""
+    blocks = re.split(_CASE_BLOCK_RE, text)
+    return [b.strip() for b in blocks if len(b.strip()) > 80]
 
 
 def extract_lis_pendens_parties(block: str) -> tuple[str | None, str | None]:
@@ -311,31 +353,41 @@ def extract_lis_pendens_parties(block: str) -> tuple[str | None, str | None]:
     """
     p_m = _IN_CASE_OF_RE.search(block) or _LP_PLAINTIFF_VS_RE.search(block)
     plaintiff_raw = _ws(p_m.group(1)) if p_m else None
+    if plaintiff_raw:
+        plaintiff_raw = _CASE_PREFIX_RE.sub("", plaintiff_raw)
     plaintiff = _PL_ROLE_SUFFIX_RE.sub("", plaintiff_raw).strip() if plaintiff_raw else None
     defendant_raw = _ws(p_m.group(2)) if p_m else None
-    defendant = (
-        re.split(r";|\s+and\s+", defendant_raw)[0].strip()
-        if defendant_raw else None
-    )
+
+    defendant = None
+    if defendant_raw:
+        # "Any heirs-at-law or devisees of <NAME>, deceased..." captions
+        # list several named heirs after the boilerplate opener; the
+        # decedent named in the opener is the real debtor identity, not
+        # whichever heir happens to be split out first.
+        heirs_m = _HEIRS_OF_DECEASED_RE.search(defendant_raw)
+        if heirs_m:
+            defendant = _ws(heirs_m.group(1)).rstrip(",")
+        else:
+            defendant = re.split(r";|\s+and\s+", defendant_raw)[0].strip().rstrip(",")
 
     if not defendant:
         given_m = _GIVEN_BY_RE.search(block)
         if given_m:
             mortgagor = _ws(given_m.group(1)).rstrip(",")
-            defendant = re.split(r";|\s+and\s+", mortgagor)[0].strip()
+            defendant = re.split(r";|\s+and\s+", mortgagor)[0].strip().rstrip(",")
 
     return plaintiff, defendant or None
 
 
 def _parse_lis_pendens(text: str, article_num: int, article_url: str, captured_at: str) -> list[dict]:
     records = []
-    for i, m in enumerate(_LP_SECTION_RE.finditer(text)):
-        block = m.group(1).strip()
-        if len(block) < 60:
+    for block in _split_into_case_blocks(text):
+        case_m = _CASE_NUMBER_RE.search(block)
+        if not case_m:
+            # No case caption in this block at all — text before the first
+            # "C/A No" in the article, not a real case notice.
             continue
-
-        case_m = re.search(r"C/A\s+No\.?:?\s*([\d]{4}-CP-\d+-\d+|\d{4}CP\d+)", block, re.IGNORECASE)
-        case_number = case_m.group(1).strip() if case_m else f"LP-{article_num}-{i+1}"
+        case_number = case_m.group(1).strip()
 
         tms_m = _TMS_RE.search(block)
         tms = tms_m.group(1).strip() if tms_m else None
