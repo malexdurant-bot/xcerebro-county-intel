@@ -447,13 +447,20 @@ def _enrich_raw_events_by_owner_name(
     max_new_lookups: int | None = None,
 ) -> list[dict]:
     """
-    Pre-pipeline step: for raw events of `canonical_doc_type` with no parcel
-    match yet, take the party whose name_type is `party_name_type` and
-    search the county assessor by that name — free, no API key required —
-    filling in parcel_id + situs_address on a confident single match. Run
-    this BEFORE any paid skip-trace step (e.g. richland_skiptrace_
-    dealmachine) so that step only has to cover whatever this free pass
-    couldn't resolve.
+    Pre-pipeline step: for raw events of `canonical_doc_type` that have
+    neither a parcel match nor an address at all — i.e. all we have is a
+    name — take the party whose name_type is `party_name_type` and search
+    the county assessor by that name — free, no API key required — filling
+    in parcel_id + situs_address on a confident single match. Run this
+    BEFORE any paid skip-trace step (e.g. richland_skiptrace_dealmachine) so
+    that step only has to cover whatever this free pass couldn't resolve.
+
+    Deliberately requires situs_address to ALSO be empty, not just
+    parcel_id: some notices (e.g. Master's Sales) name a property address
+    directly in the text without a matched TMS. That address is authoritative
+    — it's what the notice itself says — and must never be second-guessed
+    or overwritten by a probabilistic name search that could resolve to a
+    different property the same person happens to also own.
 
     Args:
         max_new_lookups: cap on NETWORK lookups performed this call (cache
@@ -467,6 +474,7 @@ def _enrich_raw_events_by_owner_name(
         e for e in raw_events
         if e.get("canonical_doc_type") == canonical_doc_type
         and not (e.get("property_refs") or {}).get("parcel_id")
+        and not (e.get("property_refs") or {}).get("situs_address")
     ]
     if not targets:
         return raw_events
@@ -553,6 +561,30 @@ def enrich_lis_pendens_raw_events(
         canonical_doc_type="lis_pendens",
         party_name_type="DF",
         label="lis pendens",
+        max_new_lookups=max_new_lookups,
+    )
+
+
+def enrich_foreclosure_raw_events(
+    raw_events: list[dict],
+    *,
+    max_new_lookups: int | None = None,
+) -> list[dict]:
+    """
+    Owner-name property lookup for `notice_of_sale` (Master's Sales /
+    foreclosure) events, keyed on the defendant (DF party) — same rule as
+    debtor_party_engine's notice_of_sale override in run_pipeline.py. Most
+    Master's Sales notices already state the property address directly in
+    the text, so most events never reach this (the shared helper skips
+    anything that already has an address); this only fires for the leads
+    where all we have is a name — see _enrich_raw_events_by_owner_name for
+    the shared implementation.
+    """
+    return _enrich_raw_events_by_owner_name(
+        raw_events,
+        canonical_doc_type="notice_of_sale",
+        party_name_type="DF",
+        label="foreclosure",
         max_new_lookups=max_new_lookups,
     )
 

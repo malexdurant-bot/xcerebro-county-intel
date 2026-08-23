@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-23T16:23:19Z",
+  "generated_at": "2026-08-23T17:16:44Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Richland",
   "state": "SC",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 349,
+  "lead_total": 350,
   "enrichment_breakdown": {
-    "ENRICHED": 65,
-    "UNENRICHED": 284
+    "ENRICHED": 64,
+    "UNENRICHED": 286
   },
   "pattern_counts": {
     "estate": 215,
@@ -21,25 +21,25 @@
     "entity_owned": 10,
     "free_and_clear": 8,
     "high_equity": 24,
-    "long_term_owned": 20,
+    "long_term_owned": 19,
     "out_of_state": 6,
     "senior_owner": 1
   },
   "stack_depth_distribution": {
-    "1": 347,
-    "2": 2
+    "1": 349,
+    "2": 1
   },
   "score_tier_distribution": {
     "Hot": 1,
-    "Low": 77,
+    "Low": 79,
     "Strong": 20,
-    "Workable": 251
+    "Workable": 250
   },
   "deal_path_distribution": {
-    "messy_title": 78,
+    "messy_title": 79,
     "partial_interest": 4,
     "sub_to": 17,
-    "wholesale": 349
+    "wholesale": 350
   },
   "records": [
     {
@@ -1388,18 +1388,16 @@
     },
     {
       "lead_id": "lead_parcel_R09506-05-19",
-      "scored_lead_id": "scored_430163fa6cc403d2",
+      "scored_lead_id": "scored_79099c2ce5abdc7d",
       "primary_parcel_id": "R09506-05-19",
       "display_address": "2416 SEA GULL LN, COLUMBIA, SC",
-      "display_owner": "Mary B. Mack",
-      "display_score": 58,
-      "display_tier": "Workable",
+      "display_owner": "Glenn Evans",
+      "display_score": 46,
+      "display_tier": "Low",
       "display_patterns": [
-        "lis_pendens",
         "lis_pendens"
       ],
       "stack_contrib_patterns": [
-        "lis_pendens",
         "lis_pendens"
       ],
       "display_pattern_set": [
@@ -1422,8 +1420,8 @@
         },
         {
           "path": "wholesale",
-          "confidence": "high",
-          "rationale": "Multi-signal distress + investor-friendly attribute set."
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -1433,15 +1431,11 @@
       "display_last_sale_date": "2002-03-15",
       "display_year_built": 1970,
       "display_match_confidence": 0,
-      "stack_depth": 2,
+      "stack_depth": 1,
       "score_reasons": [
         {
           "factor": "base_LIS_PENDENS",
           "delta": 35
-        },
-        {
-          "factor": "stack_depth_2",
-          "delta": 12
         },
         {
           "factor": "attribute_bonus",
@@ -1449,7 +1443,7 @@
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": "1999-06-08",
+      "primary_event_date": null,
       "review_flags": [
         "lis_pendens_review"
       ],
@@ -3245,70 +3239,6 @@
       ]
     },
     {
-      "lead_id": "lead_parcel_R23113-07-13",
-      "scored_lead_id": "scored_ce4d213ee0a141c9",
-      "primary_parcel_id": "R23113-07-13",
-      "display_address": "6 SUGAR PINE CT, COLUMBIA, SC",
-      "display_owner": "Van J. Robinson",
-      "display_score": 38,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [
-        "long_term_owned"
-      ],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": 149200.0,
-      "display_last_sale_price": 109925.0,
-      "display_last_sale_date": "1996-01-29",
-      "display_year_built": 1996,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 3
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1825/"
-      ]
-    },
-    {
       "lead_id": "lead_parcel_R23204-14-30",
       "scored_lead_id": "scored_fd7c0abfb13c6290",
       "primary_parcel_id": "R23204-14-30",
@@ -4486,6 +4416,64 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-302/",
         "https://www.thecolumbiastar.com/articles/masters-sales-303/",
         "https://www.thecolumbiastar.com/articles/masters-sales-304/"
+      ]
+    },
+    {
+      "lead_id": "lead_unresolved_2026-CP-40-02299",
+      "scored_lead_id": "scored_5d09fabef3938ff1",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "Van J. Robinson",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1825/"
       ]
     },
     {
@@ -18951,6 +18939,64 @@
       "review_flags": [
         "parcel_resolution_review_required",
         "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1836/"
+      ]
+    },
+    {
+      "lead_id": "lead_unresolved_LP-1836-7",
+      "scored_lead_id": "scored_221efe9ffa543c7c",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_owner": "Mary B. Mack",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "1999-06-08",
+      "review_flags": [
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",

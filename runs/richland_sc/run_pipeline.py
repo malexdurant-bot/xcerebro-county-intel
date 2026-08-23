@@ -184,6 +184,7 @@ def main() -> None:
     from scrapers.richland_assessor_spatialest import (  # noqa: PLC0415
         enrich_estate_raw_events as assessor_owner_search,
         enrich_lis_pendens_raw_events as assessor_lp_owner_search,
+        enrich_foreclosure_raw_events as assessor_fc_owner_search,
     )
     from scrapers.richland_skiptrace_dealmachine import enrich_estate_raw_events  # noqa: PLC0415
 
@@ -213,16 +214,39 @@ def main() -> None:
         1 for e in raw_events
         if e.get("canonical_doc_type") == "lis_pendens"
         and not (e.get("property_refs") or {}).get("parcel_id")
+        and not (e.get("property_refs") or {}).get("situs_address")
     )
     raw_events = assessor_lp_owner_search(raw_events)
     lp_still_unenriched = sum(
         1 for e in raw_events
         if e.get("canonical_doc_type") == "lis_pendens"
         and not (e.get("property_refs") or {}).get("parcel_id")
+        and not (e.get("property_refs") or {}).get("situs_address")
     )
     print(
         f"[richland_sc] Assessor owner-name search (lis pendens): "
         f"{lp_unenriched - lp_still_unenriched}/{lp_unenriched} defendants matched to a parcel"
+    )
+
+    # Most Master's Sales notices already state the property address
+    # directly in the text; this only fires for the minority where all we
+    # have is the defendant's name.
+    fc_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") == "notice_of_sale"
+        and not (e.get("property_refs") or {}).get("parcel_id")
+        and not (e.get("property_refs") or {}).get("situs_address")
+    )
+    raw_events = assessor_fc_owner_search(raw_events)
+    fc_still_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") == "notice_of_sale"
+        and not (e.get("property_refs") or {}).get("parcel_id")
+        and not (e.get("property_refs") or {}).get("situs_address")
+    )
+    print(
+        f"[richland_sc] Assessor owner-name search (foreclosure): "
+        f"{fc_unenriched - fc_still_unenriched}/{fc_unenriched} defendants matched to a parcel"
     )
 
     raw_events = enrich_estate_raw_events(raw_events)
