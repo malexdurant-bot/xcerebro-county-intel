@@ -277,6 +277,7 @@ def _parse_masters_sales(text: str, article_num: int, article_url: str, captured
         plaintiff_raw = _ws(parties_m.group(1)) if parties_m else None
         plaintiff = _PL_ROLE_SUFFIX_RE.sub("", plaintiff_raw).strip() if plaintiff_raw else None
         defendant_raw = _ws(parties_m.group(2)) if parties_m else None
+        defendant_raw = _strip_and_if_deceased(defendant_raw)
         # Take only the first defendant if multiple
         defendant = re.split(r";|,\s+(?:et al\.?|and\s+)", defendant_raw or "")[0].strip() if defendant_raw else None
 
@@ -368,12 +369,14 @@ def extract_lis_pendens_parties(block: str) -> tuple[str | None, str | None]:
         if heirs_m:
             defendant = _ws(heirs_m.group(1)).rstrip(",")
         else:
-            defendant = re.split(r";|\s+and\s+", defendant_raw)[0].strip().rstrip(",")
+            truncated = _strip_and_if_deceased(defendant_raw)
+            defendant = re.split(r";|\s+and\s+", truncated)[0].strip().rstrip(",")
 
     if not defendant:
         given_m = _GIVEN_BY_RE.search(block)
         if given_m:
             mortgagor = _ws(given_m.group(1)).rstrip(",")
+            mortgagor = _strip_and_if_deceased(mortgagor)
             defendant = re.split(r";|\s+and\s+", mortgagor)[0].strip().rstrip(",")
 
     return plaintiff, defendant or None
@@ -504,6 +507,29 @@ def _ws(raw: str | None) -> str | None:
     if raw is None:
         return None
     return re.sub(r"\s+", " ", raw).strip()
+
+
+# Common SC foreclosure boilerplate that follows a defendant's name:
+# "<NAME> AND IF <NAME> be deceased then any child and heir at law to the
+# Estate of <NAME> distributees and devisees at law to the Estate of
+# <NAME> and if any of the same be dead any and all persons entitled to
+# claim under or through them..." — repeats the same name(s), not a
+# distinct additional defendant, but a defendant split that doesn't stop
+# here ends up with the entire clause as the "name" (confirmed live —
+# e.g. "Terrell L Rhodes and Sharon G Rhodes AND IF Terrell L Rhodes and
+# Sharon G Rhodes be deceased then any child and heir at law to the Estate
+# of Terrell L Rhodes and Sharon G Rhodes distributees and devis...").
+_AND_IF_DECEASED_RE = re.compile(r"\s+AND\s+IF\s+.+?\s+be\s+deceased", re.IGNORECASE)
+
+
+def _strip_and_if_deceased(defendant_raw: str | None) -> str | None:
+    """Truncate a captured defendant clause before the AND-IF-deceased
+    boilerplate, if present. Apply this before splitting on ';'/'and' so the
+    boilerplate's own internal "and"s don't get treated as additional
+    defendants."""
+    if not defendant_raw:
+        return defendant_raw
+    return _AND_IF_DECEASED_RE.split(defendant_raw, maxsplit=1)[0]
 
 
 def _build_parties(plaintiff: str | None, defendant: str | None) -> list[dict]:

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T17:50:24Z",
+  "generated_at": "2026-08-23T19:52:42Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Richland",
@@ -98,7 +98,7 @@
       "scored_lead_id": "scored_a3e6d2bacf3840b2",
       "primary_parcel_id": "05404-01-07",
       "display_address": "397 BOOKMAN MILL RD, IRMO, SC",
-      "display_owner": "Terrell L Rhodes and Sharon G Rhodes AND IF Terrell L Rhodes and Sharon G Rhodes be deceased then any child and heir at law to the Estate of Terrell L Rhodes and Sharon G Rhodes distributees and devis",
+      "display_owner": "Terrell L Rhodes and Sharon G Rhodes",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -3909,7 +3909,7 @@
       "scored_lead_id": "scored_e2c91e298fc0f0dc",
       "primary_parcel_id": "R22009-17-36",
       "display_address": "2112 ELMRIDGE RD, COLUMBIA, SC",
-      "display_owner": "Stephen Anthony Hancock AND IF Stephen Anthony Hancock be deceased then any child and heir at law to the Estate of Stephen Anthony Hancock distributees and devisees at law to the Estate of Stephen Ant",
+      "display_owner": "Stephen Anthony Hancock",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -4612,7 +4612,7 @@
       "scored_lead_id": "scored_a7bab17506d66c9f",
       "primary_parcel_id": "R28803-06-05",
       "display_address": "11 ATTUCKS CT, ELGIN, SC",
-      "display_owner": "Ricky Allen Hatwood AND IF Ricky Allen Hatwood be deceased then any child and heir at law to the Estate of Ricky Allen Hatwood distributees and devisees at law to the Estate of Ricky Allen Hatwood and",
+      "display_owner": "Ricky Allen Hatwood",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -4832,7 +4832,7 @@
       "scored_lead_id": "scored_afd2795342b3570f",
       "primary_parcel_id": "R38600-02-07",
       "display_address": "1633 JOE COLLINS RD, EASTOVER, SC",
-      "display_owner": "Willie L Porterfield, Elaine Porterfield, Chautauqua LaTrell Porterfield and if Willie L Porterfield, Elaine Porterfield, Chautauqua LaTrell Porterfield be deceased then any children and heirs at law",
+      "display_owner": "Willie L Porterfield, Elaine Porterfield, Chautauqua LaTrell Porterfield",
       "display_score": 72,
       "display_tier": "Strong",
       "display_patterns": [
