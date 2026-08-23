@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T16:04:42Z",
+  "generated_at": "2026-08-23T16:23:19Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Richland",
@@ -7,37 +7,37 @@
   "semantic_verdict": "DEPLOY_OK",
   "lead_total": 349,
   "enrichment_breakdown": {
-    "ENRICHED": 57,
-    "UNENRICHED": 292
+    "ENRICHED": 65,
+    "UNENRICHED": 284
   },
   "pattern_counts": {
     "estate": 215,
     "foreclosure": 41,
-    "lis_pendens": 78,
+    "lis_pendens": 79,
     "tax": 16
   },
   "attribute_counts": {
-    "absentee": 26,
+    "absentee": 28,
     "entity_owned": 10,
-    "free_and_clear": 7,
-    "high_equity": 19,
-    "long_term_owned": 17,
+    "free_and_clear": 8,
+    "high_equity": 24,
+    "long_term_owned": 20,
     "out_of_state": 6,
     "senior_owner": 1
   },
   "stack_depth_distribution": {
-    "1": 348,
-    "2": 1
+    "1": 347,
+    "2": 2
   },
   "score_tier_distribution": {
     "Hot": 1,
-    "Low": 78,
+    "Low": 77,
     "Strong": 20,
-    "Workable": 250
+    "Workable": 251
   },
   "deal_path_distribution": {
     "messy_title": 78,
-    "partial_interest": 3,
+    "partial_interest": 4,
     "sub_to": 17,
     "wholesale": 349
   },
@@ -1387,6 +1387,78 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R09506-05-19",
+      "scored_lead_id": "scored_430163fa6cc403d2",
+      "primary_parcel_id": "R09506-05-19",
+      "display_address": "2416 SEA GULL LN, COLUMBIA, SC",
+      "display_owner": "Mary B. Mack",
+      "display_score": 58,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "lis_pendens",
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens",
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [
+        "free_and_clear",
+        "high_equity",
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "high",
+          "rationale": "Multi-signal distress + investor-friendly attribute set."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": 42100.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2002-03-15",
+      "display_year_built": 1970,
+      "display_match_confidence": 0,
+      "stack_depth": 2,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 11
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "1999-06-08",
+      "review_flags": [
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1836/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R09603-01-02",
       "scored_lead_id": "scored_7276e8ac78db93da",
       "primary_parcel_id": "R09603-01-02",
@@ -1434,6 +1506,63 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/masters-sales-298/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R11482-05-01",
+      "scored_lead_id": "scored_1626d18cfd5ddced",
+      "primary_parcel_id": "R11482-05-01",
+      "display_address": "1829 SENATE ST 5A APT, COLUMBIA, SC",
+      "display_owner": "MARY MOORE MCNAIR",
+      "display_score": 63,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "absentee",
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 242700.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2017-10-10",
+      "display_year_built": 1975,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 8
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -1733,6 +1862,57 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R11815-06-23",
+      "scored_lead_id": "scored_d407692be6f97cde",
+      "primary_parcel_id": "R11815-06-23",
+      "display_address": "508 MARKSBURY DR, COLUMBIA, SC",
+      "display_owner": "GENE FERDINAND BROWN",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 160000.0,
+      "display_last_sale_price": 160000.0,
+      "display_last_sale_date": "2025-06-11",
+      "display_year_built": 1970,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R13604-07-10",
       "scored_lead_id": "scored_f49b11163e9971c5",
       "primary_parcel_id": "R13604-07-10",
@@ -1950,6 +2130,70 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R14904-01-25",
+      "scored_lead_id": "scored_77afffd9a98d1479",
+      "primary_parcel_id": "R14904-01-25",
+      "display_address": "624 WINDING HICKORY CT, BLYTHEWOOD, SC",
+      "display_owner": "ANTRAN PACK",
+      "display_score": 40,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": 418000.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2022-05-19",
+      "display_year_built": 2012,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1836/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R16401-04-04",
       "scored_lead_id": "scored_fc61b93584bee1a1",
       "primary_parcel_id": "R16401-04-04",
@@ -2140,6 +2384,62 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/masters-sales-298/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R16902-04-55",
+      "scored_lead_id": "scored_8308008010f6f45e",
+      "primary_parcel_id": "R16902-04-55",
+      "display_address": "60 HUNTWICK CT, COLUMBIA, SC",
+      "display_owner": "ROBERT E. ROBINSON",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 369300.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2023-10-18",
+      "display_year_built": 1986,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -2465,6 +2765,69 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/masters-sales-305/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R20316-01-28",
+      "scored_lead_id": "scored_69acecd11121f4a8",
+      "primary_parcel_id": "R20316-01-28",
+      "display_address": "20 ROSEANGEL CT, COLUMBIA, SC",
+      "display_owner": "WILLIE J. WHITE",
+      "display_score": 58,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "partial_interest",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 169100.0,
+      "display_last_sale_price": 181830.0,
+      "display_last_sale_date": "2007-03-30",
+      "display_year_built": 2007,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -2882,6 +3245,70 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R23113-07-13",
+      "scored_lead_id": "scored_ce4d213ee0a141c9",
+      "primary_parcel_id": "R23113-07-13",
+      "display_address": "6 SUGAR PINE CT, COLUMBIA, SC",
+      "display_owner": "Van J. Robinson",
+      "display_score": 38,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": 149200.0,
+      "display_last_sale_price": 109925.0,
+      "display_last_sale_date": "1996-01-29",
+      "display_year_built": 1996,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1825/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R23204-14-30",
       "scored_lead_id": "scored_fd7c0abfb13c6290",
       "primary_parcel_id": "R23204-14-30",
@@ -3120,6 +3547,66 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_R28802-",
+      "scored_lead_id": "scored_1ec6e60cd2d2adf0",
+      "primary_parcel_id": "R28802-",
+      "display_address": "",
+      "display_owner": "Charis Community Development Corporation, Inc.",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "lis_pendens_commercial"
+      ],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1827/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1829/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1831/"
+      ]
+    },
+    {
       "lead_id": "lead_parcel_R28803-06-05",
       "scored_lead_id": "scored_a7bab17506d66c9f",
       "primary_parcel_id": "R28803-06-05",
@@ -3167,6 +3654,64 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/masters-sales-298/"
+      ]
+    },
+    {
+      "lead_id": "lead_parcel_R32508-01-03",
+      "scored_lead_id": "scored_e5bbeb62015d8ca5",
+      "primary_parcel_id": "R32508-01-03",
+      "display_address": "316 CONGAREE CHURCH RD, GADSDEN, SC",
+      "display_owner": "LINDA TUCKER BENJAMIN",
+      "display_score": 63,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [
+        "absentee",
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 56900.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2023-02-17",
+      "display_year_built": 1970,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 8
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -3944,66 +4489,6 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_2026-CP-40-02299",
-      "scored_lead_id": "scored_5d09fabef3938ff1",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1825/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_2026-CP-40-02462",
       "scored_lead_id": "scored_6df387aa327918c3",
       "primary_parcel_id": null,
@@ -4295,71 +4780,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_2026CP4004271",
-      "scored_lead_id": "scored_da54aa14558fcf9e",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1836/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_2026CP4004603",
       "scored_lead_id": "scored_8ae280771984243f",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Charis Community Development Corporation, Inc.",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -4405,15 +4830,10 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
+        "lis_pendens_commercial"
       ],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1827/",
-        "https://www.thecolumbiastar.com/articles/public-notices-1829/",
-        "https://www.thecolumbiastar.com/articles/public-notices-1831/",
         "https://www.thecolumbiastar.com/articles/public-notices-1832/"
       ]
     },
@@ -5598,56 +6018,6 @@
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4000535",
-      "scored_lead_id": "scored_8122a8d742e05de6",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "ROBERT E. ROBINSON",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
       ]
     },
     {
@@ -12679,56 +13049,6 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4001109",
-      "scored_lead_id": "scored_682ff05c71d669eb",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "MARY MOORE MCNAIR",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001110",
       "scored_lead_id": "scored_6acf3a88ea598424",
       "primary_parcel_id": null,
@@ -13299,57 +13619,6 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_26ES4001146",
-      "scored_lead_id": "scored_bf530c9cd960d969",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "GENE FERDINAND BROWN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_26ES4001158",
       "scored_lead_id": "scored_e11bf16620519e5b",
       "primary_parcel_id": null,
@@ -13407,57 +13676,6 @@
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "WILLIE EAVES SR",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001163",
-      "scored_lead_id": "scored_2bc4d0d1a30fb59c",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "WILLIE J. WHITE",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -14177,57 +14395,6 @@
       "primary_parcel_id": null,
       "display_address": "",
       "display_owner": "BETTY HALL TEMPLETON",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-895/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_26ES4001229",
-      "scored_lead_id": "scored_2096f6b9e33a84a9",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "LINDA TUCKER BENJAMIN",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -15022,7 +15189,7 @@
       "scored_lead_id": "scored_38b0d9e20bca831c",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Sandra L. St. Bernard",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -15068,8 +15235,6 @@
       "evidence_ids": [],
       "primary_event_date": "2006-01-04",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -15082,7 +15247,7 @@
       "scored_lead_id": "scored_4f83d1908833c046",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Jacqueline Jenkins, now deceased",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -15128,8 +15293,6 @@
       "evidence_ids": [],
       "primary_event_date": "1997-10-03",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -15142,7 +15305,7 @@
       "scored_lead_id": "scored_ae394e0e57ec6a29",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Susie B. Mincey",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -15188,8 +15351,6 @@
       "evidence_ids": [],
       "primary_event_date": "2017-01-25",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -15262,7 +15423,7 @@
       "scored_lead_id": "scored_f141473e66b1e9be",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Willie L. Murray",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -15308,8 +15469,6 @@
       "evidence_ids": [],
       "primary_event_date": "2016-06-17",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -15442,7 +15601,7 @@
       "scored_lead_id": "scored_2643ed3490436ee8",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Tory Simpson",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -15488,8 +15647,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -15502,7 +15659,7 @@
       "scored_lead_id": "scored_376c9f5c01a93e46",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Tory Simpson",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -15548,8 +15705,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -15922,7 +16077,7 @@
       "scored_lead_id": "scored_b6249fbcea3c3124",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Susie B. Mincey",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -15968,8 +16123,6 @@
       "evidence_ids": [],
       "primary_event_date": "2017-01-25",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -16042,7 +16195,7 @@
       "scored_lead_id": "scored_372cca862d4552c7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Willie L. Murray",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -16088,8 +16241,6 @@
       "evidence_ids": [],
       "primary_event_date": "2016-06-17",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -16402,7 +16553,7 @@
       "scored_lead_id": "scored_23942292386c2163",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Susie B. Mincey",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -16448,8 +16599,6 @@
       "evidence_ids": [],
       "primary_event_date": "2017-01-25",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -16522,7 +16671,7 @@
       "scored_lead_id": "scored_6ce3046bf4d7f73d",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Johnny D Hutto",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -16568,8 +16717,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -16582,7 +16729,7 @@
       "scored_lead_id": "scored_2f8ffa9bf09865c7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Sheronda Cook a/k/a Sheronda Jeretta Yolanda Cook",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -16628,8 +16775,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -16822,7 +16967,7 @@
       "scored_lead_id": "scored_4c5c6ae4ad672310",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Mary P. Romine",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -16868,8 +17013,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17002,7 +17145,7 @@
       "scored_lead_id": "scored_45742b8b472679a6",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "John C. Choate",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17048,8 +17191,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17062,7 +17203,7 @@
       "scored_lead_id": "scored_db9d50c79a9db4de",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Ronnie Perdue (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17108,8 +17249,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17122,7 +17261,7 @@
       "scored_lead_id": "scored_c063b3e562eb8b8d",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Queen Fersner",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17168,8 +17307,6 @@
       "evidence_ids": [],
       "primary_event_date": "2001-07-09",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17289,7 +17426,7 @@
       "primary_event_date": null,
       "review_flags": [
         "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:UNITED STATES OF AMERICA",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17302,7 +17439,7 @@
       "scored_lead_id": "scored_b2130df935a0d0f4",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Johnny D Hutto",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17348,8 +17485,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17362,7 +17497,7 @@
       "scored_lead_id": "scored_21da88f801e3c9f7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Sheronda Cook a/k/a Sheronda Jeretta Yolanda Cook",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17408,8 +17543,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17422,7 +17555,7 @@
       "scored_lead_id": "scored_8ac75107b7d67222",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Hamilton Holas, (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17468,8 +17601,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17482,7 +17613,7 @@
       "scored_lead_id": "scored_3d52b07dba50dbe3",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Queen Fersner",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17528,8 +17659,6 @@
       "evidence_ids": [],
       "primary_event_date": "2001-07-09",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17649,7 +17778,7 @@
       "primary_event_date": null,
       "review_flags": [
         "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
+        "matched_lead_review_reason:known_filer_pattern match: government_entity:UNITED STATES OF AMERICA",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17662,7 +17791,7 @@
       "scored_lead_id": "scored_027f39ff68b8d750",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Johnny D Hutto",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17708,8 +17837,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17722,7 +17849,7 @@
       "scored_lead_id": "scored_05758ae7072c47a8",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Sheronda Cook a/k/a Sheronda Jeretta Yolanda Cook",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17768,8 +17895,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17782,7 +17907,7 @@
       "scored_lead_id": "scored_f46198d75798e2b0",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "William Stacy Collins (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17828,8 +17953,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17842,7 +17965,7 @@
       "scored_lead_id": "scored_efd5ff1038e820c6",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Franklin Wayne Kell (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17888,8 +18011,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17902,7 +18023,7 @@
       "scored_lead_id": "scored_a05c747a24e09d13",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Daniel F. McCarthy (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -17948,8 +18069,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -17962,7 +18081,7 @@
       "scored_lead_id": "scored_4e9e7abd19f9e632",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Adam Creed Cooper, Veronica Joy Uson Soan, Savannah Wood Homeowners Association, Inc",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18008,9 +18127,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
+        "lis_pendens_commercial"
       ],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
@@ -18082,7 +18199,7 @@
       "scored_lead_id": "scored_c318a258dc2f1938",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Mary P. Romine",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18128,8 +18245,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -18142,7 +18257,7 @@
       "scored_lead_id": "scored_47d5726539d3a6ef",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "John C. Choate",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18188,8 +18303,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -18202,7 +18315,7 @@
       "scored_lead_id": "scored_91af7b5682925de5",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Ronnie Perdue (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18248,8 +18361,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -18322,7 +18433,7 @@
       "scored_lead_id": "scored_6302c401964e81fa",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Franklin Wayne Kell (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18368,8 +18479,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -18382,7 +18491,7 @@
       "scored_lead_id": "scored_73de9dbbb03bea45",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Daniel F. McCarthy (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18428,8 +18537,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -18442,7 +18549,7 @@
       "scored_lead_id": "scored_b33b1bc064f394f7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Adam Creed Cooper, Veronica Joy Uson Soan, Savannah Wood Homeowners Association, Inc",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18488,9 +18595,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
+        "lis_pendens_commercial"
       ],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
@@ -18562,7 +18667,7 @@
       "scored_lead_id": "scored_f24b1c26feb9dff7",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Queen Fersner",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18608,8 +18713,6 @@
       "evidence_ids": [],
       "primary_event_date": "2001-07-09",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -18742,7 +18845,7 @@
       "scored_lead_id": "scored_1e6400a2f4ef7cb4",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Juanita Hall",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -18788,8 +18891,6 @@
       "evidence_ids": [],
       "primary_event_date": "1998-10-05",
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -18858,131 +18959,11 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_LP-1836-6",
-      "scored_lead_id": "scored_ec13f7a0e689e803",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1836/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_LP-1836-7",
-      "scored_lead_id": "scored_221efe9ffa543c7c",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "1999-06-08",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1836/"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_LP-1836-8",
       "scored_lead_id": "scored_6835966a419a87fd",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "Hamilton Holas, (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -19028,8 +19009,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
@@ -19042,7 +19021,7 @@
       "scored_lead_id": "scored_60f812024d59c3f0",
       "primary_parcel_id": null,
       "display_address": "",
-      "display_owner": "lis_pendens against unidentified party",
+      "display_owner": "William Stacy Collins (",
       "display_score": 35,
       "display_tier": "Low",
       "display_patterns": [
@@ -19088,8 +19067,6 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:expected_debtor_name_type DF missing",
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
