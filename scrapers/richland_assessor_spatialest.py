@@ -26,6 +26,7 @@ log = logging.getLogger(__name__)
 
 ROOT_URL = "https://property.spatialest.com/sc/richland/"
 RECORD_CARD_URL = ROOT_URL + "api/v1/recordcard/{tms}"
+SEARCH_URL = ROOT_URL + "api/v2/search"
 _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -292,6 +293,98 @@ class SpatialestClient:
 
         return _parse_record_card(tms, data)
 
+    def search_by_owner_name(
+        self, last: str, first: str, *, full_name: Optional[str] = None
+    ) -> Optional[dict]:
+        """
+        Free owner-name search (no DealMachine/skip-trace needed): the
+        general term endpoint matches "LAST FIRST" as a substring against
+        the assessor's owner-name field, which is frequently a co-ownership
+        string like "SHARPE NINA C & BECKHAM WILLIAM D" — so a common
+        surname routinely returns several genuinely different owners/
+        parcels, not near-duplicates of one property. Disambiguate using
+        the result's own `Owner_Name` display field (never just "how many
+        rows came back"):
+
+          1. Keep only results whose Owner_Name contains both `last` and
+             `first` as whole words (defensive — the search can be fuzzier
+             than a strict substring check).
+          2. If more than one remains and `full_name` (the complete cleaned
+             decedent string, including middle name/initial) was given,
+             narrow further to results whose Owner_Name contains every word
+             of `full_name` — this is what separates the real
+             "BECKHAM WILLIAM DENNIS" match from an unrelated co-owner
+             recorded only as "BECKHAM WILLIAM D".
+          3. Only return a match when exactly one candidate survives.
+
+        Returns {"parcel_id": tms, "situs_address": "123 MAIN ST CITY SC
+        29201"} on a confident match (the address comes straight from the
+        search result — no second request needed to show something in the
+        dashboard; the full record card is still fetched later by the
+        normal enrichment_provider step). Returns None otherwise.
+        """
+        self._ensure_session()
+        self._throttle()
+        term = f"{last.strip()} {first.strip()}".strip()
+        payload = {"filters": {"term": term}, "page": 1, "limit": 10}
+        try:
+            r = self._sess.post(SEARCH_URL, json=payload, headers=self._api_headers(), timeout=20)
+        except requests.RequestException as exc:
+            log.warning("Spatialest: owner-name search network error for %r: %s", term, exc)
+            return None
+
+        if r.status_code == 419:
+            self._sess, self._csrf_token = _build_session()
+            self._throttle()
+            try:
+                r = self._sess.post(SEARCH_URL, json=payload, headers=self._api_headers(), timeout=20)
+            except requests.RequestException:
+                return None
+
+        if r.status_code != 200:
+            return None
+
+        try:
+            data = r.json()
+        except Exception:
+            return None
+
+        results = data.get("results") or []
+        if not results:
+            return None
+
+        def _field(res: dict, field_id: str) -> str:
+            for item in res.get("display") or []:
+                if isinstance(item, dict) and item.get("id") == field_id:
+                    return (item.get("value") or "").upper()
+            return ""
+
+        last_u, first_u = last.strip().upper(), first.strip().upper()
+        candidates = [
+            res for res in results
+            if re.search(rf"\b{re.escape(last_u)}\b", _field(res, "Owner_Name"))
+            and re.search(rf"\b{re.escape(first_u)}\b", _field(res, "Owner_Name"))
+        ]
+
+        if len(candidates) > 1 and full_name:
+            name_words = re.findall(r"[A-Z']+", full_name.upper())
+            narrowed = [
+                res for res in candidates
+                if all(re.search(rf"\b{re.escape(w)}\b", _field(res, "Owner_Name")) for w in name_words)
+            ]
+            if narrowed:
+                candidates = narrowed
+
+        if len(candidates) != 1:
+            return None
+
+        match = candidates[0]
+        tms = match.get("ParcelIdentifier") or match.get("order_property_TMSNUM")
+        if not tms:
+            return None
+
+        return {"parcel_id": tms, "situs_address": _field(match, "address") or None}
+
 
 def make_enrichment_provider() -> "callable[[Optional[str]], Optional[dict]]":
     """
@@ -309,6 +402,115 @@ def make_enrichment_provider() -> "callable[[Optional[str]], Optional[dict]]":
         return client.fetch(parcel_id)
 
     return _provider
+
+
+def _split_decedent_name(raw: str) -> Optional[tuple[str, str]]:
+    """Best-effort split of 'FIRST [MIDDLE] LAST' into (first, last)."""
+    cleaned = re.sub(r"\s+", " ", (raw or "")).strip().rstrip(",.")
+    parts = cleaned.split()
+    if len(parts) < 2:
+        return None
+    return parts[0], parts[-1]
+
+
+_ESTATE_SEARCH_CACHE_DIR = None  # set lazily so importing this module never touches disk paths eagerly
+
+
+def _estate_search_cache_path() -> "Path":
+    from pathlib import Path
+    global _ESTATE_SEARCH_CACHE_DIR
+    if _ESTATE_SEARCH_CACHE_DIR is None:
+        _ESTATE_SEARCH_CACHE_DIR = Path(__file__).resolve().parents[1] / "data" / "raw" / "richland_assessor_spatialest"
+        _ESTATE_SEARCH_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    return _ESTATE_SEARCH_CACHE_DIR / "owner_search_cache.json"
+
+
+def _load_owner_search_cache() -> dict:
+    import json
+    path = _estate_search_cache_path()
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    return {}
+
+
+def _save_owner_search_cache(cache: dict) -> None:
+    import json
+    _estate_search_cache_path().write_text(json.dumps(cache, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def enrich_estate_raw_events(
+    raw_events: list[dict],
+    *,
+    max_new_lookups: int | None = None,
+) -> list[dict]:
+    """
+    Pre-pipeline step: for `letters_testamentary` raw events with no parcel
+    match yet, search the county assessor by decedent name — free, no API
+    key required — and fill in parcel_id + situs_address on a confident
+    single match. Run this BEFORE any paid skip-trace step (e.g.
+    richland_skiptrace_dealmachine) so that step only has to cover whatever
+    this free pass couldn't resolve.
+
+    Args:
+        max_new_lookups: cap on NETWORK lookups performed this call (cache
+            hits don't count against it). None (default) is fine for normal
+            daily incremental runs (a handful of new estate events); pass a
+            small number for a bounded historical catch-up sweep.
+
+    Mutates events in-place. Returns the same list so callers can chain:
+        raw_events = enrich_estate_raw_events(raw_events)
+    """
+    targets = [
+        e for e in raw_events
+        if e.get("canonical_doc_type") == "letters_testamentary"
+        and not (e.get("property_refs") or {}).get("parcel_id")
+    ]
+    if not targets:
+        return raw_events
+
+    cache = _load_owner_search_cache()
+    print(f"[richland_assessor_spatialest] Owner-name search for {len(targets)} estate events…")
+    client = SpatialestClient()
+    found = 0
+    new_lookups = 0
+
+    for event in targets:
+        decedent = next(
+            (p["name"] for p in event.get("parties", []) if p.get("name_type") == "GR"),
+            None,
+        )
+        if not decedent:
+            continue
+        split = _split_decedent_name(decedent)
+        if not split:
+            continue
+        first, last = split
+        full_name = re.sub(r"\s+", " ", decedent).strip().rstrip(",.")
+        key = full_name.upper()
+
+        if key in cache:
+            match = cache[key]
+        else:
+            if max_new_lookups is not None and new_lookups >= max_new_lookups:
+                continue
+            new_lookups += 1
+            match = client.search_by_owner_name(last, first, full_name=full_name)
+            cache[key] = match
+            _save_owner_search_cache(cache)  # incremental — never lose progress on interrupt
+
+        if not match:
+            continue
+
+        if event.get("property_refs") is None:
+            event["property_refs"] = {}
+        event["property_refs"]["parcel_id"] = match["parcel_id"]
+        if match.get("situs_address"):
+            event["property_refs"]["situs_address"] = match["situs_address"]
+        event["property_refs"]["_enriched_via"] = "spatialest_owner_search"
+        found += 1
+
+    print(f"[richland_assessor_spatialest] Owner-name search matched {found}/{len(targets)} estate events")
+    return raw_events
 
 
 if __name__ == "__main__":

@@ -214,19 +214,19 @@ def _parse_masters_sales(text: str, article_num: int, article_url: str, captured
         tms = tms_m.group(1).strip() if tms_m else None
 
         addr_m = _PROP_ADDR_PREFIX_RE.search(block) or _ADDR_RE.search(block)
-        address = addr_m.group(1).strip() if addr_m else None
+        address = _ws(addr_m.group(1)) if addr_m else None
         # Exclude the courthouse sale address from property address
         if address and "2500 Decker" in address:
             addr_m2 = _ADDR_RE.search(block)
             if addr_m2 and "2500 Decker" not in addr_m2.group(1):
-                address = addr_m2.group(1).strip()
+                address = _ws(addr_m2.group(1))
             else:
                 address = None
 
         parties_m = _IN_CASE_OF_RE.search(block)
-        plaintiff_raw = parties_m.group(1).strip() if parties_m else None
+        plaintiff_raw = _ws(parties_m.group(1)) if parties_m else None
         plaintiff = _PL_ROLE_SUFFIX_RE.sub("", plaintiff_raw).strip() if plaintiff_raw else None
-        defendant_raw = parties_m.group(2).strip() if parties_m else None
+        defendant_raw = _ws(parties_m.group(2)) if parties_m else None
         # Take only the first defendant if multiple
         defendant = re.split(r";|,\s+(?:et al\.?|and\s+)", defendant_raw or "")[0].strip() if defendant_raw else None
 
@@ -283,13 +283,13 @@ def _parse_lis_pendens(text: str, article_num: int, article_url: str, captured_a
         tms = tms_m.group(1).strip() if tms_m else None
 
         addr_m = _ADDR_RE.search(block)
-        address = addr_m.group(1).strip() if addr_m else None
+        address = _ws(addr_m.group(1)) if addr_m else None
 
         # Plaintiff / defendant: same "in the case of...vs." pattern
         p_m = _IN_CASE_OF_RE.search(block)
-        plaintiff_raw = p_m.group(1).strip() if p_m else None
+        plaintiff_raw = _ws(p_m.group(1)) if p_m else None
         plaintiff = _PL_ROLE_SUFFIX_RE.sub("", plaintiff_raw).strip() if plaintiff_raw else None
-        defendant_raw = p_m.group(2).strip() if p_m else None
+        defendant_raw = _ws(p_m.group(2)) if p_m else None
         defendant = defendant_raw.split(";")[0].strip() if defendant_raw else None
 
         # Recording date from block
@@ -344,10 +344,15 @@ _ESTATE_ENTRY_RE = re.compile(
 def _parse_notice_to_creditors(text: str, article_num: int, article_url: str, captured_at: str) -> list[dict]:
     records = []
     for m in _ESTATE_ENTRY_RE.finditer(text):
-        decedent = m.group(1).strip().rstrip(",.")
+        # Names frequently wrap across a line break in the source article
+        # (e.g. "PAMELA\nELAINE SIMS") — the regex's \s allows the newline
+        # through uncollapsed, which corrupts every downstream consumer that
+        # treats the name as a single display string (owner_name ends up
+        # truncated to "PAMELA"). _ws() collapses it to a single space.
+        decedent = _ws(m.group(1)).rstrip(",.")
         case_number = m.group(2).strip()
-        rep_name = m.group(3).strip().rstrip(",.")
-        rep_address = m.group(4).strip()
+        rep_name = _ws(m.group(3)).rstrip(",.")
+        rep_address = _ws(m.group(4))
 
         raw_event_id = _stable_id("probate_estate_inquiry", article_num, case_number)
 
@@ -386,6 +391,15 @@ def _parse_notice_to_creditors(text: str, article_num: int, article_url: str, ca
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+def _ws(raw: str | None) -> str | None:
+    """Collapse internal whitespace (article text frequently wraps names and
+    addresses across a line break) to a single space, so downstream display
+    fields never show a name truncated at an embedded newline."""
+    if raw is None:
+        return None
+    return re.sub(r"\s+", " ", raw).strip()
+
 
 def _build_parties(plaintiff: str | None, defendant: str | None) -> list[dict]:
     parties = []

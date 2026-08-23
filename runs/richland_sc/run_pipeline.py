@@ -173,11 +173,16 @@ def main() -> None:
 
     # ------------------------------------------------------------------
     # Step 2b — Confirm estate leads against the official Estate Inquiry
-    # portal (case number + estate-opened date), then DealMachine skip-trace
-    # for estate leads still missing a parcel ID.
+    # portal (case number + estate-opened date), then resolve a parcel for
+    # each: first a free owner-name search against the county assessor
+    # (no API key), then DealMachine skip-trace for whatever's still
+    # unmatched.
     # ------------------------------------------------------------------
     from scrapers.richland_probate_estate_inquiry import (  # noqa: PLC0415
         enrich_estate_raw_events as confirm_estate_raw_events,
+    )
+    from scrapers.richland_assessor_spatialest import (  # noqa: PLC0415
+        enrich_estate_raw_events as assessor_owner_search,
     )
     from scrapers.richland_skiptrace_dealmachine import enrich_estate_raw_events  # noqa: PLC0415
 
@@ -188,6 +193,17 @@ def main() -> None:
         if e.get("canonical_doc_type") == "letters_testamentary"
         and not (e.get("property_refs") or {}).get("parcel_id")
     )
+    raw_events = assessor_owner_search(raw_events)
+    estate_still_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") == "letters_testamentary"
+        and not (e.get("property_refs") or {}).get("parcel_id")
+    )
+    print(
+        f"[richland_sc] Assessor owner-name search: "
+        f"{estate_unenriched - estate_still_unenriched}/{estate_unenriched} estate events matched to a parcel"
+    )
+
     raw_events = enrich_estate_raw_events(raw_events)
     estate_newly_enriched = sum(
         1 for e in raw_events
@@ -197,7 +213,7 @@ def main() -> None:
     dm_key_status = "set" if os.environ.get("DEALMACHINE_API_KEY") else "not set"
     print(
         f"[richland_sc] DealMachine skip-trace: "
-        f"{estate_newly_enriched}/{estate_unenriched} estate events enriched "
+        f"{estate_newly_enriched}/{estate_still_unenriched} estate events enriched "
         f"(DEALMACHINE_API_KEY {dm_key_status})"
     )
 
