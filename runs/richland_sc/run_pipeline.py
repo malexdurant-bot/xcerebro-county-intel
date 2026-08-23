@@ -185,10 +185,18 @@ def main() -> None:
         enrich_estate_raw_events as assessor_owner_search,
         enrich_lis_pendens_raw_events as assessor_lp_owner_search,
         enrich_foreclosure_raw_events as assessor_fc_owner_search,
+        repair_broken_parcel_ids,
     )
     from scrapers.richland_skiptrace_dealmachine import enrich_estate_raw_events  # noqa: PLC0415
 
     raw_events = confirm_estate_raw_events(raw_events)
+
+    # Source articles occasionally misprint a TMS (confirmed live: a
+    # one-digit typo that silently blocked a lead's address entirely, since
+    # a bad parcel_id makes the enrichment fetch fail with no fallback by
+    # design). Verify every already-extracted parcel_id actually resolves
+    # before trying to fill in the ones that have no parcel_id at all.
+    raw_events = repair_broken_parcel_ids(raw_events)
 
     estate_unenriched = sum(
         1 for e in raw_events

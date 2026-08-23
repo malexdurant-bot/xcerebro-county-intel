@@ -349,6 +349,22 @@ class SpatialestClient:
         except Exception:
             return None
 
+        # Sometimes the endpoint short-circuits to a bare {"id": "<tms>"}
+        # instead of a "results" list — apparently when its own matching is
+        # confident enough to skip returning candidates at all. There's no
+        # Owner_Name/display data to disambiguate or read an address from in
+        # this shape, so trust the id as-is and fetch the record card for
+        # the address (this path always costs one extra request; it's rare).
+        if "id" in data and "results" not in data:
+            tms = data.get("id")
+            if not tms:
+                return None
+            parcel = self.fetch(tms)
+            return {
+                "parcel_id": tms,
+                "situs_address": parcel.get("full_situs_address") if parcel else None,
+            }
+
         results = data.get("results") or []
         if not results:
             return None
@@ -436,6 +452,133 @@ def _load_owner_search_cache() -> dict:
 def _save_owner_search_cache(cache: dict) -> None:
     import json
     _estate_search_cache_path().write_text(json.dumps(cache, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def _tms_validity_cache_path() -> "Path":
+    from pathlib import Path
+    global _ESTATE_SEARCH_CACHE_DIR
+    if _ESTATE_SEARCH_CACHE_DIR is None:
+        _ESTATE_SEARCH_CACHE_DIR = Path(__file__).resolve().parents[1] / "data" / "raw" / "richland_assessor_spatialest"
+        _ESTATE_SEARCH_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    return _ESTATE_SEARCH_CACHE_DIR / "tms_validity_cache.json"
+
+
+def _load_tms_validity_cache() -> dict:
+    import json
+    path = _tms_validity_cache_path()
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    return {}
+
+
+def _save_tms_validity_cache(cache: dict) -> None:
+    import json
+    _tms_validity_cache_path().write_text(json.dumps(cache, indent=2, sort_keys=True), encoding="utf-8")
+
+
+# Party name_type carrying the debtor identity, per doc type (mirrors the
+# debtor_party_engine rules for these three canonical types).
+_DEBTOR_PARTY_NAME_TYPE_BY_DOC_TYPE = {
+    "notice_of_sale": "DF",
+    "lis_pendens": "DF",
+    "letters_testamentary": "GR",
+}
+
+
+def repair_broken_parcel_ids(
+    raw_events: list[dict],
+    *,
+    max_new_checks: int | None = None,
+) -> list[dict]:
+    """
+    Source articles occasionally misprint a TMS: confirmed live on a real
+    Master's Sales notice — the text said "TMS# R031169-05-15", but an
+    owner-name search on the same defendant found the real parcel is
+    "R03116-05-15" (one digit different; a typo in the newspaper text
+    itself, not a parsing bug). A bad TMS silently blocks the dashboard
+    address entirely, since parcel_display only ever comes from a
+    successful enrichment_provider(parcel_id) fetch — property_refs.
+    situs_address is never used as a fallback for display, by design (an
+    unverified scraped address string shouldn't be trusted over a
+    confirmed record).
+
+    For every raw event that already has a property_refs.parcel_id, verify
+    it actually resolves against the assessor record-card endpoint; when it
+    doesn't, fall back to a name search on the debtor party (per
+    _DEBTOR_PARTY_NAME_TYPE_BY_DOC_TYPE) to find and correct it.
+
+    Args:
+        max_new_checks: cap on NEW validity checks performed this call
+            (cached TMS results and the owner-name cache don't count
+            against it). None (default) is fine for normal daily
+            incremental runs; pass a small number for a bounded historical
+            catch-up sweep.
+
+    Mutates events in-place. Returns the same list so callers can chain.
+    """
+    targets = [
+        e for e in raw_events
+        if (e.get("property_refs") or {}).get("parcel_id")
+        and e.get("canonical_doc_type") in _DEBTOR_PARTY_NAME_TYPE_BY_DOC_TYPE
+    ]
+    if not targets:
+        return raw_events
+
+    validity_cache = _load_tms_validity_cache()
+    name_cache = _load_owner_search_cache()
+    print(f"[richland_assessor_spatialest] Verifying {len(targets)} existing parcel IDs…")
+    client = SpatialestClient()
+    repaired = 0
+    checked = 0
+
+    for event in targets:
+        tms = event["property_refs"]["parcel_id"]
+
+        if tms in validity_cache:
+            resolves = validity_cache[tms]
+        else:
+            if max_new_checks is not None and checked >= max_new_checks:
+                continue
+            checked += 1
+            resolves = client.fetch(tms) is not None
+            validity_cache[tms] = resolves
+            _save_tms_validity_cache(validity_cache)  # incremental save
+
+        if resolves:
+            continue
+
+        party_name_type = _DEBTOR_PARTY_NAME_TYPE_BY_DOC_TYPE[event["canonical_doc_type"]]
+        subject = next(
+            (p["name"] for p in event.get("parties", []) if p.get("name_type") == party_name_type),
+            None,
+        )
+        if not subject:
+            continue
+        split = _split_person_name(subject)
+        if not split:
+            continue
+        first, last = split
+        full_name = re.sub(r"\s+", " ", subject).strip().rstrip(",.")
+        key = full_name.upper()
+
+        if key in name_cache:
+            match = name_cache[key]
+        else:
+            match = client.search_by_owner_name(last, first, full_name=full_name)
+            name_cache[key] = match
+            _save_owner_search_cache(name_cache)
+
+        if not match or match["parcel_id"] == tms:
+            continue
+
+        event["property_refs"]["parcel_id"] = match["parcel_id"]
+        if match.get("situs_address"):
+            event["property_refs"]["situs_address"] = match["situs_address"]
+        event["property_refs"]["_enriched_via"] = "spatialest_owner_search_repair"
+        repaired += 1
+
+    print(f"[richland_assessor_spatialest] Repaired {repaired}/{len(targets)} parcel IDs that didn't resolve")
+    return raw_events
 
 
 def _enrich_raw_events_by_owner_name(

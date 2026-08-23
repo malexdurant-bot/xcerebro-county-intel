@@ -185,7 +185,12 @@ _PROP_ADDR_PREFIX_RE = re.compile(
     re.IGNORECASE,
 )
 _ADDR_RE = re.compile(
-    r"(\d{1,5}\s+[A-Za-z0-9\s,\.]+?"
+    # The middle group used to be unbounded (`+?`), which let it lazily
+    # span across entire unrelated sentences to reach a street-suffix word
+    # much later in the block (e.g. matching from a "2022" in "recorded
+    # February 25, 2022..." all the way to the real address two sentences
+    # later). Real street names are short — bound it so it can't do that.
+    r"(\d{1,5}[A-Za-z0-9\s,\.]{0,40}?"
     r"(?:Dr(?:ive)?|St(?:reet)?|Ave(?:nue)?|Rd|Road|Ln|Lane|Blvd|Boulevard"
     r"|Way|Ct|Court|Cir(?:cle)?|Pl(?:ace)?|Pkwy|Parkway|Hwy|Highway|Ter(?:race)?|Loop)\.?"
     r"[,\s]+(?:Columbia|Blythewood|Eastover|Forest Acres|Irmo|Hopkins|Dentsville|Pontiac|Ballentine)"

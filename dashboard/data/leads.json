@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-23T17:16:44Z",
+  "generated_at": "2026-08-23T17:30:10Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Richland",
   "state": "SC",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 350,
+  "lead_total": 349,
   "enrichment_breakdown": {
-    "ENRICHED": 64,
-    "UNENRICHED": 286
+    "ENRICHED": 65,
+    "UNENRICHED": 284
   },
   "pattern_counts": {
     "estate": 215,
@@ -26,20 +26,20 @@
     "senior_owner": 1
   },
   "stack_depth_distribution": {
-    "1": 349,
-    "2": 1
+    "1": 347,
+    "2": 2
   },
   "score_tier_distribution": {
     "Hot": 1,
-    "Low": 79,
+    "Low": 77,
     "Strong": 20,
-    "Workable": 250
+    "Workable": 251
   },
   "deal_path_distribution": {
-    "messy_title": 79,
+    "messy_title": 78,
     "partial_interest": 4,
     "sub_to": 17,
-    "wholesale": 350
+    "wholesale": 349
   },
   "records": [
     {
@@ -523,10 +523,10 @@
       ]
     },
     {
-      "lead_id": "lead_parcel_R031169-05-15",
-      "scored_lead_id": "scored_c288024b7644b95a",
-      "primary_parcel_id": "R031169-05-15",
-      "display_address": "",
+      "lead_id": "lead_parcel_R03116-05-15",
+      "scored_lead_id": "scored_d5b02923555abb85",
+      "primary_parcel_id": "R03116-05-15",
+      "display_address": "106 BRICKLING RD, IRMO, SC",
       "display_owner": "Shaquanna C Myers",
       "display_score": 60,
       "display_tier": "Workable",
@@ -552,10 +552,10 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
+      "display_assessed_value": 258000.0,
+      "display_last_sale_price": 260000.0,
+      "display_last_sale_date": "2022-02-25",
+      "display_year_built": 1976,
       "display_match_confidence": 0,
       "stack_depth": 1,
       "score_reasons": [
@@ -567,7 +567,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/masters-sales-299/",
         "https://www.thecolumbiastar.com/articles/masters-sales-300/",
@@ -1388,16 +1388,18 @@
     },
     {
       "lead_id": "lead_parcel_R09506-05-19",
-      "scored_lead_id": "scored_79099c2ce5abdc7d",
+      "scored_lead_id": "scored_430163fa6cc403d2",
       "primary_parcel_id": "R09506-05-19",
       "display_address": "2416 SEA GULL LN, COLUMBIA, SC",
-      "display_owner": "Glenn Evans",
-      "display_score": 46,
-      "display_tier": "Low",
+      "display_owner": "Mary B. Mack",
+      "display_score": 58,
+      "display_tier": "Workable",
       "display_patterns": [
+        "lis_pendens",
         "lis_pendens"
       ],
       "stack_contrib_patterns": [
+        "lis_pendens",
         "lis_pendens"
       ],
       "display_pattern_set": [
@@ -1420,8 +1422,8 @@
         },
         {
           "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "confidence": "high",
+          "rationale": "Multi-signal distress + investor-friendly attribute set."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -1431,11 +1433,15 @@
       "display_last_sale_date": "2002-03-15",
       "display_year_built": 1970,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
           "factor": "base_LIS_PENDENS",
           "delta": 35
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         },
         {
           "factor": "attribute_bonus",
@@ -1443,7 +1449,7 @@
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": null,
+      "primary_event_date": "1999-06-08",
       "review_flags": [
         "lis_pendens_review"
       ],
@@ -18939,64 +18945,6 @@
       "review_flags": [
         "parcel_resolution_review_required",
         "matched_lead_review_reason:expected_debtor_name_type DF missing",
-        "lis_pendens_review"
-      ],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1836/"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_LP-1836-7",
-      "scored_lead_id": "scored_221efe9ffa543c7c",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_owner": "Mary B. Mack",
-      "display_score": 35,
-      "display_tier": "Low",
-      "display_patterns": [
-        "lis_pendens"
-      ],
-      "stack_contrib_patterns": [
-        "lis_pendens"
-      ],
-      "display_pattern_set": [
-        "lis_pendens"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "messy_title",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "messy_title",
-          "confidence": "moderate",
-          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LIS_PENDENS",
-          "delta": 35
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "1999-06-08",
-      "review_flags": [
         "lis_pendens_review"
       ],
       "enrichment_status": "UNENRICHED",
