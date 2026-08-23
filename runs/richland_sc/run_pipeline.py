@@ -5,6 +5,23 @@ Sources scraped in this build (PARTIAL_BUILD — Register of Deeds blocked):
   - Columbia Star Master's Sales       → notice_of_sale  (foreclosure)
   - Columbia Star Public Notices       → lis_pendens     (circuit civil)
   - Columbia Star Notice to Creditors  → letters_testamentary (probate)
+  - Richland delinquent tax parcel API → tax_foreclosure_notice (tax distress)
+
+Enrichment-only (does not add raw events, fills in fields on existing ones):
+  - Richland Probate Estate Inquiry    → confirms case number / dates on
+                                          Columbia Star probate leads by
+                                          decedent-name lookup (the portal
+                                          has no bulk or date-range search,
+                                          so it cannot run as a primary feed)
+
+Not built — see runs/richland_sc/richland_pipeline.log and
+config/counties/richland_sc.json `blocker` fields for why:
+  - SC Courts Public Index (publicindex.sccourts.org) — site disclaimer
+    expressly prohibits automated scraping; Columbia Star Public Notices
+    substitutes for the lis_pendens signal instead.
+  - Master-in-Equity foreclosure sales page (richlandcountysc.gov) — the
+    whole domain is Akamai-WAF-blocked from this environment (no residential
+    proxy configured); Columbia Star Master's Sales substitutes instead.
 
 Usage:
   python runs/richland_sc/run_pipeline.py               # incremental (default)
@@ -35,6 +52,7 @@ SIGNAL_TYPE_LABELS: dict[str, str] = {
     "notice_of_sale": "Foreclosure Sale",
     "lis_pendens": "Lis Pendens",
     "letters_testamentary": "Notice to Creditors",
+    "tax_foreclosure_notice": "Delinquent Tax",
 }
 
 
@@ -66,15 +84,21 @@ def _build_debtor_party_rules() -> dict:
 # Raw-event loader (full-rebuild path)
 # ---------------------------------------------------------------------------
 
-def _load_all_raw_events(raw_dir: Path) -> list[dict]:
-    """Load all raw event records from every JSONL file in raw_dir."""
+def _load_jsonl_glob(dir_path: Path, pattern: str) -> list[dict]:
     events: list[dict] = []
-    for path in sorted(raw_dir.glob("columbia_star_*.jsonl")):
+    for path in sorted(dir_path.glob(pattern)):
         with path.open(encoding="utf-8") as fh:
             for line in fh:
                 line = line.strip()
                 if line:
                     events.append(json.loads(line))
+    return events
+
+
+def _load_all_raw_events(columbia_star_dir: Path, delinquent_tax_dir: Path) -> list[dict]:
+    """Load all raw event records from every source's JSONL files."""
+    events = _load_jsonl_glob(columbia_star_dir, "columbia_star_*.jsonl")
+    events += _load_jsonl_glob(delinquent_tax_dir, "delinquent_tax_*.jsonl")
     return events
 
 
@@ -112,12 +136,19 @@ def main() -> None:
     print(f"[richland_sc] Mode: {'full rebuild' if args.full else 'incremental'}")
 
     # ------------------------------------------------------------------
-    # Step 1 — Scrape Columbia Star
+    # Step 1 — Scrape Columbia Star + Richland delinquent tax
     # ------------------------------------------------------------------
-    from scrapers.columbia_star_richland import scrape, RAW_DIR  # noqa: PLC0415
+    from scrapers.columbia_star_richland import scrape as scrape_columbia_star, RAW_DIR as CS_RAW_DIR  # noqa: PLC0415
+    from scrapers.richland_delinquent_tax import scrape as scrape_delinquent_tax, RAW_DIR as DT_RAW_DIR  # noqa: PLC0415
 
-    new_records = scrape(incremental=incremental)
-    print(f"[richland_sc] Scraper returned {len(new_records)} new records")
+    cs_records = scrape_columbia_star(incremental=incremental)
+    print(f"[richland_sc] Columbia Star: {len(cs_records)} new records")
+
+    dt_records = scrape_delinquent_tax(incremental=incremental)
+    print(f"[richland_sc] Delinquent tax: {len(dt_records)} new records")
+
+    new_records = cs_records + dt_records
+    print(f"[richland_sc] Scrapers returned {len(new_records)} new records total")
 
     if args.dry_run:
         print("[richland_sc] --dry-run: stopping before pipeline. Done.")
@@ -127,10 +158,10 @@ def main() -> None:
     # Step 2 — Select raw events for this run
     # ------------------------------------------------------------------
     if args.full:
-        raw_events = _load_all_raw_events(RAW_DIR)
+        raw_events = _load_all_raw_events(CS_RAW_DIR, DT_RAW_DIR)
         print(
             f"[richland_sc] Full rebuild: loaded {len(raw_events)} raw events "
-            f"from {RAW_DIR}"
+            f"from {CS_RAW_DIR} and {DT_RAW_DIR}"
         )
     else:
         raw_events = new_records
@@ -141,9 +172,16 @@ def main() -> None:
         return
 
     # ------------------------------------------------------------------
-    # Step 2b — DealMachine skip-trace for estate leads (no parcel ID)
+    # Step 2b — Confirm estate leads against the official Estate Inquiry
+    # portal (case number + estate-opened date), then DealMachine skip-trace
+    # for estate leads still missing a parcel ID.
     # ------------------------------------------------------------------
+    from scrapers.richland_probate_estate_inquiry import (  # noqa: PLC0415
+        enrich_estate_raw_events as confirm_estate_raw_events,
+    )
     from scrapers.richland_skiptrace_dealmachine import enrich_estate_raw_events  # noqa: PLC0415
+
+    raw_events = confirm_estate_raw_events(raw_events)
 
     estate_unenriched = sum(
         1 for e in raw_events

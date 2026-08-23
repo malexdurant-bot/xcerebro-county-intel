@@ -1,29 +1,48 @@
 """
 Richland County, SC — Delinquent Tax Sale scraper.
 
-Source: richlandmaps.com/apps/delinquent/ (ArcGIS Web App, backed by a
-hosted feature layer). This scraper discovers the feature layer REST endpoint
-from the app's init config and pages through all features via ArcGIS REST API.
+Source: richlandmaps.com/apps/delinquent/ — a custom Leaflet-based "RCGeo Tax
+Sale Parcel Viewer" app (NOT ArcGIS, despite what an earlier version of this
+file assumed). The app's vector layer loads from a small JSON API:
+
+    GET https://richlandmaps.com/apps/api/layers/load.php
+        ?layer=delinquent
+        &fields=owner,tms,address,balance,due1,due2,due3,due4,other1,other2
+        &where=
+        &roi=SRID=4326;POLYGON((west south, west north, east north, east south, west south))
+        &zoom=10
+        &geomtype=wkt
+        &limit=10000
+
+`roi` is a county-wide bounding polygon (EWKT) — the front-end normally sends
+the current map viewport bounds; we send the full county extent (from the
+app's own MAP_CONFIG.base_themes bounds) to get every parcel in one call.
+Endpoint/params confirmed live 2026-08-22 by reading rclib/app-layers.js
+(AppLayers[...].refresh_data — builds the query string) and
+rclib/app-utils.js (AppUtils.GetMapBoundsEWKTPolygon — builds the roi string).
 
 Canonical doc type: tax_foreclosure_notice (annual tax sale list)
 Source ID:         delinquent_tax_sale
 Source role:       PRIMARY_EVENT_SOURCE
 
 Annual cadence — Richland County holds its tax sale in November or December.
-The GIS viewer is updated when the delinquent list is published (typically
-~60 days before the sale). Running this scraper outside the Oct–Dec window
-will return zero records or last year's list — that is expected.
+The layer is "updated nightly prior to the tax sale" per the app's own layer
+label; outside that window it may return a small carryover list (confirmed
+16 parcels live in August) or zero. That is expected, not a failure.
 
-Rate policy: ArcGIS REST pagination (1000 features/page, max 10 pages/run).
-No artificial sleep required between pages; the endpoint is a public REST API.
+Incremental behaviour: this endpoint returns the CURRENT full snapshot, not
+an event log, so this scraper keeps a small `seen.json` cursor of parcel
+IDs (TMS) already emitted and only returns newly-appeared parcels on each
+incremental run. `--full` (or incremental=False) re-emits every parcel
+currently on the list, ignoring the cursor.
 """
 
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import sys
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -37,6 +56,7 @@ if sys.platform == "win32":
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw" / "richland_delinquent_tax"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
+SEEN_PATH = RAW_DIR / "seen.json"
 
 _SESSION = requests.Session()
 _SESSION.headers.update({
@@ -44,157 +64,102 @@ _SESSION.headers.update({
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/124.0.0.0 Safari/537.36"
-    )
+    ),
+    "Referer": "https://richlandmaps.com/apps/delinquent/",
 })
 
-# ---------------------------------------------------------------------------
-# ArcGIS endpoint discovery
-# The richlandmaps.com delinquent viewer is a standard ArcGIS Web AppBuilder
-# or Experience Builder app. The feature layer URL is found in the app's
-# config.json or init endpoint. We probe the known pattern first; if the
-# endpoint changes, re-run _discover_layer_url() with a live browser network
-# capture and update FEATURE_LAYER_URL below.
-# ---------------------------------------------------------------------------
-
-FEATURE_LAYER_URL: str | None = (
-    "https://services1.arcgis.com/dkWT1XL4nglP5MIE"
-    "/arcgis/rest/services/Delinquent_Tax_2024/FeatureServer/0"
-)
-
-# App entry point — used for endpoint discovery if the above URL stops working
 APP_URL = "https://richlandmaps.com/apps/delinquent/"
+LOAD_URL = "https://richlandmaps.com/apps/api/layers/load.php"
 
-# Fields we want from the feature layer (use "*" if schema unknown)
-FIELDS = "*"
+# County extent, from APP.MAP_CONFIG.base_themes[...].bounds in the live app
+# (rclib/app-init.js), covers all of Richland County in one query.
+_COUNTY_SOUTH = 33.74341568
+_COUNTY_WEST = -81.34567040
+_COUNTY_NORTH = 34.27008380
+_COUNTY_EAST = -80.59771797
 
-# Max features per ArcGIS page
-PAGE_SIZE = 1000
+FIELDS = "owner,tms,address,balance,due1,due2,due3,due4,other1,other2"
+
+
+def _county_roi() -> str:
+    s, w, n, e = _COUNTY_SOUTH, _COUNTY_WEST, _COUNTY_NORTH, _COUNTY_EAST
+    return (
+        f"SRID=4326;POLYGON(({w} {s}, {w} {n}, {e} {n}, {e} {s}, {w} {s}))"
+    )
 
 
 # ---------------------------------------------------------------------------
-# ArcGIS REST helpers
+# Cursor helpers
 # ---------------------------------------------------------------------------
 
-def _query_page(layer_url: str, offset: int) -> dict:
-    """Fetch one page of features from an ArcGIS feature layer."""
+def _load_seen() -> set[str]:
+    if SEEN_PATH.exists():
+        return set(json.loads(SEEN_PATH.read_text(encoding="utf-8")))
+    return set()
+
+
+def _save_seen(seen: set[str]) -> None:
+    SEEN_PATH.write_text(json.dumps(sorted(seen), indent=2), encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# Fetch
+# ---------------------------------------------------------------------------
+
+def _fetch_layer() -> list[dict]:
+    """Fetch the current delinquent-tax parcel list from the live layer API."""
     params = {
-        "where": "1=1",
-        "outFields": FIELDS,
-        "f": "json",
-        "resultOffset": offset,
-        "resultRecordCount": PAGE_SIZE,
-        "orderByFields": "OBJECTID ASC",
+        "layer": "delinquent",
+        "fields": FIELDS,
+        "where": "",
+        "roi": _county_roi(),
+        "zoom": "10",
+        "geomtype": "wkt",
+        "limit": "10000",
     }
-    r = _SESSION.get(f"{layer_url}/query", params=params, timeout=30)
+    r = _SESSION.get(LOAD_URL, params=params, timeout=30)
     r.raise_for_status()
-    return r.json()
-
-
-def _fetch_all_features(layer_url: str, max_pages: int = 10) -> list[dict]:
-    """Page through all features from an ArcGIS feature layer."""
-    all_features: list[dict] = []
-    offset = 0
-
-    for page_num in range(max_pages):
-        data = _query_page(layer_url, offset)
-
-        if "error" in data:
-            print(f"[richland_delinquent_tax] ArcGIS error: {data['error']}")
-            break
-
-        features = data.get("features", [])
-        all_features.extend(features)
-
-        exceeded = data.get("exceededTransferLimit", False)
-        print(
-            f"[richland_delinquent_tax] Page {page_num + 1}: "
-            f"{len(features)} features (total: {len(all_features)}, "
-            f"exceededTransferLimit: {exceeded})"
-        )
-
-        if not exceeded or not features:
-            break
-
-        offset += len(features)
-        time.sleep(1)
-
-    return all_features
+    data = r.json()
+    return data.get("data", [])
 
 
 # ---------------------------------------------------------------------------
 # Feature → raw_event_record
 # ---------------------------------------------------------------------------
 
-def _stable_id(parcel_id: str | None, account: str | None) -> str:
-    discriminator = f"{parcel_id or ''}:{account or ''}"
-    return "raw_dt_" + hashlib.md5(discriminator.encode()).hexdigest()[:16]
+def _stable_id(tms: str) -> str:
+    return "raw_dt_" + hashlib.md5(tms.encode()).hexdigest()[:16]
 
 
-def _normalize_tms(raw: str | None) -> str | None:
-    """Normalize a raw TMS/parcel value to the SC TMS format (e.g. R07516-06-50)."""
-    if not raw:
+def _clean(val: Any) -> str | None:
+    if val is None:
         return None
-    val = str(raw).strip()
-    # Already looks like a TMS — return as-is
-    if val and val[0].isalpha():
-        return val
-    return val or None
+    s = html.unescape(str(val)).strip()
+    return s or None
 
 
-def _feature_to_raw_event(feat: dict, captured_at: str) -> dict | None:
-    attrs: dict[str, Any] = feat.get("attributes") or {}
+def _feature_to_raw_event(item: dict, captured_at: str) -> dict | None:
+    tms = _clean(item.get("tms"))
+    owner = _clean(item.get("owner"))
+    address = _clean(item.get("address"))
 
-    # Common field name patterns in Richland delinquent GIS layers
-    parcel_raw = (
-        attrs.get("TMS")
-        or attrs.get("PARCEL_ID")
-        or attrs.get("ParcelID")
-        or attrs.get("PIN")
-        or attrs.get("parcel_id")
-    )
-    parcel_id = _normalize_tms(parcel_raw)
+    if not tms:
+        return None
 
-    owner = (
-        attrs.get("OWNER")
-        or attrs.get("OWNER_NAME")
-        or attrs.get("OwnerName")
-        or attrs.get("owner")
-    )
-
-    address = (
-        attrs.get("SITUS_ADDRESS")
-        or attrs.get("ADDRESS")
-        or attrs.get("SitusAddress")
-        or attrs.get("address")
-        or attrs.get("PHYSICAL_ADDRESS")
-    )
-
-    city = attrs.get("CITY") or attrs.get("City") or attrs.get("city") or ""
-    if city and address and city.upper() not in address.upper():
-        address = f"{address}, {city}, SC"
-
-    amount_raw = (
-        attrs.get("AMOUNT")
-        or attrs.get("TAX_AMOUNT")
-        or attrs.get("TaxAmount")
-        or attrs.get("DELINQUENT_AMOUNT")
-    )
     try:
-        amount = float(amount_raw) if amount_raw is not None else None
+        balance = float(item["balance"]) if item.get("balance") not in (None, "") else None
     except (ValueError, TypeError):
-        amount = None
+        balance = None
 
-    account_num = (
-        attrs.get("ACCOUNT_NUM")
-        or attrs.get("ACCT_NUM")
-        or attrs.get("AccountNum")
-        or str(attrs.get("OBJECTID", ""))
-    )
+    # due1..due4 / other1..other2 carry delinquent tax-year codes (e.g. "24" =
+    # TY2024); occasionally other1/other2 carry a second owner name instead
+    # of a year on multi-owner parcels. Collect whichever look like years.
+    tax_years = [
+        v for v in (item.get(f"due{i}") for i in range(1, 5))
+        if v and str(v).strip().isdigit()
+    ]
 
-    if not parcel_id and not owner:
-        return None
-
-    raw_event_id = _stable_id(parcel_id, account_num)
+    raw_event_id = _stable_id(tms)
 
     return {
         "raw_event_id": raw_event_id,
@@ -202,7 +167,7 @@ def _feature_to_raw_event(feat: dict, captured_at: str) -> dict | None:
         "source_role": "PRIMARY_EVENT_SOURCE",
         "raw_doc_type": "DELINQUENT TAX SALE LIST",
         "canonical_doc_type": "tax_foreclosure_notice",
-        "instrument_number": account_num or None,
+        "instrument_number": tms,
         "recorded_date": None,
         "event_date": None,
         "source_url": APP_URL,
@@ -211,21 +176,26 @@ def _feature_to_raw_event(feat: dict, captured_at: str) -> dict | None:
             if owner
             else []
         ),
-        "document_body_text": None,
+        "document_body_text": (
+            f"TMS: {tms}\nOWNER: {owner}\nADDRESS: {address}\n"
+            f"BALANCE: {balance}\nDELINQUENT TAX YEARS: {', '.join(tax_years)}"
+            if owner or address
+            else None
+        ),
         "property_refs": {
-            "parcel_id": parcel_id,
+            "parcel_id": tms,
             "situs_address": address,
             "legal_description": None,
             "case_number": None,
         },
         "amounts": (
-            [{"label": "delinquent_amount", "value": amount}]
-            if amount is not None
+            [{"label": "delinquent_amount", "value": balance}]
+            if balance is not None
             else []
         ),
-        "parser_name": "richland_delinquent_tax_arcgis_v1",
-        "parser_version": "1.0.0",
-        "parser_confidence": 70 if parcel_id and owner else 40,
+        "parser_name": "richland_delinquent_tax_rcgeo_v2",
+        "parser_version": "2.0.0",
+        "parser_confidence": 85 if (tms and owner and address) else 60,
         "captured_at": captured_at,
     }
 
@@ -234,59 +204,54 @@ def _feature_to_raw_event(feat: dict, captured_at: str) -> dict | None:
 # Main scrape entry point
 # ---------------------------------------------------------------------------
 
-def scrape(layer_url: str | None = None) -> list[dict]:
+def scrape(incremental: bool = True) -> list[dict]:
     """
-    Scrape the Richland County delinquent tax sale GIS layer.
+    Scrape the Richland County delinquent tax parcel list.
 
     Args:
-        layer_url: Override the ArcGIS feature layer URL. If None, uses
-                   FEATURE_LAYER_URL. If that fails, returns [] with a
-                   diagnostic message.
+        incremental: If True (default), only return parcels not already
+                      seen in a prior run (tracked in data/raw/.../seen.json).
+                      If False, return every parcel currently on the list.
 
     Returns:
         List of raw_event_record dicts.
     """
-    url = layer_url or FEATURE_LAYER_URL
-    if not url:
-        print("[richland_delinquent_tax] No feature layer URL configured. Skipping.")
-        return []
-
     captured_at = datetime.now(timezone.utc).isoformat()
 
-    print(f"[richland_delinquent_tax] Querying ArcGIS layer: {url}")
-
+    print(f"[richland_delinquent_tax] Querying live layer: {LOAD_URL}")
     try:
-        features = _fetch_all_features(url)
+        features = _fetch_layer()
     except requests.HTTPError as exc:
-        if exc.response is not None and exc.response.status_code == 404:
-            print(
-                f"[richland_delinquent_tax] Layer URL returned 404. "
-                f"The annual delinquent list may not be published yet, or the "
-                f"URL has changed. Update FEATURE_LAYER_URL in this file. "
-                f"Attempted: {url}"
-            )
-        else:
-            print(f"[richland_delinquent_tax] HTTP error: {exc}")
+        print(f"[richland_delinquent_tax] HTTP error: {exc}")
         return []
     except Exception as exc:
         print(f"[richland_delinquent_tax] Fetch failed: {exc}")
         return []
 
-    print(f"[richland_delinquent_tax] Total features fetched: {len(features)}")
+    print(f"[richland_delinquent_tax] Total parcels on list: {len(features)}")
 
-    records: list[dict] = []
+    all_records: list[dict] = []
     skipped = 0
     for feat in features:
         rec = _feature_to_raw_event(feat, captured_at)
         if rec:
-            records.append(rec)
+            all_records.append(rec)
         else:
             skipped += 1
 
+    seen = _load_seen() if incremental else set()
+    if incremental:
+        records = [r for r in all_records if r["instrument_number"] not in seen]
+    else:
+        records = all_records
+
     print(
-        f"[richland_delinquent_tax] Parsed {len(records)} records "
-        f"({skipped} skipped — no parcel_id or owner)"
+        f"[richland_delinquent_tax] Parsed {len(all_records)} parcels "
+        f"({skipped} skipped — no TMS); {len(records)} new this run"
     )
+
+    new_seen = seen | {r["instrument_number"] for r in all_records}
+    _save_seen(new_seen)
 
     if records:
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -300,5 +265,5 @@ def scrape(layer_url: str | None = None) -> list[dict]:
 
 
 if __name__ == "__main__":
-    results = scrape()
+    results = scrape(incremental="--full" not in sys.argv)
     print(f"Total delinquent tax records: {len(results)}")
