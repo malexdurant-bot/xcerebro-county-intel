@@ -161,6 +161,24 @@ _IN_CASE_OF_RE = re.compile(
 # Strip trailing role labels appended after plaintiff name (e.g. ", Plaintiff,")
 _PL_ROLE_SUFFIX_RE = re.compile(r",\s*Plaintiff\b.*$", re.IGNORECASE)
 
+# Lis Pendens party pattern — this is the phrasing Public Notices' Lis
+# Pendens section actually uses ("<name>, Plaintiff, vs. <name>,
+# Defendant(s)."), confirmed against real article text: none of these
+# records use "in the case of X vs. Y" (that phrasing is Master's Sales
+# only), so _IN_CASE_OF_RE never matched a single one of them.
+_LP_PLAINTIFF_VS_RE = re.compile(
+    r"(.{3,300}?),?\s*Plaintiff,?\s*vs\.?\s+"
+    r"(.{3,400}?),?\s*Defendants?(?:\(s\))?\b",
+    re.IGNORECASE | re.DOTALL,
+)
+# Fallback for the mortgage-foreclosure boilerplate lis pendens notices that
+# don't use the Plaintiff/Defendant caption at all: "...mortgage ... given
+# by <mortgagor> to <lender>...". The mortgagor is the property owner facing
+# foreclosure — the debtor identity we want either way.
+_GIVEN_BY_RE = re.compile(
+    r"given\s+by\s+(.{3,150}?)\s+to\s+", re.IGNORECASE
+)
+
 # Address: full and abbreviated street types; also a "Property Address:" prefix
 _PROP_ADDR_PREFIX_RE = re.compile(
     r"(?:property\s+address|known\s+as|located\s+at)[:\s]+(\d.+?)(?:\n|;|,\s*SC|\Z)",
@@ -269,6 +287,41 @@ _LP_SECTION_RE = re.compile(
 )
 
 
+def extract_lis_pendens_parties(block: str) -> tuple[str | None, str | None]:
+    """
+    Extract (plaintiff, defendant) from a Lis Pendens notice block. Real
+    notices use "<name>, Plaintiff, vs. <name>, Defendant(s)." — NOT the
+    "in the case of X vs. Y" phrasing (that's Master's Sales only;
+    confirmed against real article text that _IN_CASE_OF_RE never matches a
+    lis pendens block). Tries that first anyway in case a future notice uses
+    it, then the real pattern, then falls back to the mortgage-foreclosure
+    "given by <mortgagor> to <lender>" boilerplate for notices that skip the
+    Plaintiff/Defendant caption entirely (mortgagor = the property owner
+    facing foreclosure — the debtor identity we want either way).
+
+    Exposed as a standalone function (not inlined in _parse_lis_pendens) so
+    a one-time repair pass can re-run the identical logic against
+    document_body_text already saved from historical scrapes, without
+    needing to re-fetch the source articles.
+    """
+    p_m = _IN_CASE_OF_RE.search(block) or _LP_PLAINTIFF_VS_RE.search(block)
+    plaintiff_raw = _ws(p_m.group(1)) if p_m else None
+    plaintiff = _PL_ROLE_SUFFIX_RE.sub("", plaintiff_raw).strip() if plaintiff_raw else None
+    defendant_raw = _ws(p_m.group(2)) if p_m else None
+    defendant = (
+        re.split(r";|\s+and\s+", defendant_raw)[0].strip()
+        if defendant_raw else None
+    )
+
+    if not defendant:
+        given_m = _GIVEN_BY_RE.search(block)
+        if given_m:
+            mortgagor = _ws(given_m.group(1)).rstrip(",")
+            defendant = re.split(r";|\s+and\s+", mortgagor)[0].strip()
+
+    return plaintiff, defendant or None
+
+
 def _parse_lis_pendens(text: str, article_num: int, article_url: str, captured_at: str) -> list[dict]:
     records = []
     for i, m in enumerate(_LP_SECTION_RE.finditer(text)):
@@ -285,12 +338,7 @@ def _parse_lis_pendens(text: str, article_num: int, article_url: str, captured_a
         addr_m = _ADDR_RE.search(block)
         address = _ws(addr_m.group(1)) if addr_m else None
 
-        # Plaintiff / defendant: same "in the case of...vs." pattern
-        p_m = _IN_CASE_OF_RE.search(block)
-        plaintiff_raw = _ws(p_m.group(1)) if p_m else None
-        plaintiff = _PL_ROLE_SUFFIX_RE.sub("", plaintiff_raw).strip() if plaintiff_raw else None
-        defendant_raw = _ws(p_m.group(2)) if p_m else None
-        defendant = defendant_raw.split(";")[0].strip() if defendant_raw else None
+        plaintiff, defendant = extract_lis_pendens_parties(block)
 
         # Recording date from block
         rec_m = re.search(

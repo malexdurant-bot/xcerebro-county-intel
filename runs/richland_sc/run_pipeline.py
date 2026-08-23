@@ -183,6 +183,7 @@ def main() -> None:
     )
     from scrapers.richland_assessor_spatialest import (  # noqa: PLC0415
         enrich_estate_raw_events as assessor_owner_search,
+        enrich_lis_pendens_raw_events as assessor_lp_owner_search,
     )
     from scrapers.richland_skiptrace_dealmachine import enrich_estate_raw_events  # noqa: PLC0415
 
@@ -202,6 +203,26 @@ def main() -> None:
     print(
         f"[richland_sc] Assessor owner-name search: "
         f"{estate_unenriched - estate_still_unenriched}/{estate_unenriched} estate events matched to a parcel"
+    )
+
+    # Lis pendens defendants often own a house even when the lawsuit itself
+    # has nothing to do with real estate (a car-accident judgment, say) —
+    # they may still need to sell it to resolve the legal matter, so check
+    # regardless of what the notice's own text says.
+    lp_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") == "lis_pendens"
+        and not (e.get("property_refs") or {}).get("parcel_id")
+    )
+    raw_events = assessor_lp_owner_search(raw_events)
+    lp_still_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") == "lis_pendens"
+        and not (e.get("property_refs") or {}).get("parcel_id")
+    )
+    print(
+        f"[richland_sc] Assessor owner-name search (lis pendens): "
+        f"{lp_unenriched - lp_still_unenriched}/{lp_unenriched} defendants matched to a parcel"
     )
 
     raw_events = enrich_estate_raw_events(raw_events)

@@ -404,7 +404,7 @@ def make_enrichment_provider() -> "callable[[Optional[str]], Optional[dict]]":
     return _provider
 
 
-def _split_decedent_name(raw: str) -> Optional[tuple[str, str]]:
+def _split_person_name(raw: str) -> Optional[tuple[str, str]]:
     """Best-effort split of 'FIRST [MIDDLE] LAST' into (first, last)."""
     cleaned = re.sub(r"\s+", " ", (raw or "")).strip().rstrip(",.")
     parts = cleaned.split()
@@ -438,54 +438,57 @@ def _save_owner_search_cache(cache: dict) -> None:
     _estate_search_cache_path().write_text(json.dumps(cache, indent=2, sort_keys=True), encoding="utf-8")
 
 
-def enrich_estate_raw_events(
+def _enrich_raw_events_by_owner_name(
     raw_events: list[dict],
     *,
+    canonical_doc_type: str,
+    party_name_type: str,
+    label: str,
     max_new_lookups: int | None = None,
 ) -> list[dict]:
     """
-    Pre-pipeline step: for `letters_testamentary` raw events with no parcel
-    match yet, search the county assessor by decedent name — free, no API
-    key required — and fill in parcel_id + situs_address on a confident
-    single match. Run this BEFORE any paid skip-trace step (e.g.
-    richland_skiptrace_dealmachine) so that step only has to cover whatever
-    this free pass couldn't resolve.
+    Pre-pipeline step: for raw events of `canonical_doc_type` with no parcel
+    match yet, take the party whose name_type is `party_name_type` and
+    search the county assessor by that name — free, no API key required —
+    filling in parcel_id + situs_address on a confident single match. Run
+    this BEFORE any paid skip-trace step (e.g. richland_skiptrace_
+    dealmachine) so that step only has to cover whatever this free pass
+    couldn't resolve.
 
     Args:
         max_new_lookups: cap on NETWORK lookups performed this call (cache
             hits don't count against it). None (default) is fine for normal
-            daily incremental runs (a handful of new estate events); pass a
-            small number for a bounded historical catch-up sweep.
+            daily incremental runs (a handful of new events); pass a small
+            number for a bounded historical catch-up sweep.
 
-    Mutates events in-place. Returns the same list so callers can chain:
-        raw_events = enrich_estate_raw_events(raw_events)
+    Mutates events in-place. Returns the same list so callers can chain.
     """
     targets = [
         e for e in raw_events
-        if e.get("canonical_doc_type") == "letters_testamentary"
+        if e.get("canonical_doc_type") == canonical_doc_type
         and not (e.get("property_refs") or {}).get("parcel_id")
     ]
     if not targets:
         return raw_events
 
     cache = _load_owner_search_cache()
-    print(f"[richland_assessor_spatialest] Owner-name search for {len(targets)} estate events…")
+    print(f"[richland_assessor_spatialest] Owner-name search for {len(targets)} {label} events…")
     client = SpatialestClient()
     found = 0
     new_lookups = 0
 
     for event in targets:
-        decedent = next(
-            (p["name"] for p in event.get("parties", []) if p.get("name_type") == "GR"),
+        subject = next(
+            (p["name"] for p in event.get("parties", []) if p.get("name_type") == party_name_type),
             None,
         )
-        if not decedent:
+        if not subject:
             continue
-        split = _split_decedent_name(decedent)
+        split = _split_person_name(subject)
         if not split:
             continue
         first, last = split
-        full_name = re.sub(r"\s+", " ", decedent).strip().rstrip(",.")
+        full_name = re.sub(r"\s+", " ", subject).strip().rstrip(",.")
         key = full_name.upper()
 
         if key in cache:
@@ -509,8 +512,49 @@ def enrich_estate_raw_events(
         event["property_refs"]["_enriched_via"] = "spatialest_owner_search"
         found += 1
 
-    print(f"[richland_assessor_spatialest] Owner-name search matched {found}/{len(targets)} estate events")
+    print(f"[richland_assessor_spatialest] Owner-name search matched {found}/{len(targets)} {label} events")
     return raw_events
+
+
+def enrich_estate_raw_events(
+    raw_events: list[dict],
+    *,
+    max_new_lookups: int | None = None,
+) -> list[dict]:
+    """Owner-name property lookup for `letters_testamentary` (probate)
+    events, keyed on the decedent (GR party) — see
+    _enrich_raw_events_by_owner_name for the shared implementation."""
+    return _enrich_raw_events_by_owner_name(
+        raw_events,
+        canonical_doc_type="letters_testamentary",
+        party_name_type="GR",
+        label="estate",
+        max_new_lookups=max_new_lookups,
+    )
+
+
+def enrich_lis_pendens_raw_events(
+    raw_events: list[dict],
+    *,
+    max_new_lookups: int | None = None,
+) -> list[dict]:
+    """
+    Owner-name property lookup for `lis_pendens` events, keyed on the
+    defendant (DF party). A lis pendens notice's own text often doesn't
+    state a property address at all (many are civil suits unrelated to real
+    estate — see extract_lis_pendens_parties), but the defendant may still
+    own a house that becomes relevant if they need to sell to resolve the
+    legal matter, so this checks regardless of what the underlying lawsuit
+    is about — see _enrich_raw_events_by_owner_name for the shared
+    implementation.
+    """
+    return _enrich_raw_events_by_owner_name(
+        raw_events,
+        canonical_doc_type="lis_pendens",
+        party_name_type="DF",
+        label="lis pendens",
+        max_new_lookups=max_new_lookups,
+    )
 
 
 if __name__ == "__main__":
