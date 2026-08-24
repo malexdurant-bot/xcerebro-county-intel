@@ -48,6 +48,11 @@ sys.path.insert(0, str(ROOT))
 WORKDIR = ROOT / "pipeline_output" / "richland_sc"
 WORKDIR.mkdir(parents=True, exist_ok=True)
 
+# Client-facing dashboard lives in its own dedicated repo (richlandsc.justfriday.ai),
+# isolated from this repo's other counties' data — see the sibling checkout below.
+# Not fatal if this checkout doesn't exist (e.g. on a machine that never set it up).
+CLIENT_REPO_DIR = ROOT.parent / "richland-sc-leads"
+
 SIGNAL_TYPE_LABELS: dict[str, str] = {
     "notice_of_sale": "Foreclosure Sale",
     "lis_pendens": "Lis Pendens",
@@ -368,6 +373,41 @@ def main() -> None:
             print("[richland_sc] GitHub Pages: no changes to publish")
         else:
             print(f"[richland_sc] GitHub Pages publish failed (non-fatal): {stderr[:200]}")
+
+    # ------------------------------------------------------------------
+    # Step 5b — Publish to the isolated client-facing repo (richlandsc.justfriday.ai)
+    # ------------------------------------------------------------------
+    if CLIENT_REPO_DIR.is_dir():
+        try:
+            client_data_path = CLIENT_REPO_DIR / "data" / "leads.json"
+            client_data_path.parent.mkdir(parents=True, exist_ok=True)
+            client_data_path.write_text(payload_json, encoding="utf-8")
+
+            subprocess.run(
+                ["git", "add", "data/leads.json"],
+                cwd=str(CLIENT_REPO_DIR), check=True, capture_output=True,
+            )
+            subprocess.run(
+                ["git", "commit", "-m",
+                 f"data: dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
+                cwd=str(CLIENT_REPO_DIR), check=True, capture_output=True,
+            )
+            subprocess.run(
+                ["git", "push", "origin", "main"],
+                cwd=str(CLIENT_REPO_DIR), check=True, capture_output=True, timeout=60,
+            )
+            print("[richland_sc] Client dashboard updated → https://richlandsc.justfriday.ai/")
+        except subprocess.CalledProcessError as exc:
+            stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
+            if "nothing to commit" in stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):
+                print("[richland_sc] Client dashboard: no changes to publish")
+            else:
+                print(f"[richland_sc] Client dashboard publish failed (non-fatal): {stderr[:200]}")
+    else:
+        print(
+            f"[richland_sc] Client dashboard repo not found at {CLIENT_REPO_DIR} — "
+            "skipping (not fatal; only affects this machine)"
+        )
 
     print(
         f"[richland_sc] Pipeline complete — "
