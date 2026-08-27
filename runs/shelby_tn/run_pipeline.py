@@ -1214,6 +1214,51 @@ def run_pipeline(
     _shutil.copy(dashboard_path, _live_dash)
     print(f"  Live dashboard updated: {_live_dash}")
 
+    # ------------------------------------------------------------------
+    # Publish to the isolated client-facing repo (shelbytn.justfriday.ai)
+    #
+    # dashboard/data/leads.json above is a SHARED path other counties'
+    # pipelines also write to — whichever ran most recently wins there, so
+    # it's not a reliable per-client URL. This repo is isolated (own repo,
+    # own domain) so a Shelby client's browser has no path to another
+    # county's data. Not fatal if the sibling checkout doesn't exist on a
+    # given machine.
+    # ------------------------------------------------------------------
+    _client_repo_dir = REPO_ROOT.parent / "shelby-tn-leads"
+    if _client_repo_dir.is_dir():
+        try:
+            import subprocess as _subprocess
+            _client_data_path = _client_repo_dir / "data" / "leads.json"
+            _client_data_path.parent.mkdir(parents=True, exist_ok=True)
+            _client_data_path.write_text(
+                dashboard_path.read_text(encoding="utf-8"), encoding="utf-8"
+            )
+            _subprocess.run(
+                ["git", "add", "data/leads.json"],
+                cwd=str(_client_repo_dir), check=True, capture_output=True,
+            )
+            _subprocess.run(
+                ["git", "commit", "-m",
+                 f"data: dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
+                cwd=str(_client_repo_dir), check=True, capture_output=True,
+            )
+            _subprocess.run(
+                ["git", "push", "origin", "main"],
+                cwd=str(_client_repo_dir), check=True, capture_output=True, timeout=60,
+            )
+            print("  Client dashboard updated → https://shelbytn.justfriday.ai/")
+        except _subprocess.CalledProcessError as exc:
+            _stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
+            if "nothing to commit" in _stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):
+                print("  Client dashboard: no changes to publish")
+            else:
+                print(f"  Client dashboard publish failed (non-fatal): {_stderr[:200]}")
+    else:
+        print(
+            f"  Client dashboard repo not found at {_client_repo_dir} — "
+            "skipping (not fatal; only affects this machine)"
+        )
+
     elapsed = round(time.time() - t0, 1)
     print(f"\n[DONE] Shelby County pipeline complete in {elapsed}s")
     print(f"  Leads: {len(scored_leads)}  |  Verdict: {result['semantic_verdict']}")

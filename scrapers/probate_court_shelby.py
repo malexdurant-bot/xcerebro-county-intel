@@ -145,7 +145,16 @@ def _load_prior(path: Path) -> dict:
     return out
 
 
-def _merge_with_prior(current: list, prior_by_id: dict) -> list:
+def _merge_with_prior(
+    current: list, prior_by_id: dict, *, mark_missing_disappeared: bool = True
+) -> list:
+    """
+    mark_missing_disappeared: when False, prior records not seen in `current`
+    keep their existing change_status instead of flipping to DISAPPEARED.
+    Callers should pass False when this run hit scrape errors — an empty or
+    partial result set from a failed run is not trustworthy evidence that a
+    previously-active record has actually disappeared from the source.
+    """
     out: list = []
     current_ids: set = set()
     for rec in current:
@@ -167,7 +176,8 @@ def _merge_with_prior(current: list, prior_by_id: dict) -> list:
         if rid in current_ids:
             continue
         prev = dict(prev)
-        prev["change_status"] = "DISAPPEARED"
+        if mark_missing_disappeared:
+            prev["change_status"] = "DISAPPEARED"
         out.append(prev)
     return out
 
@@ -449,7 +459,7 @@ def run_scraper(
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prior = _load_prior(prior_path)
-    merged = _merge_with_prior(current, prior)
+    merged = _merge_with_prior(current, prior, mark_missing_disappeared=not errors)
 
     tmp = output_path.with_suffix(".jsonl.tmp")
     with open(tmp, "w", encoding="utf-8") as fh:

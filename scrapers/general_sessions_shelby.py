@@ -126,7 +126,16 @@ def _load_prior(path: Path) -> dict:
     return out
 
 
-def merge_with_prior(current: list, prior_by_id: dict) -> list:
+def merge_with_prior(
+    current: list, prior_by_id: dict, *, mark_missing_disappeared: bool = True
+) -> list:
+    """
+    mark_missing_disappeared: when False, prior records not seen in `current`
+    keep their existing change_status instead of flipping to DISAPPEARED.
+    Callers should pass False when this run hit scrape errors — an empty or
+    partial result set from a failed run is not trustworthy evidence that a
+    previously-active record has actually disappeared from the source.
+    """
     out: list = []
     current_ids: set = set()
     for rec in current:
@@ -148,7 +157,8 @@ def merge_with_prior(current: list, prior_by_id: dict) -> list:
         if rid in current_ids:
             continue
         prev = dict(prev)
-        prev["change_status"] = "DISAPPEARED"
+        if mark_missing_disappeared:
+            prev["change_status"] = "DISAPPEARED"
         out.append(prev)
     return out
 
@@ -176,6 +186,30 @@ def _get_frame(page, name_hint: str):
     return None
 
 
+def _goto_with_retry(
+    page, url: str, *, attempts: int = 3, retry_delay: float = 5.0, **goto_kwargs
+) -> None:
+    """
+    page.goto with retry for transient DNS / connectivity failures
+    (ERR_NAME_NOT_RESOLVED, ERR_ADDRESS_UNREACHABLE, navigation timeouts) —
+    these have been observed to be transient (e.g. right after the host
+    machine wakes from sleep, before its network adapter has fully
+    reconnected) and typically clear within a few seconds.
+    """
+    import time as _time
+
+    last_exc: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            page.goto(url, **goto_kwargs)
+            return
+        except Exception as exc:
+            last_exc = exc
+            if attempt < attempts:
+                _time.sleep(retry_delay)
+    raise last_exc
+
+
 def _navigate_to_search_form(page, verbose: bool) -> Optional[object]:
     """
     Navigate through CourtConnect frameset to reach the party search form.
@@ -184,7 +218,7 @@ def _navigate_to_search_form(page, verbose: bool) -> Optional[object]:
     if verbose:
         print(f"  [GS-Civil] Loading main portal: {PORTAL_URL}", flush=True)
 
-    page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=60_000)
+    _goto_with_retry(page, PORTAL_URL, wait_until="domcontentloaded", timeout=60_000)
     _wait_settled(page)
 
     # Step 1: Find the "Big" frame that has the party search link
@@ -523,19 +557,33 @@ def run_scraper(
         )
         page = context.new_page()
 
-        # Establish session by navigating through the disclaimer once
-        _navigate_to_search_form(page, verbose)
+        # Establish session by navigating through the disclaimer once. A
+        # failure here (e.g. transient DNS/connectivity issue right after
+        # the host wakes from sleep) means every subsequent per-letter
+        # search would fail too — record one error and skip the sweep
+        # rather than crashing the whole process (which would abort the
+        # daily .cmd chain and skip probate + the pipeline run entirely).
+        portal_reachable = True
+        try:
+            _navigate_to_search_form(page, verbose)
+        except Exception as exc:
+            portal_reachable = False
+            msg = f"portal_unreachable: {exc}"
+            errors.append(msg)
+            if verbose:
+                print(f"  [GS-Civil] ERROR: {msg}", flush=True)
 
-        for ct in resolved_case_types:
-            for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-                try:
-                    records = _pw_search(page, begin_date, end_date, ct, letter, verbose)
-                    current.extend(records)
-                except Exception as exc:
-                    msg = f"search_error(case_type={ct!r}, letter={letter!r}): {exc}"
-                    errors.append(msg)
-                    if verbose:
-                        print(f"  [GS-Civil] ERROR: {msg}", flush=True)
+        if portal_reachable:
+            for ct in resolved_case_types:
+                for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+                    try:
+                        records = _pw_search(page, begin_date, end_date, ct, letter, verbose)
+                        current.extend(records)
+                    except Exception as exc:
+                        msg = f"search_error(case_type={ct!r}, letter={letter!r}): {exc}"
+                        errors.append(msg)
+                        if verbose:
+                            print(f"  [GS-Civil] ERROR: {msg}", flush=True)
 
         browser.close()
 
@@ -571,7 +619,7 @@ def run_scraper(
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prior = _load_prior(prior_path)
-    merged = merge_with_prior(current, prior)
+    merged = merge_with_prior(current, prior, mark_missing_disappeared=not errors)
 
     tmp = output_path.with_suffix(".jsonl.tmp")
     with open(tmp, "w", encoding="utf-8") as fh:
