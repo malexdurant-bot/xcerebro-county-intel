@@ -32,6 +32,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+# The scheduled daily task runs this under cmd.exe's default console code
+# page (cp1252), not UTF-8. A stray non-cp1252 character in any print (e.g.
+# the "->" arrow U+2192 in the client-dashboard status line) raises
+# UnicodeEncodeError *after* all real work for the run has already
+# succeeded, which reports the whole pipeline as failed. Force UTF-8 with
+# replacement so an unencodable character degrades the print, not the run.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 # ---------------------------------------------------------------------------
 # Repo bootstrap
 # ---------------------------------------------------------------------------
@@ -822,14 +832,20 @@ def _enrich_lien_by_hoa_subdivision(
         safe = fragment.replace("'", "''")
         parcels: list[dict] = []
         offset = 0
-        while True:
-            batch = _arcgis_query(f"UPPER(SUBDIV) LIKE '%{safe}%'", count=100, offset=offset)
-            if not batch:
-                break
-            parcels.extend(batch)
-            if len(batch) < 100:
-                break
-            offset += len(batch)
+        try:
+            while True:
+                batch = _arcgis_query(f"UPPER(SUBDIV) LIKE '%{safe}%'", count=100, offset=offset)
+                if not batch:
+                    break
+                parcels.extend(batch)
+                if len(batch) < 100:
+                    break
+                offset += len(batch)
+        except Exception as exc:
+            if verbose:
+                print(f"  [HOA Subdiv] lookup error for {fragment!r}: {exc}", flush=True)
+            subdiv_cache[fragment] = []
+            return []
         subdiv_cache[fragment] = parcels
         return parcels
 
