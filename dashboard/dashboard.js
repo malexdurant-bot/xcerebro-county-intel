@@ -521,10 +521,15 @@
   // and everything else) write "FIRST [MIDDLE] LAST[, SUFFIX]" or
   // "LAST, FIRST MIDDLE". The comma case is detected directly regardless of
   // source; ownerNameConvention picks LAST-FIRST vs FIRST-LAST for the
-  // no-comma case from the lead's patterns. This is a heuristic over messy
-  // source data, not a guarantee -- co-owner pairs joined with "&"/"AND"
-  // (e.g. "SMITH JOHN & JANE") don't split into two people, and get left
-  // whole in the last-name field.
+  // no-comma case from the lead's patterns. splitCoOwners additionally
+  // detects two owners joined in one field -- either explicitly with
+  // "&"/"AND" ("REARDON BENJAMIN R & JULIE") or, in the register/tax-roll
+  // convention, a repeated surname with no delimiter at all
+  // ("MHOON ERIC A MHOON SYMONE") -- and returns one parsed name per
+  // owner so each can be looked up and contacted individually. This is a
+  // heuristic over messy source data, not a guarantee: a business name
+  // with no corporate-suffix keyword (no LLC/INC/etc token) won't be
+  // recognized as an entity and gets run through the person-name splitter.
   // -------------------------------------------------------------------
 
   const NAME_SUFFIXES = new Set(["JR", "SR", "II", "III", "IV", "V"]);
@@ -537,11 +542,19 @@
 
   function ownerNameConvention(patterns) {
     const p = patterns || [];
-    if (p.includes("estate")) return "first_last";
-    if (p.includes("lien") || p.includes("tax") || p.includes("foreclosure")) {
-      return "last_first";
+    // Probate / eviction / chancery patterns are unambiguously court-sourced.
+    if (
+      p.includes("estate") || p.includes("eviction") ||
+      p.includes("lis_pendens") || p.includes("title_issue")
+    ) {
+      return "first_last";
     }
-    return "first_last"; // eviction, lis_pendens, title_issue, unknown
+    // Everything else -- lien / tax / foreclosure, AND leads with no
+    // recognized pattern at all -- is register-sourced. An empty pattern
+    // list isn't "unknown source"; it means the register event's doc type
+    // didn't map to a scored pattern, but the grantor/grantee name still
+    // came from the register's own "LAST FIRST [MIDDLE]" formatting.
+    return "last_first";
   }
 
   function splitOwnerName(fullName, ownerType, convention) {
@@ -609,16 +622,117 @@
     return { first, middle, last: suffix ? `${last} ${suffix}` : last };
   }
 
+  function stripNameSuffix(last) {
+    return (last || "").replace(/\s+(JR|SR|II|III|IV|V)\.?$/i, "").trim();
+  }
+
+  // A one-letter "first name" is almost always a misplaced middle initial
+  // -- a strong signal the wrong LAST-FIRST/FIRST-LAST convention was
+  // applied to *this* segment specifically. This matters most for two
+  // co-owners with different surnames listed in a single deed field: each
+  // person may be written in their own natural order independent of the
+  // lead's overall (pattern-derived) convention -- e.g. "ROME EMMA L AND
+  // MARK A LEWIS" has segment 1 in LAST-FIRST order but segment 2 in
+  // FIRST-LAST order. Retry with the opposite convention and prefer
+  // whichever gives a plausible (multi-letter) first name.
+  function bestGuessSplit(segment, ownerType, convention) {
+    const primary = splitOwnerName(segment, ownerType, convention);
+    if (primary.first.length === 1) {
+      const opposite = convention === "last_first" ? "first_last" : "last_first";
+      const retry = splitOwnerName(segment, ownerType, opposite);
+      if (retry.first.length > 1) return retry;
+    }
+    return primary;
+  }
+
+  // Second owner's segment can be as little as a bare first name ("...&
+  // JULIE"), a full independent name sharing the first owner's surname
+  // ("...& JENNINGS BENNER" -- no, different surname, see below), or a
+  // full name that happens to repeat the first owner's surname in either
+  // position ("KEATON MATA" when owner A is "MATA JOSEPH"). Only fall back
+  // to parsing segB as a fully independent name when neither end matches.
+  function splitJoinedOwners(segA, segB, ownerType, convention) {
+    const ownerA = bestGuessSplit(segA, ownerType, convention);
+    const segBTokens = segB.split(/\s+/).filter(Boolean);
+    if (segBTokens.length === 0) return [ownerA];
+
+    const baseLastA = stripNameSuffix(ownerA.last).toUpperCase();
+
+    if (segBTokens.length === 1) {
+      return [ownerA, { first: segBTokens[0], middle: "", last: ownerA.last }];
+    }
+    const firstTok = segBTokens[0].toUpperCase();
+    const lastTok = segBTokens[segBTokens.length - 1].toUpperCase();
+    if (lastTok === baseLastA) {
+      return [
+        ownerA,
+        { first: segBTokens[0], middle: segBTokens.slice(1, -1).join(" "), last: ownerA.last },
+      ];
+    }
+    if (firstTok === baseLastA) {
+      return [
+        ownerA,
+        { first: segBTokens[1] || "", middle: segBTokens.slice(2).join(" "), last: ownerA.last },
+      ];
+    }
+    // No shared surname detected -- treat segB as its own independent owner.
+    return [ownerA, bestGuessSplit(segB, ownerType, convention)];
+  }
+
+  function splitCoOwners(fullName, ownerType, convention) {
+    // Strip deed ownership-type annotations like "(RS)" (rights of
+    // survivorship), "(JT)" (joint tenancy), "(TC)" (tenants in common) --
+    // legal notation, not part of anyone's name.
+    const raw = (fullName || "").replace(/\s*\([A-Z]{1,4}(?:\/[A-Z]{1,4})?\)/g, "").trim();
+    if (!raw) return [{ first: "", middle: "", last: "" }];
+
+    const tokensUpper = raw.toUpperCase().replace(/[.,]/g, "").split(/\s+/).filter(Boolean);
+    const isEntity = ownerType === "ENTITY" || tokensUpper.some((t) => ENTITY_WORDS.has(t));
+    if (isEntity) return [{ first: "", middle: "", last: raw }];
+
+    // Explicit join: "OWNER_A & OWNER_B" / "OWNER_A AND OWNER_B"
+    const delimMatch = raw.match(/\s+(?:&|AND)\s+/i);
+    if (delimMatch) {
+      const segA = raw.slice(0, delimMatch.index).trim();
+      const segB = raw.slice(delimMatch.index + delimMatch[0].length).trim();
+      return splitJoinedOwners(segA, segB, ownerType, convention);
+    }
+
+    // No delimiter word at all: register/tax-roll data sometimes just
+    // repeats the surname, e.g. "MHOON ERIC A MHOON SYMONE". Only checked
+    // for the last_first convention -- this concatenation style hasn't
+    // been observed in court-sourced (first_last) names.
+    if (convention === "last_first") {
+      const rawTokens = raw.replace(",", "").split(/\s+/).filter(Boolean);
+      if (rawTokens.length >= 4) {
+        const lastName = rawTokens[0].toUpperCase();
+        for (let i = 2; i < rawTokens.length; i++) {
+          if (rawTokens[i].toUpperCase() === lastName) {
+            const segA = rawTokens.slice(0, i).join(" ");
+            const segB = rawTokens.slice(i).join(" ");
+            return [
+              splitOwnerName(segA, ownerType, convention),
+              splitOwnerName(segB, ownerType, convention),
+            ];
+          }
+        }
+      }
+    }
+
+    return [bestGuessSplit(raw, ownerType, convention)];
+  }
+
   function hasStructuredAddress(r) {
     return Boolean((r.display_address_street || "").trim());
   }
 
   const SKIPTRACE_COLUMNS = [
     "Parcel ID",
+    "Owner #",
     "Owner First Name",
     "Owner Middle Name",
     "Owner Last Name",
-    "Owner Full Name",
+    "Owner Full Name (record)",
     "Street Address",
     "City",
     "State",
@@ -633,12 +747,13 @@
   function exportSkiptraceCsv() {
     const rows = applyFilters(state.payload.records).filter(hasStructuredAddress);
     const header = SKIPTRACE_COLUMNS.join(",");
-    const lines = rows.map((r) => {
-      const name = splitOwnerName(
+    const lines = rows.flatMap((r) => {
+      const owners = splitCoOwners(
         r.display_owner, r.display_owner_type, ownerNameConvention(r.display_patterns)
       );
-      return [
+      return owners.map((name, i) => [
         csvEscape(r.primary_parcel_id),
+        csvEscape(i + 1),
         csvEscape(name.first),
         csvEscape(name.middle),
         csvEscape(name.last),
@@ -652,17 +767,18 @@
         csvEscape((r.display_patterns || []).join("; ")),
         csvEscape(r.primary_event_date),
         csvEscape(r.lead_id),
-      ].join(",");
+      ].join(","));
     });
     downloadCsv(header, lines, "skiptrace");
-    return { rows: rows.length, columns: SKIPTRACE_COLUMNS.length };
+    return { rows: lines.length, leads: rows.length, columns: SKIPTRACE_COLUMNS.length };
   }
 
   const NAMES_ONLY_COLUMNS = [
+    "Owner #",
     "Owner First Name",
     "Owner Middle Name",
     "Owner Last Name",
-    "Owner Full Name",
+    "Owner Full Name (record)",
     "County",
     "State",
     "Score",
@@ -675,11 +791,12 @@
   function exportNamesOnlyCsv() {
     const rows = applyFilters(state.payload.records).filter((r) => !hasStructuredAddress(r));
     const header = NAMES_ONLY_COLUMNS.join(",");
-    const lines = rows.map((r) => {
-      const name = splitOwnerName(
+    const lines = rows.flatMap((r) => {
+      const owners = splitCoOwners(
         r.display_owner, r.display_owner_type, ownerNameConvention(r.display_patterns)
       );
-      return [
+      return owners.map((name, i) => [
+        csvEscape(i + 1),
         csvEscape(name.first),
         csvEscape(name.middle),
         csvEscape(name.last),
@@ -691,10 +808,10 @@
         csvEscape((r.display_patterns || []).join("; ")),
         csvEscape(r.primary_event_date),
         csvEscape(r.lead_id),
-      ].join(",");
+      ].join(","));
     });
     downloadCsv(header, lines, "names_only");
-    return { rows: rows.length, columns: NAMES_ONLY_COLUMNS.length };
+    return { rows: lines.length, leads: rows.length, columns: NAMES_ONLY_COLUMNS.length };
   }
 
   // -------------------------------------------------------------------
@@ -819,6 +936,8 @@
     exportSkiptraceCsv,
     exportNamesOnlyCsv,
     splitOwnerName,
+    splitCoOwners,
+    bestGuessSplit,
     ownerNameConvention,
   };
 
