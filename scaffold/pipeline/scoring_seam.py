@@ -333,6 +333,7 @@ def _parcel_display_from(parcel: dict) -> Optional[dict]:
         "situs_address": parcel.get("situs_address") or parcel.get("address"),
         "situs_city": parcel.get("situs_city") or parcel.get("city"),
         "situs_state": parcel.get("situs_state"),
+        "situs_zip": parcel.get("situs_zip"),
         "owner_mailing_address": parcel.get("owner_mailing_address"),
         "owner_mailing_city": parcel.get("owner_mailing_city"),
         "owner_mailing_state": parcel.get("owner_mailing_state"),

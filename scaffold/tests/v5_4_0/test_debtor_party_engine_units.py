@@ -100,6 +100,18 @@ STRUCTURED_CASES = [
     ("sheriff_sale", "DF"),
 ]
 
+# Operator gap-fill (post-Session 8) — three lead_generating P0 registry doc
+# types that had no §17.C rule row: (doc_type, debtor name_type, fallback
+# name_type or None). quitclaim_deed → GE (current titleholder); fallback GR.
+# partition_action → PL (the co-owner forcing the sale); fallback DF.
+# quiet_title_action → PL (the owner clearing title); no fallback (DF is the
+# adverse claimant, never the owner).
+GAP_FILL_STRUCTURED_CASES = [
+    ("quitclaim_deed", "GE", "GR"),
+    ("partition_action", "PL", "DF"),
+    ("quiet_title_action", "PL", None),
+]
+
 # v5.4.0 Session 7 — the 12 new registry doc types and the lead's NAME_TYPE.
 # tax_deed / tax_foreclosure_notice / tax_sale_certificate / sheriff_sale_surplus
 # → TP (the former owner / delinquent taxpayer / claimant entitled to surplus).
@@ -164,14 +176,16 @@ def main() -> int:
     # --- structural: the §17.C table and §17.D groups -----------------------
     rules = engine.UNIVERSAL_DEBTOR_PARTY_RULES
     # v5.4.0 Session 8 added 13 registry-keyed fan-out rule rows on top of
-    # Session 7's 29 (17 Session-2 + 12 Session-7), so the §17 table now
-    # carries 42 keys. The fan-out is sourced from BROAD_KEY_REGISTRY_ALIASES
-    # and is tested in detail by test_doc_type_bridge.py; here we pin the count
-    # so a future row addition surfaces in the gate.
-    check("§17.C UNIVERSAL_DEBTOR_PARTY_RULES covers 42 mapped doc types "
-          "(17 from Session 2 + 12 from Session 7 + 13 from Session 8 "
-          "broad-key → registry fan-out)",
-          len(rules) == 42)
+    # Session 7's 29 (17 Session-2 + 12 Session-7), so the §17 table carried
+    # 42 keys. The post-Session-8 operator gap-fill added 3 more
+    # (quitclaim_deed, partition_action, quiet_title_action), bringing the
+    # table to 45. The fan-out is sourced from BROAD_KEY_REGISTRY_ALIASES and
+    # is tested in detail by test_doc_type_bridge.py; here we pin the count so
+    # a future row addition surfaces in the gate.
+    check("§17.C UNIVERSAL_DEBTOR_PARTY_RULES covers 45 mapped doc types "
+          "(17 Session 2 + 12 Session 7 + 13 Session 8 fan-out + 3 "
+          "post-Session-8 gap-fill)",
+          len(rules) == 45)
     check("§17.C table maps `probate` (Session 2 row 17)", "probate" in rules)
     # The 12 Session-7 registry doc types are all present.
     for new_doc_type in (
@@ -216,6 +230,65 @@ def main() -> int:
             ok = False
             print(f"  (exception for {doc_type}: {exc})")
         check(f"§17.C {doc_type} (document-body) → RESOLVED to the debtor", ok)
+
+    # --- post-Session-8 gap-fill: quitclaim_deed / partition_action /
+    # quiet_title_action resolve to the primary debtor name_type -------------
+    for doc_type, primary_type, _fallback_type in GAP_FILL_STRUCTURED_CASES:
+        try:
+            out = engine.resolve_debtor_party(
+                _raw_event(doc_type, parties=[_party(DEBTOR, primary_type)])
+            )
+            ok = (out.get("debtor_resolution_status") == "RESOLVED"
+                  and "DOE" in str(out.get("owner_name", "")).upper()
+                  and out.get("expected_debtor_name_type") == primary_type)
+        except Exception as exc:  # noqa: BLE001
+            ok = False
+            print(f"  (exception for {doc_type}: {exc})")
+        check(f"§17.C gap-fill {doc_type} ({primary_type}) → RESOLVED to "
+              f"the primary debtor", ok)
+
+    # --- gap-fill fallback path: primary absent, fallback party present -----
+    for doc_type, _primary_type, fallback_type in GAP_FILL_STRUCTURED_CASES:
+        if fallback_type is None:
+            continue
+        out = engine.resolve_debtor_party(
+            _raw_event(doc_type, parties=[_party(DEBTOR, fallback_type)])
+        )
+        check(f"§17.C gap-fill {doc_type} falls back to {fallback_type} "
+              f"when {doc_type} has no primary-type party",
+              out.get("debtor_resolution_status") == "RESOLVED"
+              and "DOE" in str(out.get("owner_name", "")).upper()
+              and out.get("expected_debtor_name_type") == fallback_type)
+
+    # --- gap-fill: no qualifying party on the document → REVIEW_REQUIRED ----
+    for doc_type, _primary_type, _fallback_type in GAP_FILL_STRUCTURED_CASES:
+        out = engine.resolve_debtor_party(_raw_event(doc_type, parties=[]))
+        check(f"§17.C gap-fill {doc_type} with no debtor on document → "
+              f"REVIEW_REQUIRED 'owner_not_on_document'",
+              out.get("debtor_resolution_status") == "REVIEW_REQUIRED"
+              and out.get("review_reason") == "owner_not_on_document")
+
+    # --- quiet_title_action: DF is the adverse claimant, never a fallback ---
+    # owner — a record carrying only a DF party must NOT resolve to them.
+    out = engine.resolve_debtor_party(
+        _raw_event("quiet_title_action", parties=[_party("DOE, JOHN", "DF")]),
+    )
+    check("§17.C quiet_title_action: a DF-only record (the adverse claimant) "
+          "never resolves DF as the owner",
+          out.get("debtor_resolution_status") == "REVIEW_REQUIRED"
+          and "DOE, JOHN" not in str(out.get("owner_name", "")).upper())
+
+    # --- vacated_judgment is deliberately unmapped (negative_signal, not
+    # lead-originating — §4.36) and hits the F-5 default like any other
+    # unmapped doc type. ------------------------------------------------------
+    out = engine.resolve_debtor_party(_raw_event("vacated_judgment"))
+    check("§17.C vacated_judgment (negative_signal) is NOT a §17 rule and "
+          "hits the F-5 default, same as satisfaction_of_mortgage / "
+          "reconveyance / release_of_lis_pendens / "
+          "release_of_federal_tax_lien",
+          "vacated_judgment" not in rules
+          and out.get("debtor_resolution_status") == "REVIEW_REQUIRED"
+          and out.get("review_reason") == "no_debtor_rule_for_doc_type")
 
     # --- F-5 default rule: an unmapped doc type routes to REVIEW_REQUIRED ----
     try:

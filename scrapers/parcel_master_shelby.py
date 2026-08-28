@@ -37,7 +37,7 @@ _BASE_URL = (
 
 _OUT_FIELDS = ",".join([
     "PARCELID", "PARID", "OWNER", "OWNER_EXT",
-    "PAR_ADDR1", "PAR_ADRNO", "PAR_ADRSTR", "PAR_ADRSUF",
+    "PAR_ADDR1", "PAR_ADRNO", "PAR_ADRSTR", "PAR_ADRSUF", "PAR_ZIP",
     "OWN_ADDR1", "OWN_ADDR2", "OWN_CITY", "OWN_STATE", "OWN_ZIP", "OWN_ZIP4",
     "CLASS", "LUC", "NBHD", "ZONING", "LANDUSE", "MUNI", "SUBDIV", "SUBLOT",
 ])
@@ -190,6 +190,7 @@ def normalize_parcel_attrs(attrs: dict) -> dict:
         "situs_city": s("MUNI"),
         "city": s("MUNI"),
         "situs_state": "TN",
+        "situs_zip": s("PAR_ZIP"),
         # Owner mailing — scoring seam reads owner_mailing_address (singular)
         "owner_mailing_address": s("OWN_ADDR1"),
         "owner_mailing_city": s("OWN_CITY"),

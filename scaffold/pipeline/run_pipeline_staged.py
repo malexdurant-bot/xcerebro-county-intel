@@ -201,7 +201,17 @@ def project_scored_lead(scored_lead: dict) -> dict:
                 parcel.get("situs_state"),
             ) if v
         ),
+        # Structured address components, kept separate from display_address
+        # (a joined string) so consumers like the CSV skiptrace export don't
+        # have to re-parse it. Present only when parcel_display is (ENRICHED
+        # leads) -- posting-text addresses patched onto UNENRICHED leads
+        # elsewhere are free text with no reliable street/city/state/zip split.
+        "display_address_street": parcel.get("situs_address"),
+        "display_address_city": parcel.get("situs_city"),
+        "display_address_state": parcel.get("situs_state"),
+        "display_address_zip": parcel.get("situs_zip"),
         "display_owner": scored_lead.get("owner_name") or "Unknown",
+        "display_owner_type": scored_lead.get("owner_type") or "UNKNOWN",
         "display_score": scored_lead.get("score", 0),
         "display_tier": scored_lead.get("tier") or "",
         "display_patterns": list(scored_lead.get("display_patterns") or []),

@@ -213,6 +213,7 @@
         "situs_address": { "type": ["string", "null"] },
         "situs_city": { "type": ["string", "null"] },
         "situs_state": { "type": ["string", "null"] },
+        "situs_zip": { "type": ["string", "null"] },
         "owner_mailing_address": { "type": ["string", "null"] },
         "owner_mailing_city": { "type": ["string", "null"] },
         "owner_mailing_state": { "type": ["string", "null"] },

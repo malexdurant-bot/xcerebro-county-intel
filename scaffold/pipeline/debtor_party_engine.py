@@ -40,6 +40,14 @@ doc type and NEVER silently passes it through. tax_delinquency is intentionally
 NOT a §17 doc type — it is a tax-roll STATUS, not a recorded document; it is
 enrichment, not §17.
 
+Post-Session-8 operator gap-fill: three more `lead_generating` P0 registry doc
+types — quitclaim_deed, partition_action, quiet_title_action — were found with
+no §17.C rule row (falling through to the F-5 default on every real record)
+and were added below the Session-8 fan-out block. `vacated_judgment` was
+checked and deliberately left unmapped — it is `source_class: negative_signal`
+(suppresses JUDGMENT_LIEN), the same category as the other release/discharge
+doc types, none of which carry a §17 rule.
+
 Session 7 also formalises DOCUMENT-ONLY RESOLUTION (§17.K): the §17 engine
 resolves the debtor solely from parties NAMED ON THE DOCUMENT. Several of the
 new doc types (tax_foreclosure_notice, eviction_filing, writ_of_possession,
@@ -405,6 +413,69 @@ UNIVERSAL_DEBTOR_PARTY_RULES: dict[str, dict] = {
                             "/ municipal court / hearing officer",
         "missing_debtor_review_reason": "owner_not_on_document",
     },
+    # -----------------------------------------------------------------------
+    # Operator gap-fill (post-Session 8) — three `lead_generating` P0 registry
+    # doc types (quitclaim_deed, partition_action, quiet_title_action) had no
+    # §17.C rule row and were falling through to the F-5 default
+    # (REVIEW_REQUIRED "no_debtor_rule_for_doc_type") for every real record.
+    # None of the three appear in the Session-7 deferred-rule list (tax_sale,
+    # tax_delinquency, tax_certificate, surplus, eviction, divorce,
+    # bankruptcy, condemnation, demolition) — they were simply missed, not a
+    # documented deferral. `vacated_judgment` is deliberately NOT given a rule
+    # here: it is `source_class: negative_signal` (it suppresses
+    # JUDGMENT_LIEN, per canonical_doc_types.json and doc_type_bridge.py), the
+    # same category as satisfaction_of_mortgage / reconveyance /
+    # release_of_lis_pendens / release_of_federal_tax_lien — none of which
+    # carry a §17 rule either, since §17 governs lead-originating records
+    # (§4.36), not negative signals.
+    # -----------------------------------------------------------------------
+    # Quitclaim deed. Lead: the grantee — the party who now holds title after
+    # a no-warranty conveyance. Frequently signals an heir consolidating a
+    # fractional interest or a spouse becoming sole owner post-divorce; either
+    # way it is the CURRENT titleholder (GE), not the party who quitclaimed
+    # away their interest (GR), who is left dealing with the resulting title.
+    # No adversarial filer — both parties are private individuals, not an
+    # institutional filer to suppress.
+    "quitclaim_deed": {
+        "expected_debtor_name_type": "GE",
+        "fallback_debtor_name_type": "GR",
+        "filer_name_types": [],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "none (private transfer — no adversarial filer)",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    # Partition action. Lead: a co-owner. The petitioner (PL) forcing the sale
+    # is the strongest motivated-seller signal — they are actively trying to
+    # exit shared ownership — so PL is primary; the named co-owner defendant
+    # (DF) is also a legitimate owner-lead and is the fallback. Unlike
+    # lis_pendens / civil_judgment, PL is NOT suppressed here: a partition
+    # action is co-owner litigation, not a third-party creditor claim, so
+    # neither side is an adversarial filer.
+    "partition_action": {
+        "expected_debtor_name_type": "PL",
+        "fallback_debtor_name_type": "DF",
+        "filer_name_types": [],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "none (co-owner litigation — both parties are "
+                            "potential leads)",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
+    # Quiet title action. Lead: the plaintiff (PL) — the party asserting
+    # ownership and seeking to clear a cloud on title, mirroring the
+    # eviction_filing precedent (PL = owner, DF = the other side). No
+    # fallback to DF: the defendant is the adverse claimant whose competing
+    # claim is being extinguished, never the property owner — falling back to
+    # them would misidentify the lead the same way falling back to a tenant
+    # would on an eviction.
+    "quiet_title_action": {
+        "expected_debtor_name_type": "PL",
+        "fallback_debtor_name_type": None,
+        "filer_name_types": ["DF"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "adverse claimant / defendant named in the "
+                            "quiet title action",
+        "missing_debtor_review_reason": "owner_not_on_document",
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -660,12 +731,18 @@ _ALNUM_RE = re.compile(r"[A-Za-z0-9]")
 # ---------------------------------------------------------------------------
 
 _BODY_DEBTOR_LABELS: dict[str, list[str]] = {
+    # TRUSTOR added 2026-08-28 (Dallas OCR rollout): the standard Texas
+    # deed-of-trust trustee-sale-service template (Auction.com / Stockman /
+    # Prestige Default, etc.) labels the debtor "Trustor(s):" rather than
+    # Mortgagor/Grantor/Borrower — same party, different vendor vocabulary.
+    # The "(s)" is handled generically by extract_debtor_from_document_body's
+    # regex, not baked into the label string here.
     "foreclosure_notice": [
-        "ORIGINAL MORTGAGOR", "MORTGAGOR", "GRANTOR", "DEBTOR", "BORROWER",
+        "ORIGINAL MORTGAGOR", "MORTGAGOR", "TRUSTOR", "GRANTOR", "DEBTOR", "BORROWER",
         "PROPERTY OWNER", "RECORD OWNER", "OWNER OF RECORD",
     ],
     "trustee_sale": [
-        "ORIGINAL MORTGAGOR", "MORTGAGOR", "GRANTOR", "DEBTOR", "BORROWER",
+        "ORIGINAL MORTGAGOR", "MORTGAGOR", "TRUSTOR", "GRANTOR", "DEBTOR", "BORROWER",
         "PROPERTY OWNER", "RECORD OWNER",
     ],
     "probate": ["NAME OF DECEDENT", "DECEDENT", "DECEASED"],
@@ -862,7 +939,11 @@ def extract_debtor_from_document_body(
     labels = _BODY_DEBTOR_LABELS.get(canonical_doc_type, [])
     for label in labels:
         pattern = re.compile(
-            r"\b" + re.escape(label).replace(r"\ ", r"\s+") + r"\b\s*[:\-]\s*([^\n;]+)",
+            # Optional "(S)" / "(s)" plural marker between the label and the
+            # colon — e.g. "Trustor(s):", "Grantor(s):" — added 2026-08-28
+            # alongside the TRUSTOR label after Dallas OCR text showed this
+            # is how trustee-sale-service templates commonly write it.
+            r"\b" + re.escape(label).replace(r"\ ", r"\s+") + r"\b\s*(?:\(S\))?\s*[:\-]\s*([^\n;]+)",
             re.IGNORECASE,
         )
         match = pattern.search(text)
