@@ -54,6 +54,12 @@
         <button id="csv-export" class="action-btn primary" data-testid="csv-export">
           Export CSV
         </button>
+        <button id="csv-export-skiptrace" class="action-btn" data-testid="csv-export-skiptrace" title="Property leads with a resolved address: parcel ID, split owner name, street/city/state/zip">
+          Export skiptrace CSV
+        </button>
+        <button id="csv-export-names-only" class="action-btn" data-testid="csv-export-names-only" title="Leads with no resolved address: split owner name, county, state -- for DealMachine people search">
+          Export names-only CSV
+        </button>
       </div>
     </aside>
 
@@ -87,6 +93,7 @@
         <p class="empty-state" id="empty-state" hidden>
           No leads match the current filter set.
         </p>
+        <div class="table-pagination" id="table-pagination" hidden></div>
       </div>
     </section>
   </main>

@@ -62,7 +62,15 @@
     sort: { key: "display_score", dir: -1 },
     mode: "operator", // "client" or "operator"
     precannedView: null,
+    page: 1,
   };
+
+  // Rendering every filtered row's <tr> HTML into the DOM in one shot
+  // froze the tab on Dallas TX's ~6,000-lead dataset (counties built
+  // before it topped out around 300 leads, so this never surfaced).
+  // Paginate the TABLE render only -- tiles/chips/footer/CSV export still
+  // see the full filtered set, so counts and exports stay correct.
+  const PAGE_SIZE = 100;
 
   const PRECANNED_VIEWS = [
     {
@@ -172,9 +180,40 @@
     renderTiles(filteredRows);
     renderChips();
     renderPrecanned();
-    renderTable(filteredRows);
+    const pageCount = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+    if (state.page > pageCount) state.page = pageCount;
+    if (state.page < 1) state.page = 1;
+    const start = (state.page - 1) * PAGE_SIZE;
+    renderTable(filteredRows.slice(start, start + PAGE_SIZE));
+    renderPagination(filteredRows.length, pageCount);
     renderFooter(filteredRows);
     document.body.setAttribute("data-ready", "1");
+  }
+
+  function renderPagination(totalRows, pageCount) {
+    const el = document.getElementById("table-pagination");
+    if (!el) return;
+    if (pageCount <= 1) {
+      el.hidden = true;
+      el.innerHTML = "";
+      return;
+    }
+    el.hidden = false;
+    const start = totalRows === 0 ? 0 : (state.page - 1) * PAGE_SIZE + 1;
+    const end = Math.min(state.page * PAGE_SIZE, totalRows);
+    el.innerHTML = `
+      <button type="button" class="action-btn" id="pg-prev" ${state.page <= 1 ? "disabled" : ""}>&laquo; Prev</button>
+      <span class="pg-status">Rows ${start}&ndash;${end} of ${totalRows} &mdash; page ${state.page} of ${pageCount}</span>
+      <button type="button" class="action-btn" id="pg-next" ${state.page >= pageCount ? "disabled" : ""}>Next &raquo;</button>
+    `;
+    document.getElementById("pg-prev").addEventListener("click", () => {
+      state.page -= 1;
+      render();
+    });
+    document.getElementById("pg-next").addEventListener("click", () => {
+      state.page += 1;
+      render();
+    });
   }
 
   function applyFilters(rows) {
@@ -296,6 +335,7 @@
           const set = state.filters[axis];
           if (set.has(value)) set.delete(value);
           else set.add(value);
+          state.page = 1;
           render();
         });
       });
@@ -311,6 +351,7 @@
     el.querySelectorAll(".pv-btn").forEach((b) => {
       b.addEventListener("click", () => {
         state.precannedView = state.precannedView === b.dataset.pv ? null : b.dataset.pv;
+        state.page = 1;
         render();
       });
     });
@@ -425,6 +466,22 @@
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   }
 
+  function downloadCsv(header, lines, filenameSuffix) {
+    const blob = new Blob([header + "\n" + lines.join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `leads_${state.payload.county || "export"}_${filenameSuffix}_${(new Date()).toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 100);
+  }
+
   function exportCsv() {
     const rows = applyFilters(state.payload.records);
     const header = CSV_COLUMNS.join(",");
@@ -448,20 +505,196 @@
         }
       }).join(",")
     );
-    const blob = new Blob([header + "\n" + lines.join("\n")], {
-      type: "text/csv;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `leads_${state.payload.county || "export"}_${(new Date()).toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      a.remove();
-    }, 100);
+    downloadCsv(header, lines, "full");
     return { rows: rows.length, columns: CSV_COLUMNS.length };
+  }
+
+  // -------------------------------------------------------------------
+  // Skip-trace exports
+  //
+  // Owner names arrive as a single free-text string from two different
+  // conventions, and which one applies tracks the *source*, not whether
+  // the lead resolved to a parcel: register/tax-sale-sourced names (lien /
+  // tax / foreclosure patterns) come from the county's own grantor/tax-roll
+  // formatting, "LAST FIRST [MIDDLE]" with no comma. Court-sourced names
+  // (probate decedents, eviction/chancery defendants -- the estate pattern
+  // and everything else) write "FIRST [MIDDLE] LAST[, SUFFIX]" or
+  // "LAST, FIRST MIDDLE". The comma case is detected directly regardless of
+  // source; ownerNameConvention picks LAST-FIRST vs FIRST-LAST for the
+  // no-comma case from the lead's patterns. This is a heuristic over messy
+  // source data, not a guarantee -- co-owner pairs joined with "&"/"AND"
+  // (e.g. "SMITH JOHN & JANE") don't split into two people, and get left
+  // whole in the last-name field.
+  // -------------------------------------------------------------------
+
+  const NAME_SUFFIXES = new Set(["JR", "SR", "II", "III", "IV", "V"]);
+  const ENTITY_WORDS = new Set([
+    "LLC", "INC", "CORP", "CORPORATION", "ASSOCIATION", "TRUST", "LP", "LLP",
+    "LTD", "CO", "GROUP", "HOLDINGS", "PROPERTIES", "REALTY", "INVESTMENTS",
+    "MANAGEMENT", "SERVICES", "ENTERPRISES", "BANK", "MORTGAGE", "NA", "FSB",
+    "FEDERAL", "HOUSING", "AUTHORITY", "CHURCH", "MINISTRIES", "TRUSTEE",
+  ]);
+
+  function ownerNameConvention(patterns) {
+    const p = patterns || [];
+    if (p.includes("estate")) return "first_last";
+    if (p.includes("lien") || p.includes("tax") || p.includes("foreclosure")) {
+      return "last_first";
+    }
+    return "first_last"; // eviction, lis_pendens, title_issue, unknown
+  }
+
+  function splitOwnerName(fullName, ownerType, convention) {
+    const raw = (fullName || "").trim();
+    if (!raw) return { first: "", middle: "", last: "" };
+
+    const tokensUpper = raw.toUpperCase().replace(/[.,]/g, "").split(/\s+/).filter(Boolean);
+    const isEntity =
+      ownerType === "ENTITY" || tokensUpper.some((t) => ENTITY_WORDS.has(t));
+    if (isEntity) {
+      // Whole name goes in the last-name/company column -- splitting a
+      // business name into first/middle/last is meaningless.
+      return { first: "", middle: "", last: raw };
+    }
+
+    const stripSuffix = (parts) => {
+      let suffix = "";
+      if (
+        parts.length > 1 &&
+        NAME_SUFFIXES.has(parts[parts.length - 1].replace(/\.$/, "").toUpperCase())
+      ) {
+        suffix = parts.pop();
+      }
+      return suffix;
+    };
+
+    // A comma can mean two different things: "LAST, FIRST MIDDLE" (the
+    // comma separates last name from first), or "FIRST MIDDLE LAST, SUFFIX"
+    // (the comma sets off a bare suffix, not a name boundary at all) -- e.g.
+    // "CHARLES THOMAS MILLER, SR." Detect the second case by checking
+    // whether everything after the comma is itself just a suffix token, and
+    // fall through to the no-comma parse below when it is.
+    const commaIdx = raw.indexOf(",");
+    if (commaIdx !== -1) {
+      const afterComma = raw.slice(commaIdx + 1).trim();
+      const isBareSuffix =
+        afterComma.split(/\s+/).length === 1 &&
+        NAME_SUFFIXES.has(afterComma.replace(/\.$/, "").toUpperCase());
+      if (!isBareSuffix) {
+        const lastPart = raw.slice(0, commaIdx).trim();
+        const restTokens = afterComma.split(/\s+/).filter(Boolean);
+        const suffix = stripSuffix(restTokens);
+        const first = restTokens[0] || "";
+        const middle = restTokens.slice(1).join(" ");
+        return { first, middle, last: suffix ? `${lastPart} ${suffix}` : lastPart };
+      }
+    }
+
+    const parts = raw.replace(",", "").split(/\s+/).filter(Boolean);
+    const suffix = stripSuffix(parts);
+    if (parts.length === 0) return { first: "", middle: "", last: "" };
+    if (parts.length === 1) return { first: "", middle: "", last: parts[0] };
+
+    if (convention === "last_first") {
+      // Register / tax-roll convention: "LAST FIRST [MIDDLE]"
+      const last = parts[0];
+      const first = parts[1] || "";
+      const middle = parts.slice(2).join(" ");
+      return { first, middle, last: suffix ? `${last} ${suffix}` : last };
+    }
+    // Court-source convention: "FIRST [MIDDLE] LAST"
+    const last = parts[parts.length - 1];
+    const first = parts[0];
+    const middle = parts.slice(1, -1).join(" ");
+    return { first, middle, last: suffix ? `${last} ${suffix}` : last };
+  }
+
+  function hasStructuredAddress(r) {
+    return Boolean((r.display_address_street || "").trim());
+  }
+
+  const SKIPTRACE_COLUMNS = [
+    "Parcel ID",
+    "Owner First Name",
+    "Owner Middle Name",
+    "Owner Last Name",
+    "Owner Full Name",
+    "Street Address",
+    "City",
+    "State",
+    "Zip",
+    "Score",
+    "Tier",
+    "Patterns",
+    "Event Date",
+    "Lead ID",
+  ];
+
+  function exportSkiptraceCsv() {
+    const rows = applyFilters(state.payload.records).filter(hasStructuredAddress);
+    const header = SKIPTRACE_COLUMNS.join(",");
+    const lines = rows.map((r) => {
+      const name = splitOwnerName(
+        r.display_owner, r.display_owner_type, ownerNameConvention(r.display_patterns)
+      );
+      return [
+        csvEscape(r.primary_parcel_id),
+        csvEscape(name.first),
+        csvEscape(name.middle),
+        csvEscape(name.last),
+        csvEscape(r.display_owner),
+        csvEscape(r.display_address_street),
+        csvEscape(r.display_address_city),
+        csvEscape(r.display_address_state),
+        csvEscape(r.display_address_zip),
+        csvEscape(r.display_score),
+        csvEscape(r.display_tier),
+        csvEscape((r.display_patterns || []).join("; ")),
+        csvEscape(r.primary_event_date),
+        csvEscape(r.lead_id),
+      ].join(",");
+    });
+    downloadCsv(header, lines, "skiptrace");
+    return { rows: rows.length, columns: SKIPTRACE_COLUMNS.length };
+  }
+
+  const NAMES_ONLY_COLUMNS = [
+    "Owner First Name",
+    "Owner Middle Name",
+    "Owner Last Name",
+    "Owner Full Name",
+    "County",
+    "State",
+    "Score",
+    "Tier",
+    "Patterns",
+    "Event Date",
+    "Lead ID",
+  ];
+
+  function exportNamesOnlyCsv() {
+    const rows = applyFilters(state.payload.records).filter((r) => !hasStructuredAddress(r));
+    const header = NAMES_ONLY_COLUMNS.join(",");
+    const lines = rows.map((r) => {
+      const name = splitOwnerName(
+        r.display_owner, r.display_owner_type, ownerNameConvention(r.display_patterns)
+      );
+      return [
+        csvEscape(name.first),
+        csvEscape(name.middle),
+        csvEscape(name.last),
+        csvEscape(r.display_owner),
+        csvEscape(state.payload.county),
+        csvEscape(state.payload.state),
+        csvEscape(r.display_score),
+        csvEscape(r.display_tier),
+        csvEscape((r.display_patterns || []).join("; ")),
+        csvEscape(r.primary_event_date),
+        csvEscape(r.lead_id),
+      ].join(",");
+    });
+    downloadCsv(header, lines, "names_only");
+    return { rows: rows.length, columns: NAMES_ONLY_COLUMNS.length };
   }
 
   // -------------------------------------------------------------------
@@ -530,6 +763,7 @@
     document.getElementById("reset-filters").addEventListener("click", () => {
       Object.values(state.filters).forEach((s) => s.clear());
       state.precannedView = null;
+      state.page = 1;
       render();
     });
     document.getElementById("toggle-view-mode").addEventListener("click", (e) => {
@@ -538,14 +772,20 @@
         state.mode === "client"
           ? "Switch to Operator View"
           : "Switch to Client View";
+      state.page = 1;
       render();
     });
     document.getElementById("csv-export").addEventListener("click", exportCsv);
+    const skiptraceBtn = document.getElementById("csv-export-skiptrace");
+    if (skiptraceBtn) skiptraceBtn.addEventListener("click", exportSkiptraceCsv);
+    const namesOnlyBtn = document.getElementById("csv-export-names-only");
+    if (namesOnlyBtn) namesOnlyBtn.addEventListener("click", exportNamesOnlyCsv);
     document.querySelectorAll(".leads-table thead th[data-sort]").forEach((th) => {
       th.addEventListener("click", () => {
         const key = th.dataset.sort;
         if (state.sort.key === key) state.sort.dir = -state.sort.dir;
         else { state.sort.key = key; state.sort.dir = -1; }
+        state.page = 1;
         render();
       });
     });
@@ -576,6 +816,10 @@
     getState: () => state,
     applyFilters,
     exportCsv,
+    exportSkiptraceCsv,
+    exportNamesOnlyCsv,
+    splitOwnerName,
+    ownerNameConvention,
   };
 
   if (document.readyState === "loading") {
