@@ -52,12 +52,51 @@ interactive user session (one browser context, no concurrency, small page
 counts, real UA) rather than a bulk crawler, consistent with the framework's
 other Playwright-based adapters on portals with no public bulk-export API.
 
-Requires: pip install playwright && playwright install chromium
+Document body OCR (added 2026-08-28): the FC index/detail views expose no
+grantor/mortgagor name anywhere in the DOM or an API — the document detail
+page's own "Parties" panel reports "No parties found" for these notices.
+The debtor identity only exists as text baked into the recorded document's
+page-1 image (confirmed live: these are typed legal documents, not
+handwriting, so OCR is viable). For each row, after the results table is
+scraped, this adapter additionally clicks into that row's detail view,
+captures the page-1 document image (the URL is only obtainable by observing
+the network response after navigating there — it's a signed URL keyed by an
+internal document id with no relation to the public doc_number, and doc_number
+itself is not globally unique: the same number can independently exist under
+a different department, e.g. RP), fetches the raw image bytes through the
+authenticated browser context (a plain unauthenticated request 401s), OCRs it
+with Tesseract, and stores the result as raw_payload.document_body_text for
+translate.py to pass through to the debtor-resolution engine. Falls back to
+None (same as before) if Tesseract/pytesseract aren't installed or a given
+capture fails — never blocks or fails the run. Only page 1 is captured (both
+manually-verified samples had the debtor label there); some multi-page
+documents may state it later and will route to REVIEW_REQUIRED like before.
+
+debtor_name_ocr_hint (added 2026-08-28, same rollout): every free-preview
+document image on this portal carries a diagonal "Unofficial Copy" watermark
+stamp, and where its ink physically overlaps the debtor name's ink, that's
+unrecoverable — a shared black pixel carries no trace of which stroke it
+came from. This field is a best-effort SECOND OCR pass (crop to the
+debtor-label row + morphological erosion/watershed to separate touching
+watermark strokes from text — see _ocr_watermark_cleaned_hint) that often
+recovers characters the primary pass loses entirely, but still isn't
+reliably correct at the character level. It is NOT used for extraction (the
+shared debtor_party_engine never sees it) — run_pipeline.py writes it to a
+separate side file for a human reviewer to consult on REVIEW_REQUIRED leads,
+never into a schema-validated lead record. Requires cv2 (opencv-python-
+headless) + numpy in addition to the OCR deps below; degrades to None
+independently of document_body_text if unavailable.
+
+Requires: pip install playwright pytesseract opencv-python-headless numpy
+  && playwright install chromium, and the Tesseract OCR engine itself (e.g.
+  `winget install UB-Mannheim.TesseractOCR` on Windows) — see
+  TESSERACT_CMD_CANDIDATES below.
 """
 
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import re
 import sys
@@ -74,6 +113,52 @@ _PLAYWRIGHT_INSTALL_MSG = (
     "playwright not installed. Run: pip install playwright && playwright install chromium"
 )
 
+# OCR is optional-at-import: a missing pytesseract/Tesseract must degrade to
+# document_body_text=None (same as before this feature existed), not crash
+# the scraper — clerk_recordings/tax_collector/sheriff_sales/etc. don't need it.
+try:
+    import pytesseract
+    from PIL import Image
+    OCR_LIBS_AVAILABLE = True
+except ImportError:
+    OCR_LIBS_AVAILABLE = False
+
+# Optional second pass: watermark-cleanup on the debtor-label row (see
+# _ocr_watermark_cleaned_hint). cv2/numpy are heavier deps than pytesseract/
+# Pillow, so this degrades independently — a missing cv2 just means no hint
+# text, not a broken scrape.
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+
+# winget's UB-Mannheim.TesseractOCR package (the one this adapter was built
+# against) installs here and does not add itself to PATH.
+TESSERACT_CMD_CANDIDATES = (
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+    r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+)
+
+
+def _configure_tesseract() -> bool:
+    """Returns True if a usable tesseract binary is findable. Prefers PATH;
+    falls back to the well-known Windows install locations."""
+    if not OCR_LIBS_AVAILABLE:
+        return False
+    import shutil
+    if shutil.which("tesseract"):
+        return True
+    for candidate in TESSERACT_CMD_CANDIDATES:
+        if Path(candidate).exists():
+            pytesseract.pytesseract.tesseract_cmd = candidate
+            return True
+    return False
+
+
+OCR_AVAILABLE = _configure_tesseract()
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # ---------------------------------------------------------------------------
@@ -84,6 +169,20 @@ PORTAL_HOST = "dallas.tx.publicsearch.us"
 ADVANCED_SEARCH_URL = f"https://{PORTAL_HOST}/search/advanced"
 DEPARTMENT = "FC"
 SOURCE_ID = "foreclosure_notices"
+
+# Matches the page-1 document image response, e.g.
+# /files/documents/330336158/images/312020617_1.png?exp=...&sig=...
+# The numeric ids are internal (unrelated to the public doc_number) and only
+# observable by watching network responses after navigating to the detail view.
+PAGE1_IMAGE_URL_RE = re.compile(r"/files/documents/\d+/images/\d+_1\.png")
+_DOCUMENT_IMAGE_WAIT_MS = 8_000
+
+# Debtor-label words this template uses (mirrors scaffold/pipeline/
+# debtor_party_engine.py's foreclosure_notice/trustee_sale label set, plus
+# TRUSTOR) — used only to locate the row to crop for the watermark-cleanup
+# hint pass below, not for the actual extraction (that stays in the shared
+# engine, on the plain document_body_text).
+_DEBTOR_LABEL_WORDS = ("TRUSTOR", "MORTGAGOR", "GRANTOR", "DEBTOR", "BORROWER")
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -200,8 +299,13 @@ def _select_foreclosures_doc_type(page) -> None:
 def _run_search(page, date_from: datetime, date_to: datetime, verbose: bool) -> str:
     """Drive the Advanced Search UI to start a Foreclosures search. Returns
     final status string: 'HasRows' | 'NoResults' | 'Error'."""
-    page.goto(ADVANCED_SEARCH_URL, wait_until="networkidle", timeout=30_000)
-    page.wait_for_timeout(2_000)
+    # networkidle never fires on this page (the SPA holds a persistent
+    # connection open indefinitely, confirmed live 2026-08-28 - a plain
+    # networkidle goto reliably burns the full 30s timeout). Wait for the
+    # DOM plus the #docTypes combobox we actually need instead.
+    page.goto(ADVANCED_SEARCH_URL, wait_until="domcontentloaded", timeout=30_000)
+    page.wait_for_selector("#docTypes", timeout=15_000)
+    page.wait_for_timeout(1_000)
     _select_foreclosures_doc_type(page)
 
     start_inp = page.query_selector("#recordedDateRange-start")
@@ -228,27 +332,73 @@ def _run_search(page, date_from: datetime, date_to: datetime, verbose: bool) -> 
     return "Error"
 
 
-def _scrape_current_table_page(page) -> list[dict]:
+def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose: bool = False) -> list[dict]:
+    """Scrape the visible results table. When do_ocr is True, also clicks into
+    each row's detail view to OCR its page-1 document image (see
+    _fetch_and_ocr_row_document) before moving to the next row.
+
+    Row text is read by DOM position (tr index within <table tbody>), NOT by
+    position within rows_out — a handful of rows can get skipped below (e.g.
+    a malformed row with too few cells), and if OCR indexed into rows_out
+    instead it would click the wrong physical row for everything after a
+    skip. Re-querying `table tbody tr` fresh every iteration (rather than
+    iterating a single snapshot) is also required: clicking into a detail
+    view and back can cause the SPA to replace the table's DOM nodes, which
+    would make a stale snapshot's element handles invalid on the next
+    iteration.
+    """
     rows_out: list[dict] = []
-    for tr in page.query_selector_all("table tbody tr"):
+    tr_index = 0
+    while True:
+        trs = page.query_selector_all("table tbody tr")
+        if tr_index >= len(trs):
+            break
+        tr = trs[tr_index]
         texts = [c.inner_text().strip() for c in tr.query_selector_all("td")]
         if len(texts) < 8:
+            tr_index += 1
             continue
         doc_type, recorded_date, sale_date, doc_number, property_city = texts[3:8]
         if not doc_number:
+            tr_index += 1
             continue
-        rows_out.append({
+
+        row = {
             "doc_type": doc_type or None,
             "recorded_date": recorded_date or None,
             "sale_date": sale_date or None,
             "doc_number": doc_number,
             "property_city": property_city or None,
-        })
+            "document_body_text": None,
+            "debtor_name_ocr_hint": None,
+        }
+
+        if do_ocr:
+            expected_count = len(trs)
+            row["document_body_text"], row["debtor_name_ocr_hint"] = _fetch_and_ocr_row_document(
+                page, context, tr_index, verbose
+            )
+            if verbose:
+                got = "captured" if row["document_body_text"] else "none"
+                print(f"    [Dallas FC] doc {doc_number}: document body {got}", flush=True)
+            trs_now = page.query_selector_all("table tbody tr")
+            if len(trs_now) != expected_count:
+                if verbose:
+                    print(f"  [Dallas FC] results table row count changed after go_back "
+                          f"({len(trs_now)} != {expected_count}) — stopping document "
+                          f"body capture for remaining rows on this page", flush=True)
+                do_ocr = False
+
+        rows_out.append(row)
+        tr_index += 1
     return rows_out
 
 
-def _goto_next_page(page) -> bool:
-    """Click the 'next page' pagination control. Returns False if absent/disabled."""
+def _goto_next_page(page, verbose: bool = False) -> bool:
+    """Click the 'next page' pagination control. Returns False if absent/disabled
+    or if the click itself fails (e.g. a transient SPA re-render stall) - a
+    pagination failure should stop pagination, not discard the pages already
+    scraped (see run_scraper's caller, which used to lose them)."""
     btn = page.query_selector('[aria-label="next page"]')
     if btn is None:
         return False
@@ -256,18 +406,156 @@ def _goto_next_page(page) -> bool:
     if disabled in ("true", ""):
         return False
     btn.scroll_into_view_if_needed()
-    btn.click(force=True, timeout=10_000)
+    try:
+        btn.click(force=True, timeout=10_000)
+    except Exception as exc:
+        if verbose:
+            print(f"  [Dallas FC] next-page click failed, stopping pagination here: {exc}", flush=True)
+        return False
     page.wait_for_timeout(2_500)
     return True
 
 
+def _ocr_watermark_cleaned_hint(image_bytes: bytes, verbose: bool = False) -> str | None:
+    """Best-effort SECOND OCR pass, used only to produce a human-review hint
+    — never fed into the actual owner_name extraction (see run_pipeline.py,
+    which writes this to a separate side file, not into any schema-validated
+    lead record).
+
+    Context: Kofile stamps every free-preview document image with a diagonal
+    "Unofficial Copy" watermark. Where the watermark's ink physically
+    overlaps the debtor name's ink, that's fundamentally lost information —
+    no algorithm recovers which stroke a shared black pixel belonged to. What
+    IS recoverable: pixels where only one of (watermark, text) has ink. This
+    does a rough watermark/text separation via morphological erosion +
+    watershed reconstruction (thin diagonal watermark strokes get broken
+    apart by erosion; compact letter-shaped blobs survive as seeds; each
+    original touching region is then re-partitioned to its nearest seed) on
+    just the row containing a recognized debtor label, then re-OCRs that
+    cleaned crop. Still frequently garbled at the character level — that's
+    exactly why it's a hint, not a resolution.
+    """
+    if not (OCR_LIBS_AVAILABLE and CV2_AVAILABLE):
+        return None
+    try:
+        img = Image.open(io.BytesIO(image_bytes)).convert("L")
+        w, h = img.size
+        left = img.crop((0, 0, int(w * 0.52), h))  # left column only — see
+        # module docstring: right column is a different field (Beneficiary/
+        # Loan Servicer), bleeding it in was the original wrong-name bug.
+
+        data = pytesseract.image_to_data(left, output_type=pytesseract.Output.DICT)
+        label_y = None
+        for word, top in zip(data["text"], data["top"]):
+            if any(label in word.upper() for label in _DEBTOR_LABEL_WORDS):
+                label_y = top
+                break
+        if label_y is None:
+            return None
+
+        strip = left.crop((0, max(0, label_y - 20), left.width, label_y + 120))
+        strip_arr = np.array(strip)
+
+        _, binary = cv2.threshold(strip_arr, 200, 255, cv2.THRESH_BINARY_INV)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        eroded = cv2.erode(binary, kernel, iterations=1)
+
+        n, seed_labels, stats, _ = cv2.connectedComponentsWithStats(eroded, connectivity=8)
+        text_seed_ids = set()
+        for i in range(1, n):
+            x, y, sw, sh, area = stats[i]
+            if area < 3:
+                continue
+            density = area / (sw * sh)
+            elongated = max(sw, sh) / max(1, min(sw, sh))
+            # Thresholds fit empirically to this template's font size/weight
+            # at the portal's ~300 DPI page-1 render — a compact, reasonably
+            # dense, non-elongated blob is a letter/word; the watermark's
+            # thin diagonal strokes and circular border fail at least one.
+            if sh <= 60 and sw <= 120 and density >= 0.25 and elongated <= 6:
+                text_seed_ids.add(i)
+        if not text_seed_ids:
+            return None
+
+        markers = seed_labels.astype(np.int32) + 1
+        unknown = cv2.subtract(binary, eroded)
+        markers[unknown == 255] = 0
+        color = cv2.cvtColor(strip_arr, cv2.COLOR_GRAY2BGR)
+        cv2.watershed(color, markers)
+
+        out = np.full_like(binary, 0)
+        for seed_id in text_seed_ids:
+            out[markers == (seed_id + 1)] = 255
+            out[seed_labels == seed_id] = 255
+        cleaned = 255 - out
+
+        hint = pytesseract.image_to_string(cleaned).strip()
+        return hint or None
+    except Exception as exc:
+        if verbose:
+            print(f"  [Dallas FC] watermark-cleanup hint pass failed (non-fatal): {exc}", flush=True)
+        return None
+
+
+def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) -> tuple[str | None, str | None]:
+    """Click into row_index's detail view, capture + OCR its page-1 document
+    image, then navigate back to the results table. Returns
+    (document_body_text, debtor_name_ocr_hint) — either or both may be None
+    on failure (no image found in time, fetch error, OCR error); callers
+    treat a None document_body_text identically to "this source has no
+    document body", the pre-existing behavior. debtor_name_ocr_hint is purely
+    a best-effort human-review aid (see _ocr_watermark_cleaned_hint) and is
+    never used for extraction.
+    """
+    trs = page.query_selector_all("table tbody tr")
+    if row_index >= len(trs):
+        return None, None
+
+    captured: dict = {}
+
+    def _on_response(resp):
+        if "url" not in captured and PAGE1_IMAGE_URL_RE.search(resp.url):
+            captured["url"] = resp.url
+
+    page.on("response", _on_response)
+    try:
+        trs[row_index].click()
+        waited = 0
+        while "url" not in captured and waited < _DOCUMENT_IMAGE_WAIT_MS:
+            page.wait_for_timeout(500)
+            waited += 500
+    finally:
+        page.remove_listener("response", _on_response)
+
+    text = None
+    hint = None
+    if "url" in captured:
+        try:
+            resp = context.request.get(captured["url"])
+            if resp.ok:
+                image_bytes = resp.body()
+                text = pytesseract.image_to_string(Image.open(io.BytesIO(image_bytes))).strip() or None
+                hint = _ocr_watermark_cleaned_hint(image_bytes, verbose=verbose)
+        except Exception as exc:
+            if verbose:
+                print(f"  [Dallas FC] OCR fetch/parse failed: {exc}", flush=True)
+    elif verbose:
+        print(f"  [Dallas FC] no page-1 image response observed within {_DOCUMENT_IMAGE_WAIT_MS}ms", flush=True)
+
+    page.go_back()
+    page.wait_for_timeout(1_500)
+    return text, hint
+
+
 def _scrape_window(
     page,
+    context,
     date_from: datetime,
     date_to: datetime,
     limit: int,
     max_pages: int,
     verbose: bool,
+    fetch_document_body: bool = True,
 ) -> list[dict]:
     status = _run_search(page, date_from, date_to, verbose)
     if status == "NoResults":
@@ -280,15 +568,21 @@ def _scrape_window(
             "never left 'Loading Results...')"
         )
 
+    do_ocr = fetch_document_body and OCR_AVAILABLE
+    if fetch_document_body and not OCR_AVAILABLE and verbose:
+        print("  [Dallas FC] OCR requested but pytesseract/Tesseract not available "
+              "— document_body_text will be None for all rows", flush=True)
+
     rows_out: list[dict] = []
     for page_num in range(max_pages):
-        page_rows = _scrape_current_table_page(page)
+        page_rows = _scrape_current_table_page(page, context=context, do_ocr=do_ocr, verbose=verbose)
         if verbose:
             print(f"  [Dallas FC] page {page_num}: {len(page_rows)} rows", flush=True)
+
         rows_out.extend(page_rows)
         if len(page_rows) < limit:
             break
-        if not _goto_next_page(page):
+        if not _goto_next_page(page, verbose):
             break
     return rows_out
 
@@ -318,6 +612,12 @@ def _to_wrapped_records(scraped_rows: list[dict]) -> list[dict]:
             "doc_type": row["doc_type"],
             "sale_date_raw": row["sale_date"],
             "recorded_date_raw": recorded_date,
+            "document_body_text": row.get("document_body_text"),
+            # Best-effort watermark-cleanup re-OCR of the debtor-label row,
+            # for human review only — see _ocr_watermark_cleaned_hint. Never
+            # fed into owner_name extraction; run_pipeline.py surfaces it in
+            # a separate side file, not in any schema-validated lead record.
+            "debtor_name_ocr_hint": row.get("debtor_name_ocr_hint"),
         }
 
         out.append({
@@ -379,9 +679,17 @@ def run_scraper(
     max_pages: int = 20,
     headless: bool = True,
     verbose: bool = True,
+    fetch_document_body: bool = True,
 ) -> dict:
     """limit_per_page must match the portal's actual results-per-page (50) —
-    it is used only to detect the last page, not to request a page size."""
+    it is used only to detect the last page, not to request a page size.
+
+    fetch_document_body: when True (default) and Tesseract/pytesseract are
+    available, clicks into every row's detail view to OCR the page-1 document
+    image for a debtor name (see module docstring). Roughly doubles the run's
+    wall-clock time (one extra page load + image fetch + OCR pass per row).
+    Set False to skip this and keep the old list-only-fields behavior.
+    """
     if not PLAYWRIGHT_AVAILABLE:
         raise RuntimeError(_PLAYWRIGHT_INSTALL_MSG)
 
@@ -399,7 +707,8 @@ def run_scraper(
         page = context.new_page()
         try:
             scraped_rows = _scrape_window(
-                page, date_from, date_to, limit_per_page, max_pages, verbose
+                page, context, date_from, date_to, limit_per_page, max_pages, verbose,
+                fetch_document_body=fetch_document_body,
             )
         except Exception as exc:
             errors.append(f"scrape_error: {exc}")
@@ -422,6 +731,8 @@ def run_scraper(
         "foreclosure_notices": stats,
         "errors": errors,
         "playwright_available": PLAYWRIGHT_AVAILABLE,
+        "ocr_available": OCR_AVAILABLE,
+        "document_body_fetch_requested": fetch_document_body,
     }
 
 
@@ -450,6 +761,9 @@ def main() -> int:
     parser.add_argument("--out-dir", default=None,
                          help="Output directory for foreclosure_notices.jsonl. Default: data/raw/")
     parser.add_argument("--no-headless", action="store_true")
+    parser.add_argument("--no-document-body", action="store_true",
+                         help="Skip the per-row detail-view OCR pass (faster, but "
+                              "document_body_text stays None and debtor names won't resolve).")
     args = parser.parse_args()
 
     if not PLAYWRIGHT_AVAILABLE:
@@ -463,6 +777,7 @@ def main() -> int:
         limit_per_page=args.limit_per_page,
         max_pages=args.max_pages,
         headless=not args.no_headless,
+        fetch_document_body=not args.no_document_body,
     )
     print(json.dumps(stats, indent=2))
     return 0

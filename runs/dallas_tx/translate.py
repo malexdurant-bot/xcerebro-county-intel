@@ -18,11 +18,21 @@ normalize_doc_type at all).
 Known structural data limitations (not bugs — the source portals simply
 don't expose these fields at the index/list level):
   - foreclosure_notices (PublicSearch FC department) exposes no
-    grantor/grantee/owner name at all -> parties=[] -> notice_of_
-    substitute_trustee_sale's DOCUMENT_BODY debtor rule cannot extract a
-    debtor without document_body_text (which we don't have) -> every
-    foreclosure_notices lead is emitted but routes to
-    REVIEW_REQUIRED/document_body_debtor_not_extractable. Still emitted,
+    grantor/grantee/owner name anywhere in the index/list view or the detail
+    view's own "Parties" panel ("No parties found" on every notice checked
+    live) -> parties=[] always. As of 2026-08-28, scrapers/
+    publicsearch_foreclosures_dallas.py addresses this via OCR: it clicks into
+    each row's detail view and OCRs the page-1 document image (these are
+    typed legal documents, not handwriting — Tesseract reads them cleanly),
+    populating raw_payload.document_body_text, which we pass through below so
+    notice_of_substitute_trustee_sale's DOCUMENT_BODY debtor rule can extract
+    MORTGAGOR/GRANTOR/BORROWER/etc. This resolves most records, but is NOT
+    universal: it requires Tesseract to be installed (falls back to None,
+    same as before, if missing), only page 1 is OCR'd (a debtor label stated
+    only on a later page won't be found), and the extractor's label regex is
+    a strict "LABEL:" match (e.g. "Grantor(s):" with a parenthetical doesn't
+    match "Grantor"). Records that still can't resolve continue to route to
+    REVIEW_REQUIRED/document_body_debtor_not_extractable — still emitted,
     never dropped, per framework philosophy.
   - taxsales_lgbs_dallas rows (both tax_deed and sheriff_sale) expose no
     owner/defendant name either (account/cause-number based, not
@@ -146,6 +156,56 @@ def _party(name: str | None, name_type: str) -> dict | None:
     return {"name": name, "name_type": name_type, "raw_role": None}
 
 
+# Added 2026-08-29: Kofile's RP index reuses the same Grantor/Grantee column
+# pair for every recorded document type, including non-deed instruments
+# where "grantor/grantee" isn't the real-world role — and empirically, which
+# column holds the actual debtor FLIPS by doc-type family. Verified against
+# the live raw data (not guessed):
+#   - Judgment family (85 abstract_of_judgment/lis_pendens sampled): Grantor
+#     is consistently a bank/creditor/government entity (CAPITAL ONE BANK
+#     USA, FROST BANK, JPMORGAN CHASE BANK, DALLAS COUNTY, ...) and Grantee
+#     is consistently the individual/business being sued — i.e. Grantor=
+#     Plaintiff, Grantee=Defendant. The shared engine's rule already expects
+#     debtor=DF/filer=PL for these types; only the tagging below needs to
+#     match that.
+#   - Tax lien family (16 state_tax_lien/federal_tax_lien sampled): Grantee
+#     is ALWAYS the taxing authority (5/5 "TEXAS STATE[ OF]", 11/11 "U S A
+#     INTERNAL REVENUE SERVICE") and Grantor is always the taxpayer — the
+#     OPPOSITE of what the shared rule's filer_name_types=['GR'] assumes.
+#     Previously this caused the authority to be emitted as "owner_name" and
+#     the real taxpayer (sitting right there as Grantor) to never be
+#     examined. Tagging grantor "TP" (the rule's exact expected_debtor_
+#     name_type, no fallback needed) and grantee "GR" (satisfies
+#     filer_name_types) fixes this without touching the shared rule.
+#   - mechanics_lien/construction_lien: NOT touched — only 3 live samples
+#     and the grantor/grantee pattern was mixed/inconclusive (unlike the
+#     tax-lien and judgment families above), so flipping the direction here
+#     would be a guess, not a verified fix. Left on the pre-existing GR/GE
+#     default, which the shared rule already expects for these two.
+_JUDGMENT_FAMILY_DOC_TYPES = {"abstract_of_judgment", "lis_pendens", "judgment_lien"}
+_TAX_LIEN_FAMILY_DOC_TYPES = {"state_tax_lien", "federal_tax_lien", "municipal_lien"}
+
+# affidavit_of_heirship (2026-08-29): the shared engine's rule requires
+# DOCUMENT_BODY extraction (a "DECEDENT: ..." labelled line in real document
+# text) and clerk_recordings has no OCR. But Kofile's Grantee column is
+# reliably the decedent — confirmed live: of the ~34 sampled, every record
+# whose Grantee carried an explicit "... DECD" suffix (e.g. "GOVAN MOSES
+# DECD", "COOPER MARY ELLA DECD") had it in the Grantee slot, never Grantor.
+# Rather than change the shared engine's DOCUMENT_BODY contract for this one
+# doc type, we synthesize a minimal "DECEDENT: <name>" body string from the
+# structured Grantee field so the existing extractor's label matching (which
+# already recognizes "DECEDENT") resolves it — no shared-engine change, no
+# new OCR dependency.
+_DECEDENT_SUFFIX_RE = re.compile(r"\s+(DECD|AKA|DECEASED)\b.*$", re.IGNORECASE)
+
+
+def _clean_decedent_name(name: str | None) -> str | None:
+    name = (name or "").strip()
+    if not name:
+        return None
+    return _DECEDENT_SUFFIX_RE.sub("", name).strip() or None
+
+
 def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
     events: list[dict] = []
     for rec in wrapped_records:
@@ -155,13 +215,26 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
         if canonical is None:
             continue  # non-distress recording (deed of trust, warranty deed, release of lien, ...)
 
+        if canonical in _JUDGMENT_FAMILY_DOC_TYPES:
+            grantor_type, grantee_type = "PL", "DF"
+        elif canonical in _TAX_LIEN_FAMILY_DOC_TYPES:
+            grantor_type, grantee_type = "TP", "GR"
+        else:
+            grantor_type, grantee_type = "GR", "GE"
+
         parties = []
         for p in (
-            _party(payload.get("grantor_name"), "GR"),
-            _party(payload.get("grantee_name"), "GE"),
+            _party(payload.get("grantor_name"), grantor_type),
+            _party(payload.get("grantee_name"), grantee_type),
         ):
             if p:
                 parties.append(p)
+
+        document_body_text = None
+        if canonical == "affidavit_of_heirship":
+            decedent = _clean_decedent_name(payload.get("grantee_name"))
+            if decedent:
+                document_body_text = f"DECEDENT: {decedent}"
 
         events.append({
             "raw_event_id": rec["raw_record_id"],
@@ -174,7 +247,7 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
             "event_date": None,
             "source_url": rec.get("source_url") or "about:blank",
             "parties": parties,
-            "document_body_text": None,
+            "document_body_text": document_body_text,
             "property_refs": {
                 "parcel_id": None,
                 "situs_address": None,  # RP index exposes city only, not street address
@@ -206,10 +279,20 @@ def translate_foreclosure_notices(wrapped_records: list[dict]) -> list[dict]:
             "event_date": _to_iso_date(payload.get("sale_date_raw")),
             "source_url": rec.get("source_url") or "about:blank",
             "parties": [],  # FC department exposes no grantor/grantee/owner name at the index level
-            "document_body_text": None,
+            "document_body_text": payload.get("document_body_text") or None,
             "property_refs": {
                 "parcel_id": None,
-                "situs_address": None,  # FC index exposes city only, not street address
+                # Despite the scraper's "property_city" naming, live data shows
+                # this field holds a full street address (street, city, state,
+                # zip) on most records, not just a city name — but "CITY, TEXAS"
+                # (2 comma-separated parts) is still a bare city/state, so
+                # require at least 3 parts (street, city, state[, zip]) before
+                # treating it as a real address.
+                "situs_address": (
+                    payload.get("city")
+                    if payload.get("city") and len(str(payload.get("city")).split(",")) >= 3
+                    else None
+                ),
                 "legal_description": None,
                 "case_number": None,
             },

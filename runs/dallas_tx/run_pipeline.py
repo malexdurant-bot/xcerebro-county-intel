@@ -98,6 +98,12 @@ def main() -> None:
                          help="Optional path to a DCAD enrichment cache JSON (from "
                               "scrapers/parcel_master_dcad_dallas.py) to reuse instead of "
                               "re-querying every account live.")
+    parser.add_argument("--skip-scrape", action="store_true",
+                         help="Skip Step 1 entirely and reuse whatever raw JSONL for all 4 "
+                              "sources already exists on disk. For re-running translate/"
+                              "scoring/publish after a code fix without waiting through a "
+                              "full re-scrape (e.g. clerk_recordings' RP department alone "
+                              "can take 15+ pages).")
     args = parser.parse_args()
 
     approve_review = not args.no_approve_review
@@ -108,24 +114,27 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Step 1 — Scrape all 4 sources
     # ------------------------------------------------------------------
-    from scrapers.publicsearch_recorder_dallas import run_scraper as scrape_clerk_recordings  # noqa: E402
-    from scrapers.publicsearch_foreclosures_dallas import run_scraper as scrape_foreclosure_notices  # noqa: E402
-    from scrapers.tax_collector_dallas import run_scraper as scrape_tax_collector  # noqa: E402
-    from scrapers.taxsales_lgbs_dallas import run_scraper as scrape_taxsales_lgbs  # noqa: E402
-
-    print("[dallas_tx] Scraping clerk_recordings + foreclosure_notices (PublicSearch)...")
-    scrape_clerk_recordings(RAW_DIR, verbose=True)
-    scrape_foreclosure_notices(RAW_DIR, verbose=True)
-
-    if args.skip_tax_collector:
-        print("[dallas_tx] --skip-tax-collector: reusing existing raw tax_collector.jsonl")
+    if args.skip_scrape:
+        print("[dallas_tx] --skip-scrape: reusing existing raw JSONL for all sources")
     else:
-        print("[dallas_tx] Scraping tax_collector (weekly bulk TRW file — this can take "
-              "several minutes even with a cached zip)...")
-        scrape_tax_collector(RAW_DIR, verbose=True)
+        from scrapers.publicsearch_recorder_dallas import run_scraper as scrape_clerk_recordings  # noqa: E402
+        from scrapers.publicsearch_foreclosures_dallas import run_scraper as scrape_foreclosure_notices  # noqa: E402
+        from scrapers.tax_collector_dallas import run_scraper as scrape_tax_collector  # noqa: E402
+        from scrapers.taxsales_lgbs_dallas import run_scraper as scrape_taxsales_lgbs  # noqa: E402
 
-    print("[dallas_tx] Scraping tax_foreclosure_resales + sheriff_sales (LGBS API)...")
-    scrape_taxsales_lgbs(RAW_DIR, verbose=True)
+        print("[dallas_tx] Scraping clerk_recordings + foreclosure_notices (PublicSearch)...")
+        scrape_clerk_recordings(RAW_DIR, verbose=True)
+        scrape_foreclosure_notices(RAW_DIR, verbose=True)
+
+        if args.skip_tax_collector:
+            print("[dallas_tx] --skip-tax-collector: reusing existing raw tax_collector.jsonl")
+        else:
+            print("[dallas_tx] Scraping tax_collector (weekly bulk TRW file — this can take "
+                  "several minutes even with a cached zip)...")
+            scrape_tax_collector(RAW_DIR, verbose=True)
+
+        print("[dallas_tx] Scraping tax_foreclosure_resales + sheriff_sales (LGBS API)...")
+        scrape_taxsales_lgbs(RAW_DIR, verbose=True)
 
     if args.dry_run:
         print("[dallas_tx] --dry-run: stopping before pipeline stages. Done.")
@@ -143,6 +152,37 @@ def main() -> None:
     foreclosure_raw = _load_jsonl(RAW_DIR / "foreclosure_notices.jsonl")
     foreclosure_events = translate_foreclosure_notices(foreclosure_raw)
     print(f"[dallas_tx]   foreclosure_notices: {len(foreclosure_raw)} raw -> {len(foreclosure_events)} events", flush=True)
+
+    # debtor_name_ocr_hint (2026-08-28): a best-effort, watermark-cleanup
+    # SECOND OCR pass the scraper runs on the debtor-label row of each
+    # foreclosure notice image (see publicsearch_foreclosures_dallas.py's
+    # _ocr_watermark_cleaned_hint). It's frequently garbled at the character
+    # level and is deliberately NOT fed into owner_name extraction — the
+    # shared debtor_party_engine never sees it, and it's excluded from
+    # scored_lead_record entirely (that schema is additionalProperties:false,
+    # shared across counties). It's written here as its own side file, keyed
+    # by instrument_number (== doc_number, stable across every pipeline
+    # stage), so a human reviewing a REVIEW_REQUIRED foreclosure_notices lead
+    # in foreclosure_notices_leads_base.json can cross-reference this file by
+    # instrument_number for a possible-name lead — never treated as ground
+    # truth.
+    foreclosure_ocr_hints = [
+        {
+            "instrument_number": rec["raw_payload"].get("doc_number"),
+            "recorded_date": rec["raw_payload"].get("recorded_date_raw"),
+            "ocr_hint": rec["raw_payload"]["debtor_name_ocr_hint"],
+        }
+        for rec in foreclosure_raw
+        if rec.get("raw_payload", {}).get("debtor_name_ocr_hint")
+    ]
+    if foreclosure_ocr_hints:
+        hints_path = WORKDIR / "foreclosure_notices_review_hints.json"
+        hints_path.write_text(
+            json.dumps(foreclosure_ocr_hints, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        print(f"[dallas_tx]   {len(foreclosure_ocr_hints)} watermark-cleanup review hints "
+              f"-> {hints_path}", flush=True)
 
     print("[dallas_tx] Streaming + translating tax_collector (large file, filtered inline)...", flush=True)
     tax_collector_path = RAW_DIR / "tax_collector.jsonl"

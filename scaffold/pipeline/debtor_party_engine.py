@@ -908,6 +908,41 @@ def match_known_filer(
     return None
 
 
+# Added 2026-08-28 alongside OCR-sourced document_body_text (Dallas
+# foreclosure_notices): a scanned multi-column form (Trustor / Beneficiary /
+# Loan Servicer laid out as a table) can OCR into one interleaved line of
+# text with no reliable delimiter between the debtor's name and the next
+# field's boilerplate, so a captured value can run on into lender/MERS
+# language that is definitely not a person or entity name. Rather than
+# return that as a "resolved" debtor — worse than not resolving at all, per
+# this function's own never-guess principle — treat it as unextractable and
+# keep trying other labels / fall through to REVIEW_REQUIRED.
+_OCR_BOILERPLATE_MARKERS = (
+    "MORTGAGE ELECTRONIC",  # "...ELECTRONIC REGISTRATION SYSTEMS" (MERS) can get
+                            # truncated mid-phrase by the newline-bounded capture
+    "MERS",
+    "BENEFICIARY",
+    "NOMINEE",
+    "SUCCESSORS AND ASSIGNS",
+    "LOAN SERVIC",
+    "SUBSTITUTE TRUSTEE",
+    "CURRENT TRUSTEE",
+    "DEED OF TRUST",
+    "PROMISSORY NOTE",
+    "PRINCIPAL AMOUNT",
+)
+_MAX_PLAUSIBLE_NAME_WORDS = 12
+
+
+def _is_plausible_extracted_name(value: str) -> bool:
+    upper = value.upper()
+    if any(marker in upper for marker in _OCR_BOILERPLATE_MARKERS):
+        return False
+    if len(value.split()) > _MAX_PLAUSIBLE_NAME_WORDS:
+        return False
+    return True
+
+
 def extract_debtor_from_document_body(
     document_body_text: str,
     canonical_doc_type: str,
@@ -949,7 +984,7 @@ def extract_debtor_from_document_body(
         match = pattern.search(text)
         if match:
             value = _clean_extracted_name(match.group(1))
-            if value:
+            if value and _is_plausible_extracted_name(value):
                 return value
 
     # "ESTATE OF <name>" / "HEIRS OF <name>" appear without a colon in the
@@ -966,7 +1001,7 @@ def extract_debtor_from_document_body(
             value = _clean_extracted_name(
                 f"{match.group(1)} {match.group(2)}"
             )
-            if value:
+            if value and _is_plausible_extracted_name(value):
                 return value
 
     return None
