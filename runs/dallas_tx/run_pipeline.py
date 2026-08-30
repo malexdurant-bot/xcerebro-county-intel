@@ -238,6 +238,138 @@ def main() -> None:
     print(f"[dallas_tx]   tax_foreclosure_resales: {len(resales_raw)} raw -> {len(resales_events)} events", flush=True)
     print(f"[dallas_tx]   sheriff_sales: {len(sheriff_raw)} raw -> {len(sheriff_events)} events", flush=True)
 
+    # ------------------------------------------------------------------
+    # Step 2c — DCAD address/owner-name enrichment for clerk_recordings
+    # (liens/estate) and foreclosure_notices (2026-08-29).
+    #
+    # Discovered after the debtor-name fix: even with a real situs_address
+    # (foreclosure_notices) or a real resolved owner_name (clerk_recordings,
+    # after the grantor/grantee role fix), NONE of it reached the dashboard.
+    # matched_lead_record/scored_lead_record only carry an address via
+    # primary_parcel_id -> parcel_display (the Step 2b join above), and
+    # these two sources never get a parcel_id assigned at all -- confirmed
+    # live: every foreclosure/lien/estate scored lead showed parcel_display:
+    # None regardless of what the base-layer record actually had.
+    #
+    # Fix: resolve a real DCAD parcel_id (= DCAD account number) for these
+    # leads BEFORE the staged pipeline runs, so the framework's own
+    # aggregation carries it through to primary_parcel_id exactly like
+    # tax_collector/LGBS accounts already do -- no schema change anywhere.
+    # Two DCAD search modes, tried in reliability order per source:
+    #   - foreclosure_notices: address search first (unambiguous -- house
+    #     number + street name matched a single live property in every
+    #     test), owner-name search as fallback for the rare case address
+    #     search finds nothing (e.g. a scraped address DCAD doesn't
+    #     recognize) but a debtor name did resolve.
+    #   - clerk_recordings (liens/estate): owner-name search only -- there
+    #     is no address at all for these on the RP index (see translate.py).
+    # Owner-name search is inherently riskier (a common name can match many
+    # properties); parcel_master_dcad_dallas.py's lookup_by_owner_name only
+    # ever returns a hit when there's EXACTLY one match, same "never guess"
+    # principle as the debtor-name extraction fixes above.
+    # ------------------------------------------------------------------
+    if args.skip_dcad_enrichment:
+        print("[dallas_tx] --skip-dcad-enrichment: skipping address/owner DCAD lookups too", flush=True)
+    else:
+        from scaffold.pipeline.debtor_party_engine import resolve_debtor_party  # noqa: E402
+        from scrapers.parcel_master_dcad_dallas import DCADSession  # noqa: E402
+
+        addr_owner_cache_path = WORKDIR / "dcad_address_owner_cache.json"
+        addr_owner_cache: dict = {}
+        if addr_owner_cache_path.exists():
+            try:
+                addr_owner_cache = json.loads(addr_owner_cache_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                addr_owner_cache = {}
+
+        dcad_session = DCADSession()
+        addr_owner_hits = 0
+        addr_owner_attempted = 0
+        name_fallback_hits = 0
+
+        def _cached_lookup(cache_key: str, do_lookup) -> "dict | None":
+            if cache_key in addr_owner_cache:
+                return addr_owner_cache[cache_key]
+            result = do_lookup()
+            addr_owner_cache[cache_key] = result
+            return result
+
+        def _enrich_events_needing_parcel(events: list[dict], try_address: bool) -> None:
+            nonlocal addr_owner_hits, addr_owner_attempted, name_fallback_hits
+            for ev in events:
+                refs = ev.get("property_refs") or {}
+                if refs.get("parcel_id"):
+                    continue  # already resolved (shouldn't happen pre-Step-3, but safe)
+
+                hit = None
+                situs_address = refs.get("situs_address") if try_address else None
+                if situs_address:
+                    addr_owner_attempted += 1
+                    hit = _cached_lookup(
+                        f"addr:{situs_address}",
+                        lambda a=situs_address: dcad_session.lookup_by_address(a, verbose=True),
+                    )
+
+                # A confident address match found a REAL DCAD owner-of-record
+                # name. §13.14 (leads_base_writer.py) nulls the aggregation
+                # key's parcel_id whenever the DEBTOR isn't resolved, even if
+                # we just found a perfectly good parcel_id here -- so an
+                # address hit alone doesn't help a foreclosure_notices lead
+                # whose OCR debtor extraction failed (the majority of them).
+                # If the debtor isn't resolved yet, inject DCAD's name as a
+                # "MORTGAGOR: <name>" line into document_body_text so the
+                # EXISTING extractor (extract_debtor_from_document_body,
+                # unmodified) resolves it through its normal label matching.
+                # Caveat this is NOT the same guarantee as reading the actual
+                # notice: DCAD's current owner-of-record can differ from the
+                # exact party named in it (e.g. an intervening transfer) --
+                # a strong proxy, not certain truth, same spirit as the
+                # watermark-cleanup review hints already shipped.
+                if hit and hit.get("owner_name"):
+                    resolved_before = resolve_debtor_party(ev)
+                    if resolved_before.get("debtor_resolution_status") != "RESOLVED":
+                        hint_line = f"MORTGAGOR: {hit['owner_name']}"
+                        existing_body = ev.get("document_body_text") or ""
+                        if hint_line not in existing_body:
+                            ev["document_body_text"] = (
+                                f"{existing_body}\n{hint_line}".strip() if existing_body else hint_line
+                            )
+                            name_fallback_hits += 1
+
+                if hit is None:
+                    resolved = resolve_debtor_party(ev)
+                    owner_name = resolved.get("owner_name")
+                    if resolved.get("debtor_resolution_status") == "RESOLVED" and owner_name:
+                        addr_owner_attempted += 1
+                        hit = _cached_lookup(
+                            f"owner:{owner_name}",
+                            lambda n=owner_name: dcad_session.lookup_by_owner_name(n, verbose=True),
+                        )
+
+                if hit:
+                    addr_owner_hits += 1
+                    ev["property_refs"]["parcel_id"] = hit["account_number"]
+                    dcad_lookup[hit["account_number"]] = {
+                        "situs_address": hit["situs_address"],
+                        "situs_city": hit["situs_city"],
+                        "owner_name": hit["owner_name"],
+                        "assessed_value": hit["assessed_value"],
+                        "property_type": hit["property_type"],
+                    }
+
+        print(f"[dallas_tx] DCAD address/owner enrichment: {len(foreclosure_events)} foreclosure_notices "
+              f"+ {len(clerk_events)} clerk_recordings leads to try...", flush=True)
+        _enrich_events_needing_parcel(foreclosure_events, try_address=True)
+        _enrich_events_needing_parcel(clerk_events, try_address=False)
+        print(f"[dallas_tx]   {addr_owner_hits}/{addr_owner_attempted} address/owner lookups matched "
+              f"a single confident DCAD account", flush=True)
+        print(f"[dallas_tx]   {name_fallback_hits} of those also injected a DCAD owner-of-record name "
+              f"as a MORTGAGOR fallback (debtor wasn't otherwise resolved)", flush=True)
+
+        addr_owner_cache_path.write_text(
+            json.dumps(addr_owner_cache, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+
     raw_events: list[dict] = (
         clerk_events + foreclosure_events + tax_collector_events
         + resales_events + sheriff_events

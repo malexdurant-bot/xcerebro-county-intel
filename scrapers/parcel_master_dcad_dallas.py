@@ -74,6 +74,22 @@ import requests
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 SEARCH_URL = "https://www.dallascad.org/SearchAcct.aspx"
+# Added 2026-08-29: clerk_recordings (liens/estate) and foreclosure_notices
+# leads have no account number to look up at all -- they only ever carry a
+# street address (foreclosure_notices, post-OCR-address-fix) or a resolved
+# owner name (clerk_recordings, post-debtor-role fix; also foreclosure_
+# notices when OCR resolved a name). SearchAddr.aspx / SearchOwner.aspx are
+# DCAD's own address/owner search pages (confirmed live: "Search By: Owner
+# Name | Account Number | Street Address | Business Name | Map" nav on every
+# DCAD search page) -- both single-match-tested live against real leads from
+# this run (11240 PELICAN DR -> HAJ EZZAT; owner "DUNCAN GREG" -> DUNCAN
+# GREGORY M, 6421 FAIRFIELD DR) and both expose the DCAD account number in
+# the result row's AcctDetail*.aspx?ID=... link, same as SEARCH_URL's own
+# results -- so a hit from either of these plugs directly into the same
+# account-number-keyed enrichment (dcad_lookup) the rest of the pipeline
+# already trusts, no new schema/field needed anywhere downstream.
+SEARCH_ADDR_URL = "https://www.dallascad.org/SearchAddr.aspx"
+SEARCH_OWNER_URL = "https://www.dallascad.org/SearchOwner.aspx"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -87,13 +103,103 @@ _EVENTVALIDATION_RE = re.compile(r'id="__EVENTVALIDATION" value="([^"]*)"')
 
 # One result row inside the #SearchResults1_dgResults table (see module
 # docstring for the exact HTML shape this was matched against live).
+#
+# The value cell is NOT always "$1,234" -- a property under active protest
+# renders "Value in Dispute" there instead (confirmed live 2026-08-29: DCAD
+# account 00000738961300000 / 11240 PELICAN DR). The original `\$(?P<value>
+# [\d,]*)` required a literal "$" and so silently failed to match the ENTIRE
+# row (not just the value) for any disputed-value property -- a real,
+# pre-existing bug, not just new-code risk. `(?P<value>[^<]*)` accepts
+# either shape; _parse_assessed_value below only converts it to a float when
+# it actually looks numeric.
 _RESULT_ROW_RE = re.compile(
     r"<a href='AcctDetail\w*\.aspx\?ID=[^']*'[^>]*>\s*(?P<address>.*?)\s*</a>\s*"
     r"</td>\s*<td[^>]*>(?P<city>.*?)</td>\s*<td[^>]*>\s*<span[^>]*>(?P<owner>.*?)</span>\s*"
-    r"</td>\s*<td[^>]*>\s*<span[^>]*>\$(?P<value>[\d,]*)</span>\s*"
+    r"</td>\s*<td[^>]*>\s*<span[^>]*>(?P<value>[^<]*)</span>\s*"
     r"</td>\s*<td[^>]*>\s*<span[^>]*>(?P<proptype>.*?)</span>",
     re.DOTALL,
 )
+
+# Same result-row shape as _RESULT_ROW_RE but also captures the account
+# number out of the AcctDetail*.aspx?ID=... href -- needed for address/owner
+# search (unlike account search, the account number isn't already known
+# going in).
+_RESULT_ROW_WITH_ID_RE = re.compile(
+    r"<a href='AcctDetail\w*\.aspx\?ID=(?P<acct>[^']*)'[^>]*>\s*(?P<address>.*?)\s*</a>\s*"
+    r"</td>\s*<td[^>]*>(?P<city>.*?)</td>\s*<td[^>]*>\s*<span[^>]*>(?P<owner>.*?)</span>\s*"
+    r"</td>\s*<td[^>]*>\s*<span[^>]*>(?P<value>[^<]*)</span>\s*"
+    r"</td>\s*<td[^>]*>\s*<span[^>]*>(?P<proptype>.*?)</span>",
+    re.DOTALL,
+)
+
+
+def _parse_assessed_value(raw: str) -> "float | None":
+    """"$515,840" -> 515840.0; "Value in Dispute" (or anything else
+    non-numeric) -> None -- a disputed value isn't a usable number, but the
+    row (address/owner/account) around it is still real and worth keeping."""
+    cleaned = (raw or "").strip().lstrip("$").replace(",", "")
+    try:
+        return float(cleaned) if cleaned else None
+    except ValueError:
+        return None
+
+# "< PREV matches 1 - 1 of 1 properties. NEXT >" -- the total is group 1.
+_MATCH_COUNT_RE = re.compile(r"matches\s*[\d,]*\s*-\s*[\d,]*\s*of\s*([\d,]+)\s*propert", re.IGNORECASE)
+
+# DCAD's address-search hint (confirmed live on SearchAddr.aspx): "Do not
+# enter the street type such as Street, Drive or Lane." -- so it must be
+# stripped before searching. Ordered longest-first so e.g. "DRIVE" doesn't
+# get shadowed by a shorter partial match.
+_STREET_TYPE_SUFFIXES = sorted([
+    "STREET", "DRIVE", "AVENUE", "BOULEVARD", "PARKWAY", "CIRCLE", "COURT",
+    "TERRACE", "CRESCENT", "CROSSING", "HIGHWAY", "TRAIL", "SQUARE",
+    "LANE", "ROAD", "PLACE", "LOOP", "PATH", "WAY", "ALLEY", "COVE", "PASS",
+    "PIKE", "ROW", "RUN", "WALK",
+    "ST", "DR", "AVE", "BLVD", "PKWY", "CIR", "CT", "TER", "HWY", "TRL",
+    "SQ", "LN", "RD", "PL", "CV",
+], key=len, reverse=True)
+_STREET_DIRECTIONS = {"N", "S", "E", "W", "NE", "NW", "SE", "SW"}
+
+
+def parse_street_address(raw: str) -> "dict | None":
+    """Parse a scraped/OCR'd address string into DCAD's SearchAddr.aspx
+    fields: house number, optional leading direction, and a bare street
+    name (type suffix stripped, per the site's own hint). Returns None if
+    no leading house number is found (nothing to search on).
+
+    Handles the shapes seen in this county's own raw data, e.g.
+    "11240 PELICAN DRIVE, DALLAS, TEXAS, 75238" and
+    "703 E. CHERRY STSREET, DUNCANVILLE, TEXAS, 75116" (yes, "STSREET" --
+    a real OCR typo in live data; stripped as a best-effort prefix match
+    against "STREET" rather than an exact-suffix match for exactly this
+    reason).
+    """
+    if not raw or not isinstance(raw, str):
+        return None
+    # Only the portion before the first comma is the street address itself;
+    # city/state/zip (if present) are handled separately via listCity.
+    street_part = raw.split(",")[0].strip()
+    m = re.match(r"^(\d+)\s+(.*)$", street_part)
+    if not m:
+        return None
+    house_number, rest = m.group(1), m.group(2).strip()
+
+    tokens = rest.split()
+    direction = ""
+    if tokens and tokens[0].strip(".").upper() in _STREET_DIRECTIONS:
+        direction = tokens[0].strip(".").upper()
+        tokens = tokens[1:]
+    if tokens:
+        last = tokens[-1].strip(".").upper()
+        # Prefix match (not equality) to tolerate an OCR-mangled suffix like
+        # "STSREET" for "STREET" -- still unambiguously a street-type word,
+        # not part of the actual street name.
+        if any(last.startswith(suf) or suf.startswith(last) for suf in _STREET_TYPE_SUFFIXES if len(last) >= 2):
+            tokens = tokens[:-1]
+    street_name = " ".join(tokens).strip()
+    if not street_name:
+        return None
+    return {"house_number": house_number, "direction": direction, "street_name": street_name}
 
 
 def _clean_html_text(raw: str) -> str:
@@ -121,8 +227,12 @@ class DCADSession:
         self.session.headers.update({"User-Agent": USER_AGENT})
         self._tokens = None
 
-    def _fetch_tokens(self) -> dict:
-        resp = self.session.get(SEARCH_URL, timeout=15)
+    def _fetch_tokens(self, url: str = SEARCH_URL) -> dict:
+        # ASP.NET __VIEWSTATE is tied to the specific page's control tree --
+        # a token fetched from SearchAcct.aspx will NOT validate when posted
+        # to SearchAddr.aspx/SearchOwner.aspx, so the caller must fetch from
+        # (and post back to) the same url.
+        resp = self.session.get(url, timeout=15)
         resp.raise_for_status()
         vs = _VIEWSTATE_RE.search(resp.text)
         vsg = _VIEWSTATEGEN_RE.search(resp.text)
@@ -189,15 +299,131 @@ class DCADSession:
         address = _clean_html_text(m.group("address"))
         city = _clean_html_text(m.group("city"))
         owner = _clean_html_text(m.group("owner"))
-        value = m.group("value")
         prop_type = _clean_html_text(m.group("proptype"))
         return {
             "situs_address": address or None,
             "situs_city": city or None,
             "owner_name": owner or None,
-            "assessed_value": float(value.replace(",", "")) if value else None,
+            "assessed_value": _parse_assessed_value(m.group("value")),
             "property_type": prop_type or None,
         }
+
+    def _post_and_parse_single_match(
+        self, url: str, extra_fields: dict, label: str, verbose: bool, retries: int
+    ) -> dict | None:
+        """Shared POST + single-match-only parsing for lookup_by_address and
+        lookup_by_owner_name. Unlike lookup_account (an account number is
+        inherently unique), address and especially owner-name searches can
+        return many results -- e.g. "SMITH J" alone hit 505 live. Returning
+        ANY result from an ambiguous multi-match set would risk attributing
+        the wrong property/value to a lead, which is worse than leaving it
+        unenriched, so this only ever returns a hit when there is EXACTLY
+        one match. account (the DCAD account number, parsed out of the
+        result row's own AcctDetail*.aspx?ID=... link) is included in the
+        returned dict so callers can key dcad_lookup / parcel_id with it.
+        """
+        last_exc: Exception | None = None
+        resp = None
+        for attempt in range(retries):
+            try:
+                tokens = self._fetch_tokens(url)
+                data = dict(tokens)
+                data.update(extra_fields)
+                resp = self.session.post(url, data=data, timeout=20)
+                resp.raise_for_status()
+                break
+            except requests.RequestException as exc:
+                last_exc = exc
+                if verbose:
+                    print(f"  [DCAD] {label} attempt {attempt + 1}/{retries} failed: {exc}", flush=True)
+                if attempt < retries - 1:
+                    time.sleep(1.0 * (attempt + 1))
+        else:
+            if verbose:
+                print(f"  [DCAD] {label}: giving up after {retries} attempts: {last_exc}", flush=True)
+            return None
+
+        if "No Records Found" in resp.text:
+            return None
+
+        count_m = _MATCH_COUNT_RE.search(resp.text)
+        if count_m and int(count_m.group(1).replace(",", "")) != 1:
+            if verbose:
+                print(f"  [DCAD] {label}: {count_m.group(1)} matches -- ambiguous, skipping", flush=True)
+            return None
+
+        m = _RESULT_ROW_WITH_ID_RE.search(resp.text)
+        if not m:
+            return None
+
+        return {
+            "account_number": m.group("acct").strip(),
+            "situs_address": _clean_html_text(m.group("address")) or None,
+            "situs_city": _clean_html_text(m.group("city")) or None,
+            "owner_name": _clean_html_text(m.group("owner")) or None,
+            "assessed_value": _parse_assessed_value(m.group("value")),
+            "property_type": _clean_html_text(m.group("proptype")) or None,
+        }
+
+    def lookup_by_address(
+        self, raw_address: str, verbose: bool = False, retries: int = 3
+    ) -> dict | None:
+        """raw_address: a scraped/OCR'd street address, e.g.
+        "11240 PELICAN DRIVE, DALLAS, TEXAS, 75238" (city/state/zip after
+        the first comma are ignored -- house number + street name alone was
+        confirmed live to return a confident single match; city is
+        deliberately left as DCAD's own "[ALL]" rather than attempting a
+        city-name-to-code mapping). Returns the same shape as lookup_account
+        plus "account_number", or None if unparseable/no match/ambiguous.
+        """
+        parsed = parse_street_address(raw_address)
+        if parsed is None:
+            return None
+        fields = {
+            "txtAddrNum": parsed["house_number"],
+            "listStDir": parsed["direction"],
+            "txtStName": parsed["street_name"],
+            "txtBldgID": "",
+            "txtUnitID": "",
+            "listCity": "",
+            "txtAddrNum1": "",
+            "txtAddrNum2": "",
+            "cmdSubmit": "Search",
+            "AcctTypeCheckList1:chkAcctType:0": "on",
+            "AcctTypeCheckList1:chkAcctType:1": "on",
+            "AcctTypeCheckList1:chkAcctType:2": "on",
+        }
+        return self._post_and_parse_single_match(
+            SEARCH_ADDR_URL, fields, f"address {raw_address!r}", verbose, retries
+        )
+
+    def lookup_by_owner_name(
+        self, name: str, verbose: bool = False, retries: int = 3
+    ) -> dict | None:
+        """name: "LAST FIRST[ MIDDLE]" -- the exact format clerk_recordings'
+        raw grantor/grantee fields and the shared engine's resolved
+        owner_name already use (confirmed live: "DUNCAN GREG" -> single
+        match "DUNCAN GREGORY M"), so callers pass the resolved owner_name
+        straight through with no reformatting. Returns the same shape as
+        lookup_by_address, or None if no match/ambiguous. DCAD requires the
+        full last name plus at least 2 letters of the first name -- very
+        short names may 422/validation-fail rather than return "No Records
+        Found"; that surfaces as a request exception here and is treated as
+        no-match by the retry loop's normal give-up path.
+        """
+        name = (name or "").strip()
+        if not name or len(name.split()) < 2:
+            return None
+        fields = {
+            "txtOwnerName": name,
+            "cmdSubmit": "Search",
+            "AcctTypeCheckList1:chkAcctType:0": "on",
+            "AcctTypeCheckList1:chkAcctType:1": "on",
+            "AcctTypeCheckList1:chkAcctType:2": "on",
+        }
+        return self._post_and_parse_single_match(
+            SEARCH_OWNER_URL, fields, f"owner {name!r}", verbose, retries
+        )
 
 
 def enrich_accounts(
