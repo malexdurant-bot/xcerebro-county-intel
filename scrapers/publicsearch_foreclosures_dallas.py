@@ -381,12 +381,25 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
             if verbose:
                 got = "captured" if row["document_body_text"] else "none"
                 print(f"    [Dallas FC] doc {doc_number}: document body {got}", flush=True)
+            # Poll rather than a single immediate snapshot: _fetch_and_ocr_row_
+            # document's fixed 1.5s post-go_back wait isn't always enough for
+            # the SPA to finish re-rendering the full row count, especially
+            # later in a long session with many navigations behind it -- a
+            # single-snapshot check here was confirmed live 2026-08-29 to
+            # false-positive after as few as 6 rows, silently aborting OCR
+            # for the rest of the page every run. Give it up to 6s total
+            # before concluding the table is genuinely broken (not just slow).
             trs_now = page.query_selector_all("table tbody tr")
+            recheck_waited = 0
+            while len(trs_now) != expected_count and recheck_waited < 6_000:
+                page.wait_for_timeout(500)
+                recheck_waited += 500
+                trs_now = page.query_selector_all("table tbody tr")
             if len(trs_now) != expected_count:
                 if verbose:
-                    print(f"  [Dallas FC] results table row count changed after go_back "
-                          f"({len(trs_now)} != {expected_count}) — stopping document "
-                          f"body capture for remaining rows on this page", flush=True)
+                    print(f"  [Dallas FC] results table row count still wrong after "
+                          f"{recheck_waited}ms extra wait ({len(trs_now)} != {expected_count}) "
+                          f"— stopping document body capture for remaining rows on this page", flush=True)
                 do_ocr = False
 
         rows_out.append(row)
