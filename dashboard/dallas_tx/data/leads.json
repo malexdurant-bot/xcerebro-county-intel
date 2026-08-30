@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-30T00:11:45Z",
+  "generated_at": "2026-08-30T01:34:04Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Dallas",
@@ -7,8 +7,8 @@
   "semantic_verdict": "NEEDS_OPERATOR_REVIEW",
   "lead_total": 5975,
   "enrichment_breakdown": {
-    "ENRICHED": 4378,
-    "UNENRICHED": 1597
+    "ENRICHED": 4393,
+    "UNENRICHED": 1582
   },
   "pattern_counts": {
     "estate": 34,
@@ -12754,10 +12754,10 @@
       "lead_id": "lead_parcel_00000180241000000",
       "scored_lead_id": "scored_ebfb5f0993f15fd5",
       "primary_parcel_id": "00000180241000000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "4104 PENELOPE ST, DALLAS, TX",
+      "display_address_street": "4104 PENELOPE ST",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "SORRELLS JIM MACK EST OF",
       "display_owner_type": "ESTATE",
@@ -12785,7 +12785,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 145520.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -12800,7 +12800,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -59570,10 +59570,10 @@
       "lead_id": "lead_parcel_00000479872000000",
       "scored_lead_id": "scored_a30f559068d11873",
       "primary_parcel_id": "00000479872000000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "3921 SUMMIT RIDGE DR, DALLAS, TX",
+      "display_address_street": "3921 SUMMIT RIDGE DR",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "SMITH LEE ELLA",
       "display_owner_type": "INDIVIDUAL",
@@ -59601,7 +59601,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 213730.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -59616,7 +59616,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -77622,7 +77622,7 @@
       "display_address_city": "DALLAS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "GARZA GONZALO JR &",
+      "display_owner": "Gonzalo Garza Jr & Maria L Garza, Husba",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -97762,10 +97762,10 @@
       "lead_id": "lead_parcel_00000690772000000",
       "scored_lead_id": "scored_96c31ddc4aebb22f",
       "primary_parcel_id": "00000690772000000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "3130 PALACIOS AVE, DALLAS, TX",
+      "display_address_street": "3130 PALACIOS AVE",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "LOPEZ IPOLITO A &",
       "display_owner_type": "INDIVIDUAL",
@@ -97793,7 +97793,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 185360.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -97808,7 +97808,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -101892,7 +101892,7 @@
       "display_address_city": "DALLAS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "SINGLETERRY MICALA",
+      "display_owner": "MICALA",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -102276,10 +102276,10 @@
       "lead_id": "lead_parcel_00000719323000000",
       "scored_lead_id": "scored_da76ce344396792a",
       "primary_parcel_id": "00000719323000000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "12019 GALVA DR, DALLAS, TX",
+      "display_address_street": "12019 GALVA DR",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "LEWIS MELVIN A EST OF &",
       "display_owner_type": "ESTATE",
@@ -102307,7 +102307,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 170110.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -102322,7 +102322,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -118796,7 +118796,7 @@
       "display_address_city": "DALLAS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "ROMERO LILIANA",
+      "display_owner": "LILIANA ROMERO, UNMARRIED WOMAN",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -119730,10 +119730,10 @@
       "lead_id": "lead_parcel_00000820783420000",
       "scored_lead_id": "scored_178a9c9df7a60584",
       "primary_parcel_id": "00000820783420000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "9505 TIMBERBLUFF CIR, DALLAS, TX",
+      "display_address_street": "9505 TIMBERBLUFF CIR",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "ACOSTA SALOMON",
       "display_owner_type": "INDIVIDUAL",
@@ -119761,7 +119761,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 236260.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -119776,7 +119776,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -123749,10 +123749,10 @@
       "lead_id": "lead_parcel_005074000D0160000",
       "scored_lead_id": "scored_b61003a0dfa3886d",
       "primary_parcel_id": "005074000D0160000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "20 COCHRAN OAKS LN, DALLAS, TX",
+      "display_address_street": "20 COCHRAN OAKS LN",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "TOOFANIAN KARISA",
       "display_owner_type": "INDIVIDUAL",
@@ -123780,7 +123780,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 925000.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -123795,7 +123795,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -138434,7 +138434,7 @@
       "display_address_city": "DESOTO",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "CARTER ANDRE D SR & STELLA",
+      "display_owner": "Andre D Carter, Sr. and Stella Carter, husband 2",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -140976,7 +140976,7 @@
       "display_address_city": "DUNCANVILLE",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "ZAVALA JOSE L",
+      "display_owner": "Jose L. Zavala and Maria Zavala, husband and wife",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -141199,10 +141199,10 @@
       "lead_id": "lead_parcel_22051000520140000",
       "scored_lead_id": "scored_cd441b3ba7a49356",
       "primary_parcel_id": "22051000520140000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "727 SUN VALLEY DR, DUNCANVILLE, TX",
+      "display_address_street": "727 SUN VALLEY DR",
+      "display_address_city": "DUNCANVILLE",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "WASHAM CARL EST OF",
       "display_owner_type": "ESTATE",
@@ -141230,7 +141230,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 199270.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -141245,7 +141245,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -141483,7 +141483,7 @@
       "display_address_city": "DUNCANVILLE",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "IDDEEN MANSOUR",
+      "display_owner": "MANSOUR ID-DEEN AND CRYSTAL",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -148549,7 +148549,7 @@
       "display_address_city": "GARLAND",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "HONORIO ROBELLE ANN",
+      "display_owner": "Robelle Ann Honorio. a single",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -157640,7 +157640,7 @@
       "display_address_city": "GRAND PRAIRIE",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "COHAN BERENICE ATENAS",
+      "display_owner": "BERENICE ATENAS",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -159257,7 +159257,7 @@
       "display_address_city": "IRVING",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "PEREZ EVELYN IRENE &",
+      "display_owner": "Erik Jon Martinez, a single man",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -164948,7 +164948,7 @@
       "display_address_city": "IRVING",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "DAVIS MAVIS",
+      "display_owner": "R.F. Davis and wife, Mavis Davis",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -165337,7 +165337,7 @@
       "display_address_city": "IRVING",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "ANDERSON AMBER",
+      "display_owner": "AMBER ANDERSON",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -169092,7 +169092,7 @@
       "display_address_city": "LANCASTER",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "WALLACE ZELNA J",
+      "display_owner": "ZELNA J. WALLACE, A SINGLE WOMAN",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -169815,7 +169815,7 @@
       "display_address_city": "LANCASTER",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "HERNANDEZ RAUL",
+      "display_owner": "Raul Hernadez",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -171377,7 +171377,7 @@
       "display_address_city": "MESQUITE",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "MURPHY JESSICA RENEE",
+      "display_owner": "JESSICA RENEE MURPHY, AN UNMARRIED WOMAN",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -174088,7 +174088,7 @@
       "display_address_city": "MESQUITE",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "JIMA ROBERT",
+      "display_owner": "Robert Jima, A Single Man",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -188068,7 +188068,7 @@
       "display_address_city": "SUNNYVALE",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "HUTSON EDWARD R & ADRIANA M",
+      "display_owner": "Edward R Hutson and Adriana M. Hutson",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -194074,10 +194074,10 @@
       "lead_id": "lead_parcel_60184500020060000",
       "scored_lead_id": "scored_302a9226cd441fc2",
       "primary_parcel_id": "60184500020060000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "5020 GARDEN DR, HUTCHINS, TX",
+      "display_address_street": "5020 GARDEN DR",
+      "display_address_city": "HUTCHINS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "GARCIA MAE C",
       "display_owner_type": "INDIVIDUAL",
@@ -194105,7 +194105,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 129130.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -194120,7 +194120,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -194349,10 +194349,10 @@
       "lead_id": "lead_parcel_60218500470180000",
       "scored_lead_id": "scored_027112454898d7d3",
       "primary_parcel_id": "60218500470180000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "4033 CENTENARY DR, UNIVERSITY PARK, TX",
+      "display_address_street": "4033 CENTENARY DR",
+      "display_address_city": "UNIVERSITY PARK",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "SHELTON MICHELLE ANN",
       "display_owner_type": "INDIVIDUAL",
@@ -194380,7 +194380,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 2013000.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -194395,7 +194395,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -194404,10 +194404,10 @@
       "lead_id": "lead_parcel_60219500040010000",
       "scored_lead_id": "scored_9a52fd621c97417d",
       "primary_parcel_id": "60219500040010000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "4084 PURDUE ST, UNIVERSITY PARK, TX",
+      "display_address_street": "4084 PURDUE ST",
+      "display_address_city": "UNIVERSITY PARK",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "SHELTON MICHELLE ANN",
       "display_owner_type": "INDIVIDUAL",
@@ -194435,7 +194435,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 1576250.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -194450,7 +194450,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -204744,10 +204744,10 @@
       "lead_id": "lead_parcel_65152309010072000",
       "scored_lead_id": "scored_9bda4b784aa1e188",
       "primary_parcel_id": "65152309010072000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "291 BILINDSAY COVE, NO TOWN, TX",
+      "display_address_street": "291 BILINDSAY COVE",
+      "display_address_city": "NO TOWN",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "HANDLEY SHARON ELAINE EST OF",
       "display_owner_type": "ESTATE",
@@ -204775,7 +204775,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 91830.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -204790,7 +204790,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -204799,10 +204799,10 @@
       "lead_id": "lead_parcel_65152309010072001",
       "scored_lead_id": "scored_45f883fa0b025d3d",
       "primary_parcel_id": "65152309010072001",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "291 BILINDSAY COVE, NO TOWN, TX",
+      "display_address_street": "291 BILINDSAY COVE",
+      "display_address_city": "NO TOWN",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "HANDLEY SHARON ELAINE EST OF",
       "display_owner_type": "ESTATE",
@@ -204830,7 +204830,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 29750.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -204845,7 +204845,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -210414,7 +210414,7 @@
       "display_address_city": "NO TOWN",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "CATALAN ARACELI",
+      "display_owner": "ARACELT CATALAN, AN UNMARRIED WOMAN",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -210473,7 +210473,7 @@
       "display_address_city": "NO TOWN",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "SEWELL LAQUIS LENIAE &",
+      "display_owner": "LAQUIS LENIAE SEWELL AND MARQUES DESHON SEWELL, WIFE AND",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
@@ -250108,10 +250108,10 @@
       "lead_id": "lead_parcel_99210210510000000",
       "scored_lead_id": "scored_105567677c2183f7",
       "primary_parcel_id": "99210210510000000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "8215 MADDOX AVE, DALLAS, TX",
+      "display_address_street": "8215 MADDOX AVE",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "HERNANDEZ LEO",
       "display_owner_type": "INDIVIDUAL",
@@ -250139,7 +250139,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 17310.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -250154,7 +250154,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -253573,10 +253573,10 @@
       "lead_id": "lead_parcel_99211101260000000",
       "scored_lead_id": "scored_96ccc0cd0c91b9aa",
       "primary_parcel_id": "99211101260000000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "9100 N CENTRAL EXPY Suite: 115, DALLAS, TX",
+      "display_address_street": "9100 N CENTRAL EXPY Suite: 115",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "NGUYEN  PHUONG",
       "display_owner_type": "INDIVIDUAL",
@@ -253604,7 +253604,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 57960.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -253619,7 +253619,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -258651,10 +258651,10 @@
       "lead_id": "lead_parcel_99220929900000000",
       "scored_lead_id": "scored_f3930a6bc2a5967a",
       "primary_parcel_id": "99220929900000000",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
+      "display_address": "14854 MONTFORT DR, ADDISON, TX",
+      "display_address_street": "14854 MONTFORT DR",
+      "display_address_city": "ADDISON",
+      "display_address_state": "TX",
       "display_address_zip": null,
       "display_owner": "TKS COMEDY COCKTAILS CUISINE",
       "display_owner_type": "INDIVIDUAL",
@@ -258682,7 +258682,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
+      "display_assessed_value": 148000.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -258697,7 +258697,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
@@ -291168,8 +291168,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "TR Atrium, L.P. (Borrower/Mortgagor)",
+      "display_owner_type": "ENTITY",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291193,7 +291193,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291212,10 +291212,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-19",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002145"
@@ -291230,8 +291227,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "ISRAEL ENDESHAW AND FEVEN LEGESSE HUSBAND",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291255,7 +291252,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291274,10 +291271,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002154"
@@ -291292,8 +291286,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "DAWN BADGER, UNMARRIED PERSON AND TINNIS C",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291317,7 +291311,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291336,10 +291330,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002155"
@@ -291354,8 +291345,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "3/20/2020 CASEY ELLIOTT, A SINGLE MAN",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291379,7 +291370,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291398,10 +291389,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002156"
@@ -291478,8 +291466,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "YASMIN M. VASQUEZ AND HUSBAND, RIGOBERTO M",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291503,7 +291491,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291522,10 +291510,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002158"
@@ -291664,8 +291649,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "CARLOS B. FERNANDEZ AND KARLA BON NRA",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291689,7 +291674,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291708,10 +291693,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002166"
@@ -291726,8 +291708,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "ERIK L. LARSEN",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291751,7 +291733,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291770,10 +291752,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002173"
@@ -291788,8 +291767,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "DUSTIN MICHAEL KUHN, A SINGLE MA",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291813,7 +291792,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291832,10 +291811,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002174"
@@ -291850,8 +291826,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "and Page",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -291875,7 +291851,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -291894,10 +291870,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002175"
@@ -292160,8 +292133,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "hall, [i",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -292185,7 +292158,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -292204,10 +292177,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002191"
@@ -292904,8 +292874,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "notice_of_substitute_trustee_sale against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "3/12/2015 PEDRO SENDEJO AND YAMARA SENDEJO, HUSBAND",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 65,
       "display_tier": "Strong",
       "display_patterns": [
@@ -292929,7 +292899,7 @@
         }
       ],
       "display_title_complexity_tier": "None",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -292948,10 +292918,7 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-21",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/foreclosure_notices/202600002218"
