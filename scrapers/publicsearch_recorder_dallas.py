@@ -436,14 +436,23 @@ def _run_search(page, date_from: datetime, date_to: datetime, verbose: bool) -> 
     return "Error"
 
 
-def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) -> "str | None":
+def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) -> "tuple[str | None, str | None]":
     """Click into row_index's detail view, capture + OCR its page-1 document
     image, navigate back. Mirrors publicsearch_foreclosures_dallas.py's
     function of the same name (see that module for the network-capture/
-    authenticated-fetch reasoning) -- returns raw OCR text or None."""
+    authenticated-fetch reasoning) -- returns (document_body_text,
+    detail_url); either may be None.
+
+    detail_url (added 2026-08-30): a real, permanent, publicly-loadable URL
+    (confirmed live: a plain unauthenticated GET returns 200) -- every
+    wrapped record's source_url was previously a fake "about:blank/..."
+    placeholder, meaning the dashboard's "source" link did nothing for
+    clerk_recordings leads. See the FC adapter's version of this function
+    for the fuller explanation (same portal, same fix).
+    """
     trs = page.query_selector_all("table tbody tr")
     if row_index >= len(trs):
-        return None
+        return None, None
 
     captured: dict = {}
 
@@ -461,6 +470,8 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
     finally:
         page.remove_listener("response", _on_response)
 
+    detail_url = page.url if "/doc/" in page.url else None
+
     text = None
     if "url" in captured:
         try:
@@ -475,7 +486,7 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
 
     page.go_back()
     page.wait_for_timeout(1_500)
-    return text
+    return text, detail_url
 
 
 def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose: bool = False) -> list[dict]:
@@ -519,11 +530,12 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
             "legal_description": legal_description or None,
             "document_body_text": None,
             "situs_address_ocr_hint": None,
+            "detail_url": None,
         }
 
         if do_ocr and (doc_type or "").strip().upper() in DISTRESS_DOC_TYPES:
             expected_count = len(trs)
-            row["document_body_text"] = _fetch_and_ocr_row_document(page, context, tr_index, verbose)
+            row["document_body_text"], row["detail_url"] = _fetch_and_ocr_row_document(page, context, tr_index, verbose)
             row["situs_address_ocr_hint"] = _extract_address_near_name(
                 row["document_body_text"] or "", _debtor_name_for_row(row)
             )
@@ -653,7 +665,11 @@ def _to_wrapped_records(scraped_rows: list[dict]) -> list[dict]:
         out.append({
             "raw_record_id": _raw_record_id(doc_number),
             "source_id": SOURCE_ID,
-            "source_url": f"about:blank/{SOURCE_ID}/{doc_number}",
+            # Real, permanent, publicly-loadable when OCR ran for this row
+            # (distress doc types only — see _fetch_and_ocr_row_document's
+            # detail_url note); falls back to the old placeholder for
+            # ordinary (non-distress) rows OCR never clicks into.
+            "source_url": row.get("detail_url") or f"about:blank/{SOURCE_ID}/{doc_number}",
             "source_fetched_at": now,
             "parser_confidence": 100,
             "raw_payload": raw_payload,

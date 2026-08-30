@@ -371,11 +371,12 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
             "property_city": property_city or None,
             "document_body_text": None,
             "debtor_name_ocr_hint": None,
+            "detail_url": None,
         }
 
         if do_ocr:
             expected_count = len(trs)
-            row["document_body_text"], row["debtor_name_ocr_hint"] = _fetch_and_ocr_row_document(
+            row["document_body_text"], row["debtor_name_ocr_hint"], row["detail_url"] = _fetch_and_ocr_row_document(
                 page, context, tr_index, verbose
             )
             if verbose:
@@ -510,19 +511,30 @@ def _ocr_watermark_cleaned_hint(image_bytes: bytes, verbose: bool = False) -> st
         return None
 
 
-def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) -> tuple[str | None, str | None]:
+def _fetch_and_ocr_row_document(
+    page, context, row_index: int, verbose: bool
+) -> tuple[str | None, str | None, str | None]:
     """Click into row_index's detail view, capture + OCR its page-1 document
     image, then navigate back to the results table. Returns
-    (document_body_text, debtor_name_ocr_hint) — either or both may be None
-    on failure (no image found in time, fetch error, OCR error); callers
-    treat a None document_body_text identically to "this source has no
-    document body", the pre-existing behavior. debtor_name_ocr_hint is purely
-    a best-effort human-review aid (see _ocr_watermark_cleaned_hint) and is
-    never used for extraction.
+    (document_body_text, debtor_name_ocr_hint, detail_url) — any may be None
+    on failure; callers treat a None document_body_text identically to "this
+    source has no document body", the pre-existing behavior.
+    debtor_name_ocr_hint is purely a best-effort human-review aid (see
+    _ocr_watermark_cleaned_hint) and is never used for extraction.
+
+    detail_url (added 2026-08-30): the click navigates to a real, permanent,
+    publicly-loadable URL (https://dallas.tx.publicsearch.us/doc/<internal
+    id> -- confirmed live: a plain unauthenticated GET returns 200 with the
+    actual document viewer). Every wrapped record's source_url was
+    previously a fake "about:blank/..." placeholder because there's no way
+    to construct this URL without actually clicking through the search UI
+    (the internal id is unrelated to the public doc_number) -- meaning the
+    dashboard's "source" link did nothing at all for these leads. Captured
+    here since this is the only place that ever navigates there.
     """
     trs = page.query_selector_all("table tbody tr")
     if row_index >= len(trs):
-        return None, None
+        return None, None, None
 
     captured: dict = {}
 
@@ -539,6 +551,8 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
             waited += 500
     finally:
         page.remove_listener("response", _on_response)
+
+    detail_url = page.url if "/doc/" in page.url else None
 
     text = None
     hint = None
@@ -557,7 +571,7 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
 
     page.go_back()
     page.wait_for_timeout(1_500)
-    return text, hint
+    return text, hint, detail_url
 
 
 def _scrape_window(
@@ -636,7 +650,11 @@ def _to_wrapped_records(scraped_rows: list[dict]) -> list[dict]:
         out.append({
             "raw_record_id": _raw_record_id(doc_number),
             "source_id": SOURCE_ID,
-            "source_url": f"about:blank/{SOURCE_ID}/{doc_number}",
+            # Real, permanent, publicly-loadable when OCR ran (see
+            # _fetch_and_ocr_row_document's detail_url note) — falls back to
+            # the old placeholder only when OCR didn't run for this row
+            # (--no-document-body, Tesseract missing, or capture failure).
+            "source_url": row.get("detail_url") or f"about:blank/{SOURCE_ID}/{doc_number}",
             "source_fetched_at": now,
             "parser_confidence": 100,
             "raw_payload": raw_payload,
