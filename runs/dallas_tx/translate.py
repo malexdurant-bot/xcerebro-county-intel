@@ -230,11 +230,32 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
             if p:
                 parties.append(p)
 
-        document_body_text = None
-        if canonical == "affidavit_of_heirship":
+        # document_body_text: prefer the scraper's real OCR text (added
+        # 2026-08-30, only present on distress-type rows the scraper OCR'd —
+        # see publicsearch_recorder_dallas.py's DISTRESS_DOC_TYPES) over the
+        # synthesized DECEDENT-only fallback, which stays as a safety net
+        # for affidavit_of_heirship records scraped before that rollout /
+        # whose OCR capture failed.
+        document_body_text = payload.get("document_body_text")
+        if not document_body_text and canonical == "affidavit_of_heirship":
             decedent = _clean_decedent_name(payload.get("grantee_name"))
             if decedent:
                 document_body_text = f"DECEDENT: {decedent}"
+
+        # situs_address_ocr_hint (2026-08-30): a best-effort address pulled
+        # from the recorded document's own text, anchored on the already-
+        # resolved debtor name (see publicsearch_recorder_dallas.py's
+        # _extract_address_near_name) -- independent of whether that party
+        # currently owns property in Dallas County, unlike the DCAD-lookup
+        # enrichment path. Re-validated here (not just trusted from the
+        # scraper) the same way every other OCR-sourced field in this
+        # county's pipeline is: must start with a plausible house number.
+        ocr_address_hint = payload.get("situs_address_ocr_hint")
+        situs_address = (
+            ocr_address_hint
+            if ocr_address_hint and re.match(r"^\d", ocr_address_hint.strip())
+            else None
+        )
 
         events.append({
             "raw_event_id": rec["raw_record_id"],
@@ -250,7 +271,7 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
             "document_body_text": document_body_text,
             "property_refs": {
                 "parcel_id": None,
-                "situs_address": None,  # RP index exposes city only, not street address
+                "situs_address": situs_address,  # RP index itself exposes city only; see hint above
                 "legal_description": payload.get("legal_description") or None,
                 "case_number": None,
             },

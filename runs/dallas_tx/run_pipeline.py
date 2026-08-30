@@ -360,7 +360,11 @@ def main() -> None:
         print(f"[dallas_tx] DCAD address/owner enrichment: {len(foreclosure_events)} foreclosure_notices "
               f"+ {len(clerk_events)} clerk_recordings leads to try...", flush=True)
         _enrich_events_needing_parcel(foreclosure_events, try_address=True)
-        _enrich_events_needing_parcel(clerk_events, try_address=False)
+        # try_address=True here too as of 2026-08-30: clerk_recordings can
+        # now carry a real situs_address from OCR (see translate.py /
+        # publicsearch_recorder_dallas.py's document-level address
+        # extraction) where it never could before.
+        _enrich_events_needing_parcel(clerk_events, try_address=True)
         print(f"[dallas_tx]   {addr_owner_hits}/{addr_owner_attempted} address/owner lookups matched "
               f"a single confident DCAD account", flush=True)
         print(f"[dallas_tx]   {name_fallback_hits} of those also injected a DCAD owner-of-record name "
@@ -369,6 +373,30 @@ def main() -> None:
         addr_owner_cache_path.write_text(
             json.dumps(addr_owner_cache, indent=2, ensure_ascii=False), encoding="utf-8"
         )
+
+    # instrument_number -> validated OCR/scraped situs_address, built from
+    # every foreclosure_notices/clerk_recordings event that has one *before*
+    # the staged pipeline runs (2026-08-30). Needed because a lead whose
+    # parcel never got a real DCAD account match becomes an "unresolved"
+    # lead (aggregator.py's F-3 fallback) with primary_parcel_id: None --
+    # and parcel_display, the dashboard's only address channel, is only
+    # ever populated by primary_parcel_id -> dcad_lookup. Without this, an
+    # address we're confident in (translate.py already re-validates it
+    # independently of the scraper) would be computed and then silently
+    # dropped for every property DCAD can't confirm -- e.g. genuinely
+    # out-of-county addresses like the Tarrant County one that motivated
+    # building this in the first place. See the Step 3b fallback below for
+    # where this gets used; it is NOT run through DCAD, so it's a real
+    # address from the recorded document itself, not a verified parcel
+    # match -- a meaningfully different confidence level than the
+    # DCAD-backed dcad_lookup entries, even though the schema has no field
+    # to mark that distinction on the final record.
+    ocr_address_by_instrument: dict[str, str] = {}
+    for ev in foreclosure_events + clerk_events:
+        addr = (ev.get("property_refs") or {}).get("situs_address")
+        instrument = ev.get("instrument_number")
+        if addr and instrument:
+            ocr_address_by_instrument[str(instrument)] = addr
 
     raw_events: list[dict] = (
         clerk_events + foreclosure_events + tax_collector_events
@@ -446,6 +474,42 @@ def main() -> None:
             lead["enrichment_status"] = "ENRICHED"
             enriched_count += 1
     print(f"[dallas_tx] DCAD-enriched {enriched_count}/{len(scored_leads)} leads with a real address", flush=True)
+
+    # ------------------------------------------------------------------
+    # Step 3c — Fallback: attach a document-sourced address (no DCAD match)
+    # to "unresolved" leads (2026-08-30). A lead whose parcel never matched
+    # a DCAD account gets primary_parcel_id: None (aggregator.py's F-3
+    # fallback, lead_id = "lead_unresolved_<instrument_number>") and so
+    # never enters the Step 3b loop above at all -- even when we're
+    # confident in an address for it (translate.py already re-validated
+    # it), it would otherwise vanish from the dashboard entirely. This is
+    # exactly the case that motivated building document-level OCR in the
+    # first place: e.g. a judgment debtor's address recorded in Tarrant
+    # County, which Dallas-only DCAD can never confirm no matter how the
+    # lookup is phrased. NOT DCAD-verified -- a real address from the
+    # recorded document itself, but not cross-checked against current
+    # county property records the way the Step 3b matches are.
+    # ------------------------------------------------------------------
+    ocr_enriched_count = 0
+    for lead in scored_leads:
+        if lead.get("primary_parcel_id") or lead.get("parcel_display"):
+            continue  # already handled above, or has a real parcel match
+        lead_id = lead.get("lead_id") or ""
+        if not lead_id.startswith("lead_unresolved_"):
+            continue
+        instrument = lead_id[len("lead_unresolved_"):]
+        addr = ocr_address_by_instrument.get(instrument)
+        if addr:
+            lead["parcel_display"] = {
+                "situs_address": addr,
+                "situs_city": None,
+                "situs_state": "TX",
+                "assessed_value": None,
+            }
+            lead["enrichment_status"] = "ENRICHED"
+            ocr_enriched_count += 1
+    print(f"[dallas_tx] Document-OCR-enriched {ocr_enriched_count}/{len(scored_leads)} additional "
+          f"leads with an address DCAD couldn't confirm", flush=True)
 
     # ------------------------------------------------------------------
     # Step 4 — Dashboard payload (LOCAL ONLY — see note below)

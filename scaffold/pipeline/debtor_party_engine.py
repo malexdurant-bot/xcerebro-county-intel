@@ -655,7 +655,17 @@ _FILER_SUPPRESSION_PATTERNS: dict[str, list[tuple[str, re.Pattern]]] = {
     "law_enforcement": [
         ("SHERIFF", _ci(r"\bSHERIFF\b")),
         ("CONSTABLE", _ci(r"\bCONSTABLE\b")),
-        ("MARSHAL", _ci(r"\bMARSHALL?\b")),
+        # A bare \bMARSHALL?\b (added pre-2026-08-30) false-positived on
+        # "MARSHALL" as an ordinary surname -- confirmed live: DCAD-matched
+        # owner "MARSHALL LATOYA &" (a person, "Latoya Marshall") got
+        # wrongly suppressed as a law-enforcement filer, silently dropping
+        # an otherwise-good name+address match. "Marshall" is a common
+        # surname (and place name); the law-enforcement TITLE only reads as
+        # such with a qualifying word attached, so require one.
+        ("MARSHAL", _ci(
+            r"\b(?:U\.?S\.?|UNITED\s+STATES|CITY|COUNTY|DEPUTY)\s+MARSHALL?S?\b"
+            r"|\bMARSHALL?S?\s+SERVICE\b"
+        )),
     ],
     "surplus_recovery": [
         ("SURPLUS RECOVERY", _ci(r"\bSURPLUS\s+RECOVERY\b")),
