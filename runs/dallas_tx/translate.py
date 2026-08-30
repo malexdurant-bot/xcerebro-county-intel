@@ -471,7 +471,15 @@ def translate_taxsales_lgbs(
         dcad_match = dcad_lookup.get(account_nbr) if account_nbr else None
         parties = []
         if dcad_match and dcad_match.get("owner_name"):
-            p = _party(dcad_match["owner_name"], "TP")
+            # tax_deed's §17 rule expects TP (taxpayer); sheriff_sale's
+            # expects DF (defendant) with NO fallback at all -- tagging both
+            # canonicals "TP" (fixed 2026-08-30) meant every one of 476
+            # sheriff_sales leads silently ignored a DCAD-matched owner name
+            # and routed to REVIEW_REQUIRED "expected_debtor_name_type DF
+            # missing" regardless of match rate, confirmed live: 0/476
+            # resolved before this fix, 100% hitting that exact reason.
+            debtor_type = "TP" if canonical == "tax_deed" else "DF"
+            p = _party(dcad_match["owner_name"], debtor_type)
             if p:
                 parties.append(p)
 
