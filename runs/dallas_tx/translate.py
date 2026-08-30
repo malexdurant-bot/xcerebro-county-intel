@@ -230,17 +230,22 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
             if p:
                 parties.append(p)
 
-        # document_body_text: prefer the scraper's real OCR text (added
-        # 2026-08-30, only present on distress-type rows the scraper OCR'd —
-        # see publicsearch_recorder_dallas.py's DISTRESS_DOC_TYPES) over the
-        # synthesized DECEDENT-only fallback, which stays as a safety net
-        # for affidavit_of_heirship records scraped before that rollout /
-        # whose OCR capture failed.
-        document_body_text = payload.get("document_body_text")
-        if not document_body_text and canonical == "affidavit_of_heirship":
+        # document_body_text: for affidavit_of_heirship, always use the
+        # synthesized DECEDENT-only text built from the index's grantee_name
+        # field, never the scraper's real OCR text. grantee_name is clean,
+        # structured data -- 100% reliable -- while real OCR text on these
+        # documents is noisy and caused the shared engine's ESTATE OF/HEIRS
+        # OF matcher to pull garbage fragments ("PAGE 1", "Son",
+        # "Granddaughter") or fail to match at all (found 2026-08-30 while
+        # diagnosing low estate-contact match rates). For every other
+        # canonical doc type, real OCR text (when the scraper captured it --
+        # see publicsearch_recorder_dallas.py's DISTRESS_DOC_TYPES) is used
+        # as before.
+        if canonical == "affidavit_of_heirship":
             decedent = _clean_decedent_name(payload.get("grantee_name"))
-            if decedent:
-                document_body_text = f"DECEDENT: {decedent}"
+            document_body_text = f"DECEDENT: {decedent}" if decedent else None
+        else:
+            document_body_text = payload.get("document_body_text")
 
         # situs_address_ocr_hint (2026-08-30): a best-effort address pulled
         # from the recorded document's own text, anchored on the already-

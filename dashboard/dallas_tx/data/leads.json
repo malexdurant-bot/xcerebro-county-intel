@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-30T18:55:39Z",
+  "generated_at": "2026-08-30T22:46:43Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Dallas",
   "state": "TX",
   "semantic_verdict": "NEEDS_OPERATOR_REVIEW",
-  "lead_total": 5624,
+  "lead_total": 5623,
   "enrichment_breakdown": {
-    "ENRICHED": 4529,
-    "UNENRICHED": 1095
+    "ENRICHED": 4530,
+    "UNENRICHED": 1093
   },
   "pattern_counts": {
     "estate": 42,
@@ -19,20 +19,20 @@
   },
   "attribute_counts": {},
   "stack_depth_distribution": {
-    "1": 5219,
-    "2": 404,
+    "1": 5217,
+    "2": 405,
     "3": 1
   },
   "score_tier_distribution": {
     "Archive": 11,
     "Hot": 1,
     "Low": 75,
-    "Strong": 485,
-    "Workable": 5052
+    "Strong": 486,
+    "Workable": 5050
   },
   "deal_path_distribution": {
     "messy_title": 12,
-    "wholesale": 5624
+    "wholesale": 5623
   },
   "records": [
     {
@@ -8596,24 +8596,27 @@
     },
     {
       "lead_id": "lead_parcel_00000172870000000",
-      "scored_lead_id": "scored_75f9e5bf9d80d2a8",
+      "scored_lead_id": "scored_71b5679e72ac4318",
       "primary_parcel_id": "00000172870000000",
       "display_address": "3900 WALDRON AVE, DALLAS, TX",
       "display_address_street": "3900 WALDRON AVE",
       "display_address_city": "DALLAS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "COOPER MARY ELLA ESTATE",
-      "display_owner_type": "ESTATE",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_owner": "COOPER MARY ELLA",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "estate",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "estate",
         "tax"
       ],
       "display_pattern_set": [
+        "estate",
         "tax"
       ],
       "display_attributes": [],
@@ -8624,30 +8627,42 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
-      "display_title_complexity_tier": "None",
+      "display_title_complexity_tier": "Light curative",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 109270.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
           "delta": 55
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": null,
+      "primary_event_date": "2026-08-18",
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://dallas.tx.publicsearch.us/doc/329720705",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "STEELE ROBERT"
+      }
     },
     {
       "lead_id": "lead_parcel_00000172894000000",
@@ -70858,6 +70873,68 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_00000516580000000",
+      "scored_lead_id": "scored_e48d11a2ca74e24a",
+      "primary_parcel_id": "00000516580000000",
+      "display_address": "5307 EVERGLADE RD, DALLAS, TX",
+      "display_address_street": "5307 EVERGLADE RD",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "DAVIS KATHRYN LUCILLE",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "Light curative",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 324450.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-08-20",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://dallas.tx.publicsearch.us/doc/330357160"
+      ],
+      "contact_info": {
+        "executor_name": "DAVIS JEFFREY SCOTT"
+      }
+    },
+    {
       "lead_id": "lead_parcel_00000517438000000",
       "scored_lead_id": "scored_88e0f3a2c6a57998",
       "primary_parcel_id": "00000517438000000",
@@ -118470,6 +118547,64 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_00000789454000000",
+      "scored_lead_id": "scored_4d38c1b60eba9cbf",
+      "primary_parcel_id": "00000789454000000",
+      "display_address": "10316 VISTADALE DR, DALLAS, TX",
+      "display_address_street": "10316 VISTADALE DR",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "THORSON GLORIA MELBY",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "Light curative",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2020-03-19",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://dallas.tx.publicsearch.us/doc/67266028"
+      ],
+      "contact_info": {
+        "executor_name": "MENDIVE LAWRENCE"
+      }
+    },
+    {
       "lead_id": "lead_parcel_00000789478000000",
       "scored_lead_id": "scored_418c54a8b421a33c",
       "primary_parcel_id": "00000789478000000",
@@ -131178,6 +131313,68 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_006882000A0040000",
+      "scored_lead_id": "scored_dc019a20e5b1ba0d",
+      "primary_parcel_id": "006882000A0040000",
+      "display_address": "3440 SIMPSON STUART RD, DALLAS, TX",
+      "display_address_street": "3440 SIMPSON STUART RD",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "SMITH TRACY",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "Light curative",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 27000000.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-08-17",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://dallas.tx.publicsearch.us/doc/329713736"
+      ],
+      "contact_info": {
+        "executor_name": "SMITH AMIRI"
+      }
+    },
+    {
       "lead_id": "lead_parcel_00688900060030000",
       "scored_lead_id": "scored_2bd865fe89763ab8",
       "primary_parcel_id": "00688900060030000",
@@ -131239,6 +131436,64 @@
         "https://taxsales.lgbs.com/api/property_sales/?uid=1010841100",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
+    },
+    {
+      "lead_id": "lead_parcel_006896000B0010000",
+      "scored_lead_id": "scored_a2b4a54c94bf6ce2",
+      "primary_parcel_id": "006896000B0010000",
+      "display_address": "6712 PATROL WAY, DALLAS, TX",
+      "display_address_street": "6712 PATROL WAY",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "MATTHEWS DEBORAH JONES",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "Light curative",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 10062500.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2020-03-09",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "about:blank/clerk_recordings/202000067678"
+      ],
+      "contact_info": {
+        "executor_name": "CASON ALLAN"
+      }
     },
     {
       "lead_id": "lead_parcel_0069500001178H000",
@@ -136165,6 +136420,68 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_12012500010070000",
+      "scored_lead_id": "scored_9c0aa0cf6c38a719",
+      "primary_parcel_id": "12012500010070000",
+      "display_address": "1523 COLLINSON ST, BALCH SPRINGS, TX",
+      "display_address_street": "1523 COLLINSON ST",
+      "display_address_city": "BALCH SPRINGS",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "CERVANTES JUAN ARTURO",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "Light curative",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 145080.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-08-20",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://dallas.tx.publicsearch.us/doc/330354844"
+      ],
+      "contact_info": {
+        "executor_name": "CERVANTES CLAUDIA LIZBETH"
+      }
+    },
+    {
       "lead_id": "lead_parcel_12013500040030000",
       "scored_lead_id": "scored_1d78727d7824fbdb",
       "primary_parcel_id": "12013500040030000",
@@ -137611,7 +137928,7 @@
       "display_address_city": "BALCH SPRINGS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "JOSE GABRIEL GARCIA",
+      "display_owner": "GARCIA JOSE GABRIEL",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
@@ -137659,7 +137976,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/330349835"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "DEL CARMEN RICO MARIA"
+      }
     },
     {
       "lead_id": "lead_parcel_12069500010280000",
@@ -143523,8 +143843,8 @@
       "display_address_city": "DESOTO",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "Estate of Steven Bernard Richardson",
-      "display_owner_type": "ESTATE",
+      "display_owner": "RICHARDSON STEVEN BERNARD",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -143571,7 +143891,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/329727134"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "WILLIAMS PAMELA"
+      }
     },
     {
       "lead_id": "lead_parcel_20017580100190000",
@@ -146991,6 +147314,68 @@
       "primary_source_urls": [
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.749506.zip"
       ]
+    },
+    {
+      "lead_id": "lead_parcel_22048500090360000",
+      "scored_lead_id": "scored_9b8d1197696f87e5",
+      "primary_parcel_id": "22048500090360000",
+      "display_address": "610 LAZY RIVER DR, DUNCANVILLE, TX",
+      "display_address_street": "610 LAZY RIVER DR",
+      "display_address_city": "DUNCANVILLE",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "GOVAN MOSES",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "Light curative",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 243620.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
+          "delta": 55
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-08-19",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://dallas.tx.publicsearch.us/doc/330328368"
+      ],
+      "contact_info": {
+        "executor_name": "ELLISON MILDRED"
+      }
     },
     {
       "lead_id": "lead_parcel_22051000510190000",
@@ -153930,8 +154315,8 @@
       "display_address_city": "GARLAND",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "HEIRS OF MARIA DE JESUS HERNANDEZ",
-      "display_owner_type": "ESTATE",
+      "display_owner": "DE JESUS HERNANDEZ MARIA",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -153978,7 +154363,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/329700121"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "HERNANDEZ ROSA ALBA"
+      }
     },
     {
       "lead_id": "lead_parcel_26404520070180000",
@@ -161043,7 +161431,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600178249"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "ROE JENNIFER"
+      }
     },
     {
       "lead_id": "lead_parcel_28111500020260000",
@@ -189651,6 +190042,64 @@
       ]
     },
     {
+      "lead_id": "lead_parcel_38238770530260000",
+      "scored_lead_id": "scored_e7439f959a978702",
+      "primary_parcel_id": "38238770530260000",
+      "display_address": "706 ROUNDTREE DR, MESQUITE, TX",
+      "display_address_street": "706 ROUNDTREE DR",
+      "display_address_city": "MESQUITE",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "RODRIGUEZ JOSE LUIS",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "Light curative",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 263880.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2020-03-16",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://dallas.tx.publicsearch.us/doc/67268788"
+      ],
+      "contact_info": {
+        "executor_name": "GUTIERREZ CINTHYA"
+      }
+    },
+    {
       "lead_id": "lead_parcel_382388300A0130000",
       "scored_lead_id": "scored_6ed945cfb3ca9c2d",
       "primary_parcel_id": "382388300A0130000",
@@ -191554,7 +192003,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600178867"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "ROLLINS LISA MICHELLE"
+      }
     },
     {
       "lead_id": "lead_parcel_440070000A0010000",
@@ -297932,8 +298384,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "estate of Decedent was not of",
-      "display_owner_type": "ESTATE",
+      "display_owner": "HURD NELLIE JEAN",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -297976,7 +298428,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000060415"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "BRIGHT DON"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000061728",
@@ -298152,8 +298607,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "estate of Jeanne F. Lyle",
-      "display_owner_type": "ESTATE",
+      "display_owner": "LYLE JEANNE FRIOU",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298196,7 +298651,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000066272"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "COOK ROBERT L"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000067375",
@@ -298254,64 +298712,6 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_202000067678",
-      "scored_lead_id": "scored_726781b0252a9afa",
-      "primary_parcel_id": null,
-      "display_address": "6712 Patrol Way, Apt. 3208, Dallas, Texas 75241, TX",
-      "display_address_street": "6712 Patrol Way, Apt. 3208, Dallas, Texas 75241",
-      "display_address_city": null,
-      "display_address_state": "TX",
-      "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2020-03-09",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "about:blank/clerk_recordings/202000067678"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_202000068007",
       "scored_lead_id": "scored_48182a72207a9d7a",
       "primary_parcel_id": null,
@@ -298320,8 +298720,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "KAMINSKI SHARON KAY ROGERS",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298345,7 +298745,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -298360,14 +298760,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-09",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000068007"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "AYERS DAVID"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000068283",
@@ -298441,8 +298841,8 @@
       "display_address_city": null,
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "NORRIS MARY ALICE",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298466,7 +298866,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -298481,14 +298881,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-10",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/67274811"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "MESSICK KEVIN"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000069482",
@@ -298664,8 +299064,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "LARA FELICIANO",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298689,7 +299089,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -298704,14 +299104,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-12",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000071939"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "DE LARA MARIA VILLARREAL"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000073523",
@@ -298722,8 +299122,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "MARTINEZ MARIA GUADALUPE",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298747,7 +299147,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -298762,14 +299162,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-13",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000073523"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "GUZMAN MIGUEL ANGEL"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000074039",
@@ -298780,8 +299180,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "WILLIAMS WILMER",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298805,7 +299205,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -298820,72 +299220,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-16",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000074039"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_202000074542",
-      "scored_lead_id": "scored_514ea7e6d8230cf3",
-      "primary_parcel_id": null,
-      "display_address": "706 Roundtree Drive, Mesquite, Texas 75150, TX",
-      "display_address_street": "706 Roundtree Drive, Mesquite, Texas 75150",
-      "display_address_city": null,
-      "display_address_state": "TX",
-      "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
       ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2020-03-16",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://dallas.tx.publicsearch.us/doc/67268788"
-      ]
+      "contact_info": {
+        "executor_name": "EVANS LEAH"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000075615",
@@ -298896,8 +299238,8 @@
       "display_address_city": null,
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "Estate of Feltus Jackson",
-      "display_owner_type": "ESTATE",
+      "display_owner": "JACKSON FELTUS",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298940,7 +299282,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000075615"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "GARDNER ARNEY C"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000076053",
@@ -298951,8 +299296,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "WILLIAMS RANDY",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -298976,7 +299321,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -298991,72 +299336,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-17",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000076053"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_202000078585",
-      "scored_lead_id": "scored_434f0d2a743c8646",
-      "primary_parcel_id": null,
-      "display_address": "10316 Vistadale Drive, TX",
-      "display_address_street": "10316 Vistadale Drive",
-      "display_address_city": null,
-      "display_address_state": "TX",
-      "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
       ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2020-03-19",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://dallas.tx.publicsearch.us/doc/67266028"
-      ]
+      "contact_info": {
+        "executor_name": "JACKSON JACKIE L"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000078768",
@@ -299067,8 +299354,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "MEASLES DANNA",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -299092,7 +299379,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -299107,14 +299394,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-19",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000078768"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "MATTHEWS MARY"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000078925",
@@ -299125,7 +299412,7 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "PAGE 1",
+      "display_owner": "DIXON WILLIAM HENRY",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
@@ -299169,7 +299456,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000078925"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "HENNESSEY DAVID J"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000081363",
@@ -299180,8 +299470,8 @@
       "display_address_city": null,
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "EAST JUDITH",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
@@ -299205,7 +299495,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -299220,14 +299510,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2020-03-23",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000081363"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "EVERBLUE HEATHER"
+      }
     },
     {
       "lead_id": "lead_unresolved_202000083122",
@@ -299238,7 +299528,7 @@
       "display_address_city": null,
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "Frise",
+      "display_owner": "GARCIA JUAN ANTONIO",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
       "display_tier": "Workable",
@@ -299282,7 +299572,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202000083122"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "VIERA JESSICA S"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600002145",
@@ -301238,8 +301531,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "HENDERSON JOSEPH EDWIN",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -301263,7 +301556,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -301282,14 +301575,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-17",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/329705693"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "MEDINA DEANNA MARITA"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600177242",
@@ -301646,127 +301939,6 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_202600177695",
-      "scored_lead_id": "scored_ab58002c358e2478",
-      "primary_parcel_id": null,
-      "display_address": "3440 Simpson Stuart Road, Apartment 7206, Dallas, TX",
-      "display_address_street": "3440 Simpson Stuart Road, Apartment 7206, Dallas",
-      "display_address_city": null,
-      "display_address_state": "TX",
-      "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
-      "display_score": 60,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2026-08-17",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://dallas.tx.publicsearch.us/doc/329713736"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_202600178012",
-      "scored_lead_id": "scored_106db40acd94229a",
-      "primary_parcel_id": null,
-      "display_address": "1 South Buckner Boulevard, Dallas, Texas 75227. 1 am the son of, TX",
-      "display_address_street": "1 South Buckner Boulevard, Dallas, Texas 75227. 1 am the son of",
-      "display_address_city": null,
-      "display_address_state": "TX",
-      "display_address_zip": null,
-      "display_owner": "Mary Ella Cooper",
-      "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2026-08-18",
-      "review_flags": [],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://dallas.tx.publicsearch.us/doc/329720705"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_202600178056",
       "scored_lead_id": "scored_189ae2c9d529afc1",
       "primary_parcel_id": null,
@@ -301823,7 +301995,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600178056"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "GOODVIN TIBERH"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600178162",
@@ -301834,8 +302009,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "LOPEZ JAVIER RUBIO",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -301859,7 +302034,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -301878,14 +302053,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-18",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/329722744"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "PALOS HUMBERTO"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600178253",
@@ -302958,8 +303133,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "ROCHAS MA PETRA SALAS",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -302983,7 +303158,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -303002,14 +303177,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-18",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/329733767"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "SIERRA YOLANDA"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600178896",
@@ -303068,7 +303243,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600178896"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "HOMAN KATHERINE VICTORIA"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179048",
@@ -303079,7 +303257,7 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "Son",
+      "display_owner": "MELKA DENISE MARY",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
@@ -303127,7 +303305,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/330327808"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "MELKA DENISE ZDENEK"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179049",
@@ -303186,7 +303367,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600179049"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "MELKA DENNIS ZDENEK"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179136",
@@ -303245,7 +303429,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600179136"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "ELLISON MILDRED"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179137",
@@ -303256,7 +303443,7 @@
       "display_address_city": null,
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "McBeth Anderson Johnson",
+      "display_owner": "JOHNSON MCBETH ANDERSON",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
@@ -303304,66 +303491,10 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/330328376"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_202600179138",
-      "scored_lead_id": "scored_eaee159a00132c30",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
-      "display_address_zip": null,
-      "display_owner": "Moses Govan",
-      "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
       ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2026-08-19",
-      "review_flags": [],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://dallas.tx.publicsearch.us/doc/330328368"
-      ]
+      "contact_info": {
+        "executor_name": "ELLISON MILDRED"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179187",
@@ -303540,7 +303671,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600179256"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "HUNTER EVETTE BRADLEY"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179322",
@@ -304141,8 +304275,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "NGUYEN HUNG PHI",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -304166,7 +304300,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -304185,14 +304319,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-19",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/330334383"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "NGUYEN THAO"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179642",
@@ -304664,7 +304798,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600179746"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "MORRISON JEROLYN"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179750",
@@ -304675,7 +304812,7 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "Granddaughter",
+      "display_owner": "RICHARD MARY BERNEASE",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
@@ -304723,7 +304860,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/330337897"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "SPEIR VICKI"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600179818",
@@ -306552,7 +306692,10 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "about:blank/clerk_recordings/202600180092"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "ROSALES CECILIA ANGEL"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600180136",
@@ -306740,8 +306883,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "DAVIS LOIS L",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -306765,7 +306908,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -306784,14 +306927,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/330347691"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "JACOBS ROBERT N"
+      }
     },
     {
       "lead_id": "lead_unresolved_202600180714",
@@ -307384,130 +307527,6 @@
       ]
     },
     {
-      "lead_id": "lead_unresolved_202600181107",
-      "scored_lead_id": "scored_65679fb32e58cb41",
-      "primary_parcel_id": null,
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
-      "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
-      "display_score": 60,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
-      "enrichment_status": "UNENRICHED",
-      "primary_source_urls": [
-        "https://dallas.tx.publicsearch.us/doc/330354844"
-      ]
-    },
-    {
-      "lead_id": "lead_unresolved_202600181201",
-      "scored_lead_id": "scored_c2ce56f4d9d85554",
-      "primary_parcel_id": null,
-      "display_address": "7840 County Road 153, Kaufman, TX 75142, TX",
-      "display_address_street": "7840 County Road 153, Kaufman, TX 75142",
-      "display_address_city": null,
-      "display_address_state": "TX",
-      "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
-      "display_score": 60,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_AFFIDAVIT_OF_HEIRSHIP",
-          "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://dallas.tx.publicsearch.us/doc/330357160"
-      ]
-    },
-    {
       "lead_id": "lead_unresolved_202600181206",
       "scored_lead_id": "scored_fbf6ba51882a41eb",
       "primary_parcel_id": null,
@@ -307516,8 +307535,8 @@
       "display_address_city": null,
       "display_address_state": null,
       "display_address_zip": null,
-      "display_owner": "affidavit_of_heirship against unidentified party",
-      "display_owner_type": "UNKNOWN",
+      "display_owner": "CHADWICK ELLA RUTH",
+      "display_owner_type": "INDIVIDUAL",
       "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
@@ -307541,7 +307560,7 @@
         }
       ],
       "display_title_complexity_tier": "Light curative",
-      "display_lead_status": "REVIEW_REQUIRED",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
@@ -307560,14 +307579,14 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-20",
-      "review_flags": [
-        "parcel_resolution_review_required",
-        "matched_lead_review_reason:document_body_debtor_not_extractable"
-      ],
+      "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://dallas.tx.publicsearch.us/doc/330357151"
-      ]
+      ],
+      "contact_info": {
+        "executor_name": "THETFORD SHEILA G"
+      }
     },
     {
       "lead_id": "lead_unresolved_220038000009A0000",

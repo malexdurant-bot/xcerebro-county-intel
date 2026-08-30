@@ -61,6 +61,7 @@ RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 from translate import (  # noqa: E402
     SIGNAL_TYPE_LABELS,
+    _clean_decedent_name,
     stream_translate_tax_collector,
     translate_clerk_recordings,
     translate_foreclosure_notices,
@@ -147,6 +148,28 @@ def main() -> None:
     clerk_raw = _load_jsonl(RAW_DIR / "clerk_recordings.jsonl")
     clerk_events = translate_clerk_recordings(clerk_raw)
     print(f"[dallas_tx]   clerk_recordings: {len(clerk_raw)} raw -> {len(clerk_events)} events", flush=True)
+
+    # estate leads' contact person (2026-08-30): affidavit_of_heirship's
+    # owner_name is the DECEDENT (per the debtor-role fix above) -- correct,
+    # and left untouched here. But a dead person isn't who a client calls to
+    # skip-trace; Kofile's own Grantor field on these filings is reliably a
+    # living relative filing on the decedent's behalf (verified live: same-
+    # surname pairs, e.g. grantor "NGUYEN THAO" / decedent "NGUYEN HUNG PHI
+    # DECD" -- and that field is already scraped, no new work needed). Keyed
+    # by the cleaned decedent name (the exact string that ends up as
+    # display_owner) rather than instrument_number/parcel_id, because a
+    # scored estate lead carries neither of those back to its source row --
+    # this is the only value guaranteed to match between the two computations
+    # (both derive from the same _clean_decedent_name(grantee_name) call).
+    contact_by_decedent_name: dict[str, str] = {}
+    for rec in clerk_raw:
+        payload = rec.get("raw_payload", {}) or {}
+        if (payload.get("doc_type") or "").strip().upper() != "AFFIDAVIT OF HEIRSHIP":
+            continue
+        decedent = _clean_decedent_name(payload.get("grantee_name"))
+        contact = (payload.get("grantor_name") or "").strip()
+        if decedent and contact:
+            contact_by_decedent_name[decedent] = contact
 
     print("[dallas_tx] Loading + translating foreclosure_notices...", flush=True)
     foreclosure_raw = _load_jsonl(RAW_DIR / "foreclosure_notices.jsonl")
@@ -522,6 +545,29 @@ def main() -> None:
         mode="full_rebuild",
         build_label="PARTIAL_BUILD",  # court_civil/court_probate not built — see module docstring
     )
+
+    # ------------------------------------------------------------------
+    # Step 4b — Attach the estate contact person (2026-08-30). Dashboard-
+    # payload-only (never touches scored_leads / owner_name / parcel_display
+    # / any schema-validated stage) -- per operator instruction, this must
+    # change NOTHING else about these leads; the decedent stays owner_name,
+    # the property address stays what it already was. dashboard.js's
+    # renderContact() already reads exactly this contact_info.executor_name
+    # shape (built for a different county's court-probate executor data,
+    # apparently never wired up for Dallas) -- so the table's existing
+    # "Contact" column starts working with zero frontend changes.
+    # ------------------------------------------------------------------
+    contact_attached = 0
+    for rec in payload["records"]:
+        if "estate" not in (rec.get("display_patterns") or []):
+            continue
+        contact = contact_by_decedent_name.get(rec.get("display_owner"))
+        if contact:
+            rec["contact_info"] = {"executor_name": contact}
+            contact_attached += 1
+    print(f"[dallas_tx] Attached a contact person to {contact_attached} estate leads "
+          f"(decedent stays as owner; nothing else changed)", flush=True)
+
     payload_json = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
 
     dash_path = WORKDIR / "data.json"
