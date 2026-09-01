@@ -420,10 +420,22 @@ def make_enrichment_provider() -> "callable[[Optional[str]], Optional[dict]]":
     return _provider
 
 
+_NAME_SUFFIXES = {"JR", "SR", "II", "III", "IV", "V", "ESQ"}
+
+
 def _split_person_name(raw: str) -> Optional[tuple[str, str]]:
-    """Best-effort split of 'FIRST [MIDDLE] LAST' into (first, last)."""
+    """Best-effort split of 'FIRST [MIDDLE] LAST[, SUFFIX]' into (first,
+    last). A trailing generational suffix (Jr/Sr/II/III/IV/V/Esq) is common
+    in probate decedent and lis pendens defendant names (e.g. "Earl James
+    Jackson, III") and must be dropped before taking the last remaining
+    token as the surname -- confirmed live: without this, "Earl James
+    Jackson, III" split as (first="Earl", last="III") and searched the
+    assessor for "III Earl", 0 results, even though the county has an exact
+    "JACKSON EARL JAMES III" owner record."""
     cleaned = re.sub(r"\s+", " ", (raw or "")).strip().rstrip(",.")
-    parts = cleaned.split()
+    parts = [p.rstrip(",.") for p in cleaned.split()]
+    if parts and parts[-1].upper() in _NAME_SUFFIXES:
+        parts = parts[:-1]
     if len(parts) < 2:
         return None
     return parts[0], parts[-1]
