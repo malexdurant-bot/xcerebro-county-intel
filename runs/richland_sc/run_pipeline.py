@@ -38,6 +38,8 @@ import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+import requests
+
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stderr.reconfigure(encoding="utf-8")
@@ -48,10 +50,20 @@ sys.path.insert(0, str(ROOT))
 WORKDIR = ROOT / "pipeline_output" / "richland_sc"
 WORKDIR.mkdir(parents=True, exist_ok=True)
 
-# Client-facing dashboard lives in its own dedicated repo (richlandsc.justfriday.ai),
-# isolated from this repo's other counties' data — see the sibling checkout below.
-# Not fatal if this checkout doesn't exist (e.g. on a machine that never set it up).
-CLIENT_REPO_DIR = ROOT.parent / "richland-sc-leads"
+# Client-facing dashboard (richlandsc.justfriday.ai) is a static, credential-
+# free frontend living in its own dedicated repo (richland-sc-leads),
+# isolated from this repo's other counties' code. It holds no data file —
+# leads are fetched client-side only after the visitor authenticates,
+# straight from the hosted backend this step publishes to below.
+LEADS_BACKEND_URL = os.environ.get("LEADS_BACKEND_URL")
+LEADS_BACKEND_WRITE_KEY = os.environ.get("LEADS_BACKEND_WRITE_KEY")
+
+# Client-agent leads API (runs/richland_sc/api_server.py) — a separate,
+# deliberately minimal read API a client's own automation polls for new
+# leads (distinct from the dashboard backend above). Deployed on its own
+# host (e.g. Render); this repo only pushes to it, never serves it locally.
+RICHLAND_AGENT_API_URL = os.environ.get("RICHLAND_AGENT_API_URL")
+RICHLAND_AGENT_API_INGEST_KEY = os.environ.get("RICHLAND_AGENT_API_INGEST_KEY")
 
 SIGNAL_TYPE_LABELS: dict[str, str] = {
     "notice_of_sale": "Foreclosure Sale",
@@ -375,38 +387,65 @@ def main() -> None:
             print(f"[richland_sc] GitHub Pages publish failed (non-fatal): {stderr[:200]}")
 
     # ------------------------------------------------------------------
-    # Step 5b — Publish to the isolated client-facing repo (richlandsc.justfriday.ai)
+    # Step 5b — Publish to the login-gated client dashboard backend
+    # (richlandsc.justfriday.ai serves a static, credential-free frontend;
+    # the actual lead data is fetched client-side only after the visitor
+    # authenticates, from this hosted table — never committed to a repo).
     # ------------------------------------------------------------------
-    if CLIENT_REPO_DIR.is_dir():
+    if LEADS_BACKEND_URL and LEADS_BACKEND_WRITE_KEY:
         try:
-            client_data_path = CLIENT_REPO_DIR / "data" / "leads.json"
-            client_data_path.parent.mkdir(parents=True, exist_ok=True)
-            client_data_path.write_text(payload_json, encoding="utf-8")
-
-            subprocess.run(
-                ["git", "add", "data/leads.json"],
-                cwd=str(CLIENT_REPO_DIR), check=True, capture_output=True,
+            resp = requests.post(
+                f"{LEADS_BACKEND_URL}/rest/v1/dashboard_payloads",
+                headers={
+                    "apikey": LEADS_BACKEND_WRITE_KEY,
+                    "Authorization": f"Bearer {LEADS_BACKEND_WRITE_KEY}",
+                    "Content-Type": "application/json",
+                    "Prefer": "resolution=merge-duplicates",
+                },
+                json={
+                    "county": "richland_sc",
+                    "payload": json.loads(payload_json),
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                },
+                timeout=30,
             )
-            subprocess.run(
-                ["git", "commit", "-m",
-                 f"data: dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
-                cwd=str(CLIENT_REPO_DIR), check=True, capture_output=True,
-            )
-            subprocess.run(
-                ["git", "push", "origin", "main"],
-                cwd=str(CLIENT_REPO_DIR), check=True, capture_output=True, timeout=60,
-            )
-            print("[richland_sc] Client dashboard updated → https://richlandsc.justfriday.ai/")
-        except subprocess.CalledProcessError as exc:
-            stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
-            if "nothing to commit" in stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):
-                print("[richland_sc] Client dashboard: no changes to publish")
-            else:
-                print(f"[richland_sc] Client dashboard publish failed (non-fatal): {stderr[:200]}")
+            resp.raise_for_status()
+            print("[richland_sc] Client dashboard data updated → https://richlandsc.justfriday.ai/")
+        except requests.RequestException as exc:
+            print(f"[richland_sc] Client dashboard publish failed (non-fatal): {exc}")
     else:
         print(
-            f"[richland_sc] Client dashboard repo not found at {CLIENT_REPO_DIR} — "
-            "skipping (not fatal; only affects this machine)"
+            "[richland_sc] Client dashboard backend not configured "
+            "(LEADS_BACKEND_URL / LEADS_BACKEND_WRITE_KEY not set in .env) — "
+            "skipping client publish"
+        )
+
+    # ------------------------------------------------------------------
+    # Step 5c — Push to the client-agent leads API (runs/richland_sc/
+    # api_server.py, deployed separately e.g. on Render). That process
+    # doesn't share this machine's filesystem, so it can't read data.json
+    # itself — we push it the finished payload after every run instead.
+    # ------------------------------------------------------------------
+    if RICHLAND_AGENT_API_URL and RICHLAND_AGENT_API_INGEST_KEY:
+        try:
+            resp = requests.post(
+                f"{RICHLAND_AGENT_API_URL}/richland/ingest",
+                headers={
+                    "X-Ingest-Key": RICHLAND_AGENT_API_INGEST_KEY,
+                    "Content-Type": "application/json",
+                },
+                data=payload_json.encode("utf-8"),
+                timeout=30,
+            )
+            resp.raise_for_status()
+            print(f"[richland_sc] Agent API updated → {RICHLAND_AGENT_API_URL}/richland/leads/new")
+        except requests.RequestException as exc:
+            print(f"[richland_sc] Agent API push failed (non-fatal): {exc}")
+    else:
+        print(
+            "[richland_sc] Agent API not configured "
+            "(RICHLAND_AGENT_API_URL / RICHLAND_AGENT_API_INGEST_KEY not set in .env) — "
+            "skipping agent API push"
         )
 
     print(
