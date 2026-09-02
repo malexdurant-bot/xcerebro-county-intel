@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-09-01T03:35:54Z",
+  "generated_at": "2026-09-02T01:19:46Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Richland",
   "state": "SC",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 333,
+  "lead_total": 331,
   "enrichment_breakdown": {
-    "ENRICHED": 188,
-    "UNENRICHED": 145
+    "ENRICHED": 185,
+    "UNENRICHED": 146
   },
   "pattern_counts": {
-    "estate": 232,
+    "estate": 230,
     "foreclosure": 41,
     "lis_pendens": 45,
     "tax": 16
@@ -27,20 +27,20 @@
     "vacant": 7
   },
   "stack_depth_distribution": {
-    "1": 332,
+    "1": 330,
     "2": 1
   },
   "score_tier_distribution": {
     "Hot": 1,
     "Low": 45,
     "Strong": 43,
-    "Workable": 244
+    "Workable": 242
   },
   "deal_path_distribution": {
     "messy_title": 45,
     "partial_interest": 46,
     "sub_to": 19,
-    "wholesale": 333
+    "wholesale": 331
   },
   "records": [
     {
@@ -17743,13 +17743,13 @@
       ]
     },
     {
-      "lead_id": "lead_26ES4000953_candidate1",
-      "scored_lead_id": "scored_6ff81cca236a76df_c1",
-      "primary_parcel_id": "M90011-35-60",
-      "display_address": "1115 ABBOTT RD, COLUMBIA, SC",
-      "display_address_street": "1115 ABBOTT RD",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
+      "lead_id": "lead_unresolved_26ES4000953",
+      "scored_lead_id": "scored_6ff81cca236a76df",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
       "display_address_zip": null,
       "display_owner": "LADSON HAYES SR",
       "display_owner_type": "INDIVIDUAL",
@@ -17777,11 +17777,11 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 19400,
+      "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
-      "display_match_confidence": 33,
+      "display_match_confidence": 0,
       "stack_depth": 1,
       "score_reasons": [
         {
@@ -17791,139 +17791,12 @@
       ],
       "evidence_ids": [],
       "primary_event_date": null,
-      "review_flags": [
-        "multi_candidate_same_owner_name"
-      ],
-      "enrichment_status": "ENRICHED",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-897/"
-      ],
-      "candidate_group_id": "26ES4000953_ladson_hayes",
-      "candidate_group_note": "Owner-name search on 'HAYES LADSON' (decedent: LADSON HAYES SR) returned 3 parcels, all under the identical owner name on file with Richland County -- same person, not name-collision ambiguity between different people. No single notice detail (case text) narrows it further, so all three are listed as outreach candidates rather than dropping the lead.",
-      "candidate_group_size": 3
-    },
-    {
-      "lead_id": "lead_26ES4000953_candidate2",
-      "scored_lead_id": "scored_6ff81cca236a76df_c2",
-      "primary_parcel_id": "R11213-03-07",
-      "display_address": "1239 WALCOTT ST, COLUMBIA, SC",
-      "display_address_street": "1239 WALCOTT ST",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": null,
-      "display_owner": "LADSON HAYES SR",
-      "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 55700,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 33,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "multi_candidate_same_owner_name"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-897/"
-      ],
-      "candidate_group_id": "26ES4000953_ladson_hayes",
-      "candidate_group_note": "Owner-name search on 'HAYES LADSON' (decedent: LADSON HAYES SR) returned 3 parcels, all under the identical owner name on file with Richland County -- same person, not name-collision ambiguity between different people. No single notice detail (case text) narrows it further, so all three are listed as outreach candidates rather than dropping the lead.",
-      "candidate_group_size": 3
-    },
-    {
-      "lead_id": "lead_26ES4000953_candidate3",
-      "scored_lead_id": "scored_6ff81cca236a76df_c3",
-      "primary_parcel_id": "R14208-02-15",
-      "display_address": "104 W CAMPANELLA DR, COLUMBIA, SC",
-      "display_address_street": "104 W CAMPANELLA DR",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": null,
-      "display_owner": "LADSON HAYES SR",
-      "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_attributes": [],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 5500,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
-      "display_match_confidence": 33,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [
-        "multi_candidate_same_owner_name"
-      ],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-896/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-897/"
-      ],
-      "candidate_group_id": "26ES4000953_ladson_hayes",
-      "candidate_group_note": "Owner-name search on 'HAYES LADSON' (decedent: LADSON HAYES SR) returned 3 parcels, all under the identical owner name on file with Richland County -- same person, not name-collision ambiguity between different people. No single notice detail (case text) narrows it further, so all three are listed as outreach candidates rather than dropping the lead.",
-      "candidate_group_size": 3
+      ]
     },
     {
       "lead_id": "lead_unresolved_26ES4000954",
