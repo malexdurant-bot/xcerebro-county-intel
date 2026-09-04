@@ -253,6 +253,20 @@ def main() -> None:
 
     # ------------------------------------------------------------------
     # Step 2 — Select raw events for this run
+    #
+    # NOTE: every publish destination (Step 5's GitHub Pages push, 5c's
+    # agent-API ingest, 5d's richlandsc.justfriday.ai push) REPLACES the
+    # destination's entire dataset rather than merging into it. An
+    # incremental run only scores/publishes THAT DAY'S new-records delta —
+    # by design, per operator instruction 2026-09-04 (daily runs are meant
+    # to push just the day's new leads; Kevin's /richland/leads/new
+    # delivery-cursor endpoint tracks its own delivered-ids separately, so
+    # it correctly treats each day's small delta as "new" regardless of
+    # what's in the full snapshot). This means the FIRST push after any
+    # reset (fresh disk, new deploy, etc.) must be a --full run to seed the
+    # complete baseline — a plain incremental run right after a reset will
+    # only ever publish that day's tiny delta and looks like data loss even
+    # though nothing is actually broken.
     # ------------------------------------------------------------------
     if args.full:
         raw_events = _load_all_raw_events(CS_RAW_DIR, DT_RAW_DIR, ROD_RAW_DIR)
