@@ -44,7 +44,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -55,6 +55,34 @@ if sys.platform == "win32":
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+
+
+def _load_dotenv(path: Path) -> None:
+    """Minimal .env loader (no external dependency) — only sets vars not
+    already present in the environment. Mirrors the loader in
+    scrapers/richland_register_of_deeds.py.
+
+    This file's own env reads below (LEADS_BACKEND_URL etc.) run at import
+    time — before main() gets to the `from scrapers... import` lines that
+    would otherwise populate .env via richland_register_of_deeds.py's own
+    loader. Without calling this here first, run_richland_daily.cmd (which
+    sets no environment variables of its own) has every optional
+    integration read as unset even when .env has real values — confirmed
+    live 2026-09-03: the deployed client-agent API had never received a
+    single push despite months of "successful" daily runs, because
+    RICHLAND_AGENT_API_URL/RICHLAND_AGENT_API_INGEST_KEY were always None
+    by the time Step 5c read them."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, val = line.partition("=")
+        os.environ.setdefault(key.strip(), val.strip())
+
+
+_load_dotenv(ROOT / ".env")
 
 WORKDIR = ROOT / "pipeline_output" / "richland_sc"
 WORKDIR.mkdir(parents=True, exist_ok=True)
@@ -134,6 +162,24 @@ def _load_all_raw_events(
     return events
 
 
+def _filter_by_recency(raw_events: list[dict], days: int) -> list[dict]:
+    """Keep only events dated within the last `days` days (by event_date,
+    falling back to recorded_date), PLUS every event that has neither field
+    set at all. Some lead types (e.g. letters_testamentary — Columbia
+    Star's Notice to Creditors parser never populates a date; see
+    scrapers/columbia_star_richland.py) never carry a date on the raw
+    record even though they're inherently recent (bounded by the scraper's
+    own latest-N-articles fetch cap) — excluding them here would just be
+    wrong, not a real recency filter."""
+    cutoff = (date.today() - timedelta(days=days)).isoformat()
+    kept = []
+    for e in raw_events:
+        d = e.get("event_date") or e.get("recorded_date")
+        if d is None or d >= cutoff:
+            kept.append(e)
+    return kept
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -146,6 +192,13 @@ def main() -> None:
         "--full",
         action="store_true",
         help="Full rebuild: reset scraper cursor and load all historical raw files",
+    )
+    parser.add_argument(
+        "--days",
+        type=int,
+        default=None,
+        help="With --full, only keep raw events dated within the last N days "
+             "(events with no date at all are always kept — see _filter_by_recency)",
     )
     parser.add_argument(
         "--dry-run",
@@ -207,6 +260,13 @@ def main() -> None:
             f"[richland_sc] Full rebuild: loaded {len(raw_events)} raw events "
             f"from {CS_RAW_DIR}, {DT_RAW_DIR}, and {ROD_RAW_DIR}"
         )
+        if args.days is not None:
+            before = len(raw_events)
+            raw_events = _filter_by_recency(raw_events, args.days)
+            print(
+                f"[richland_sc] --days {args.days}: kept {len(raw_events)}/{before} "
+                f"raw events (dateless events always kept)"
+            )
     else:
         raw_events = new_records
         print(f"[richland_sc] Incremental: processing {len(raw_events)} records from this scrape")
