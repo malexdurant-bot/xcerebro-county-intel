@@ -34,6 +34,12 @@ Render deployment:
     Start command:  python api_server.py --host 0.0.0.0 --port $PORT
     Env vars:       RICHLAND_AGENT_API_KEY, RICHLAND_AGENT_API_INGEST_KEY
                     (set both in Render's dashboard — do not commit them)
+                    RICHLAND_DATA_DIR — REQUIRED for the deployed instance,
+                    or every cold start silently wipes the dataset (see
+                    DATA_DIR below). Attach a Render persistent disk
+                    (Dashboard -> service -> Disks -> Add Disk, 1GB is
+                    plenty), note its mount path (e.g. "/data"), and set
+                    RICHLAND_DATA_DIR to that same path.
 
 Endpoints:
     GET /health                    — no auth; liveness check
@@ -103,8 +109,19 @@ import hmac  # noqa: E402
 
 from fastapi import Body, FastAPI, Header, HTTPException, Query  # noqa: E402
 
-DATA_PATH = ROOT / "pipeline_output" / "richland_sc" / "data.json"
-DELIVERED_PATH = ROOT / "pipeline_output" / "richland_sc" / "_delivered_lead_ids.json"
+# RICHLAND_DATA_DIR: set this to a Render persistent disk's mount path
+# (e.g. "/data") in production. Render's default container filesystem is
+# ephemeral — every cold start (idle spin-down, redeploy, restart) wipes
+# it, which silently resets both DATA_PATH and DELIVERED_PATH back to
+# empty. Confirmed live 2026-09-04: a successful POST /richland/ingest the
+# day before was gone after the very next cold start, reproducing the "No
+# pipeline output yet" 503 even though the pipeline had already pushed
+# real data. Left unset, this defaults to the same path as before
+# (ephemeral, fine for local dev — NOT fine for the deployed instance
+# until a disk is attached and this is pointed at its mount path).
+DATA_DIR = Path(os.environ.get("RICHLAND_DATA_DIR") or (ROOT / "pipeline_output" / "richland_sc"))
+DATA_PATH = DATA_DIR / "data.json"
+DELIVERED_PATH = DATA_DIR / "_delivered_lead_ids.json"
 DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 API_KEY = os.environ.get("RICHLAND_AGENT_API_KEY", "")
