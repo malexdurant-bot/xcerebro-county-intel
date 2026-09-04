@@ -322,8 +322,8 @@
       "translator": "custom",
       "refresh_cadence": "daily",
       "ttl_days": 730,
-      "enabled": false,
-      "allowed_to_export": false,
+      "enabled": true,
+      "allowed_to_export": true,
       "source_priority": "P1",
       "build_priority": "high_value",
       "official_status": "OFFICIAL_COUNTY",
@@ -351,35 +351,34 @@
       "access_method": "PAID_SUBSCRIPTION_ACTIVE",
       "public_access_status": "FREE_ACCOUNT_REQUIRED",
       "document_access_status": "DOCUMENTS_LOGIN_REQUIRED",
-      "source_role": "BLOCKED_SOURCE",
+      "source_role": "PRIMARY_EVENT_SOURCE",
       "lead_value": "LEAD_GENERATING",
       "verification_confidence": "HIGH",
       "verification_method": "official_domain",
       "verified_from_url": "https://www.richlandcountysc.gov/Property-Business/Mapping-and-Records/Register-of-Deeds",
       "verification_note": "Portal confirmed at www7.richlandcountysc.gov/SMS_External/ — the Richland County SMS (Subscription Management System), which hands off to a second app 'RODPublicViewer' for the actual document search. Operator registered a paid 'Register Of Deeds / Unlimited-Full Access' subscription (08/21/2026-09/22/2026), confirmed live in the account's 'Current Subscriptions' list 2026-08-22. Login (including the login CAPTCHA — its 'random' seed is embedded in plaintext elsewhere on the page, no OCR needed) and navigation to the search form (QueryPanel.aspx) are confirmed working — see scrapers/richland_register_of_deeds.py. Registry has 254 document types; no standalone Lis Pendens type exists here (SC lis pendens is a Clerk of Court filing, already covered by Columbia Star's Public Notices) — highest-value unique adds would be mechanics liens, federal/state tax liens, and foreclosure-completion deeds.",
       "sample_record_path_confirmed": true,
-      "sample_record_type": "search_form",
-      "sample_search_possible": false,
+      "sample_record_type": "search_results",
+      "sample_search_possible": true,
       "sample_document_view_possible": false,
-      "blocker": "Login and search-form navigation work, but every search submission (tested via raw HTTP and a real Playwright-driven Chromium browser, across multiple doc types / date ranges / name-only queries) returns a server-side '.NET FormatException: Input string was not in a correct format.' All submitted field values are confirmed correctly received and echoed back by the server, so the exception is not in field parsing — it happens deeper in the search-execution path. The operator confirmed getting real results from one manual search in a real browser, so the portal is not fundamentally broken; something about the automated flow (or session state — ~15 automated logins were performed while debugging this, which may itself have degraded session state) differs from a clean manual search. Paused per operator instruction 2026-08-22 pending a clean repro.",
-      "blocker_type": "UNRESOLVED_SERVER_ERROR",
-      "next_access_strategy": "diff_working_search_payload_against_automated_payload",
+      "blocker": "",
+      "blocker_type": null,
+      "next_access_strategy": "",
       "open_questions": [
-        "What exact request does a clean, single manual search send (doc type, date range, name fields) — ideally captured via browser DevTools Network tab — that the automated flow's structurally-identical request does not?",
-        "Does repeated automated login (many logins in a short window while debugging) degrade or corrupt server-side session state for this account?",
-        "Once search works: what does the results list response actually look like? Never observed populated in testing — client JS references a 'divResults' div that was never seen non-empty."
+        "Foreclosure-completion deeds (Foreclosure - Deed / Foreclosure - Mortgage / Master's Deed-Foreclosure, codes 70/71/248) are deliberately NOT searched — they record a sale that already happened, not a fresh distress signal, and Columbia Star's Master's Sales already covers the pre-sale opportunity for the same cases. Worth a future look as a distinct REO/suppression signal, not as-is."
       ],
       "known_limitations": [
-        "254 document types in the registry; no bulk 'all types' search confirmed to work yet — MVP scope should target mechanics liens, federal/state tax liens, and foreclosure-completion deeds (Foreclosure - Deed, Foreclosure - Mortgage, Master's Deed-Foreclosure) once search is unblocked.",
+        "254 document types in the registry; MVP scope is mechanics liens (16, 193, 143) and federal/state tax liens (47, 203, 48) only — see scrapers/richland_register_of_deeds.py DOC_TYPE_CANONICAL.",
         "Records before 2/19/1998 have index only — no document images online.",
-        "Search execution currently broken for automated (and possibly all) use — see blocker."
+        "Tax liens are filed against the taxpayer, not a parcel, so most start with no parcel_id — resolved (where possible) by scrapers/richland_assessor_spatialest.py's enrich_lien_raw_events free owner-name search, same as estate/lis-pendens/foreclosure leads.",
+        "Newly-recorded instruments can sit in the index with blank party names for the first few days (clerk backfills names after recording) — scrape()'s 2-day trailing cursor overlap re-covers those dates on the next run, but a record whose name populates later than that window is missed."
       ],
       "source_reliability_grade": "A",
-      "paused_reason": "Search submission errors server-side for reasons not yet isolated; operator asked to pause investigation 2026-08-22 rather than continue debugging live.",
+      "paused_reason": "",
       "credentials_required_kind": "paid_subscription",
       "credentials_declared": true,
-      "auto_resolve_status": "REQUIRES_OPERATOR_APPROVAL",
-      "final_resolution_status": "SEARCH_EXECUTION_BLOCKED",
+      "auto_resolve_status": "RESOLVED",
+      "final_resolution_status": "LIVE_MVP_SCOPE",
       "auto_resolve_attempts": [
         {
           "attempt_order": 1,
@@ -398,6 +397,15 @@
           "status": "REQUIRES_OPERATOR_APPROVAL",
           "result": "Operator registered a paid Unlimited/Full Access subscription. Login + CAPTCHA bypass + navigation to the search form all confirmed working (scrapers/richland_register_of_deeds.py). Every search submission (raw HTTP and real-browser Playwright) errors server-side with a FormatException regardless of parameters; operator confirmed one manual search worked and produced real results. Root cause not isolated before operator asked to pause.",
           "next_step": "Resume with a clean manual repro (ideally a DevTools Network export of the working search) to diff against the automated payload; then write the results-list parser (never observed non-empty in testing)."
+        },
+        {
+          "attempt_order": 3,
+          "timestamp": "2026-09-03T18:00:00Z",
+          "blocker_type": "UNRESOLVED_SERVER_ERROR",
+          "strategy": "diff_working_search_payload_against_automated_payload",
+          "status": "RESOLVED",
+          "result": "Root cause isolated without needing an operator repro: (1) the site's own http->https redirect for viewer.aspx duplicates every querystring param onto the redirect target — the old code propagated that doubled querystring into the search POST, and ASP.NET threw the FormatException trying to parse the doubled Id/UserGuid server-side; fixed by deduping the querystring before building every downstream request. (2) The search button's onclick calls SubmitSearch(), which itself calls __doPostBack('btnSearch', '') — posting __EVENTTARGET as the button's own name ('btnNewSearch') is a silent no-op; fixed by targeting 'btnSearch'. (3) datePickerBegin/End are ignored unless chkUseDateRange=on is also sent. With all three fixed, doc-type-filtered + date-ranged search, pagination (btnNext), and the DataList1 results-row parser are all confirmed working against real data (tested: 45 mechanics-lien/tax-lien records over a 30-day window, correct dates, correct doc-type filtering, correct amounts/parcel extraction).",
+          "next_step": "None — live. Foreclosure-completion deed types (70/71/248) remain deliberately unsearched; see open_questions."
         }
       ]
     },
@@ -786,26 +794,32 @@
             "official_url": "https://www7.richlandcountysc.gov/SMS_External/Login.aspx",
             "authority_type": "county_recorder",
             "vendor_name": "Richland County (SMS — custom county system)",
-            "source_role": "BLOCKED_SOURCE",
-            "access_status": "FREE_ACCOUNT_REQUIRED",
-            "bulk_availability": "UNKNOWN",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_ACTIVE",
+            "bulk_availability": "BATCH_QUERY",
             "verification_layers": {
               "authority": "PASS — official county subdomain, confirmed from official Register of Deeds page",
-              "lead_type_relevance": "PASS — lis pendens, deeds, mortgages, liens are confirmed record types in SMS system",
-              "access": "BLOCKED — login required; account creation required for any online access",
-              "extractability": "UNKNOWN — cannot confirm until account created and access tier determined",
+              "lead_type_relevance": "PASS — mechanics liens, federal/state tax liens confirmed live (MVP scope; see scrapers/richland_register_of_deeds.py — no standalone lis pendens type in this registry, SC lis pendens is a Clerk of Court filing already covered by sc_courts_circuit_civil / Columbia Star)",
+              "access": "PASS — paid subscription active, login + doc-type-filtered date-ranged search confirmed working end-to-end",
+              "extractability": "PASS — DataList1 results-row parser confirmed against real data",
               "refresh_provenance": "PASS — recordings indexed on recording date per user guide"
             },
             "sample_record_path_confirmed": true,
             "sample_document_view_possible": false,
-            "minimum_lead_fields_available": [],
-            "operator_verified": false,
-            "notes": "Blocked pending operator account registration. Once account created, will provide lis pendens, deeds, mortgage filings — highest-value clerk recording source. Operator should register at /SMS_External/Login.aspx and report back on free vs. paid access tiers."
+            "minimum_lead_fields_available": [
+              "instrument_number",
+              "recorded_date",
+              "document_type",
+              "party_names",
+              "book_page"
+            ],
+            "operator_verified": true,
+            "notes": "LIVE 2026-09-03. Paid subscription active. Search execution's 2026-08-22 FormatException blocker was two bugs in the scraper, not the site (querystring duplication on the site's own http->https redirect, and the wrong postback event target) — see scrapers/richland_register_of_deeds.py module docstring and auto_resolve_attempts[2] below."
           }
         ],
         "selected_source_id": "register_of_deeds_sms",
-        "status": "SOURCE_FOUND_NEEDS_LOGIN",
-        "coverage_notes": "ROD confirmed but blocked by account requirement. SC Courts public index covers foreclosure lis pendens at the case level, partially mitigating this gap. ROD is the definitive source for recording dates, exact document types, and grantee/grantor data."
+        "status": "LIVE_SOURCE_FOUND",
+        "coverage_notes": "ROD live for mechanics liens and federal/state tax liens (MVP scope). SC Courts public index / Columbia Star cover foreclosure lis pendens at the case level. ROD remains the definitive source for recording dates, exact document types, and grantor/grantee data for the doc types it now searches."
       },
       {
         "lead_type": "eviction",
@@ -853,11 +867,10 @@
       "master_in_equity_foreclosure_sales",
       "delinquent_tax_sale",
       "assessor_parcel_master",
-      "gis_richlandmaps"
-    ],
-    "blocked_sources": [
+      "gis_richlandmaps",
       "register_of_deeds_sms"
     ],
+    "blocked_sources": [],
     "limited_coverage_sources": [
       "probate_estate_inquiry",
       "delinquent_tax_sale"

@@ -744,6 +744,36 @@ def enrich_foreclosure_raw_events(
     )
 
 
+def enrich_lien_raw_events(
+    raw_events: list[dict],
+    *,
+    max_new_lookups: int | None = None,
+) -> list[dict]:
+    """
+    Owner-name property lookup for Register of Deeds lien events
+    (mechanics_lien, federal_tax_lien, state_tax_lien) — see
+    scrapers/richland_register_of_deeds.py. Most of these carry no
+    parcel_id at all (a tax lien is filed against the taxpayer, not a
+    specific parcel; only some mechanics liens include a TMS) — keyed on
+    the debtor party (GR for mechanics_lien matching its
+    UNIVERSAL_DEBTOR_PARTY_RULES override, TP for the two tax lien types)
+    — see _enrich_raw_events_by_owner_name for the shared implementation.
+    """
+    for canonical_doc_type, party_name_type, label in (
+        ("mechanics_lien", "GR", "mechanics lien"),
+        ("federal_tax_lien", "TP", "federal tax lien"),
+        ("state_tax_lien", "TP", "state tax lien"),
+    ):
+        raw_events = _enrich_raw_events_by_owner_name(
+            raw_events,
+            canonical_doc_type=canonical_doc_type,
+            party_name_type=party_name_type,
+            label=label,
+            max_new_lookups=max_new_lookups,
+        )
+    return raw_events
+
+
 if __name__ == "__main__":
     import sys
     if sys.platform == "win32":

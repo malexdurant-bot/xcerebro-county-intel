@@ -47,6 +47,46 @@ knowledge surfaces. Each entry should be:
 
 ## register_of_deeds_sms
 
+**2026-09-03T18:00:00Z** — LIVE. Search execution unblocked; wired into run_pipeline.py.
+
+- Root cause of the 2026-08-22 FormatException blocker: two bugs in the
+  scraper, not the site. (1) The site's own http→https redirect for
+  viewer.aspx duplicates every querystring param on the redirect target —
+  the old code propagated the doubled querystring into every downstream
+  request including the search POST, and ASP.NET threw the FormatException
+  trying to parse the doubled `Id`/`UserGuid` server-side. Fixed by
+  deduping the querystring before building QueryPanel.aspx requests. (2)
+  The Search button's onclick calls `SubmitSearch()`, which itself calls
+  `__doPostBack('btnSearch', '')` — posting `__EVENTTARGET` as the
+  button's own `name` ("btnNewSearch") is a silent no-op. Fixed by
+  targeting `btnSearch`. (3) `datePickerBegin`/`End` are silently ignored
+  unless `chkUseDateRange=on` is also sent.
+- MVP scope: mechanics liens (doc codes 16, 193, 143) and federal/state
+  tax liens (47, 203, 48) only. Deliberately NOT foreclosure-completion
+  deeds (70, 71, 248 — "Foreclosure - Deed" / "Foreclosure - Mortgage" /
+  "Master's Deed-Foreclosure") — those record a sale that already
+  happened, not a fresh distress signal, and Columbia Star's Master's
+  Sales already covers the pre-sale opportunity for the same cases. Could
+  be a future REO/suppression signal but that's a different feature.
+- New canonical_doc_types added to SIGNAL_TYPE_LABELS / the debtor party
+  rules (already covered by UNIVERSAL_DEBTOR_PARTY_RULES, no county
+  override needed): `mechanics_lien`, `federal_tax_lien`, `state_tax_lien`.
+- Owner-name enrichment: added `enrich_lien_raw_events` to
+  scrapers/richland_assessor_spatialest.py (mirrors the existing
+  estate/lis-pendens/foreclosure helpers) since tax liens are filed
+  against the taxpayer, not a parcel — most start with no parcel_id.
+- Verified end-to-end against real data: 45 clean records over a 30-day
+  backfill window (30 federal tax liens, 15 mechanics liens; 0 state tax
+  liens in that window — none recorded), correct dates, correct doc-type
+  filtering, correct dollar-amount / TMS extraction, staged pipeline runs
+  to DEPLOY_OK with no exceptions.
+- Known limitation: newly-recorded instruments can sit in the index with
+  blank party names for the first few days before the clerk's office
+  fills them in — scrape()'s 2-day trailing cursor overlap re-covers
+  those dates on the next run (safe: raw_event_id is stable per
+  instrument number, so the pipeline dedupes the repeat), but a record
+  whose name populates later than that window would be missed.
+
 **2026-07-20T00:00:00Z** — CLOSED. Paid subscription required — not viable.
 
 - Operator confirmed: the SMS system requires a paid subscription for bulk index access.

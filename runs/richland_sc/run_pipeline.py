@@ -1,11 +1,15 @@
 """
 Richland County, SC — daily pipeline runner.
 
-Sources scraped in this build (PARTIAL_BUILD — Register of Deeds blocked):
+Sources scraped in this build (PARTIAL_BUILD — see "Not built" below):
   - Columbia Star Master's Sales       → notice_of_sale  (foreclosure)
   - Columbia Star Public Notices       → lis_pendens     (circuit civil)
   - Columbia Star Notice to Creditors  → letters_testamentary (probate)
   - Richland delinquent tax parcel API → tax_foreclosure_notice (tax distress)
+  - Register of Deeds SMS (mechanics/tax liens only — see
+    scrapers/richland_register_of_deeds.py for the doc-type scope and the
+    2026-08-22 blocker's root cause + fix) →
+      mechanics_lien / federal_tax_lien / state_tax_lien
 
 Enrichment-only (does not add raw events, fills in fields on existing ones):
   - Richland Probate Estate Inquiry    → confirms case number / dates on
@@ -22,6 +26,11 @@ config/counties/richland_sc.json `blocker` fields for why:
   - Master-in-Equity foreclosure sales page (richlandcountysc.gov) — the
     whole domain is Akamai-WAF-blocked from this environment (no residential
     proxy configured); Columbia Star Master's Sales substitutes instead.
+  - Register of Deeds foreclosure-completion deeds (Foreclosure - Deed,
+    Foreclosure - Mortgage, Master's Deed-Foreclosure) — deliberately out
+    of scope, not blocked: these record a sale that already happened, so
+    they aren't a fresh distress lead the way the liens above are. See
+    scrapers/richland_register_of_deeds.py module docstring.
 
 Usage:
   python runs/richland_sc/run_pipeline.py               # incremental (default)
@@ -70,6 +79,9 @@ SIGNAL_TYPE_LABELS: dict[str, str] = {
     "lis_pendens": "Lis Pendens",
     "letters_testamentary": "Notice to Creditors",
     "tax_foreclosure_notice": "Delinquent Tax",
+    "mechanics_lien": "Mechanics Lien",
+    "federal_tax_lien": "Federal Tax Lien",
+    "state_tax_lien": "State Tax Lien",
 }
 
 
@@ -112,10 +124,13 @@ def _load_jsonl_glob(dir_path: Path, pattern: str) -> list[dict]:
     return events
 
 
-def _load_all_raw_events(columbia_star_dir: Path, delinquent_tax_dir: Path) -> list[dict]:
+def _load_all_raw_events(
+    columbia_star_dir: Path, delinquent_tax_dir: Path, register_of_deeds_dir: Path,
+) -> list[dict]:
     """Load all raw event records from every source's JSONL files."""
     events = _load_jsonl_glob(columbia_star_dir, "columbia_star_*.jsonl")
     events += _load_jsonl_glob(delinquent_tax_dir, "delinquent_tax_*.jsonl")
+    events += _load_jsonl_glob(register_of_deeds_dir, "register_of_deeds_*.jsonl")
     return events
 
 
@@ -157,6 +172,7 @@ def main() -> None:
     # ------------------------------------------------------------------
     from scrapers.columbia_star_richland import scrape as scrape_columbia_star, RAW_DIR as CS_RAW_DIR  # noqa: PLC0415
     from scrapers.richland_delinquent_tax import scrape as scrape_delinquent_tax, RAW_DIR as DT_RAW_DIR  # noqa: PLC0415
+    from scrapers.richland_register_of_deeds import scrape as scrape_register_of_deeds, RAW_DIR as ROD_RAW_DIR  # noqa: PLC0415
 
     cs_records = scrape_columbia_star(incremental=incremental)
     print(f"[richland_sc] Columbia Star: {len(cs_records)} new records")
@@ -164,7 +180,18 @@ def main() -> None:
     dt_records = scrape_delinquent_tax(incremental=incremental)
     print(f"[richland_sc] Delinquent tax: {len(dt_records)} new records")
 
-    new_records = cs_records + dt_records
+    try:
+        rod_records = scrape_register_of_deeds(incremental=incremental)
+    except Exception as exc:
+        # Non-fatal: the SMS portal is a fragile, unofficial-API third-party
+        # ASP.NET WebForms app (see module docstring) — a session/site hiccup
+        # here shouldn't take down Columbia Star + delinquent tax, which are
+        # this county's primary, more reliable sources.
+        print(f"[richland_sc] Register of Deeds scrape failed (non-fatal): {exc}")
+        rod_records = []
+    print(f"[richland_sc] Register of Deeds: {len(rod_records)} new records")
+
+    new_records = cs_records + dt_records + rod_records
     print(f"[richland_sc] Scrapers returned {len(new_records)} new records total")
 
     if args.dry_run:
@@ -175,10 +202,10 @@ def main() -> None:
     # Step 2 — Select raw events for this run
     # ------------------------------------------------------------------
     if args.full:
-        raw_events = _load_all_raw_events(CS_RAW_DIR, DT_RAW_DIR)
+        raw_events = _load_all_raw_events(CS_RAW_DIR, DT_RAW_DIR, ROD_RAW_DIR)
         print(
             f"[richland_sc] Full rebuild: loaded {len(raw_events)} raw events "
-            f"from {CS_RAW_DIR} and {DT_RAW_DIR}"
+            f"from {CS_RAW_DIR}, {DT_RAW_DIR}, and {ROD_RAW_DIR}"
         )
     else:
         raw_events = new_records
@@ -202,6 +229,7 @@ def main() -> None:
         enrich_estate_raw_events as assessor_owner_search,
         enrich_lis_pendens_raw_events as assessor_lp_owner_search,
         enrich_foreclosure_raw_events as assessor_fc_owner_search,
+        enrich_lien_raw_events as assessor_lien_owner_search,
         repair_broken_parcel_ids,
     )
     from scrapers.richland_skiptrace_dealmachine import enrich_estate_raw_events  # noqa: PLC0415
@@ -272,6 +300,28 @@ def main() -> None:
     print(
         f"[richland_sc] Assessor owner-name search (foreclosure): "
         f"{fc_unenriched - fc_still_unenriched}/{fc_unenriched} defendants matched to a parcel"
+    )
+
+    # Register of Deeds liens (mechanics_lien / federal_tax_lien /
+    # state_tax_lien) — a tax lien is filed against the taxpayer, not a
+    # specific parcel, so most of these start with no parcel_id at all.
+    lien_types = {"mechanics_lien", "federal_tax_lien", "state_tax_lien"}
+    lien_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") in lien_types
+        and not (e.get("property_refs") or {}).get("parcel_id")
+        and not (e.get("property_refs") or {}).get("situs_address")
+    )
+    raw_events = assessor_lien_owner_search(raw_events)
+    lien_still_unenriched = sum(
+        1 for e in raw_events
+        if e.get("canonical_doc_type") in lien_types
+        and not (e.get("property_refs") or {}).get("parcel_id")
+        and not (e.get("property_refs") or {}).get("situs_address")
+    )
+    print(
+        f"[richland_sc] Assessor owner-name search (liens): "
+        f"{lien_unenriched - lien_still_unenriched}/{lien_unenriched} debtors matched to a parcel"
     )
 
     raw_events = enrich_estate_raw_events(raw_events)
