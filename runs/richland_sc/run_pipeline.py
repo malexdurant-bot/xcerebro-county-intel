@@ -558,6 +558,59 @@ def main() -> None:
             "skipping agent API push"
         )
 
+    # ------------------------------------------------------------------
+    # Step 5d — Push to the richlandsc.justfriday.ai dashboard's own repo
+    # (malexdurant-bot/richland-sc-leads, a separate GitHub Pages site on a
+    # custom domain — isolated from this repo so the client never sees our
+    # scraper source). That repo's data/leads.json was hand-published once
+    # on 2026-08-24 and never updated again — the LEADS_BACKEND_URL/
+    # LEADS_BACKEND_WRITE_KEY Supabase-REST design above was a different,
+    # never-provisioned approach; confirmed live 2026-09-04 (via the site's
+    # own network requests) that the deployed frontend actually just fetches
+    # a static data/leads.json from its own domain, identical in shape to
+    # payload_json. Uses the GitHub Contents API via `gh api` (already
+    # authenticated on this machine) rather than a local git clone, since
+    # this repo has no working tree for richland-sc-leads. Fetch-then-PUT
+    # (not a plain git push) because the Contents API requires the
+    # existing file's blob sha to update it.
+    # ------------------------------------------------------------------
+    RICHLAND_SC_LEADS_REPO = "malexdurant-bot/richland-sc-leads"
+    RICHLAND_SC_LEADS_PATH = "data/leads.json"
+    try:
+        import base64  # noqa: PLC0415
+        import tempfile  # noqa: PLC0415
+
+        sha_result = subprocess.run(
+            ["gh", "api", f"repos/{RICHLAND_SC_LEADS_REPO}/contents/{RICHLAND_SC_LEADS_PATH}",
+             "--jq", ".sha"],
+            capture_output=True, text=True, check=True, timeout=30,
+        )
+        current_sha = sha_result.stdout.strip()
+
+        body = {
+            "message": f"data(richland_sc): dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}",
+            "content": base64.b64encode(payload_json.encode("utf-8")).decode("ascii"),
+            "sha": current_sha,
+            "branch": "main",
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as f:
+            json.dump(body, f)
+            tmp_path = f.name
+        try:
+            subprocess.run(
+                ["gh", "api", f"repos/{RICHLAND_SC_LEADS_REPO}/contents/{RICHLAND_SC_LEADS_PATH}",
+                 "-X", "PUT", "--input", tmp_path],
+                check=True, capture_output=True, timeout=60,
+            )
+        finally:
+            os.unlink(tmp_path)
+        print("[richland_sc] richlandsc.justfriday.ai updated → https://richlandsc.justfriday.ai/")
+    except subprocess.CalledProcessError as exc:
+        stderr = exc.stderr.decode(errors="replace") if isinstance(exc.stderr, bytes) else (exc.stderr or "")
+        print(f"[richland_sc] richlandsc.justfriday.ai publish failed (non-fatal): {stderr[:300]}")
+    except Exception as exc:  # noqa: BLE001 - best-effort publish, never block the pipeline
+        print(f"[richland_sc] richlandsc.justfriday.ai publish failed (non-fatal): {exc}")
+
     print(
         f"[richland_sc] Pipeline complete — "
         f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}"
