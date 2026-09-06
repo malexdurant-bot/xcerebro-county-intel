@@ -102,6 +102,15 @@ LEADS_BACKEND_WRITE_KEY = os.environ.get("LEADS_BACKEND_WRITE_KEY")
 RICHLAND_AGENT_API_URL = os.environ.get("RICHLAND_AGENT_API_URL")
 RICHLAND_AGENT_API_INGEST_KEY = os.environ.get("RICHLAND_AGENT_API_INGEST_KEY")
 
+# Dashboard default view: leads with a primary_event_date within this many
+# days are "Active"; older ones are "Aged" (surfaced in a separate dashboard
+# view). Distinct from the score-based "Archive" tier (display_tier, score
+# < 35) — that's about lead quality, this is about staleness. Leads with no
+# primary_event_date at all (most estate/probate notices) are always
+# "Active": we can't judge an age we don't have, and most of those leads
+# stay live/actionable far longer than 10 days anyway.
+RECENCY_WINDOW_DAYS = 10
+
 SIGNAL_TYPE_LABELS: dict[str, str] = {
     "notice_of_sale": "Foreclosure Sale",
     "lis_pendens": "Lis Pendens",
@@ -180,6 +189,21 @@ def _filter_by_recency(raw_events: list[dict], days: int) -> list[dict]:
     return kept
 
 
+def _tag_recency_bucket(scored_leads: list[dict]) -> dict[str, int]:
+    """Mutates each lead in place, adding display_recency_bucket
+    ("Active"/"Aged") per RECENCY_WINDOW_DAYS — see that constant's
+    docstring. Returns the {bucket: count} distribution for the dashboard
+    payload's chip counts."""
+    cutoff = (date.today() - timedelta(days=RECENCY_WINDOW_DAYS)).isoformat()
+    counts = {"Active": 0, "Aged": 0}
+    for lead in scored_leads:
+        event_date = lead.get("primary_event_date")
+        bucket = "Active" if not event_date or event_date >= cutoff else "Aged"
+        lead["display_recency_bucket"] = bucket
+        counts[bucket] += 1
+    return counts
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -254,36 +278,34 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Step 2 — Select raw events for this run
     #
-    # NOTE: every publish destination (Step 5's GitHub Pages push, 5c's
-    # agent-API ingest, 5d's richlandsc.justfriday.ai push) REPLACES the
-    # destination's entire dataset rather than merging into it. An
-    # incremental run only scores/publishes THAT DAY'S new-records delta —
-    # by design, per operator instruction 2026-09-04 (daily runs are meant
-    # to push just the day's new leads; Kevin's /richland/leads/new
-    # delivery-cursor endpoint tracks its own delivered-ids separately, so
-    # it correctly treats each day's small delta as "new" regardless of
-    # what's in the full snapshot). This means the FIRST push after any
-    # reset (fresh disk, new deploy, etc.) must be a --full run to seed the
-    # complete baseline — a plain incremental run right after a reset will
-    # only ever publish that day's tiny delta and looks like data loss even
-    # though nothing is actually broken.
+    # Every run scores and publishes the FULL historical raw-event archive,
+    # not just today's new-scrape delta. "Incremental" (Step 1, above) only
+    # controls the SCRAPE — whether we re-fetch already-seen articles / reset
+    # scraper cursors. It must not also control what gets scored/published:
+    # every publish destination (Step 5's GitHub Pages push, 5c's agent-API
+    # ingest, 5d's richlandsc.justfriday.ai push) REPLACES the destination's
+    # entire dataset rather than merging into it, so publishing only today's
+    # delta wipes out every previously-published lead down to that handful.
+    # Confirmed live 2026-09-04: a --full push landed 353 leads; the next
+    # scheduled incremental run found 2 new raw records, published just
+    # those 2 (old behavior), and the client's dashboard/automation saw the
+    # dataset collapse to 2 overnight. The dashboard's own "last N days
+    # active, older aged out" behavior (display_recency_bucket, below) is
+    # how staleness should actually be handled — not by shrinking what gets
+    # published.
     # ------------------------------------------------------------------
-    if args.full:
-        raw_events = _load_all_raw_events(CS_RAW_DIR, DT_RAW_DIR, ROD_RAW_DIR)
+    raw_events = _load_all_raw_events(CS_RAW_DIR, DT_RAW_DIR, ROD_RAW_DIR)
+    print(
+        f"[richland_sc] Loaded {len(raw_events)} raw events from the full archive "
+        f"({'full rebuild' if args.full else f'incremental scrape — {len(new_records)} new this run'})"
+    )
+    if args.days is not None:
+        before = len(raw_events)
+        raw_events = _filter_by_recency(raw_events, args.days)
         print(
-            f"[richland_sc] Full rebuild: loaded {len(raw_events)} raw events "
-            f"from {CS_RAW_DIR}, {DT_RAW_DIR}, and {ROD_RAW_DIR}"
+            f"[richland_sc] --days {args.days}: kept {len(raw_events)}/{before} "
+            f"raw events (dateless events always kept)"
         )
-        if args.days is not None:
-            before = len(raw_events)
-            raw_events = _filter_by_recency(raw_events, args.days)
-            print(
-                f"[richland_sc] --days {args.days}: kept {len(raw_events)}/{before} "
-                f"raw events (dateless events always kept)"
-            )
-    else:
-        raw_events = new_records
-        print(f"[richland_sc] Incremental: processing {len(raw_events)} records from this scrape")
 
     if not raw_events:
         print("[richland_sc] No raw events — pipeline up to date. Exiting.")
@@ -464,6 +486,18 @@ def main() -> None:
         state="SC",
         mode="incremental" if incremental else "full_rebuild",
         build_label="PARTIAL_BUILD",
+    )
+
+    # _tag_recency_bucket runs on payload["records"] (the projected dashboard
+    # rows), not scored_leads: build_dashboard_payload's row projection
+    # (project_scored_lead, universal framework code) builds each row as an
+    # explicit new dict of known fields — an extra key set on scored_leads
+    # beforehand would just be dropped, not carried through.
+    recency_distribution = _tag_recency_bucket(payload["records"])
+    payload["recency_distribution"] = recency_distribution
+    print(
+        f"[richland_sc] Recency (last {RECENCY_WINDOW_DAYS}d):  "
+        f"{recency_distribution['Active']} Active / {recency_distribution['Aged']} Aged"
     )
 
     payload_json = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
