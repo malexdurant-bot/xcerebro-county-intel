@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-09-07T14:07:31Z",
+  "generated_at": "2026-09-08T14:06:43Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
   "state": "SC",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 404,
+  "lead_total": 405,
   "enrichment_breakdown": {
     "ENRICHED": 211,
-    "UNENRICHED": 193
+    "UNENRICHED": 194
   },
   "pattern_counts": {
     "estate": 255,
     "foreclosure": 42,
-    "lien": 18,
+    "lien": 20,
     "lis_pendens": 46,
     "tax": 46
   },
@@ -29,20 +29,20 @@
   },
   "stack_depth_distribution": {
     "1": 401,
-    "2": 3
+    "2": 4
   },
   "score_tier_distribution": {
     "Archive": 3,
     "Hot": 1,
     "Low": 57,
     "Strong": 47,
-    "Workable": 296
+    "Workable": 297
   },
   "deal_path_distribution": {
     "messy_title": 47,
     "partial_interest": 52,
     "sub_to": 19,
-    "wholesale": 404
+    "wholesale": 405
   },
   "records": [
     {
@@ -2979,7 +2979,7 @@
     },
     {
       "lead_id": "lead_parcel_R08914-01-10",
-      "scored_lead_id": "scored_f4158acc52c1342c",
+      "scored_lead_id": "scored_f0c701e2df8a74cd",
       "primary_parcel_id": "R08914-01-10",
       "display_address": "602 HUGER ST, COLUMBIA, SC",
       "display_address_street": "602 HUGER ST",
@@ -2988,12 +2988,14 @@
       "display_address_zip": "29201",
       "display_owner": "604 HUGER LLC",
       "display_owner_type": "ENTITY",
-      "display_score": 42,
-      "display_tier": "Low",
+      "display_score": 54,
+      "display_tier": "Workable",
       "display_patterns": [
+        "lien",
         "lien"
       ],
       "stack_contrib_patterns": [
+        "lien",
         "lien"
       ],
       "display_pattern_set": [
@@ -3010,22 +3012,26 @@
       "display_deal_path_details": [
         {
           "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "confidence": "high",
+          "rationale": "Multi-signal distress + investor-friendly attribute set."
         }
       ],
-      "display_title_complexity_tier": "None",
+      "display_title_complexity_tier": "Light curative",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 1513500.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         },
         {
           "factor": "recent_filing_within_30_days",
@@ -3037,7 +3043,7 @@
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": "2026-09-01",
+      "primary_event_date": "2026-09-08",
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
@@ -17970,7 +17976,7 @@
       "primary_source_urls": [
         "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_unresolved_2026044395",
@@ -18145,6 +18151,66 @@
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-09-04",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_unresolved_2026044798",
+      "scored_lead_id": "scored_31d0198ce524abd7",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "GROVE AT ST ANDREWS",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-08",
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
@@ -25294,6 +25360,6 @@
   ],
   "recency_distribution": {
     "Active": 355,
-    "Aged": 49
+    "Aged": 50
   }
 }
