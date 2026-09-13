@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T14:09:56Z",
+  "generated_at": "2026-09-13T14:07:02Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -7,8 +7,8 @@
   "semantic_verdict": "DEPLOY_OK",
   "lead_total": 430,
   "enrichment_breakdown": {
-    "ENRICHED": 224,
-    "UNENRICHED": 206
+    "ENRICHED": 225,
+    "UNENRICHED": 205
   },
   "pattern_counts": {
     "estate": 275,
@@ -20,9 +20,9 @@
   "attribute_counts": {
     "absentee": 63,
     "entity_owned": 24,
-    "free_and_clear": 32,
-    "high_equity": 86,
-    "long_term_owned": 73,
+    "free_and_clear": 33,
+    "high_equity": 87,
+    "long_term_owned": 74,
     "out_of_state": 15,
     "senior_owner": 30,
     "vacant": 7
@@ -36,12 +36,12 @@
     "Archive": 3,
     "Hot": 1,
     "Low": 61,
-    "Strong": 47,
-    "Workable": 318
+    "Strong": 48,
+    "Workable": 317
   },
   "deal_path_distribution": {
     "messy_title": 51,
-    "partial_interest": 53,
+    "partial_interest": 54,
     "sub_to": 19,
     "wholesale": 430
   },
@@ -6585,17 +6585,17 @@
     },
     {
       "lead_id": "lead_parcel_R13906-06-09",
-      "scored_lead_id": "scored_99123163ad6ea2fd",
+      "scored_lead_id": "scored_a6e8474a2d460941",
       "primary_parcel_id": "R13906-06-09",
-      "display_address": "",
-      "display_address_street": null,
-      "display_address_city": null,
-      "display_address_state": null,
-      "display_address_zip": null,
+      "display_address": "3727 LINWOOD RD, COLUMBIA, SC",
+      "display_address_street": "3727 LINWOOD RD",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29205",
       "display_owner": "MARYANN S. CREWS",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 66,
+      "display_tier": "Strong",
       "display_patterns": [
         "estate"
       ],
@@ -6605,11 +6605,21 @@
       "display_pattern_set": [
         "estate"
       ],
-      "display_attributes": [],
+      "display_attributes": [
+        "free_and_clear",
+        "high_equity",
+        "long_term_owned"
+      ],
       "display_deal_paths": [
+        "partial_interest",
         "wholesale"
       ],
       "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
         {
           "path": "wholesale",
           "confidence": "moderate",
@@ -6618,22 +6628,26 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": null,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
-      "display_year_built": null,
+      "display_assessed_value": 568900.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2003-03-25",
+      "display_year_built": 1950,
       "display_match_confidence": 0,
       "stack_depth": 1,
       "score_reasons": [
         {
           "factor": "base_LETTERS_TESTAMENTARY",
           "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 11
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "UNENRICHED",
+      "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
