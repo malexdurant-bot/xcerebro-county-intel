@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-16T14:07:14Z",
+  "generated_at": "2026-09-17T14:07:06Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -33,9 +33,9 @@
     "3": 1
   },
   "score_tier_distribution": {
-    "Archive": 3,
+    "Archive": 4,
     "Hot": 1,
-    "Low": 65,
+    "Low": 64,
     "Strong": 48,
     "Workable": 317
   },
@@ -7976,7 +7976,7 @@
     },
     {
       "lead_id": "lead_parcel_R14214-03-11",
-      "scored_lead_id": "scored_3c44522ab6f3aa94",
+      "scored_lead_id": "scored_50c4f784bb499ab1",
       "primary_parcel_id": "R14214-03-11",
       "display_address": "106 BRANCH HILL LN, COLUMBIA, SC",
       "display_address_street": "106 BRANCH HILL LN",
@@ -7985,7 +7985,7 @@
       "display_address_zip": "29223",
       "display_owner": "PENA TRUSTEE, JAVIER",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
+      "display_score": 50,
       "display_tier": "Workable",
       "display_patterns": [
         "lien",
@@ -8034,10 +8034,6 @@
         {
           "factor": "stack_depth_2",
           "delta": 12
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         },
         {
           "factor": "attribute_bonus",
@@ -19188,7 +19184,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026040861",
-      "scored_lead_id": "scored_aa9c55716d8c6669",
+      "scored_lead_id": "scored_9b35b4ffd984c519",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -19197,8 +19193,8 @@
       "display_address_zip": null,
       "display_owner": "PENA TRUSTEE, JAVIER",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -19237,10 +19233,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
