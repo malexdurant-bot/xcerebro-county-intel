@@ -90,6 +90,20 @@ SIGNAL_TYPE_LABELS: dict[str, str] = {
     "code_violation_notice": "Code Violation Notice",
     "demolition_order": "Demolition Order",
     "condemnation_notice": "Condemnation Notice",
+    # Dallas client expansion (2026-09-15).
+    "trustees_deed_upon_sale": "Trustee's Deed Upon Sale",
+    "sheriff_sale": "Forced Sale Deed (Sheriff/Constable/Marshal)",
+    "tax_foreclosure_notice": "Tax Foreclosure Notice",
+    "tax_deed": "Tax Sale / Tax Deed",
+    "tax_sale_certificate": "Tax Sale Certificate",
+    "transfer_of_tax_lien": "Transfer of Tax Lien (Property Tax Lender)",
+    "administrative_lien": "Administrative Lien",
+    "hospital_lien": "Hospital Lien",
+    "child_support_lien": "Child Support Lien",
+    "forfeiture_of_contract": "Forfeiture of Contract for Deed",
+    "guardians_deed": "Guardian's Deed",
+    "disclaimer_of_interest": "Disclaimer of Interest",
+    "probate": "Probate Filing",
 }
 
 # clerk_recordings DOC TYPE (as the PublicSearch RP department publishes it,
@@ -126,7 +140,119 @@ _CLERK_DOC_TYPE_MAP: dict[str, str] = {
     "NOTICE OF VIOLATION": "code_violation_notice",
     "DEMOLITION ORDER": "demolition_order",
     "CONDEMNATION": "condemnation_notice",
+
+    # ------------------------------------------------------------------
+    # Dallas client expansion (2026-09-15) — Penny Patel's Tier 1
+    # (distress) doc-type list. Raw strings are the county's own exact
+    # index spellings (including misspellings) per the client's explicit
+    # instruction that these must be searched verbatim or they won't
+    # match. Where a client-listed type is structurally identical to an
+    # already-verified canonical (e.g. every forced-sale deed variant —
+    # sheriff/constable/marshal — behaves the same way for debtor
+    # resolution), it's mapped straight onto that existing canonical
+    # rather than inventing a near-duplicate. See debtor_party_engine.py
+    # and knowledge_base/domain/canonical_doc_types.json for the few
+    # genuinely new canonical types this introduces (transfer_of_tax_lien,
+    # child_support_lien, forfeiture_of_contract — the last two
+    # deliberately have no debtor-party rule yet and route to
+    # REVIEW_REQUIRED rather than guess a role direction with no live
+    # sample data, same posture the engine already takes elsewhere).
+    # ------------------------------------------------------------------
+    "APPOINTMENT OF SUBSTITUTE TRUST": "appointment_of_substitute_trustee",
+    "APPOINTMENT OF TRUSTEE/SUBSTITUTE TRUSTEE": "appointment_of_substitute_trustee",
+    "TRUSTEE'S/SUBSTITUTE TRUSTEE'S DEED": "trustees_deed_upon_sale",
+    "TRUSTEE DEED": "trustees_deed_upon_sale",
+    "DECLARATION OF INVALIDITY OF FORECLOSURE SALE": "notice_of_substitute_trustee_sale",
+    "SHERIFF'S DEED": "sheriff_sale",
+    "SHERIFFS DEED": "sheriff_sale",
+    "CONSTABLES DEED": "sheriff_sale",
+    "MARSHALS DEED": "sheriff_sale",
+    "CONSTABLES BILL OF SALE": "sheriff_sale",
+    "TAX LIEN": "state_tax_lien",
+    # transfer_of_tax_lien deliberately has no debtor_party_engine rule —
+    # live-checked and found inconsistent (see debtor_party_engine.py's
+    # BROAD_KEY_REGISTRY_ALIASES comment) — still emitted, routes to
+    # REVIEW_REQUIRED for manual owner confirmation.
+    "TRANSFER OF TAX LIEN": "transfer_of_tax_lien",
+    "TAX WARRANT": "tax_foreclosure_notice",
+    "TAX SALE": "tax_deed",
+    "TAX DEED": "tax_deed",
+    "SEIZURE & SALE": "tax_foreclosure_notice",
+    "CERTIFICATE OF SALE OF SEIZED PROPERTY": "tax_sale_certificate",
+    "ABSTRACT OF ASSESSMENT": "state_tax_lien",
+    "MECHANICS LIEN AFFIDAVIT": "mechanics_lien",
+    "MECHANIC'S LIEN CONTRACT/AFFIDAVIT": "mechanics_lien",
+    "LIEN AFFIDAVIT": "mechanics_lien",
+    "LIEN CLAIM": "mechanics_lien",
+    "LIEN NOTICE": "mechanics_lien",
+    "ASSESSMENT LIEN BY HOMEOWNERS ASN": "municipal_lien",
+    "ASSESSMENT LIEN": "municipal_lien",
+    "ADMINISTRATIVE LIEN": "administrative_lien",
+    "PAVING LIEN": "municipal_lien",
+    "LIS PENDENS (NOTICE OF)": "lis_pendens",
+    "BANKRUPTCY": "bankruptcy_petition",
+    "BANKRUPTCY PROCEEDINGS": "bankruptcy_petition",
+    "CONDEMNATION PROCEEDINGS": "condemnation_notice",
+    "FORFEITURE OF CONTRACT": "forfeiture_of_contract",
+    "HOSPITAL LIEN": "hospital_lien",
+    "CHILD SUPPORT LIEN": "child_support_lien",
+    # A revocation of a lien RELEASE reinstates the lien — distress again,
+    # not a resolution — unlike every other release/partial-release/
+    # subordination/termination variant in the portal's FEDERAL TAX LIENS /
+    # STATE TAX LIENS / CHILD SUPPORT LIENS / HOSPITAL LIENS groups, which
+    # are negative signals (a resolved distress) and are deliberately NOT
+    # mapped here, matching this framework's existing release-type posture
+    # (see RELEASE_OF_LIEN / RELEASE_OF_FEDERAL_TAX_LIEN in the registry).
+    "REVOCATION OF RELEASE OF FEDERAL TAX LIEN": "federal_tax_lien",
+
+    # Tier 2 (life-event) additions.
+    "AFFIDAVIT OF HEIRSHIP AND CONVEYANCE": "affidavit_of_heirship",
+    "JUDGEMENT DECLARAING HEIRSHIP": "determination_of_heirship",  # verbatim county misspelling
+    "PROBATE PROCEEDINGS": "probate",
+    "CERTIFIED COPY OF PROBATE": "probate",
+    "CERTIFIED COPY OF WILL": "probate",
+    "WILL": "probate",
+    "GUARDIANS DEED": "guardians_deed",
+    "GUARDIANSHIP": "probate",
+    "DISCLAIMER": "disclaimer_of_interest",
+    # verbatim county misspelling ("ESTAE" for "Estate", "WW" typo) — this
+    # is the Texas HHSC Medicaid Estate Recovery Program (MERP).
+    "MEDICAID ESTAE RECOVERY PROGRAM NOTICE OF WW OF CLAIM AGAINST ESTATE": "probate",
+    "CERTIFIED COPY OF DIVORCE": "final_decree_of_divorce",
+    "DIVORCE PROCEEDINGS": "divorce_filing",
+    "COMMUNITY PROPERTY SETTLEMENT": "marital_property_division",
+    "PARTITION DEED": "partition_action",
+    "PARTITION AGREEMENT": "partition_action",
 }
+
+# Client-requested Tier 3 (title/payoff/signing — "run on every deal") and
+# Tier 4 (competitor/own filings — "who else is working your farm area")
+# doc types (2026-09-15). Deliberately NOT added to _CLERK_DOC_TYPE_MAP
+# above — per explicit operator instruction, these are the majority of all
+# county recordings (ordinary deeds, mortgages, releases) and would drown
+# the daily distress signal if treated as leads the same way Tier 1/2 are.
+# Instead they power the separate on-demand lookup tool,
+# runs/dallas_tx/title_chain_lookup.py, which only searches for these doc
+# types against an owner/property already surfaced by a Tier 1/2 lead, and
+# links any hits back to that lead. Raw index strings, exact verbatim.
+TIER3_DOC_TYPES: tuple[str, ...] = (
+    "WARRANTY DEED", "GENERAL WARRANTY DEED", "SPECIAL WARRANTY DEED",
+    "QUIT CLAIM DEED", "GIFT DEED", "DEED", "CONTRACT FOR DEED",
+    "CORRECTION OF WARRANTY DEED", "CORRECTION AFFIDAVIT",
+    "DEED OF TRUST", "AMENDMENT TO DEED OF TRUST",
+    "ASSIGNMENT OF DEED OF TRUST", "MORTGAGE", "TRANSFER OF LIEN",
+    "EXTENSION OF LIEN", "SUBORDINATION",
+    "RELEASE OF LIEN", "RELEASE OF TAX LIEN", "RELEASE OF JUDGMENT",
+    "PARTIAL RELEASE OF LIEN", "RELEASE OF LIS PENDENS", "SATISFACTION",
+    "POWER OF ATTORNEY", "REVOCATION OF POWER OF ATTORNEY",
+    "HOMESTEAD AFFIDAVIT", "HOMESTEAD DECLARATION", "HOMESTEAD DESIGNATION",
+    "RESTRICTIVE COVENANTS", "RESTRICTIONS", "EASEMENT", "RIGHT OF WAY",
+    "LEASE", "MEMORANDUM OF LEASE", "STATEMENT OF OWNERSHIP & LOCATION",
+)
+TIER4_DOC_TYPES: tuple[str, ...] = (
+    "MEMORANDUM", "MEMORANDUM OF AGREEMENT", "CONTRACT OF SALE",
+    "ASSIGNMENT OF CONTRACT", "OPTION",
+)
 
 _MDY_RE = re.compile(r"^(\d{1,2})/(\d{1,2})/(\d{4})$")
 _YMD_RE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
@@ -182,8 +308,25 @@ def _party(name: str | None, name_type: str) -> dict | None:
 #     tax-lien and judgment families above), so flipping the direction here
 #     would be a guess, not a verified fix. Left on the pre-existing GR/GE
 #     default, which the shared rule already expects for these two.
+#   - hospital_lien (Dallas client expansion, 2026-09-15; 2/2 live samples):
+#     Grantor was the individual patient, Grantee the hospital ("PORCH
+#     ANTHONY" / "RUIZ LUIS" -> "METHODIST DALLAS MEDICAL CENTER") — same
+#     reversed shape as the tax-lien family, not the GR/GE default. Small
+#     sample (2), but both consistent and each debtor/filer pair
+#     unambiguous (a person's name vs. a named hospital), unlike the
+#     genuinely mixed mechanics_lien/transfer_of_tax_lien cases above.
+#   - administrative_lien / child_support_lien (Dallas client expansion,
+#     2026-09-15): NOT touched — no live samples were checked for these
+#     (both are low-volume filing types on this portal). Left on the GR/GE
+#     default, same honest "unverified, not a guess we're confident in"
+#     posture as mechanics_lien/construction_lien above — if early
+#     production leads for either type show an institutional/agency name
+#     as owner_name instead of a real person, that is the tell to flip
+#     these into _TAX_LIEN_FAMILY_DOC_TYPES like hospital_lien was.
 _JUDGMENT_FAMILY_DOC_TYPES = {"abstract_of_judgment", "lis_pendens", "judgment_lien"}
-_TAX_LIEN_FAMILY_DOC_TYPES = {"state_tax_lien", "federal_tax_lien", "municipal_lien"}
+_TAX_LIEN_FAMILY_DOC_TYPES = {
+    "state_tax_lien", "federal_tax_lien", "municipal_lien", "hospital_lien",
+}
 
 # affidavit_of_heirship (2026-08-29): the shared engine's rule requires
 # DOCUMENT_BODY extraction (a "DECEDENT: ..." labelled line in real document
@@ -335,15 +478,30 @@ def translate_foreclosure_notices(wrapped_records: list[dict]) -> list[dict]:
 TAX_COLLECTOR_MIN_DUE_YEAR = 2024  # see translate_tax_collector docstring
 
 
-def stream_translate_tax_collector(path, verbose: bool = True) -> list[dict]:
+def stream_translate_tax_collector(path, verbose: bool = True) -> "tuple[list[dict], dict[str, float]]":
     """Stream tax_collector.jsonl line-by-line (it's ~1.4M lines / ~1.4GB —
-    do NOT json.loads the whole file into a list first) and translate only
-    the rows that pass the suit_pending + recency filter, discarding the
-    rest immediately. Prints progress every 200k lines scanned so a long
-    run doesn't look stalled."""
+    do NOT json.loads the whole file into a list first).
+
+    2026-09-15 Dallas client request, revised: tax leads stay suit-required
+    ONLY (the pre-existing _translate_tax_collector_row path, unchanged —
+    an earlier version of this session's work added a second, no-suit-
+    required "aged delinquency" lead type; the operator asked to drop that
+    after seeing it more than double daily lead volume with lower-
+    confidence signals). What the operator DID want kept: the years-
+    delinquent number itself, as a filterable/visible attribute on the
+    suit-based leads that already exist — so this function also aggregates
+    each account's OLDEST unpaid due_date across every delinquent tax year
+    (not just the suit-triggering one) and returns it as a separate
+    {account: years_delinquent} map. The caller (run_pipeline.py) attaches
+    this onto each suit-based lead's parcel_display; it never gates which
+    rows become leads.
+
+    Returns (events, years_delinquent_by_account). Prints progress every
+    200k lines scanned so a long run doesn't look stalled."""
     import json as _json
 
     events: list[dict] = []
+    accounts_agg: dict[str, dict] = {}
     scanned = 0
     with open(path, "r", encoding="utf-8") as fh:
         for line in fh:
@@ -357,9 +515,53 @@ def stream_translate_tax_collector(path, verbose: bool = True) -> list[dict]:
             translated = _translate_tax_collector_row(rec)
             if translated is not None:
                 events.append(translated)
+            _accumulate_delinquency_aggregate(rec, accounts_agg)
+    years_delinquent_by_account = _years_delinquent_by_account(accounts_agg)
     if verbose:
-        print(f"  [translate] tax_collector: done — scanned {scanned}, kept {len(events)}", flush=True)
-    return events
+        print(f"  [translate] tax_collector: done — scanned {scanned}, "
+              f"{len(events)} suit-based events kept, years-delinquent computed "
+              f"for {len(years_delinquent_by_account)} accounts", flush=True)
+    return events, years_delinquent_by_account
+
+
+def _accumulate_delinquency_aggregate(rec: dict, agg: dict) -> None:
+    """Per-account rollup across a delinquent account's multiple tax-year
+    rows (tax_collector.jsonl already only contains TOT_AMT_DUE > 0 rows —
+    see tax_collector_dallas.py). Tracks the OLDEST unpaid due_date (the
+    real delinquency age) so a multi-year-delinquent account gets one
+    years-delinquent number, not one per year row."""
+    payload = rec.get("raw_payload", {}) or {}
+    account = payload.get("account")
+    due_date = payload.get("due_date")
+    if not account or not due_date:
+        return
+    entry = agg.get(account)
+    if entry is None:
+        entry = agg[account] = {"earliest_due_date": due_date}
+    if due_date < entry["earliest_due_date"]:
+        entry["earliest_due_date"] = due_date
+
+
+def _years_delinquent_by_account(agg: dict) -> dict[str, float]:
+    """{account: years_delinquent} for every account with a valid oldest
+    unpaid due_date -- no threshold, every value is returned so the
+    dashboard can filter/sort at whatever cutoff the operator picks, per
+    the operator's explicit "give the option to see years of delinquency
+    and filter for years delinquent" instruction. Only meaningful for
+    accounts that also produced a suit-based lead (this map is looked up
+    by parcel_id on those leads); accounts with no lawsuit are computed
+    here too but simply never get looked up, since they're not leads."""
+    from datetime import date as _date
+
+    as_of = _date.today()
+    out: dict[str, float] = {}
+    for account, entry in agg.items():
+        try:
+            earliest_dt = _date.fromisoformat(entry["earliest_due_date"])
+        except (ValueError, TypeError):
+            continue
+        out[account] = round((as_of - earliest_dt).days / 365.25, 1)
+    return out
 
 
 def _translate_tax_collector_row(rec: dict) -> dict | None:

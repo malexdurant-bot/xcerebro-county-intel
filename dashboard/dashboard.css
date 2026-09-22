@@ -108,6 +108,29 @@ body {
   margin: 0 0 8px;
 }
 
+.rail-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-ink-muted);
+}
+.rail-field input[type="number"] {
+  width: 64px;
+  padding: 4px 8px;
+  border: 1px solid #d7dee8;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-ink);
+}
+
+.rail-hint {
+  font-size: 11px;
+  color: var(--color-ink-muted);
+  margin: 0 0 8px;
+  font-style: italic;
+}
+
 .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .chip {
@@ -342,6 +365,14 @@ body {
   color: #5b21b6 !important;
   border: 1px solid #ddd6fe;
   font-size: 10px;
+}
+
+.years-delinquent-badge {
+  background: #ffedd5 !important;
+  color: #9a3412 !important;
+  border: 1px solid #fed7aa;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .contact-executor {

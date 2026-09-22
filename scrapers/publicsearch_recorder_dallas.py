@@ -181,6 +181,33 @@ DISTRESS_DOC_TYPES = {
     "DETERMINATION OF HEIRSHIP", "PARTITION ACTION", "WRIT OF POSSESSION",
     "FINAL DECREE OF DIVORCE", "DIVORCE DECREE", "MARITAL PROPERTY DIVISION",
     "CODE VIOLATION", "NOTICE OF VIOLATION", "DEMOLITION ORDER", "CONDEMNATION",
+    # Dallas client expansion (2026-09-15) — see translate.py's
+    # _CLERK_DOC_TYPE_MAP for the full raw-string -> canonical mapping these
+    # mirror. Kept as a duplicated raw-string set on purpose, same as the
+    # original set above (see module docstring on why this isn't imported).
+    "APPOINTMENT OF SUBSTITUTE TRUST", "APPOINTMENT OF TRUSTEE/SUBSTITUTE TRUSTEE",
+    "TRUSTEE'S/SUBSTITUTE TRUSTEE'S DEED", "TRUSTEE DEED",
+    "DECLARATION OF INVALIDITY OF FORECLOSURE SALE",
+    "SHERIFF'S DEED", "SHERIFFS DEED", "CONSTABLES DEED", "MARSHALS DEED",
+    "CONSTABLES BILL OF SALE",
+    "TAX LIEN", "TRANSFER OF TAX LIEN", "TAX WARRANT", "TAX SALE", "TAX DEED",
+    "SEIZURE & SALE", "CERTIFICATE OF SALE OF SEIZED PROPERTY",
+    "ABSTRACT OF ASSESSMENT",
+    "MECHANICS LIEN AFFIDAVIT", "MECHANIC'S LIEN CONTRACT/AFFIDAVIT",
+    "LIEN AFFIDAVIT", "LIEN CLAIM", "LIEN NOTICE",
+    "ASSESSMENT LIEN BY HOMEOWNERS ASN", "ASSESSMENT LIEN",
+    "ADMINISTRATIVE LIEN", "PAVING LIEN",
+    "LIS PENDENS (NOTICE OF)", "BANKRUPTCY", "BANKRUPTCY PROCEEDINGS",
+    "CONDEMNATION PROCEEDINGS", "FORFEITURE OF CONTRACT",
+    "HOSPITAL LIEN", "CHILD SUPPORT LIEN",
+    "REVOCATION OF RELEASE OF FEDERAL TAX LIEN",
+    "AFFIDAVIT OF HEIRSHIP AND CONVEYANCE", "JUDGEMENT DECLARAING HEIRSHIP",
+    "PROBATE PROCEEDINGS", "CERTIFIED COPY OF PROBATE",
+    "CERTIFIED COPY OF WILL", "WILL",
+    "GUARDIANS DEED", "GUARDIANSHIP", "DISCLAIMER",
+    "MEDICAID ESTAE RECOVERY PROGRAM NOTICE OF WW OF CLAIM AGAINST ESTATE",
+    "CERTIFIED COPY OF DIVORCE", "DIVORCE PROCEEDINGS",
+    "COMMUNITY PROPERTY SETTLEMENT", "PARTITION DEED", "PARTITION AGREEMENT",
 }
 
 PAGE1_IMAGE_URL_RE = re.compile(r"/files/documents/\d+/images/\d+_1\.png")
@@ -228,6 +255,9 @@ def _looks_like_boilerplate_not_address(matched_text: str) -> bool:
 _GRANTOR_IS_DEBTOR_DOC_TYPES = {
     "STATE TAX LIEN", "FEDERAL TAX LIEN", "MUNICIPAL LIEN",
     "MECHANIC'S LIEN", "MECHANICS LIEN", "CONSTRUCTION LIEN",
+    # Dallas client expansion (2026-09-15) -- live-verified 2/2 samples, see
+    # translate.py's _TAX_LIEN_FAMILY_DOC_TYPES comment for the detail.
+    "HOSPITAL LIEN",
 }
 
 _NAME_TOKEN_STOPWORDS = {
@@ -241,7 +271,35 @@ def _debtor_name_for_row(row: dict) -> "str | None":
     return row.get(field)
 
 
-def _extract_address_near_name(text: str, debtor_name: "str | None") -> "str | None":
+# Hospital lien documents (Tex. Prop. Code Ch. 55) recite the HOSPITAL's
+# own address in their opening boilerplate ("...METHODIST DALLAS MEDICAL
+# CENTER, the address of which is, 1441 N. Beckley Ave...") BEFORE the
+# injured party's own name/address ever appear -- confirmed live 2026-09-16
+# on a real HOSPITAL LIEN document: the generic name-anchored extraction
+# below picked up the hospital's address 10/23 times because it's the
+# nearest address-shaped text within the anchor window, not the patient's.
+# The SAME document reliably states the real address later, explicitly
+# labelled: "so far as known: 4285 WILEY COLLEGE DR Dallas, TX 75241
+# (street address of injured individual)" -- so for this doc type, check
+# for that label FIRST and prefer it over the generic anchor logic.
+_HOSPITAL_LIEN_INJURED_ADDRESS_RE = re.compile(
+    r"so\s+far\s+as\s+known:?\s*(.+?)\s*\(street address", re.IGNORECASE | re.DOTALL,
+)
+
+
+def _extract_hospital_lien_injured_address(text: str) -> "str | None":
+    if not text:
+        return None
+    m = _HOSPITAL_LIEN_INJURED_ADDRESS_RE.search(text)
+    if not m:
+        return None
+    candidate = re.sub(r"\s+", " ", m.group(1)).strip().strip(".,;: ")
+    return candidate if _ADDRESS_SHAPE_RE.search(candidate) else None
+
+
+def _extract_address_near_name(
+    text: str, debtor_name: "str | None", doc_type: "str | None" = None,
+) -> "str | None":
     """Find a street-address-shaped line in OCR'd document text, anchored
     near the already-known debtor name (from the index's own grantor/
     grantee field -- clerk_recordings' names are already 100% resolved
@@ -263,6 +321,15 @@ def _extract_address_near_name(text: str, debtor_name: "str | None") -> "str | N
     debtor_name, or None if no name anchor is found or nothing shaped like
     a real address follows it within a reasonable window.
     """
+    if (doc_type or "").strip().upper() == "HOSPITAL LIEN":
+        hospital_lien_addr = _extract_hospital_lien_injured_address(text)
+        if hospital_lien_addr:
+            return hospital_lien_addr
+        # Falls through to the generic logic below only if the labelled
+        # "so far as known" line wasn't found/didn't OCR cleanly -- better
+        # than nothing, though it risks the hospital's own address (see
+        # the module-level note above this function).
+
     if not text or not debtor_name:
         return None
 
@@ -537,7 +604,7 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
             expected_count = len(trs)
             row["document_body_text"], row["detail_url"] = _fetch_and_ocr_row_document(page, context, tr_index, verbose)
             row["situs_address_ocr_hint"] = _extract_address_near_name(
-                row["document_body_text"] or "", _debtor_name_for_row(row)
+                row["document_body_text"] or "", _debtor_name_for_row(row), doc_type,
             )
             if verbose:
                 got = "captured" if row["document_body_text"] else "none"

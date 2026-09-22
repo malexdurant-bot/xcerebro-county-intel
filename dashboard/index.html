@@ -30,8 +30,13 @@
         <div class="chip-group" id="chips-tier" data-axis="tier"></div>
       </div>
       <div class="rail-group">
-        <h3 class="rail-heading">Pattern</h3>
+        <h3 class="rail-heading">Lead type</h3>
         <div class="chip-group" id="chips-pattern" data-axis="pattern"></div>
+      </div>
+      <div class="rail-group" id="rail-doc-type" hidden>
+        <h3 class="rail-heading">Lead subtype</h3>
+        <p class="rail-hint" id="doc-type-hint">Select a lead type above to see subtypes</p>
+        <div class="chip-group" id="chips-doc-type" data-axis="doc_type"></div>
       </div>
       <div class="rail-group">
         <h3 class="rail-heading">Attribute</h3>
@@ -44,6 +49,14 @@
       <div class="rail-group">
         <h3 class="rail-heading">Stack depth</h3>
         <div class="chip-group" id="chips-stack-depth" data-axis="stack_depth"></div>
+      </div>
+
+      <div class="rail-group" id="rail-years-delinquent" hidden>
+        <h3 class="rail-heading">Years tax delinquent</h3>
+        <label class="rail-field">
+          Minimum
+          <input type="number" id="min-years-delinquent" min="0" step="1" placeholder="Any" />
+        </label>
       </div>
 
       <div class="rail-group rail-actions">

@@ -230,6 +230,24 @@ def merge_signal_group(base_records: Sequence[dict]) -> dict:
     earliest = dates[0] if dates else None
     latest = dates[-1] if dates else None
 
+    # 2026-09-22 fix: event_date (a status/filing date distinct from
+    # recorded_date -- e.g. a tax lawsuit's due_date, which has no clerk
+    # recording at all) was being computed correctly all the way through
+    # translate.py -> debtor_party_engine.py -> leads_base_writer.py, then
+    # silently dropped here -- this function only ever read recorded_date,
+    # so scoring_seam.py's primary_event_date (which falls back to
+    # earliest/latest_event_date when no recorded_date exists) came back
+    # None for every leads-base record whose source has no recording date
+    # at all. Confirmed live: 77% of Dallas's tax_foreclosure_notice leads
+    # (the suit-based tax lawsuit lead type) had zero primary_event_date on
+    # the dashboard, making them impossible to sort/filter by recency the
+    # way recorded-document leads already could be.
+    event_dates = sorted(
+        r["event_date"] for r in records if r.get("event_date")
+    )
+    earliest_event = event_dates[0] if event_dates else None
+    latest_event = event_dates[-1] if event_dates else None
+
     return {
         "aggregation_key": {
             "parcel_id": key.get("parcel_id"),
@@ -246,6 +264,8 @@ def merge_signal_group(base_records: Sequence[dict]) -> dict:
         "earliest_recorded_date": earliest,
         "latest_recorded_date": latest,
         "recorded_date_range": [earliest, latest],
+        "earliest_event_date": earliest_event,
+        "latest_event_date": latest_event,
     }
 
 

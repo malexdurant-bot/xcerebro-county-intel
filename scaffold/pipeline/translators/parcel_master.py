@@ -103,6 +103,7 @@ Returns: ([], parcels, {})
 """
 
 from __future__ import annotations
+import re
 from typing import Any
 
 from scaffold.pipeline.translators import register
@@ -143,6 +144,60 @@ def _try_int(value: Any) -> int | None:
         return int(float(value))
     except (ValueError, TypeError):
         return None
+
+
+_STREET_TYPE_SUFFIXES_RE = re.compile(
+    r"\b(STREET|ST|DRIVE|DR|AVENUE|AVE|BOULEVARD|BLVD|LANE|LN|ROAD|RD|"
+    r"COURT|CT|CIRCLE|CIR|PLACE|PL|WAY|TRAIL|TRL|PARKWAY|PKWY|LOOP|"
+    r"TERRACE|TER|HIGHWAY|HWY|SQUARE|SQ|CRESCENT|CROSSING|ALLEY|COVE|CV|"
+    r"PASS|PIKE|ROW|RUN|WALK)\b\.?"
+)
+_NON_ALNUM_RE = re.compile(r"[^A-Z0-9]+")
+
+
+def _normalize_street(raw: str) -> str:
+    """Collapse a street-address string to a bare comparable token: upper-
+    case, punctuation stripped, common street-type suffixes dropped (so '123
+    MAIN ST' and '123 MAIN STREET' compare equal). Best-effort only -- used
+    for the absentee-owner derivation below, not for anything that needs an
+    authoritative address match."""
+    text = _STREET_TYPE_SUFFIXES_RE.sub("", (raw or "").upper())
+    return _NON_ALNUM_RE.sub("", text)
+
+
+def _derive_absentee_flags(parcel: dict) -> dict:
+    """Derive is_absentee_owner / is_out_of_state_owner generically from
+    fields already in this translator's contract (owner_mailing_address/
+    city/state/zip vs. the parcel's own situs address/state) -- added for
+    the Dallas client expansion (2026-09-15), but computed here in the
+    shared translator (not per-county) so any county gets both flags for
+    free the moment its scraper populates owner_mailing_*.
+
+    is_absentee_owner: True when a mailing address is on file AND its
+    normalized street differs from the situs street (the owner receives
+    mail somewhere other than the property itself). None (not False) when
+    no mailing address is on file at all -- unknown is not the same as
+    "not absentee".
+
+    is_out_of_state_owner: True when a mailing state is on file AND differs
+    from the parcel's own situs state. None when either state is unknown.
+    Situs state is not itself a parcel_master field (Dallas is single-state
+    and passes it in separately) -- callers that don't have one should not
+    call this helper, or should add situs_state to the parcel dict first.
+    """
+    mailing_addr = (parcel.get("owner_mailing_address") or "").strip()
+    situs_addr = (parcel.get("address") or "").strip()
+    is_absentee = None
+    if mailing_addr:
+        is_absentee = _normalize_street(mailing_addr) != _normalize_street(situs_addr)
+
+    mailing_state = (parcel.get("owner_mailing_state") or "").strip().upper()
+    situs_state = (parcel.get("situs_state") or "").strip().upper()
+    is_out_of_state = None
+    if mailing_state and situs_state:
+        is_out_of_state = mailing_state != situs_state
+
+    return {"is_absentee_owner": is_absentee, "is_out_of_state_owner": is_out_of_state}
 
 
 @register("parcel_master")
@@ -209,6 +264,11 @@ def translate_parcel_master(
             "owner_mailing_zip": (payload.get(_resolve("owner_mailing_zip")) or "").strip(),
             "city": (payload.get(_resolve("city")) or "").strip(),
             "zip": (payload.get(_resolve("zip")) or "").strip(),
+            # situs_state (2026-09-15): OPTIONAL -- most county scrapers only
+            # ever operate within one state and never populate this. Needed
+            # here (rather than assumed) so _derive_absentee_flags can tell
+            # an out-of-state mailing address apart from an in-state one.
+            "situs_state": (payload.get(_resolve("situs_state")) or "").strip(),
             "assessed_value": _try_int(payload.get(_resolve("assessed_value"))),
             "land_value": _try_int(payload.get(_resolve("land_value"))),
             "improvement_value": _try_int(payload.get(_resolve("improvement_value"))),
@@ -219,6 +279,7 @@ def translate_parcel_master(
             "parcel_master_status": "matched_pending_join",
             **exemption_flags,
         }
+        parcel.update(_derive_absentee_flags(parcel))
         parcels.append(parcel)
 
     return [], parcels, {}

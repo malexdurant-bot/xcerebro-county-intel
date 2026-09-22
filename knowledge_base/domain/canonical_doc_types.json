@@ -1054,6 +1054,71 @@
       ],
       "notes": "v5.1.2-beta+: Notice or filing that proceeds from a sheriff sale exceeded the debt owed. Former owner is entitled to the surplus funds and is typically a high-value contact target. Promoted from synthetic-only canonical to real canonical so production sources can declare this type via doc_type_synonyms.",
       "source_priority": "P0"
+    },
+    "ADMINISTRATIVE_LIEN": {
+      "lead_pattern": "lien",
+      "subtype": "administrative_lien",
+      "source_class": "lead_generating",
+      "default_confidence": 80,
+      "document_priority": 40,
+      "common_abbreviations": [
+        "ADMIN LIEN",
+        "ADMINISTRATIVE LIEN"
+      ],
+      "notes": "Dallas client expansion 2026-09-15: state-agency administrative lien. debtor_party_engine.py already carried a rule row for this key (Session 2) but the registry entry was missing, so it never scored -- filling that pre-existing gap.",
+      "source_priority": "P0"
+    },
+    "CHILD_SUPPORT_LIEN": {
+      "lead_pattern": "lien",
+      "subtype": "child_support_lien",
+      "source_class": "lead_generating",
+      "default_confidence": 82,
+      "document_priority": 40,
+      "common_abbreviations": [
+        "CS LIEN",
+        "CHILD SUPPORT LIEN"
+      ],
+      "notes": "Dallas client expansion 2026-09-15: child support enforcement agency lien against the obligor's property. Same shape as HOSPITAL_LIEN.",
+      "source_priority": "P0"
+    },
+    "GUARDIANS_DEED": {
+      "lead_pattern": "estate",
+      "subtype": "guardians_deed",
+      "source_class": "lead_generating",
+      "default_confidence": 88,
+      "document_priority": 70,
+      "common_abbreviations": [
+        "GUARD DEED",
+        "GUARDIANS DEED"
+      ],
+      "notes": "Dallas client expansion 2026-09-15: court-appointed guardian conveys a ward's property. Same shape as EXECUTORS_DEED/ADMINISTRATORS_DEED.",
+      "source_priority": "P0"
+    },
+    "TRANSFER_OF_TAX_LIEN": {
+      "lead_pattern": "tax",
+      "subtype": "transfer_of_tax_lien",
+      "source_class": "lead_generating",
+      "default_confidence": 90,
+      "document_priority": 82,
+      "common_abbreviations": [
+        "TRANSFER TAX LIEN",
+        "TAX LIEN TRANSFER"
+      ],
+      "notes": "Dallas client expansion 2026-09-15: a Tex. Tax Code Sec. 32.06 property-tax-lender transfer -- a private lender paid the owner's taxes and now holds the county's lien at a high rate with its own foreclosure right. Owner is already in distress and on a clock (operator's own framing). Checked live against real Kofile data: grantor/grantee party roles are inconsistent (sometimes the real owner, sometimes a taxing jurisdiction transferring to the same private buyer) -- deliberately has NO debtor_party_engine.py rule, routes to REVIEW_REQUIRED for manual owner confirmation rather than risk misresolving a jurisdiction/buyer name as the owner.",
+      "source_priority": "P0"
+    },
+    "FORFEITURE_OF_CONTRACT": {
+      "lead_pattern": "foreclosure",
+      "subtype": "forfeiture_of_contract",
+      "source_class": "lead_generating",
+      "default_confidence": 75,
+      "document_priority": 65,
+      "common_abbreviations": [
+        "FORFEITURE",
+        "FORFEITURE OF CONTRACT"
+      ],
+      "notes": "Dallas client expansion 2026-09-15: seller's forfeiture of a contract-for-deed buyer's equitable interest -- an equitable/contract foreclosure. No verified debtor-party rule yet (deliberately left unmapped, same posture as other genuinely novel types) -- routes to REVIEW_REQUIRED for manual party confirmation rather than guessing grantor/grantee direction.",
+      "source_priority": "P1"
     }
   },
   "lead_patterns": [

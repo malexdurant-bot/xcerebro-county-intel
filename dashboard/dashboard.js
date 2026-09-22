@@ -55,10 +55,16 @@
     filters: {
       tier: new Set(),
       pattern: new Set(),
+      doc_type: new Set(),
       attribute: new Set(),
       deal_path: new Set(),
       stack_depth: new Set(),
     },
+    // Not a Set (unlike state.filters above) -- a single numeric threshold,
+    // kept outside state.filters so wireEvents' reset-filters handler
+    // (which calls .clear() on every state.filters value) doesn't need a
+    // special case. Null = no filter applied.
+    minYearsDelinquent: null,
     sort: { key: "display_score", dir: -1 },
     mode: "operator", // "client" or "operator"
     precannedView: null,
@@ -179,6 +185,7 @@
     const filteredRows = applyFilters(state.payload.records);
     renderTiles(filteredRows);
     renderChips();
+    renderYearsDelinquentFilter();
     renderPrecanned();
     const pageCount = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
     if (state.page > pageCount) state.page = pageCount;
@@ -224,6 +231,10 @@
       out = out.filter((r) =>
         r.display_patterns.some((p) => state.filters.pattern.has(p))
       );
+    if (state.filters.doc_type.size)
+      out = out.filter((r) =>
+        (r.display_doc_types || []).some((d) => state.filters.doc_type.has(d))
+      );
     if (state.filters.attribute.size)
       out = out.filter((r) =>
         r.display_attributes.some((a) => state.filters.attribute.has(a))
@@ -235,6 +246,12 @@
     if (state.filters.stack_depth.size)
       out = out.filter((r) =>
         state.filters.stack_depth.has(String(r.stack_depth))
+      );
+    if (state.minYearsDelinquent != null)
+      out = out.filter(
+        (r) =>
+          r.display_years_tax_delinquent != null &&
+          r.display_years_tax_delinquent >= state.minYearsDelinquent
       );
 
     if (state.precannedView) {
@@ -282,8 +299,45 @@
       data-value="${escapeAttr(value)}">${escapeHtml(value)} <span class="chip-count">${count}</span></button>`;
   }
 
+  // Lead subtype (canonical_doc_type) counts, scoped to whichever lead
+  // type(s) (patterns) are currently chip-selected -- e.g. selecting
+  // "lien" shows hospital_lien / child_support_lien / mechanics_lien /
+  // abstract_of_judgment / etc. with how many of each actually came in.
+  // Empty when no lead type is selected (the two-step drill-down the
+  // operator asked for: pick a type, then see its subtypes). Same
+  // global-count convention as every other chip axis here (not re-scoped
+  // by OTHER active filters), computed from the full record set.
+  function computeDocTypeStats(records, selectedPatterns) {
+    const stats = {};
+    if (!selectedPatterns.size) return stats;
+    for (const r of records) {
+      const patterns = r.display_patterns || [];
+      if (!patterns.some((p) => selectedPatterns.has(p))) continue;
+      for (const dt of r.display_doc_types || []) {
+        stats[dt] = (stats[dt] || 0) + 1;
+      }
+    }
+    return stats;
+  }
+
   function renderChips() {
     const records = state.payload.records;
+    const docTypeStats = computeDocTypeStats(records, state.filters.pattern);
+    const docTypeKeys = Object.keys(docTypeStats).sort(
+      (a, b) => docTypeStats[b] - docTypeStats[a]
+    );
+
+    const docTypeRail = document.getElementById("rail-doc-type");
+    const docTypeHint = document.getElementById("doc-type-hint");
+    if (docTypeRail) {
+      // Only shown at all when the payload actually carries subtype data
+      // (older counties whose pipeline predates this field see nothing).
+      const payloadHasDocTypes = records.some((r) => (r.display_doc_types || []).length);
+      docTypeRail.hidden = !payloadHasDocTypes;
+      if (docTypeHint) {
+        docTypeHint.hidden = state.filters.pattern.size > 0;
+      }
+    }
 
     const axes = [
       {
@@ -297,6 +351,12 @@
         axis: "pattern",
         keys: Object.keys(state.payload.pattern_counts || {}),
         countFn: (k) => state.payload.pattern_counts[k] || 0,
+      },
+      {
+        elId: "chips-doc-type",
+        axis: "doc_type",
+        keys: docTypeKeys,
+        countFn: (k) => docTypeStats[k] || 0,
       },
       {
         elId: "chips-attribute",
@@ -335,11 +395,28 @@
           const set = state.filters[axis];
           if (set.has(value)) set.delete(value);
           else set.add(value);
+          // Changing which lead type(s) are selected invalidates any
+          // subtype selection scoped to the PREVIOUS set of types (a
+          // subtype chip for a now-deselected type would keep filtering
+          // invisibly with no chip shown for it).
+          if (axis === "pattern") state.filters.doc_type.clear();
           state.page = 1;
           render();
         });
       });
     });
+  }
+
+  // Shown only when at least one record actually carries a years-tax-
+  // delinquent value, so counties whose leads never populate it (i.e.
+  // everyone but Dallas today) see no trace of this control.
+  function renderYearsDelinquentFilter() {
+    const rail = document.getElementById("rail-years-delinquent");
+    if (!rail) return;
+    const hasAny = state.payload.records.some(
+      (r) => r.display_years_tax_delinquent != null
+    );
+    rail.hidden = !hasAny;
   }
 
   function renderPrecanned() {
@@ -387,6 +464,10 @@
           (r.display_pattern_set || []).includes("transfer")
             ? `<span class="cell-tag trust-badge" title="Foreclosure + transfer signal (likely living-trust owner)">trust owner</span>`
             : "";
+        const yearsDelinquentBadge =
+          r.display_years_tax_delinquent != null
+            ? `<span class="cell-tag years-delinquent-badge" title="Years tax delinquent (oldest unpaid year to today)">${r.display_years_tax_delinquent}yr delinquent</span>`
+            : "";
         const flagsCell = (r.review_flags || []).length
           ? `<div class="cell-tags">${r.review_flags
               .map((f) => `<span class="cell-tag flag-tag">${escapeHtml(f)}</span>`)
@@ -397,7 +478,7 @@
           <td><span class="tier-badge" data-tier="${escapeAttr(r.display_tier)}">${escapeHtml(r.display_tier)}</span></td>
           <td>${escapeHtml(r.primary_parcel_id || "")}${pendingBadge ? " " + pendingBadge : ""}</td>
           <td>${escapeHtml(r.display_address || "")}${heirBadge ? " " + heirBadge : ""}${trustBadge ? " " + trustBadge : ""}</td>
-          <td>${escapeHtml(r.display_owner || "")}</td>
+          <td>${escapeHtml(r.display_owner || "")}${yearsDelinquentBadge ? " " + yearsDelinquentBadge : ""}</td>
           <td><div class="cell-tags">${(r.display_patterns || []).map((p) => `<span class="cell-tag">${escapeHtml(p)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_attributes || []).map((a) => `<span class="cell-tag">${escapeHtml(a)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_deal_paths || []).map((d) => `<span class="cell-tag">${escapeHtml(d)}</span>`).join("")}</div></td>
@@ -880,9 +961,21 @@
     document.getElementById("reset-filters").addEventListener("click", () => {
       Object.values(state.filters).forEach((s) => s.clear());
       state.precannedView = null;
+      state.minYearsDelinquent = null;
+      const yd = document.getElementById("min-years-delinquent");
+      if (yd) yd.value = "";
       state.page = 1;
       render();
     });
+    const minYearsInput = document.getElementById("min-years-delinquent");
+    if (minYearsInput) {
+      minYearsInput.addEventListener("input", (e) => {
+        const v = e.target.value;
+        state.minYearsDelinquent = v === "" ? null : Number(v);
+        state.page = 1;
+        render();
+      });
+    }
     document.getElementById("toggle-view-mode").addEventListener("click", (e) => {
       state.mode = state.mode === "client" ? "operator" : "client";
       e.currentTarget.textContent =

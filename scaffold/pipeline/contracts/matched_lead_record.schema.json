@@ -135,6 +135,16 @@
             "maxItems": 2,
             "items": { "type": ["string", "null"], "format": "date" },
             "description": "The [earliest, latest] pair for display (18.C)."
+          },
+          "earliest_event_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "2026-09-22 fix: earliest raw_event_record.event_date in the group -- distinct from recorded_date (a status/filing date like a tax due date or sale date, per raw_event_record.schema.json's own event_date definition). Optional, for backward compatibility with groups built before this field existed. Falls back to recorded_date in scoring_seam.py's primary_event_date derivation only when no recorded_date exists at all (e.g. tax_collector's suit-based leads, which carry a due-date event_date but no clerk-recording date)."
+          },
+          "latest_event_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "2026-09-22 fix: latest raw_event_record.event_date in the group. See earliest_event_date."
           }
         }
       }

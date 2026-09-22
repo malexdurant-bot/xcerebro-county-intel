@@ -217,6 +217,17 @@ def project_scored_lead(scored_lead: dict) -> dict:
         "display_patterns": list(scored_lead.get("display_patterns") or []),
         "stack_contrib_patterns": list(scored_lead.get("patterns") or []),
         "display_pattern_set": list(scored_lead.get("pattern_set") or []),
+        # 2026-09-15: the specific canonical_doc_type(s) behind this lead's
+        # pattern(s) -- e.g. pattern "lien" covers hospital_lien,
+        # child_support_lien, mechanics_lien, abstract_of_judgment, etc.
+        # Needed for a lead-type -> lead-subtype drill-down filter (a
+        # pattern is too coarse on its own to answer "how many hospital
+        # liens are we getting"). Sourced from the audit-only
+        # doc_type_normalization block, which is null when not computed --
+        # never assumed present.
+        "display_doc_types": list(
+            (scored_lead.get("doc_type_normalization") or {}).get("canonical_doc_types") or []
+        ),
         "display_attributes": list(scored_lead.get("attributes") or []),
         "display_deal_paths": [
             dp.get("path") for dp in scored_lead.get("deal_paths", [])
@@ -230,6 +241,16 @@ def project_scored_lead(scored_lead: dict) -> dict:
         "display_last_sale_price": parcel.get("last_sale_price"),
         "display_last_sale_date": parcel.get("last_sale_date"),
         "display_year_built": parcel.get("year_built"),
+        # 2026-09-15: absentee-owner / out-of-state-owner / years-tax-
+        # delinquent -- present on parcel_display (scored_lead_record.
+        # schema.json) for any county whose parcel_master scraper populates
+        # owner_mailing_*/situs_state, or whose tax source attaches
+        # years_tax_delinquent, but silently dropped before this fix since
+        # this projection didn't read them. Same R3(iii) rule as every
+        # other parcel_display field: None on an UNENRICHED lead.
+        "display_is_absentee_owner": parcel.get("is_absentee_owner"),
+        "display_is_out_of_state_owner": parcel.get("is_out_of_state_owner"),
+        "display_years_tax_delinquent": parcel.get("years_tax_delinquent"),
         "display_match_confidence": scored_lead.get("match_confidence") or 0,
         "stack_depth": scored_lead.get("stack_depth", 0),
         "score_reasons": list(scored_lead.get("score_reasons") or []),

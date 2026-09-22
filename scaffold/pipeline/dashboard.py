@@ -64,6 +64,11 @@ def project_lead(lead: dict, parcel: dict) -> dict:
         "display_last_sale_price": parcel.get("last_sale_price"),
         "display_last_sale_date": parcel.get("last_sale_date"),
         "display_year_built": parcel.get("year_built"),
+        # 2026-09-15: present for any county whose parcel_master scraper
+        # populates owner_mailing_*/situs_state (see parcel_master.py's
+        # translate_parcel_master / _derive_absentee_flags).
+        "display_is_absentee_owner": parcel.get("is_absentee_owner"),
+        "display_is_out_of_state_owner": parcel.get("is_out_of_state_owner"),
         "display_match_confidence": lead.get("match_confidence", 0),
         "stack_depth": lead.get("stack_depth", 0),
         "score_reasons": lead.get("score_reasons", []),

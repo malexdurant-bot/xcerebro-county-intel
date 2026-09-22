@@ -100,11 +100,15 @@ def main() -> None:
                               "scrapers/parcel_master_dcad_dallas.py) to reuse instead of "
                               "re-querying every account live.")
     parser.add_argument("--skip-scrape", action="store_true",
-                         help="Skip Step 1 entirely and reuse whatever raw JSONL for all 4 "
+                         help="Skip Step 1 entirely and reuse whatever raw JSONL for all "
                               "sources already exists on disk. For re-running translate/"
                               "scoring/publish after a code fix without waiting through a "
                               "full re-scrape (e.g. clerk_recordings' RP department alone "
                               "can take 15+ pages).")
+    parser.add_argument("--skip-dcad-bulk", action="store_true",
+                         help="Skip the DCAD bulk Data Products download/parse (2026-09-15 "
+                              "-- ~170MB, a few minutes) and reuse whatever raw "
+                              "parcel_master.jsonl already exists on disk, if any.")
     args = parser.parse_args()
 
     approve_review = not args.no_approve_review
@@ -122,6 +126,7 @@ def main() -> None:
         from scrapers.publicsearch_foreclosures_dallas import run_scraper as scrape_foreclosure_notices  # noqa: E402
         from scrapers.tax_collector_dallas import run_scraper as scrape_tax_collector  # noqa: E402
         from scrapers.taxsales_lgbs_dallas import run_scraper as scrape_taxsales_lgbs  # noqa: E402
+        from scrapers.parcel_master_dcad_bulk_dallas import run_scraper as scrape_dcad_bulk  # noqa: E402
 
         print("[dallas_tx] Scraping clerk_recordings + foreclosure_notices (PublicSearch)...")
         scrape_clerk_recordings(RAW_DIR, verbose=True)
@@ -136,6 +141,13 @@ def main() -> None:
 
         print("[dallas_tx] Scraping tax_foreclosure_resales + sheriff_sales (LGBS API)...")
         scrape_taxsales_lgbs(RAW_DIR, verbose=True)
+
+        if args.skip_dcad_bulk:
+            print("[dallas_tx] --skip-dcad-bulk: reusing existing raw parcel_master.jsonl")
+        else:
+            print("[dallas_tx] Scraping parcel_master (DCAD bulk Data Products download — "
+                  "~170MB, a few minutes; cached weekly, see data/cache/dallas_dcad_bulk/)...")
+            scrape_dcad_bulk(RAW_DIR, verbose=True)
 
     if args.dry_run:
         print("[dallas_tx] --dry-run: stopping before pipeline stages. Done.")
@@ -207,13 +219,19 @@ def main() -> None:
         print(f"[dallas_tx]   {len(foreclosure_ocr_hints)} watermark-cleanup review hints "
               f"-> {hints_path}", flush=True)
 
-    print("[dallas_tx] Streaming + translating tax_collector (large file, filtered inline)...", flush=True)
+    print("[dallas_tx] Streaming + translating tax_collector (large file, filtered inline; "
+          "suit-required only, per operator instruction)...", flush=True)
     tax_collector_path = RAW_DIR / "tax_collector.jsonl"
-    tax_collector_events = (
-        stream_translate_tax_collector(tax_collector_path, verbose=True)
-        if tax_collector_path.exists() else []
-    )
-    print(f"[dallas_tx]   tax_collector: -> {len(tax_collector_events)} events (suit-pending + recent only)", flush=True)
+    if tax_collector_path.exists():
+        tax_collector_events, years_delinquent_by_account = stream_translate_tax_collector(
+            tax_collector_path, verbose=True,
+        )
+    else:
+        tax_collector_events, years_delinquent_by_account = [], {}
+    print(f"[dallas_tx]   tax_collector: -> {len(tax_collector_events)} events "
+          f"(suit-pending + recent only); years-delinquent computed for "
+          f"{len(years_delinquent_by_account)} accounts (attached to leads below, "
+          "not used to gate them)", flush=True)
 
     print("[dallas_tx] Loading tax_foreclosure_resales + sheriff_sales (LGBS)...", flush=True)
     resales_raw = _load_jsonl(RAW_DIR / "tax_foreclosure_resales.jsonl")
@@ -229,8 +247,20 @@ def main() -> None:
     # since DCAD's account lookup returns a real owner name where the LGBS
     # feed itself exposes none, feeding translate_taxsales_lgbs's
     # dcad_lookup parameter.
+    #
+    # 2026-09-15: dcad_lookup's PRIMARY source is now the DCAD bulk Data
+    # Products file (scrapers/parcel_master_dcad_bulk_dallas.py) rather than
+    # the live per-account HTTP lookup -- one local dict build instead of
+    # thousands of ~0.9s sequential requests, AND it carries owner mailing
+    # address / is_absentee_owner / is_out_of_state_owner, which the live
+    # lookup can never expose (DCAD's per-account detail pages are
+    # robots.txt-disallowed; the bulk file is not). The live per-account
+    # lookup (enrich_accounts) now only runs for accounts the bulk file
+    # doesn't have (new filings the bulk export hasn't caught up to yet) --
+    # a much smaller remainder set, not the full account list.
     # ------------------------------------------------------------------
     dcad_lookup: dict = {}
+    dcad_bulk_lookup: "dict | None" = None  # populated below; reused by Step 2c
     if args.dcad_cache:
         print(f"[dallas_tx] Loading DCAD enrichment cache from {args.dcad_cache}...", flush=True)
         dcad_lookup = json.loads(Path(args.dcad_cache).read_text(encoding="utf-8"))
@@ -244,14 +274,33 @@ def main() -> None:
             acct = (rec.get("raw_payload") or {}).get("account_nbr")
             if acct:
                 accounts.add(acct)
-        print(f"[dallas_tx] DCAD enrichment: looking up {len(accounts)} unique accounts "
-              f"(this can take 15-25min)...", flush=True)
-        from scrapers.parcel_master_dcad_dallas import enrich_accounts  # noqa: E402
-        dcad_cache_path = WORKDIR / "dcad_enrichment_cache.json"
-        dcad_lookup = enrich_accounts(
-            sorted(accounts), verbose=True, checkpoint_path=dcad_cache_path
-        )
-        print(f"[dallas_tx] DCAD enrichment cache written -> {dcad_cache_path}", flush=True)
+
+        dcad_bulk_path = RAW_DIR / "parcel_master.jsonl"
+        if dcad_bulk_path.exists():
+            from scrapers.parcel_master_dcad_bulk_dallas import load_lookup_from_jsonl  # noqa: E402
+            print(f"[dallas_tx] Loading DCAD bulk parcel_master.jsonl ({dcad_bulk_path})...", flush=True)
+            dcad_bulk_lookup = load_lookup_from_jsonl(dcad_bulk_path)
+            dcad_lookup = dict(dcad_bulk_lookup["by_account"])
+            print(f"[dallas_tx]   {len(dcad_lookup)} accounts indexed from the bulk file", flush=True)
+        else:
+            print("[dallas_tx] No DCAD bulk parcel_master.jsonl found (run without "
+                  "--skip-dcad-bulk / --skip-scrape at least once) -- falling back "
+                  "entirely to the live per-account lookup", flush=True)
+
+        missing_accounts = sorted(a for a in accounts if a not in dcad_lookup)
+        if missing_accounts:
+            print(f"[dallas_tx] DCAD live fallback lookup: {len(missing_accounts)}/{len(accounts)} "
+                  f"accounts not in the bulk file (new filings) -- looking these up live...", flush=True)
+            from scrapers.parcel_master_dcad_dallas import enrich_accounts  # noqa: E402
+            dcad_cache_path = WORKDIR / "dcad_enrichment_cache.json"
+            live_lookup = enrich_accounts(
+                missing_accounts, verbose=True, checkpoint_path=dcad_cache_path
+            )
+            dcad_lookup.update({k: v for k, v in live_lookup.items() if v})
+            print(f"[dallas_tx] DCAD live fallback cache written -> {dcad_cache_path}", flush=True)
+        else:
+            print(f"[dallas_tx] All {len(accounts)} accounts resolved from the bulk file "
+                  f"-- no live fallback lookups needed", flush=True)
     else:
         print("[dallas_tx] --skip-dcad-enrichment: leads will have no address", flush=True)
 
@@ -309,6 +358,7 @@ def main() -> None:
         addr_owner_hits = 0
         addr_owner_attempted = 0
         name_fallback_hits = 0
+        bulk_hits = 0
 
         def _cached_lookup(cache_key: str, do_lookup) -> "dict | None":
             if cache_key in addr_owner_cache:
@@ -316,6 +366,31 @@ def main() -> None:
             result = do_lookup()
             addr_owner_cache[cache_key] = result
             return result
+
+        # 2026-09-15: try the (already-loaded, if present) DCAD bulk index
+        # before the live per-account/address/owner HTTP lookup -- local
+        # dict lookups instead of network round-trips, and the bulk hit
+        # already carries owner_mailing_*/is_absentee_owner/
+        # is_out_of_state_owner, which the live DCADSession lookup can't.
+        def _lookup_address(addr: str) -> "dict | None":
+            nonlocal bulk_hits
+            if dcad_bulk_lookup is not None:
+                from scrapers.parcel_master_dcad_bulk_dallas import lookup_by_address as _bulk_lookup_by_address
+                hit = _bulk_lookup_by_address(dcad_bulk_lookup, addr)
+                if hit:
+                    bulk_hits += 1
+                    return hit
+            return _cached_lookup(f"addr:{addr}", lambda a=addr: dcad_session.lookup_by_address(a, verbose=True))
+
+        def _lookup_owner_name(name: str) -> "dict | None":
+            nonlocal bulk_hits
+            if dcad_bulk_lookup is not None:
+                from scrapers.parcel_master_dcad_bulk_dallas import lookup_by_owner_name as _bulk_lookup_by_owner_name
+                hit = _bulk_lookup_by_owner_name(dcad_bulk_lookup, name)
+                if hit:
+                    bulk_hits += 1
+                    return hit
+            return _cached_lookup(f"owner:{name}", lambda n=name: dcad_session.lookup_by_owner_name(n, verbose=True))
 
         def _enrich_events_needing_parcel(events: list[dict], try_address: bool) -> None:
             nonlocal addr_owner_hits, addr_owner_attempted, name_fallback_hits
@@ -328,10 +403,7 @@ def main() -> None:
                 situs_address = refs.get("situs_address") if try_address else None
                 if situs_address:
                     addr_owner_attempted += 1
-                    hit = _cached_lookup(
-                        f"addr:{situs_address}",
-                        lambda a=situs_address: dcad_session.lookup_by_address(a, verbose=True),
-                    )
+                    hit = _lookup_address(situs_address)
 
                 # A confident address match found a REAL DCAD owner-of-record
                 # name. §13.14 (leads_base_writer.py) nulls the aggregation
@@ -364,20 +436,18 @@ def main() -> None:
                     owner_name = resolved.get("owner_name")
                     if resolved.get("debtor_resolution_status") == "RESOLVED" and owner_name:
                         addr_owner_attempted += 1
-                        hit = _cached_lookup(
-                            f"owner:{owner_name}",
-                            lambda n=owner_name: dcad_session.lookup_by_owner_name(n, verbose=True),
-                        )
+                        hit = _lookup_owner_name(owner_name)
 
                 if hit:
                     addr_owner_hits += 1
                     ev["property_refs"]["parcel_id"] = hit["account_number"]
+                    # hit may come from either the bulk lookup (carries
+                    # owner_mailing_*/is_absentee_owner/is_out_of_state_owner)
+                    # or the live DCADSession (doesn't) -- pass through
+                    # whatever keys are actually present rather than
+                    # hardcoding the live lookup's narrower shape.
                     dcad_lookup[hit["account_number"]] = {
-                        "situs_address": hit["situs_address"],
-                        "situs_city": hit["situs_city"],
-                        "owner_name": hit["owner_name"],
-                        "assessed_value": hit["assessed_value"],
-                        "property_type": hit["property_type"],
+                        k: v for k, v in hit.items() if k != "account_number"
                     }
 
         print(f"[dallas_tx] DCAD address/owner enrichment: {len(foreclosure_events)} foreclosure_notices "
@@ -389,7 +459,8 @@ def main() -> None:
         # extraction) where it never could before.
         _enrich_events_needing_parcel(clerk_events, try_address=True)
         print(f"[dallas_tx]   {addr_owner_hits}/{addr_owner_attempted} address/owner lookups matched "
-              f"a single confident DCAD account", flush=True)
+              f"a single confident DCAD account ({bulk_hits} from the bulk index, "
+              f"{addr_owner_hits - bulk_hits} via live fallback)", flush=True)
         print(f"[dallas_tx]   {name_fallback_hits} of those also injected a DCAD owner-of-record name "
               f"as a MORTGAGOR fallback (debtor wasn't otherwise resolved)", flush=True)
 
@@ -491,12 +562,34 @@ def main() -> None:
                 "situs_city": match.get("situs_city"),
                 "situs_state": "TX",
                 "assessed_value": match.get("assessed_value"),
+                # 2026-09-15 client request: absentee-owner / out-of-state-
+                # owner flags. None (not present in a live-fallback-only
+                # match) when the bulk index never covered this account --
+                # scored_lead_record.schema.json allows null here, matching
+                # this framework's "unknown is not the same as false" rule
+                # (see parcel_master.py's _derive_absentee_flags docstring).
+                "is_absentee_owner": match.get("is_absentee_owner"),
+                "is_out_of_state_owner": match.get("is_out_of_state_owner"),
+                "owner_mailing_address": match.get("owner_mailing_address"),
+                "owner_mailing_city": match.get("owner_mailing_city"),
+                "owner_mailing_state": match.get("owner_mailing_state"),
+                "owner_mailing_zip": match.get("owner_mailing_zip"),
+                # years_tax_delinquent (2026-09-15 client request, revised):
+                # only meaningful for tax_collector-sourced leads, where
+                # primary_parcel_id IS the tax account number -- a harmless
+                # miss (None) for every other lead type, whose parcel_id is
+                # a DCAD account instead. Informational only; does not gate
+                # which rows become leads (see stream_translate_tax_collector).
+                "years_tax_delinquent": years_delinquent_by_account.get(pid),
             }
             # Schema contract: parcel_display is present iff enrichment_status
             # is ENRICHED (scored_lead_record.schema.json).
             lead["enrichment_status"] = "ENRICHED"
             enriched_count += 1
-    print(f"[dallas_tx] DCAD-enriched {enriched_count}/{len(scored_leads)} leads with a real address", flush=True)
+    absentee_count = sum(1 for l in scored_leads if (l.get("parcel_display") or {}).get("is_absentee_owner"))
+    oos_count = sum(1 for l in scored_leads if (l.get("parcel_display") or {}).get("is_out_of_state_owner"))
+    print(f"[dallas_tx] DCAD-enriched {enriched_count}/{len(scored_leads)} leads with a real address "
+          f"({absentee_count} absentee owner, {oos_count} out-of-state owner)", flush=True)
 
     # ------------------------------------------------------------------
     # Step 3c — Fallback: attach a document-sourced address (no DCAD match)

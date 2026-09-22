@@ -414,6 +414,35 @@ UNIVERSAL_DEBTOR_PARTY_RULES: dict[str, dict] = {
         "missing_debtor_review_reason": "owner_not_on_document",
     },
     # -----------------------------------------------------------------------
+    # Dallas client-requested expansion (2026-09-15) — two genuinely new
+    # doc-type concepts with no existing rule row or family alias close
+    # enough to reuse verbatim (see transfer_of_tax_lien below for a case
+    # that DID reuse an existing rule via fan-out instead of a new row here).
+    # -----------------------------------------------------------------------
+    # Child support lien. Same shape as hospital_lien/code_lien/
+    # administrative_lien: an institutional filer (the child support
+    # enforcement agency/office) records a lien against the obligor's
+    # property; TP is the debtor, GE the fallback if TP is absent, GR (the
+    # filing agency) suppressed as the filer.
+    "child_support_lien": {
+        "expected_debtor_name_type": "TP",
+        "fallback_debtor_name_type": "GE",
+        "filer_name_types": ["GR"],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "child support enforcement agency / office",
+    },
+    # Guardian's deed. Same shape as executors_deed/administrators_deed: a
+    # court-appointed fiduciary (here, a guardian) conveys the ward's
+    # property; GR is the debtor/lead subject (the ward's estate), no
+    # adversarial filer to suppress.
+    "guardians_deed": {
+        "expected_debtor_name_type": "GR",
+        "fallback_debtor_name_type": None,
+        "filer_name_types": [],
+        "debtor_source": "STRUCTURED",
+        "known_filer_role": "none (the ward's estate is the lead subject)",
+    },
+    # -----------------------------------------------------------------------
     # Operator gap-fill (post-Session 8) — three `lead_generating` P0 registry
     # doc types (quitclaim_deed, partition_action, quiet_title_action) had no
     # §17.C rule row and were falling through to the F-5 default
@@ -524,6 +553,20 @@ BROAD_KEY_REGISTRY_ALIASES: dict[str, tuple[str, ...]] = {
     ),
     "trustee_sale": ("trustees_deed_upon_sale",),
 }
+# transfer_of_tax_lien (Dallas client expansion, 2026-09-15): checked live
+# against real Kofile data before assuming this was a state_tax_lien-style
+# TP/GR pattern like the other tax lien types -- it is NOT reliably so.
+# Confirmed live: many TRANSFER OF TAX LIEN grantors are the actual owner
+# (e.g. "NAVARRO ORTHODONTIX OF IRVING PC", "FIVE SHADES OF GRAY LLC"), but
+# a substantial share instead show a taxing jurisdiction as grantor (e.g.
+# "DALLAS COUNTY", "RICHARDSON ISD") transferring to the same private
+# tax-lien buyer ("HOME TAX SOLUTIONS LLC", "PROPEL TAX") that appears as
+# grantee throughout -- i.e. neither party reliably names the property
+# owner on those rows. Deliberately left with NO debtor_party_engine rule
+# (same posture as mechanics_lien/construction_lien's own documented
+# "mixed/inconclusive... would be a guess" case) -- routes to
+# REVIEW_REQUIRED rather than risk resolving "DALLAS COUNTY" or "HOME TAX
+# SOLUTIONS LLC" as the lead's owner name.
 """v5.4.0 Session 8 — for each broad §17 rule key, the registry-aligned
 canonical_doc_type values the same rule must fire on after the cutover. Empty
 tuple = broad bucket with no registry-fan-out (its children carry their own
@@ -572,7 +615,31 @@ _FILER_SUPPRESSION_PATTERNS: dict[str, list[tuple[str, re.Pattern]]] = {
     "state_agency": [
         ("<STATE> COMPTROLLER", _ci(r"\bCOMPTROLLER\b")),
         ("<STATE> WORKFORCE COMMISSION", _ci(r"\bWORKFORCE\s+COMMISSION\b")),
+        # 2026-09-22: the abbreviated "DEPT OF" never matched the spelled-
+        # out "DEPARTMENT OF" pattern -- confirmed live on a real Dallas
+        # CHILD SUPPORT LIEN row: grantee "ILLINOIS DEPT OF HEALTHCARE &
+        # FAMILY SERVICES CHILD SUPPORT ENFORCEMENT" slipped through
+        # unsuppressed.
         ("<STATE> DEPARTMENT OF <*>", _ci(r"\bDEPARTMENT\s+OF\b")),
+        ("<STATE> DEPT OF <*>", _ci(r"\bDEPT\.?\s+OF\b")),
+    ],
+    # 2026-09-22: added after live-checking CHILD SUPPORT LIEN direction for
+    # the Dallas doc-type expansion (2026-09-15) -- found the grantor/
+    # grantee direction is genuinely mixed depending on who files: an
+    # individual obligee filing directly has grantor=filer/grantee=debtor
+    # (matches the existing rule's GR/GE default), but an out-of-state
+    # child-support ENFORCEMENT AGENCY filing has the opposite
+    # (grantor=debtor/grantee=agency) -- confirmed live, e.g. grantor "REED
+    # ALVIN T" / grantee "ILLINOIS DEPT OF HEALTHCARE & FAMILY SERVICES
+    # CHILD SUPPORT ENFORCEMENT". Rather than guess a single direction (the
+    # same trap transfer_of_tax_lien was deliberately left unmapped to
+    # avoid), this adds a name-pattern safety net: whichever slot an
+    # agency name lands in, it can never be returned as owner_name, so the
+    # correct debtor still resolves via the OTHER slot regardless of which
+    # direction that particular filing happened to use.
+    "child_support_agency": [
+        ("CHILD SUPPORT <*>", _ci(r"\bCHILD\s+SUPPORT\b")),
+        ("<STATE> ATTORNEY GENERAL", _ci(r"\bATTORNEY\s+GENERAL\b")),
     ],
     "hospital_entity": [
         ("HOSPITAL", _ci(r"\bHOSPITALS?\b")),

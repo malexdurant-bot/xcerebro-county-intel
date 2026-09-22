@@ -222,7 +222,10 @@
         "last_sale_price": { "type": ["number", "null"] },
         "last_sale_date": { "type": ["string", "null"], "format": "date" },
         "year_built": { "type": ["integer", "null"] },
-        "property_class": { "type": ["string", "null"] }
+        "property_class": { "type": ["string", "null"] },
+        "is_absentee_owner": { "type": ["boolean", "null"] },
+        "is_out_of_state_owner": { "type": ["boolean", "null"] },
+        "years_tax_delinquent": { "type": ["number", "null"] }
       }
     },
     "lead_status_history": {

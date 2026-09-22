@@ -29,6 +29,38 @@ knowledge surfaces. Each entry should be:
 
 (notes that apply across all sources for this county build)
 
+- 2026-09-15: Client (Penny Patel) call follow-up requested four changes:
+  absentee-owner detection, out-of-state-owner detection, a tax-delinquent-
+  years filter, and expanded Dallas County Clerk document-type coverage
+  (her own Tier 1-4 taxonomy, with the county's own exact index spellings
+  including misspellings). Operator decisions made this session:
+  - Tier 1 (distress) + Tier 2 (life-event) doc types -> new daily leads.
+  - Tier 3 (title/payoff/signing) + Tier 4 (competitor/own filings) doc
+    types -> deliberately NOT added to the daily feed (majority of all
+    county recordings, would drown the distress signal). Built as a
+    separate on-demand tool instead (title_chain_lookup.py) that only
+    searches against owners/properties already surfaced by a Tier 1/2
+    lead, and links hits back to that lead.
+  - Tax delinquency: first built as a new no-suit-required lead type at 3+
+    years delinquent, per the initial operator decision. Real cached-data
+    run found it added 55,495 additional leads (vs. ~59,436 existing
+    suit-based ones) -- more than doubling daily volume. After seeing that
+    number, the operator reversed course: tax leads stay suit-required
+    ONLY (as originally built), and years-delinquent is instead computed
+    and attached as a filterable/visible attribute
+    (parcel_display.years_tax_delinquent) on those suit-based leads, not a
+    trigger for a separate lead type. See translate.py's
+    stream_translate_tax_collector docstring.
+  - The client also pasted live login credentials for several portals
+    (PublicSearch, Dallas Open Data, Sheriff Auctions, PACER) mid-session.
+    Not used or stored anywhere in this repo -- none of this session's
+    changes required them (see clerk_recordings note below on the
+    FEDERAL/STATE/HOSPITAL/CHILD SUPPORT lien categories). If a future
+    source genuinely needs login, the intended pattern is a one-time
+    interactive login by the operator with the session state cached to a
+    local, git-ignored file and reused automatically -- not a stored
+    password.
+
 ## court_civil / court_probate
 
 - 2026-08-23: Confirmed both Tyler Odyssey portals (Smart Search at
@@ -87,6 +119,26 @@ knowledge surfaces. Each entry should be:
     site for sheriff_sales) — not yet updated to point at this API. Worth a
     config correction pass alongside the court_civil/court_probate updates.
 
+## parcel_master
+
+- 2026-09-15: The client's absentee-owner / out-of-state-owner request
+  needs owner mailing address, which DCAD's per-account detail pages
+  (AcctDetail*.aspx) can never expose -- confirmed live, `robots.txt`
+  disallows `/Acct`, and the existing per-account scraper
+  (parcel_master_dcad_dallas.py) already correctly respects that and never
+  fetches them. Found the fix: DCAD's public "Data Products" bulk download
+  (dallascad.org/DataProducts.aspx) is a DIFFERENT, NOT-disallowed path --
+  confirmed live: a plain ~170MB zip, no login (`curl -I` returned 200),
+  containing ACCOUNT_INFO.CSV (863,771 rows, one per account) with full
+  owner mailing address AND situs address. Built
+  scrapers/parcel_master_dcad_bulk_dallas.py against it; verified live
+  against the same two known-good test accounts already documented in
+  parcel_master_dcad_dallas.py's own docstring (00000110496000000 /
+  28218500060120000) -- both matched correctly. This is now the PRIMARY
+  parcel_master source; the old live per-account lookup is kept only as a
+  fallback for accounts the weekly bulk export hasn't caught up to yet.
+- Estimated cost category: FREE (no signup, no payment, confirmed live).
+
 ## clerk_recordings / foreclosure_notices
 
 - 2026-08-22: Initial scraper build (scrapers/publicsearch_recorder_dallas.py)
@@ -124,3 +176,32 @@ knowledge surfaces. Each entry should be:
   The `#docTypes` dropdown option elements report `is_visible()==False` to
   Playwright even when open; must select via `element.evaluate("el =>
   el.click()")`, not a normal `.click()`.
+- 2026-09-15: Checked live whether the client's "separate top-level
+  categories" (FEDERAL TAX LIENS, STATE TAX LIENS, HOSPITAL LIENS, CHILD
+  SUPPORT LIENS) are separate PublicSearch departments needing new scraper
+  work, the same way Foreclosures (`FC`) turned out to be. They are NOT --
+  confirmed live via Advanced Search's Department dropdown: the portal only
+  has 6 departments total (Property Records, Assumed Names, Marriage, Marks
+  and Brands, Commissioners Court Minutes, Foreclosures). All four of the
+  client's "categories" are Document-Type filter GROUPS inside Property
+  Records (confirmed live by typing "LIEN"/"HOSPITAL" into the Advanced
+  Search Document Types filter) -- i.e. already covered by the existing
+  unfiltered date-range RP scrape. No new department/portal work needed,
+  just doc-type map expansion (translate.py's _CLERK_DOC_TYPE_MAP).
+- 2026-09-15: Grantor/grantee direction checked live for two of the newly
+  added doc types before assuming a debtor-party rule:
+  - HOSPITAL LIEN (2/2 live samples): Grantor is the individual patient,
+    Grantee the hospital ("PORCH ANTHONY" / "RUIZ LUIS" ->
+    "METHODIST DALLAS MEDICAL CENTER") -- same reversed convention as the
+    tax-lien family. Added to translate.py's _TAX_LIEN_FAMILY_DOC_TYPES.
+  - TRANSFER OF TAX LIEN (browsed ~50 of 7,864 live results): direction is
+    genuinely mixed -- many rows show the real owner as Grantor (e.g.
+    "NAVARRO ORTHODONTIX OF IRVING PC" -> "PROPEL TAX"), but a substantial
+    share instead show a taxing jurisdiction as Grantor (e.g.
+    "DALLAS COUNTY", "RICHARDSON ISD" -> "HOME TAX SOLUTIONS LLC") with no
+    owner name on the row at all. Deliberately left with NO
+    debtor_party_engine.py rule (routes to REVIEW_REQUIRED) rather than
+    risk resolving a jurisdiction or lien-buyer name as the lead's owner.
+  - ADMINISTRATIVE LIEN and CHILD SUPPORT LIEN: no live samples found to
+    check (both low-volume). Left on the framework's GR/GE default,
+    unverified -- flag for a future direction check once real leads exist.

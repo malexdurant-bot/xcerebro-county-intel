@@ -245,8 +245,19 @@ def adapt_matched_lead_to_stack(
         document_priority = canonical_entry.get("document_priority", 0)
         latest = _parse_iso_date(group.get("latest_recorded_date"))
         earliest = _parse_iso_date(group.get("earliest_recorded_date"))
-        event_date = (group.get("latest_recorded_date")
-                      or group.get("earliest_recorded_date"))
+        # 2026-09-22 fix: fall back to the group's event_date range (a
+        # status/filing date distinct from recorded_date -- see
+        # aggregator.py's merge_signal_group) when there's no recorded_date
+        # at all. This is what actually surfaces as primary_event_date
+        # below -- previously always None for any source whose raw events
+        # never carry a recorded_date (e.g. tax_collector's suit-based
+        # leads, which only ever had a due_date-derived event_date).
+        event_date = (
+            group.get("latest_recorded_date")
+            or group.get("earliest_recorded_date")
+            or group.get("latest_event_date")
+            or group.get("earliest_event_date")
+        )
         count = int(group.get("count") or 1)
         if count < 1:
             count = 1
