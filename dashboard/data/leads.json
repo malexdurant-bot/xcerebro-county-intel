@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-09-18T14:09:56Z",
+  "generated_at": "2026-09-22T14:06:47Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
   "state": "SC",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 452,
+  "lead_total": 453,
   "enrichment_breakdown": {
-    "ENRICHED": 232,
+    "ENRICHED": 233,
     "UNENRICHED": 220
   },
   "pattern_counts": {
     "estate": 286,
     "foreclosure": 45,
-    "lien": 30,
+    "lien": 31,
     "lis_pendens": 52,
     "tax": 46
   },
@@ -21,21 +21,21 @@
     "absentee": 66,
     "entity_owned": 24,
     "free_and_clear": 35,
-    "high_equity": 89,
+    "high_equity": 90,
     "long_term_owned": 78,
     "out_of_state": 15,
     "senior_owner": 33,
     "vacant": 7
   },
   "stack_depth_distribution": {
-    "1": 446,
+    "1": 447,
     "2": 5,
     "3": 1
   },
   "score_tier_distribution": {
     "Archive": 4,
     "Hot": 1,
-    "Low": 68,
+    "Low": 69,
     "Strong": 50,
     "Workable": 329
   },
@@ -43,7 +43,7 @@
     "messy_title": 52,
     "partial_interest": 58,
     "sub_to": 20,
-    "wholesale": 452
+    "wholesale": 453
   },
   "records": [
     {
@@ -256,7 +256,7 @@
       "primary_source_urls": [
         "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_08914-01-08",
@@ -402,7 +402,7 @@
       "primary_source_urls": [
         "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_11116-05-12",
@@ -3909,7 +3909,7 @@
       "primary_source_urls": [
         "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_R09004-02-09",
@@ -8508,7 +8508,7 @@
     },
     {
       "lead_id": "lead_parcel_R14301-17-02",
-      "scored_lead_id": "scored_8c1bfb463451ed73",
+      "scored_lead_id": "scored_453bf1d9eeda3573",
       "primary_parcel_id": "R14301-17-02",
       "display_address": "6005 ROSEBUD ST, COLUMBIA, SC",
       "display_address_street": "6005 ROSEBUD ST",
@@ -8517,7 +8517,7 @@
       "display_address_zip": "29203",
       "display_owner": "IRVIN LAWRENCE BOWMAN",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 58,
+      "display_score": 63,
       "display_tier": "Workable",
       "display_patterns": [
         "estate"
@@ -8532,7 +8532,8 @@
         "letters_testamentary"
       ],
       "display_attributes": [
-        "absentee"
+        "absentee",
+        "high_equity"
       ],
       "display_deal_paths": [
         "wholesale"
@@ -8547,8 +8548,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 51500.0,
-      "display_last_sale_price": 51500.0,
-      "display_last_sale_date": "2023-04-12",
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2026-07-20",
       "display_year_built": 1954,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -8562,7 +8563,7 @@
         },
         {
           "factor": "attribute_bonus",
-          "delta": 3
+          "delta": 8
         }
       ],
       "evidence_ids": [],
@@ -15362,6 +15363,72 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_parcel_R23406-01-19",
+      "scored_lead_id": "scored_fa1b95eb33dfe05b",
+      "primary_parcel_id": "R23406-01-19",
+      "display_address": "1073 GREY DUCK LN, BLYTHEWOOD, SC",
+      "display_address_street": "1073 GREY DUCK LN",
+      "display_address_city": "BLYTHEWOOD",
+      "display_address_state": "SC",
+      "display_address_zip": "29016",
+      "display_owner": "BOOKER, CATINA",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lien"
+      ],
+      "stack_contrib_patterns": [
+        "lien"
+      ],
+      "display_pattern_set": [
+        "lien"
+      ],
+      "display_doc_types": [
+        "mechanics_lien"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 316500.0,
+      "display_last_sale_price": 259500.0,
+      "display_last_sale_date": "2018-03-27",
+      "display_year_built": 2016,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_MECHANICS_LIEN",
+          "delta": 30
+        },
+        {
+          "factor": "recent_filing_within_30_days",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-18",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_R23407-01-08",
       "scored_lead_id": "scored_cd31f11de8c3b7a7",
       "primary_parcel_id": "R23407-01-08",
@@ -20345,7 +20412,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026041962",
-      "scored_lead_id": "scored_33ded012503cef79",
+      "scored_lead_id": "scored_4af56b89f3a2c32b",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -20354,7 +20421,7 @@
       "display_address_zip": null,
       "display_owner": "GREGORY TECHNOLOGIES LLC",
       "display_owner_type": "ENTITY",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -20394,10 +20461,6 @@
         {
           "factor": "base_FEDERAL_TAX_LIEN",
           "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -20411,7 +20474,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026041963",
-      "scored_lead_id": "scored_d908f28971aaab1d",
+      "scored_lead_id": "scored_8dabe4fbc83c94ca",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -20420,7 +20483,7 @@
       "display_address_zip": null,
       "display_owner": "A A DICKS CORPORATON",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -20460,10 +20523,6 @@
         {
           "factor": "base_FEDERAL_TAX_LIEN",
           "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -20477,7 +20536,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026041964",
-      "scored_lead_id": "scored_0246067f1c2d9d10",
+      "scored_lead_id": "scored_c7e0123de5bae782",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -20486,7 +20545,7 @@
       "display_address_zip": null,
       "display_owner": "A A DICKS CORPORATION",
       "display_owner_type": "ENTITY",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -20526,10 +20585,6 @@
         {
           "factor": "base_FEDERAL_TAX_LIEN",
           "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -20543,7 +20598,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026041965",
-      "scored_lead_id": "scored_bf1dd5da595b4506",
+      "scored_lead_id": "scored_27db6ccf51632b8d",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -20552,7 +20607,7 @@
       "display_address_zip": null,
       "display_owner": "YOUNG, KAWIANA D",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -20592,10 +20647,6 @@
         {
           "factor": "base_FEDERAL_TAX_LIEN",
           "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -20609,7 +20660,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026041966",
-      "scored_lead_id": "scored_c8582ebee69612cc",
+      "scored_lead_id": "scored_4ec5538eb88c7edc",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -20618,7 +20669,7 @@
       "display_address_zip": null,
       "display_owner": "ARMSTRONG, ANTHONY",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -20658,10 +20709,6 @@
         {
           "factor": "base_FEDERAL_TAX_LIEN",
           "delta": 55
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -21469,7 +21516,7 @@
       "primary_source_urls": [
         "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_unresolved_2026046258",
@@ -30918,7 +30965,7 @@
     }
   ],
   "recency_distribution": {
-    "Active": 397,
-    "Aged": 55
+    "Active": 394,
+    "Aged": 59
   }
 }
