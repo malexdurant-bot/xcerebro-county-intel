@@ -208,6 +208,15 @@ DISTRESS_DOC_TYPES = {
     "MEDICAID ESTAE RECOVERY PROGRAM NOTICE OF WW OF CLAIM AGAINST ESTATE",
     "CERTIFIED COPY OF DIVORCE", "DIVORCE PROCEEDINGS",
     "COMMUNITY PROPERTY SETTLEMENT", "PARTITION DEED", "PARTITION AGREEMENT",
+    # 2026-09-23: these are mapped in translate.py's _CLERK_DOC_TYPE_MAP but
+    # were missing from this set, so they got no OCR pass and no DOM-based
+    # legal-description extraction (see _LEGAL_DESCRIPTION_JS below) -- only
+    # ever the search-results table's own (often "N/A") legal_description
+    # column. Adding them closes that gap.
+    "ADMINISTRATOR'S DEED", "ADMINISTRATORS DEED",
+    "EXECUTOR'S DEED", "EXECUTORS DEED",
+    "QUITCLAIM DEED", "NOTICE OF DEFAULT",
+    "APPOINTMENT OF SUBSTITUTE TRUSTEE",
 }
 
 PAGE1_IMAGE_URL_RE = re.compile(r"/files/documents/\d+/images/\d+_1\.png")

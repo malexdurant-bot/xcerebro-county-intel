@@ -437,6 +437,21 @@ def translate_foreclosure_notices(wrapped_records: list[dict]) -> list[dict]:
     events: list[dict] = []
     for rec in wrapped_records:
         payload = rec.get("raw_payload", {}) or {}
+
+        # 2026-09-23: the doc detail page's own "Property Address" DOM field
+        # (see publicsearch_foreclosures_dallas.py's _PROPERTY_ADDRESS_JS) is
+        # sometimes a real full street address, sometimes just city (no
+        # better than the index row) -- must start with a plausible house
+        # number before trusting it, same "never guess" discipline as every
+        # other OCR/DOM-sourced field in this pipeline. Preferred over the
+        # index-row city fallback below when valid.
+        detail_address = payload.get("property_address_detail")
+        detail_address = (
+            detail_address
+            if detail_address and re.match(r"^\d", detail_address.strip())
+            else None
+        )
+
         events.append({
             "raw_event_id": rec["raw_record_id"],
             "source_id": "foreclosure_notices",
@@ -458,9 +473,12 @@ def translate_foreclosure_notices(wrapped_records: list[dict]) -> list[dict]:
                 # require at least 3 parts (street, city, state[, zip]) before
                 # treating it as a real address.
                 "situs_address": (
-                    payload.get("city")
-                    if payload.get("city") and len(str(payload.get("city")).split(",")) >= 3
-                    else None
+                    detail_address
+                    or (
+                        payload.get("city")
+                        if payload.get("city") and len(str(payload.get("city")).split(",")) >= 3
+                        else None
+                    )
                 ),
                 "legal_description": None,
                 "case_number": None,

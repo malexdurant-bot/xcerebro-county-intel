@@ -177,6 +177,28 @@ SOURCE_ID = "foreclosure_notices"
 PAGE1_IMAGE_URL_RE = re.compile(r"/files/documents/\d+/images/\d+_1\.png")
 _DOCUMENT_IMAGE_WAIT_MS = 8_000
 
+# 2026-09-23: the FC department's document detail view is the same Kofile
+# document-viewer template as Property Records (confirmed live), which
+# exposes a structured "Property Address" panel -- sometimes a real full
+# street address (e.g. "462 ALCORN AVE DALLAS TEXAS 75217"), sometimes just
+# city (no better than the index row's own property_city column, confirmed
+# live on other samples). Captured here at zero extra navigation cost since
+# this page is already visited for OCR. translate.py revalidates it (must
+# start with a plausible house number) before trusting it as a real address,
+# same discipline as every other OCR/DOM-sourced field in this pipeline.
+_PROPERTY_ADDRESS_JS = """
+() => {
+  const headings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6'));
+  const h = headings.find(el => el.textContent.trim() === 'Property Address');
+  if (!h) return null;
+  const sib = h.nextElementSibling;
+  if (!sib) return null;
+  const text = sib.textContent.replace(/\\s+/g, ' ').trim();
+  if (!text || /no (property address|address) found/i.test(text)) return null;
+  return text;
+}
+"""
+
 # Debtor-label words this template uses (mirrors scaffold/pipeline/
 # debtor_party_engine.py's foreclosure_notice/trustee_sale label set, plus
 # TRUSTOR) — used only to locate the row to crop for the watermark-cleanup
@@ -372,13 +394,17 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
             "document_body_text": None,
             "debtor_name_ocr_hint": None,
             "detail_url": None,
+            "property_address_detail": None,
         }
 
         if do_ocr:
             expected_count = len(trs)
-            row["document_body_text"], row["debtor_name_ocr_hint"], row["detail_url"] = _fetch_and_ocr_row_document(
-                page, context, tr_index, verbose
-            )
+            (
+                row["document_body_text"],
+                row["debtor_name_ocr_hint"],
+                row["detail_url"],
+                row["property_address_detail"],
+            ) = _fetch_and_ocr_row_document(page, context, tr_index, verbose)
             if verbose:
                 got = "captured" if row["document_body_text"] else "none"
                 print(f"    [Dallas FC] doc {doc_number}: document body {got}", flush=True)
@@ -513,12 +539,13 @@ def _ocr_watermark_cleaned_hint(image_bytes: bytes, verbose: bool = False) -> st
 
 def _fetch_and_ocr_row_document(
     page, context, row_index: int, verbose: bool
-) -> tuple[str | None, str | None, str | None]:
+) -> tuple[str | None, str | None, str | None, str | None]:
     """Click into row_index's detail view, capture + OCR its page-1 document
     image, then navigate back to the results table. Returns
-    (document_body_text, debtor_name_ocr_hint, detail_url) — any may be None
-    on failure; callers treat a None document_body_text identically to "this
-    source has no document body", the pre-existing behavior.
+    (document_body_text, debtor_name_ocr_hint, detail_url,
+    property_address_detail) — any may be None on failure; callers treat a
+    None document_body_text identically to "this source has no document
+    body", the pre-existing behavior.
     debtor_name_ocr_hint is purely a best-effort human-review aid (see
     _ocr_watermark_cleaned_hint) and is never used for extraction.
 
@@ -554,6 +581,14 @@ def _fetch_and_ocr_row_document(
 
     detail_url = page.url if "/doc/" in page.url else None
 
+    property_address_detail = None
+    if detail_url:
+        try:
+            property_address_detail = page.evaluate(_PROPERTY_ADDRESS_JS)
+        except Exception as exc:
+            if verbose:
+                print(f"  [Dallas FC] Property Address DOM read failed: {exc}", flush=True)
+
     text = None
     hint = None
     if "url" in captured:
@@ -571,7 +606,7 @@ def _fetch_and_ocr_row_document(
 
     page.go_back()
     page.wait_for_timeout(1_500)
-    return text, hint, detail_url
+    return text, hint, detail_url, property_address_detail
 
 
 def _scrape_window(
@@ -640,6 +675,10 @@ def _to_wrapped_records(scraped_rows: list[dict]) -> list[dict]:
             "sale_date_raw": row["sale_date"],
             "recorded_date_raw": recorded_date,
             "document_body_text": row.get("document_body_text"),
+            # Structured DOM field from the doc detail page -- sometimes a
+            # real street address, sometimes just city (see _PROPERTY_ADDRESS_JS).
+            # translate.py revalidates before trusting it.
+            "property_address_detail": row.get("property_address_detail"),
             # Best-effort watermark-cleanup re-OCR of the debtor-label row,
             # for human review only — see _ocr_watermark_cleaned_hint. Never
             # fed into owner_name extraction; run_pipeline.py surfaces it in
