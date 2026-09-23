@@ -109,6 +109,16 @@ def main() -> None:
                          help="Skip the DCAD bulk Data Products download/parse (2026-09-15 "
                               "-- ~170MB, a few minutes) and reuse whatever raw "
                               "parcel_master.jsonl already exists on disk, if any.")
+    parser.add_argument("--skip-title-chain", action="store_true",
+                         help="Skip the Tier 3/4 title-chain lookup step (2026-09-23 -- "
+                              "made standard/automatic; each not-yet-checked lead costs "
+                              "~15-25s of real browser search, see --title-chain-budget).")
+    parser.add_argument("--title-chain-budget", type=int, default=75,
+                         help="Max not-yet-checked leads to search PER TIER per run "
+                              "(default 75 -- so ~150 leads x ~20s = ~50min added per "
+                              "run worst case). Each lead is only ever searched once "
+                              "(see title_chain_lookup.py's state file); a large "
+                              "backlog is worked down gradually across multiple runs.")
     args = parser.parse_args()
 
     approve_review = not args.no_approve_review
@@ -687,6 +697,38 @@ def main() -> None:
             contact_attached += 1
     print(f"[dallas_tx] Attached a contact person to {contact_attached} estate leads "
           f"(decedent stays as owner; nothing else changed)", flush=True)
+
+    # ------------------------------------------------------------------
+    # Step 4c — Tier 3/4 title-chain lookup (2026-09-23, made standard/
+    # automatic per operator instruction; see title_chain_lookup.py's
+    # module docstring for the incremental/budgeted design and its
+    # trade-offs). Only ever searches owners already surfaced by a Tier
+    # 1/2 lead (payload["records"] IS that set, by construction) -- never
+    # a bulk Tier 3/4 scrape of the whole county.
+    # ------------------------------------------------------------------
+    if args.skip_title_chain:
+        print("[dallas_tx] --skip-title-chain: skipping Tier 3/4 lookup", flush=True)
+    else:
+        from title_chain_lookup import (  # noqa: E402
+            load_state, save_state, hydrate_records, run_incremental_lookup,
+        )
+        title_chain_state_path = WORKDIR / "title_chain_state.json"
+        title_chain_state = load_state(title_chain_state_path)
+        for tier in (3, 4):
+            stats = run_incremental_lookup(
+                payload["records"], tier, title_chain_state,
+                budget=args.title_chain_budget, headless=True, verbose=True,
+            )
+            print(f"[dallas_tx]   Tier {stats['tier']} title-chain: checked "
+                  f"{stats['attempted']} lead(s), {stats['leads_with_hits']} had a hit "
+                  f"({stats['remaining_backlog']} still unchecked, budget "
+                  f"{args.title_chain_budget}/run)", flush=True)
+            save_state(title_chain_state_path, title_chain_state)
+        hydrate_records(payload["records"], title_chain_state)
+        total_with_hits = sum(1 for r in payload["records"] if r.get("has_related_records"))
+        total_checked = sum(1 for r in payload["records"] if r.get("related_records_checked"))
+        print(f"[dallas_tx]   Title-chain summary: {total_checked}/{len(payload['records'])} "
+              f"leads checked so far, {total_with_hits} have a related Tier 3/4 record", flush=True)
 
     payload_json = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
 

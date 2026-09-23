@@ -1,8 +1,9 @@
 """
-Dallas County Clerk PublicSearch — Tier 3 / Tier 4 on-demand lookup, linked
-to existing leads (2026-09-15 client expansion).
+Dallas County Clerk PublicSearch — Tier 3 / Tier 4 lookup, linked to
+existing leads (2026-09-15 client expansion; made a standard automatic
+pipeline step 2026-09-23 per operator instruction).
 
-Scope decision (confirmed with the operator this session): the client's
+Scope decision (confirmed with the operator 2026-09-15): the client's
 Tier 3 (chain-of-title / payoff / signing-authority doc types — warranty
 deeds, mortgages, releases, powers of attorney, easements, leases — the
 types she described as things to "run on every deal") and Tier 4
@@ -10,8 +11,7 @@ types she described as things to "run on every deal") and Tier 4
 your farm area") are NOT added to the daily distress lead feed the way
 Tier 1/2 are (see translate.py's TIER3_DOC_TYPES / TIER4_DOC_TYPES module
 docstring — they're the majority of all county recordings and would drown
-the real distress signal). Instead, this is a separate, operator-triggered
-tool that:
+the real distress signal). Instead, this tool:
 
   1. Reads an existing dashboard payload (pipeline_output/data.json by
      default) produced by run_pipeline.py.
@@ -20,14 +20,30 @@ tool that:
   3. Keeps only the hits whose doc_type is in the selected tier
      (TIER3_DOC_TYPES or TIER4_DOC_TYPES).
   4. Writes the hits to a side file (related_records.json) keyed by
-     lead_id, AND attaches a lightweight `related_records` array directly
-     onto each matching lead in a copy of the dashboard payload, so the
-     dashboard can render a link back to the original lead with zero
-     frontend schema changes beyond reading one more optional array.
+     lead_id, AND attaches `related_records` / `related_records_count` /
+     `has_related_records` directly onto each matching lead in a copy of
+     the dashboard payload, so the dashboard can render a badge and filter
+     on it with zero frontend schema changes beyond reading a few more
+     optional fields.
 
-Per the operator's explicit instruction, this ONLY searches owners already
+Per the operator's original instruction, this ONLY searches owners already
 surfaced by a Tier 1/2 lead — it is not a bulk Tier 3/4 scrape of the whole
-county, and it is never run automatically as part of the daily pipeline.
+county.
+
+Automatic/incremental mode (2026-09-23): run_pipeline.py now calls
+run_incremental_lookup() as a standard step every run. A per-lead owner
+search takes ~15-25s (real browser search + pagination), so checking the
+full ~1,500-lead Tier-1/2 backlog in one run would take hours — instead,
+a persistent state file (title_chain_state.json) records which lead_ids
+have already been checked per tier, so each lead is searched AT MOST ONCE
+ever (not re-checked every day), and each run only spends its
+--title-chain-budget (default 75 leads/tier/run) on leads it hasn't seen
+yet -- new leads first, then working down the backlog across multiple
+days. Trade-off: a lead's title chain is a snapshot as of when it was
+checked -- a NEW Tier 3/4 filing recorded against that owner afterward
+won't be picked up (no periodic re-check). --skip-title-chain opts out
+per-run; the standalone `main()` CLI below still works for a manual,
+uncapped, single-tier run against a specific dashboard file.
 
 Reuses the already-verified click-driven search/scrape/pagination helpers
 from publicsearch_recorder_dallas.py (same portal, same Playwright
@@ -72,6 +88,133 @@ from translate import TIER3_DOC_TYPES, TIER4_DOC_TYPES  # noqa: E402
 _MAX_POLLS = 12
 _POLL_INTERVAL_MS = 3_000
 DEFAULT_MAX_PAGES_PER_OWNER = 5
+DEFAULT_BUDGET_PER_TIER = 75
+
+
+def load_state(state_path: Path) -> dict:
+    """{"tier3_checked": [lead_id, ...], "tier4_checked": [lead_id, ...],
+    "related_records": {lead_id: [hit, ...]}} -- which leads have already
+    been searched (per tier) and what was found, persisted across runs so
+    an incremental run (a) never re-checks the same lead twice and (b) a
+    lead checked on day 1 still shows its hits (or lack thereof) in every
+    later day's freshly-rebuilt dashboard payload, not just the run that
+    found them -- see hydrate_records()."""
+    if not state_path.exists():
+        return {"tier3_checked": [], "tier4_checked": [], "related_records": {}}
+    try:
+        data = json.loads(state_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {"tier3_checked": [], "tier4_checked": [], "related_records": {}}
+    data.setdefault("tier3_checked", [])
+    data.setdefault("tier4_checked", [])
+    data.setdefault("related_records", {})
+    return data
+
+
+def save_state(state_path: Path, state: dict) -> None:
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps(state, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def hydrate_records(records: list[dict], state: dict) -> None:
+    """Mutates every record in place with related_records / related_records_
+    count / has_related_records / related_records_checked, sourced entirely
+    from `state` -- NOT just the records touched by this run's
+    run_incremental_lookup() calls. Every pipeline run rebuilds the
+    dashboard payload from scratch (project_scored_lead has no memory of
+    prior runs), so without this, a lead checked and found clean on day 1
+    would silently lose that "checked" status on day 2's payload. Call this
+    once, after both tiers' run_incremental_lookup() calls for the run."""
+    tier3_checked = set(state.get("tier3_checked", []))
+    tier4_checked = set(state.get("tier4_checked", []))
+    related_by_lead = state.get("related_records", {})
+    for rec in records:
+        lead_id = rec.get("lead_id")
+        related = related_by_lead.get(lead_id, []) if lead_id else []
+        rec["related_records"] = related
+        rec["related_records_count"] = len(related)
+        rec["has_related_records"] = len(related) > 0
+        rec["related_records_checked"] = bool(
+            lead_id and (lead_id in tier3_checked or lead_id in tier4_checked)
+        )
+
+
+def run_incremental_lookup(
+    records: list[dict],
+    tier: int,
+    state: dict,
+    budget: int = DEFAULT_BUDGET_PER_TIER,
+    headless: bool = True,
+    verbose: bool = True,
+) -> dict:
+    """For up to `budget` leads not yet checked for this tier (tracked via
+    `state["tier{tier}_checked"]`), searches PublicSearch for the owner's
+    Tier 3/4 filings and records any hits into `state["related_records"]`.
+    Mutates `state` in place; does NOT touch `records` directly -- call
+    hydrate_records() afterward to project state back onto the payload.
+    Caller is responsible for persisting `state` (see save_state)."""
+    if tier not in (3, 4):
+        raise ValueError("tier must be 3 or 4")
+    checked_key = f"tier{tier}_checked"
+    already_checked = set(state.get(checked_key, []))
+    related_by_lead = state.setdefault("related_records", {})
+
+    candidates = [
+        r for r in records
+        if r.get("lead_id") and r["lead_id"] not in already_checked
+        and r.get("display_owner") and r["display_owner"] != "Unknown"
+    ]
+    todo = candidates[:budget]
+
+    stats = {"tier": tier, "attempted": 0, "leads_with_hits": 0,
+              "remaining_backlog": max(0, len(candidates) - len(todo))}
+
+    if not todo:
+        if verbose:
+            print(f"  [title_chain] tier {tier}: nothing new to check "
+                  f"(backlog empty or budget exhausted last run)", flush=True)
+        return stats
+
+    if not PLAYWRIGHT_AVAILABLE:
+        raise RuntimeError(_PLAYWRIGHT_INSTALL_MSG)
+    tier_doc_types = set(TIER3_DOC_TYPES if tier == 3 else TIER4_DOC_TYPES)
+
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(headless=headless)
+        context = browser.new_context(
+            user_agent=USER_AGENT, viewport={"width": 1280, "height": 900},
+        )
+        page = context.new_page()
+        try:
+            for i, rec in enumerate(todo):
+                owner = rec["display_owner"]
+                lead_id = rec["lead_id"]
+                if verbose:
+                    print(f"  [title_chain] tier {tier} [{i + 1}/{len(todo)}] "
+                          f"{owner} (lead {lead_id})...", flush=True)
+                hits = lookup_owner(page, owner, tier_doc_types, verbose=verbose)
+                stats["attempted"] += 1
+                already_checked.add(lead_id)
+                if hits:
+                    stats["leads_with_hits"] += 1
+                    related = [
+                        {
+                            "tier": tier,
+                            "doc_type": h.get("doc_type"),
+                            "recorded_date": h.get("recorded_date"),
+                            "doc_number": h.get("doc_number"),
+                            "detail_url": h.get("detail_url"),
+                        }
+                        for h in hits
+                    ]
+                    related_by_lead.setdefault(lead_id, []).extend(related)
+                    if verbose:
+                        print(f"    [title_chain] {len(hits)} Tier {tier} record(s) found", flush=True)
+        finally:
+            browser.close()
+
+    state[checked_key] = sorted(already_checked)
+    return stats
 
 
 def _run_owner_name_search(page, owner_name: str, verbose: bool) -> str:
@@ -201,11 +344,13 @@ def run_lookup(
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Dallas County Tier 3/4 on-demand lookup — searches PublicSearch for "
+            "Dallas County Tier 3/4 manual lookup — searches PublicSearch for "
             "existing leads' owners' OTHER filings (title/payoff/signing-authority "
             "types for --tier 3, competitor/own-filing types for --tier 4), and "
-            "links any hits back to the originating lead. Never run automatically "
-            "as part of the daily pipeline."
+            "links any hits back to the originating lead. run_pipeline.py now runs "
+            "this automatically every day (incremental/budgeted, see "
+            "run_incremental_lookup); this CLI is for an uncapped, single-tier, "
+            "ad-hoc run against a specific dashboard file."
         )
     )
     parser.add_argument("--tier", type=int, required=True, choices=[3, 4],

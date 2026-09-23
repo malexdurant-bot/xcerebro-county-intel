@@ -375,6 +375,15 @@ body {
   font-weight: 600;
 }
 
+.related-records-badge {
+  background: #dbeafe !important;
+  color: #1e40af !important;
+  border: 1px solid #bfdbfe;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: help;
+}
+
 .contact-executor {
   font-size: 11px;
   color: #1e3a5f;

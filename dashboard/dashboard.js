@@ -65,6 +65,12 @@
     // (which calls .clear() on every state.filters value) doesn't need a
     // special case. Null = no filter applied.
     minYearsDelinquent: null,
+    // Tier 3/4 title-chain lookup (2026-09-23): null = no filter, "found" =
+    // only leads with has_related_records true, "not_found" = only leads
+    // where has_related_records is false (covers both "checked, nothing
+    // found" and "not yet checked" -- see title_chain_lookup.py's
+    // hydrate_records for why those two aren't distinguished here).
+    relatedRecordsFilter: null,
     sort: { key: "display_score", dir: -1 },
     mode: "operator", // "client" or "operator"
     precannedView: null,
@@ -186,6 +192,7 @@
     renderTiles(filteredRows);
     renderChips();
     renderYearsDelinquentFilter();
+    renderRelatedRecordsFilter();
     renderPrecanned();
     const pageCount = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
     if (state.page > pageCount) state.page = pageCount;
@@ -253,6 +260,10 @@
           r.display_years_tax_delinquent != null &&
           r.display_years_tax_delinquent >= state.minYearsDelinquent
       );
+    if (state.relatedRecordsFilter === "found")
+      out = out.filter((r) => r.has_related_records);
+    else if (state.relatedRecordsFilter === "not_found")
+      out = out.filter((r) => !r.has_related_records);
 
     if (state.precannedView) {
       const pv = PRECANNED_VIEWS.find((v) => v.id === state.precannedView);
@@ -419,6 +430,40 @@
     rail.hidden = !hasAny;
   }
 
+  // Shown only when at least one record has been checked (or found a hit)
+  // for Tier 3/4, so counties without title-chain lookup wired up see no
+  // trace of this control. Renders the current filter state + a live count
+  // of how many rows in the CURRENT (pre-this-filter) result set have a
+  // related record, so the operator can see the number before committing
+  // to the filter.
+  function renderRelatedRecordsFilter() {
+    const rail = document.getElementById("rail-related-records");
+    if (!rail) return;
+    const hasAny = state.payload.records.some(
+      (r) => r.related_records_checked || r.has_related_records
+    );
+    rail.hidden = !hasAny;
+    if (!hasAny) return;
+
+    const checkedCount = state.payload.records.filter(
+      (r) => r.related_records_checked
+    ).length;
+    const foundCount = state.payload.records.filter(
+      (r) => r.has_related_records
+    ).length;
+    const summary = document.getElementById("related-records-summary");
+    if (summary)
+      summary.textContent = `${foundCount} of ${checkedCount} checked leads have a Tier 3/4 record`;
+
+    rail.querySelectorAll(".chip[data-related]").forEach((chip) => {
+      const val = chip.dataset.related; // "found" | "not_found"
+      chip.setAttribute(
+        "aria-pressed",
+        String((state.relatedRecordsFilter || "") === val)
+      );
+    });
+  }
+
   function renderPrecanned() {
     const el = document.getElementById("precanned-views");
     el.innerHTML = PRECANNED_VIEWS.map(
@@ -468,6 +513,17 @@
           r.display_years_tax_delinquent != null
             ? `<span class="cell-tag years-delinquent-badge" title="Years tax delinquent (oldest unpaid year to today)">${r.display_years_tax_delinquent}yr delinquent</span>`
             : "";
+        // Tier 3/4 title-chain hit (2026-09-23): this owner has at least
+        // one OTHER recorded filing (mortgage, release, deed, memorandum,
+        // etc.) beyond the distress document that made them a lead —
+        // title-complexity / competing-interest signal for the operator.
+        const relatedRecordsBadge = r.has_related_records
+          ? `<span class="cell-tag related-records-badge" title="${escapeAttr(
+              (r.related_records || [])
+                .map((rr) => `${rr.doc_type || "?"} (${rr.recorded_date || "?"})`)
+                .join(", ")
+            )}">⚑ ${r.related_records_count} related</span>`
+          : "";
         const flagsCell = (r.review_flags || []).length
           ? `<div class="cell-tags">${r.review_flags
               .map((f) => `<span class="cell-tag flag-tag">${escapeHtml(f)}</span>`)
@@ -478,7 +534,7 @@
           <td><span class="tier-badge" data-tier="${escapeAttr(r.display_tier)}">${escapeHtml(r.display_tier)}</span></td>
           <td>${escapeHtml(r.primary_parcel_id || "")}${pendingBadge ? " " + pendingBadge : ""}</td>
           <td>${escapeHtml(r.display_address || "")}${heirBadge ? " " + heirBadge : ""}${trustBadge ? " " + trustBadge : ""}</td>
-          <td>${escapeHtml(r.display_owner || "")}${yearsDelinquentBadge ? " " + yearsDelinquentBadge : ""}</td>
+          <td>${escapeHtml(r.display_owner || "")}${yearsDelinquentBadge ? " " + yearsDelinquentBadge : ""}${relatedRecordsBadge ? " " + relatedRecordsBadge : ""}</td>
           <td><div class="cell-tags">${(r.display_patterns || []).map((p) => `<span class="cell-tag">${escapeHtml(p)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_attributes || []).map((a) => `<span class="cell-tag">${escapeHtml(a)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_deal_paths || []).map((d) => `<span class="cell-tag">${escapeHtml(d)}</span>`).join("")}</div></td>
@@ -962,6 +1018,7 @@
       Object.values(state.filters).forEach((s) => s.clear());
       state.precannedView = null;
       state.minYearsDelinquent = null;
+      state.relatedRecordsFilter = null;
       const yd = document.getElementById("min-years-delinquent");
       if (yd) yd.value = "";
       state.page = 1;
@@ -976,6 +1033,15 @@
         render();
       });
     }
+    document.querySelectorAll(".chip[data-related]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const val = chip.dataset.related || null;
+        state.relatedRecordsFilter =
+          state.relatedRecordsFilter === val ? null : val;
+        state.page = 1;
+        render();
+      });
+    });
     document.getElementById("toggle-view-mode").addEventListener("click", (e) => {
       state.mode = state.mode === "client" ? "operator" : "client";
       e.currentTarget.textContent =
