@@ -503,12 +503,28 @@ def _run_search(page, date_from: datetime, date_to: datetime, verbose: bool) -> 
     return "Error"
 
 
-def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) -> "tuple[str | None, str | None]":
+_LEGAL_DESCRIPTION_JS = """
+() => {
+  const headings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6'));
+  const h = headings.find(el => el.textContent.trim() === 'Legal Description');
+  if (!h) return null;
+  const sib = h.nextElementSibling;
+  if (!sib) return null;
+  const text = sib.textContent.replace(/\\s+/g, ' ').trim();
+  if (!text || /no (legal description|lot\\/block) found/i.test(text)) return null;
+  return text;
+}
+"""
+
+_TOWNSHIP_RE = re.compile(r"\bTownship:\s*([A-Za-z .'-]+?)(?:\s+Reference\b|\s*$)")
+
+
+def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) -> "tuple[str | None, str | None, str | None]":
     """Click into row_index's detail view, capture + OCR its page-1 document
     image, navigate back. Mirrors publicsearch_foreclosures_dallas.py's
     function of the same name (see that module for the network-capture/
     authenticated-fetch reasoning) -- returns (document_body_text,
-    detail_url); either may be None.
+    detail_url, legal_description); any may be None.
 
     detail_url (added 2026-08-30): a real, permanent, publicly-loadable URL
     (confirmed live: a plain unauthenticated GET returns 200) -- every
@@ -516,6 +532,17 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
     placeholder, meaning the dashboard's "source" link did nothing for
     clerk_recordings leads. See the FC adapter's version of this function
     for the fuller explanation (same portal, same fix).
+
+    legal_description (added 2026-09-22): the SEARCH RESULTS table's own
+    "legal description" column is unreliable -- confirmed live it reads
+    "N/A" for probate/heirship-family rows even when the real document
+    plainly has one. The detail page itself has a genuine "Legal
+    Description" section rendered as real page text (not part of the
+    scanned document image -- no OCR needed), confirmed live on a real
+    AFFIDAVIT OF HEIRSHIP: "Subdivision - Name: LAKEWOOD POINTE Lot: 23
+    Block: 8 Township: ROWLETT Reference - 99252/1". Since this function
+    already navigates to that exact page for every DISTRESS_DOC_TYPES row,
+    this is read at zero extra navigation cost.
     """
     trs = page.query_selector_all("table tbody tr")
     if row_index >= len(trs):
@@ -539,6 +566,14 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
 
     detail_url = page.url if "/doc/" in page.url else None
 
+    legal_description = None
+    if detail_url:
+        try:
+            legal_description = page.evaluate(_LEGAL_DESCRIPTION_JS)
+        except Exception as exc:
+            if verbose:
+                print(f"  [Dallas RP] legal description read failed: {exc}", flush=True)
+
     text = None
     if "url" in captured:
         try:
@@ -553,7 +588,7 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
 
     page.go_back()
     page.wait_for_timeout(1_500)
-    return text, detail_url
+    return text, detail_url, legal_description
 
 
 def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose: bool = False) -> list[dict]:
@@ -602,14 +637,32 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
 
         if do_ocr and (doc_type or "").strip().upper() in DISTRESS_DOC_TYPES:
             expected_count = len(trs)
-            row["document_body_text"], row["detail_url"] = _fetch_and_ocr_row_document(page, context, tr_index, verbose)
+            row["document_body_text"], row["detail_url"], detail_legal_description = _fetch_and_ocr_row_document(
+                page, context, tr_index, verbose
+            )
+            # The detail page's own Legal Description text is more reliable
+            # than the search-results table's column (see
+            # _fetch_and_ocr_row_document's docstring) -- prefer it whenever
+            # the detail page actually had one.
+            if detail_legal_description:
+                row["legal_description"] = detail_legal_description
+                # A "Township: <city>" clause is the closest thing to a
+                # situs city this doc family exposes at all -- the index
+                # table's own "town" column reads "N/A" for these rows.
+                # Not a street address, but strictly better than nothing.
+                if not row["town"] or row["town"] == "N/A":
+                    m = _TOWNSHIP_RE.search(detail_legal_description)
+                    if m:
+                        row["town"] = m.group(1).strip()
             row["situs_address_ocr_hint"] = _extract_address_near_name(
                 row["document_body_text"] or "", _debtor_name_for_row(row), doc_type,
             )
             if verbose:
                 got = "captured" if row["document_body_text"] else "none"
                 addr = row["situs_address_ocr_hint"] or "-"
-                print(f"    [Dallas RP] doc {doc_number} ({doc_type}): document body {got}, address hint: {addr}", flush=True)
+                ld = "found" if detail_legal_description else "none"
+                print(f"    [Dallas RP] doc {doc_number} ({doc_type}): document body {got}, "
+                      f"address hint: {addr}, legal description: {ld}", flush=True)
             # Poll rather than a single immediate snapshot -- confirmed live
             # 2026-08-29 on the FC adapter that a fixed post-go_back wait
             # false-positives this check after a handful of rows, silently

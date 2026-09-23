@@ -272,6 +272,63 @@ def _write_jsonl(records: list[dict], output_path: Path, verbose: bool = False) 
     return {"output_path": str(output_path), "records_written": len(records)}
 
 
+# Legal-description cross-reference (2026-09-22): a client-facing operator
+# noticed a real, populated legal description ("Subdivision - Name:
+# LAKEWOOD POINTE Lot: 23 Block: 8") on a probate/heirship-family lead that
+# has no address at all -- these doc types often carry no street address
+# anywhere in the recorded document, but DO reliably state the subdivision
+# + lot + block, which is exactly what DCAD's own bulk legal_description
+# field encodes too. DCAD's live search portal itself has no
+# subdivision/lot/block search mode (confirmed live: Search By is limited
+# to Owner/Account/Address/Business) -- but the bulk file already has every
+# account's own legal_description, so this is a LOCAL cross-reference, not
+# a new network dependency. Verified live end-to-end on the case that
+# motivated this: Kofile's "LAKEWOOD POINTE Lot 23 Block 8" matched exactly
+# one DCAD account ("LAKEWOOD POINTE BLK 8 LOT 23...") whose owner name
+# ("HENDERSON JOSEPH & JOANN") matched the document's own parties
+# ("HENDERSON JOSEPH EDWIN DECD" / "HENDERSON JOANN BEAM") -- situs address
+# 6406 AMESBURY LN, ROWLETT.
+#
+# DCAD's own legal_description format ("<NAME> BLK <N> LT <N> ...") differs
+# from Kofile's ("Subdivision - Name: <NAME> Lot: <N> Block: <N> ...") in
+# both field order and trailing phase/section modifiers DCAD sometimes adds
+# ("LAKEWOOD POINTE PH 5 REP" vs plain "LAKEWOOD POINTE") -- the subdivision
+# name alone is too fuzzy to match exactly, so only its CORE (everything
+# before the first phase/section/number token) is used as the join key,
+# combined with the exact lot+block pair, which is the far more
+# discriminating part of the key. Same "only when there's exactly one
+# candidate" discipline as every other lookup_by_* in this module.
+_SUBDIVISION_MODIFIER_RE = re.compile(
+    r"^(PH|PHASE|SEC|SECTION|REP|REPLAT|INST|INSTALLMENT|NO|ADDN|ADDITION|"
+    r"UNIT|AMD|AMENDED|REV|REVISED)\d*$"
+)
+_DCAD_LOT_BLOCK_RE = re.compile(
+    r"^(?P<name>.*?)\s+BLK\.?\s*(?P<block>[A-Z0-9]+)\s+L(?:T|OT)\.?\s*(?P<lot>[A-Z0-9]+)\b",
+    re.IGNORECASE,
+)
+_KOFILE_LOT_BLOCK_RE = re.compile(
+    r"Name:\s*(?P<name>.+?)\s+Lot:\s*(?P<lot>[A-Za-z0-9]+)\s+Block:\s*(?P<block>[A-Za-z0-9]+)",
+    re.IGNORECASE,
+)
+
+
+def _subdivision_core_key(name: str) -> str:
+    tokens = re.findall(r"[A-Z0-9]+", (name or "").upper())
+    core = []
+    for t in tokens:
+        if t.isdigit() or _SUBDIVISION_MODIFIER_RE.match(t):
+            break
+        core.append(t)
+    return "".join(core)
+
+
+def _lot_block_key(name: str, lot: str, block: str) -> "tuple[str, str, str] | None":
+    core = _subdivision_core_key(name)
+    if not core:
+        return None
+    return (core, lot.upper().lstrip("0") or "0", block.upper().lstrip("0") or "0")
+
+
 def build_lookup(records: list[dict]) -> dict:
     """{account_number: {situs_address, situs_city, owner_name,
     assessed_value, property_type, owner_mailing_*, is_absentee_owner,
@@ -281,15 +338,16 @@ def build_lookup(records: list[dict]) -> dict:
     the Step 2c address/owner enrichment) keep working unmodified, and gain
     the two new flags for free.
 
-    Also indexes by normalized street (for an address-based fallback lookup)
-    and by owner_name (single-match only, mirroring the old live lookup's
-    "never guess on an ambiguous name" discipline).
+    Also indexes by normalized street (for an address-based fallback lookup),
+    by owner_name, and by (subdivision-core, lot, block) (both single-match
+    only, mirroring the old live lookup's "never guess" discipline).
     """
     from scaffold.pipeline.translators.parcel_master import _derive_absentee_flags, _normalize_street
 
     by_account: dict = {}
     by_street: dict = {}
     by_owner_name: dict = {}
+    by_lot_block: dict = {}
 
     for rec in records:
         p = rec["raw_payload"]
@@ -313,11 +371,17 @@ def build_lookup(records: list[dict]) -> dict:
             by_street.setdefault(_normalize_street(p["address"]), []).append(account)
         if p.get("owner_name"):
             by_owner_name.setdefault(p["owner_name"], []).append(account)
+        ld_match = _DCAD_LOT_BLOCK_RE.match(p.get("legal_description") or "")
+        if ld_match:
+            key = _lot_block_key(ld_match.group("name"), ld_match.group("lot"), ld_match.group("block"))
+            if key:
+                by_lot_block.setdefault(key, []).append(account)
 
     return {
         "by_account": by_account,
         "by_street": by_street,
         "by_owner_name": by_owner_name,
+        "by_lot_block": by_lot_block,
     }
 
 
@@ -369,6 +433,28 @@ def lookup_by_owner_name(lookup: dict, name: str) -> "dict | None":
     if not name:
         return None
     accounts = lookup["by_owner_name"].get(name)
+    if not accounts or len(accounts) != 1:
+        return None
+    account = accounts[0]
+    entry = lookup["by_account"].get(account)
+    if entry is None:
+        return None
+    return {**entry, "account_number": account}
+
+
+def lookup_by_legal_description(lookup: dict, kofile_legal_description: str) -> "dict | None":
+    """Parse a Kofile-format legal description ("Subdivision - Name: X Lot:
+    Y Block: Z ...") and cross-reference it against the bulk file's own
+    (subdivision-core, lot, block) index (see build_lookup). Same single-
+    confident-match discipline as every other lookup_by_* here -- returns
+    None unless exactly one account shares that subdivision/lot/block."""
+    m = _KOFILE_LOT_BLOCK_RE.search(kofile_legal_description or "")
+    if not m:
+        return None
+    key = _lot_block_key(m.group("name"), m.group("lot"), m.group("block"))
+    if not key:
+        return None
+    accounts = lookup.get("by_lot_block", {}).get(key)
     if not accounts or len(accounts) != 1:
         return None
     account = accounts[0]

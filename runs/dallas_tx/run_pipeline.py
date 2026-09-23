@@ -392,6 +392,27 @@ def main() -> None:
                     return hit
             return _cached_lookup(f"owner:{name}", lambda n=name: dcad_session.lookup_by_owner_name(n, verbose=True))
 
+        # 2026-09-22: probate/heirship-family docs on the Kofile RP index
+        # often have no address on the index row AND an unresolved debtor
+        # name (heirs aren't named as parties the same way a mortgagor is),
+        # so both fallbacks above can fail even though the document itself
+        # names the property via a "Subdivision - Name: X Lot: Y Block: Z"
+        # legal description (now captured at scrape time -- see
+        # publicsearch_recorder_dallas.py's _LEGAL_DESCRIPTION_JS). Cross-
+        # reference that against the bulk file's own legal_description
+        # field (same single-confident-match discipline as address/owner).
+        # Live-only, no fallback -- parcel_master_dcad_dallas.py's live
+        # DCADSession has no legal-description search.
+        def _lookup_legal_description(legal_description: str) -> "dict | None":
+            nonlocal bulk_hits
+            if dcad_bulk_lookup is None:
+                return None
+            from scrapers.parcel_master_dcad_bulk_dallas import lookup_by_legal_description as _bulk_lookup_by_legal_description
+            hit = _bulk_lookup_by_legal_description(dcad_bulk_lookup, legal_description)
+            if hit:
+                bulk_hits += 1
+            return hit
+
         def _enrich_events_needing_parcel(events: list[dict], try_address: bool) -> None:
             nonlocal addr_owner_hits, addr_owner_attempted, name_fallback_hits
             for ev in events:
@@ -437,6 +458,12 @@ def main() -> None:
                     if resolved.get("debtor_resolution_status") == "RESOLVED" and owner_name:
                         addr_owner_attempted += 1
                         hit = _lookup_owner_name(owner_name)
+
+                if hit is None:
+                    legal_description = refs.get("legal_description")
+                    if legal_description:
+                        addr_owner_attempted += 1
+                        hit = _lookup_legal_description(legal_description)
 
                 if hit:
                     addr_owner_hits += 1
