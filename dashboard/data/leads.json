@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-23T14:06:52Z",
+  "generated_at": "2026-09-24T14:06:47Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -21,10 +21,10 @@
     "absentee": 66,
     "entity_owned": 24,
     "free_and_clear": 35,
-    "high_equity": 90,
-    "long_term_owned": 78,
+    "high_equity": 91,
+    "long_term_owned": 77,
     "out_of_state": 15,
-    "senior_owner": 33,
+    "senior_owner": 32,
     "vacant": 7
   },
   "stack_depth_distribution": {
@@ -41,7 +41,7 @@
   },
   "deal_path_distribution": {
     "messy_title": 52,
-    "partial_interest": 58,
+    "partial_interest": 57,
     "sub_to": 20,
     "wholesale": 453
   },
@@ -1586,7 +1586,7 @@
     },
     {
       "lead_id": "lead_parcel_R01506-04-05",
-      "scored_lead_id": "scored_6ad790cda0be7513",
+      "scored_lead_id": "scored_55e9217228852983",
       "primary_parcel_id": "R01506-04-05",
       "display_address": "309 WILLOWOOD PKWY, CHAPIN, SC",
       "display_address_street": "309 WILLOWOOD PKWY",
@@ -1595,7 +1595,7 @@
       "display_address_zip": "29036",
       "display_owner": "SUE KAUFMAN ELLIOTT",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 61,
+      "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
         "estate"
@@ -1610,19 +1610,12 @@
         "letters_testamentary"
       ],
       "display_attributes": [
-        "long_term_owned",
-        "senior_owner"
+        "high_equity"
       ],
       "display_deal_paths": [
-        "partial_interest",
         "wholesale"
       ],
       "display_deal_path_details": [
-        {
-          "path": "partial_interest",
-          "confidence": "high",
-          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
-        },
         {
           "path": "wholesale",
           "confidence": "moderate",
@@ -1632,8 +1625,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 201900.0,
-      "display_last_sale_price": 165000.0,
-      "display_last_sale_date": "2000-06-30",
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2026-09-10",
       "display_year_built": 1991,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -1647,7 +1640,7 @@
         },
         {
           "factor": "attribute_bonus",
-          "delta": 6
+          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -13285,8 +13278,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 282400.0,
-      "display_last_sale_price": 188999.0,
-      "display_last_sale_date": "2026-07-28",
+      "display_last_sale_price": 188940.0,
+      "display_last_sale_date": "2026-06-15",
       "display_year_built": 2022,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
