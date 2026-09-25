@@ -65,11 +65,13 @@
     // (which calls .clear() on every state.filters value) doesn't need a
     // special case. Null = no filter applied.
     minYearsDelinquent: null,
-    // Tier 3/4 title-chain lookup (2026-09-23): null = no filter, "found" =
-    // only leads with has_related_records true, "not_found" = only leads
-    // where has_related_records is false (covers both "checked, nothing
-    // found" and "not yet checked" -- see title_chain_lookup.py's
-    // hydrate_records for why those two aren't distinguished here).
+    // Tier 3/4 title-chain lookup (2026-09-23), displayed as "Title
+    // Activity" (2026-09-25 — "Tier 3/4" is internal doc-taxonomy jargon,
+    // not client-facing): null = no filter, "found" = only leads with
+    // has_related_records true, "not_found" = only leads where
+    // has_related_records is false (covers both "checked, nothing found"
+    // and "not yet checked" -- see title_chain_lookup.py's hydrate_records
+    // for why those two aren't distinguished here).
     relatedRecordsFilter: null,
     sort: { key: "display_score", dir: -1 },
     mode: "operator", // "client" or "operator"
@@ -453,7 +455,7 @@
     ).length;
     const summary = document.getElementById("related-records-summary");
     if (summary)
-      summary.textContent = `${foundCount} of ${checkedCount} checked leads have a Tier 3/4 record`;
+      summary.textContent = `${foundCount} of ${checkedCount} checked leads have Title Activity`;
 
     rail.querySelectorAll(".chip[data-related]").forEach((chip) => {
       const val = chip.dataset.related; // "found" | "not_found"
@@ -529,9 +531,9 @@
                 .join(", ")
             )}">⚑ ${r.related_records_count}</span>`
           : r.related_records_checked === true
-          ? `<span class="cell-muted" title="Checked — no Tier 3/4 filing within the lead's own date window">—</span>`
+          ? `<span class="cell-muted" title="Checked — no Title Activity within the lead's own date window">—</span>`
           : r.related_records_checked === false
-          ? `<span class="cell-muted" title="Not checked yet (budgeted incrementally, see Tier 3/4 related records filter)">…</span>`
+          ? `<span class="cell-muted" title="Not checked yet (budgeted incrementally, see Title Activity filter)">…</span>`
           : "—";
         const flagsCell = (r.review_flags || []).length
           ? `<div class="cell-tags">${r.review_flags
