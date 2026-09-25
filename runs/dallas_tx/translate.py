@@ -494,50 +494,100 @@ def translate_foreclosure_notices(wrapped_records: list[dict]) -> list[dict]:
 
 
 TAX_COLLECTOR_MIN_DUE_YEAR = 2024  # see translate_tax_collector docstring
+TAX_MIN_YEARS_DELINQUENT = 3  # see stream_translate_tax_collector docstring (2026-09-24)
 
 
 def stream_translate_tax_collector(path, verbose: bool = True) -> "tuple[list[dict], dict[str, float]]":
     """Stream tax_collector.jsonl line-by-line (it's ~1.4M lines / ~1.4GB —
     do NOT json.loads the whole file into a list first).
 
-    2026-09-15 Dallas client request, revised: tax leads stay suit-required
-    ONLY (the pre-existing _translate_tax_collector_row path, unchanged —
-    an earlier version of this session's work added a second, no-suit-
-    required "aged delinquency" lead type; the operator asked to drop that
-    after seeing it more than double daily lead volume with lower-
-    confidence signals). What the operator DID want kept: the years-
-    delinquent number itself, as a filterable/visible attribute on the
-    suit-based leads that already exist — so this function also aggregates
-    each account's OLDEST unpaid due_date across every delinquent tax year
-    (not just the suit-triggering one) and returns it as a separate
-    {account: years_delinquent} map. The caller (run_pipeline.py) attaches
-    this onto each suit-based lead's parcel_display; it never gates which
-    rows become leads.
+    2026-09-15 Dallas client request: tax leads stay suit-required (the
+    pre-existing _translate_tax_collector_row path — an earlier version of
+    this session's work added a second, no-suit-required "aged delinquency"
+    lead type; the operator asked to drop that after seeing it more than
+    double daily lead volume with lower-confidence signals).
 
-    Returns (events, years_delinquent_by_account). Prints progress every
-    200k lines scanned so a long run doesn't look stalled."""
+    2026-09-24 revision: gated further to "recent + meaningfully
+    delinquent" per the operator's explicit instruction. There is no
+    court-filed-suit DATE anywhere in this data source (SUIT/CAUSENO are
+    just a flag + a case number, no date) -- the only date on a
+    suit-pending row is that tax year's statutory due_date, which clusters
+    almost entirely on the county's fixed annual due date (confirmed live:
+    4,385/4,392 of the current cycle's rows share the exact same
+    "2026-02-01" due_date). So "recent" here means "belongs to the current
+    due-date CYCLE" (the most COMMON year+month among candidate rows, not
+    the chronological max -- a handful of stray/supplemental-bill due_dates
+    sit months past the real cycle and taking the max alone picked one such
+    row and produced zero leads; naturally rolls forward each year), not a
+    rolling day-count window (confirmed live: a 6-month window leaves ~75
+    leads, a 12-month window jumps to ~2,700, because the whole cluster
+    sits right on that cliff -- there's no stable "recent-ish" day
+    threshold this data supports). Combined with a 3+ year minimum on the
+    ACCOUNT's
+    overall delinquency age (oldest unpaid due_date across every year,
+    not just the triggering one) -- both filters applied together, per
+    "someone who recently is filed on with a minimum of 3 yrs delinquent".
+
+    This requires two passes over the candidate rows because both filters
+    depend on whole-file knowledge (the account's full delinquency history
+    for years_delinquent, and the global max due_date for "recent cycle")
+    that isn't available until the file has been fully scanned -- but only
+    ONE actual file read: suit-pending candidates (a coarse pre-filter,
+    ~250k of the file's ~1.4M rows) are buffered in memory during the
+    single streaming pass, then filtered down after the scan completes.
+
+    Returns (events, years_delinquent_by_account) -- the latter still
+    returned in full (not just for kept leads) since parcel_display.
+    years_tax_delinquent is informational/filterable on the dashboard
+    independent of which leads made the cut. Prints progress every 200k
+    lines scanned so a long run doesn't look stalled."""
     import json as _json
 
-    events: list[dict] = []
+    candidates: list[dict] = []
     accounts_agg: dict[str, dict] = {}
     scanned = 0
     with open(path, "r", encoding="utf-8") as fh:
         for line in fh:
             scanned += 1
             if verbose and scanned % 200_000 == 0:
-                print(f"  [translate] tax_collector: scanned {scanned}, kept {len(events)}", flush=True)
+                print(f"  [translate] tax_collector: scanned {scanned}, "
+                      f"{len(candidates)} suit-pending candidates so far", flush=True)
             line = line.strip()
             if not line:
                 continue
             rec = _json.loads(line)
             translated = _translate_tax_collector_row(rec)
             if translated is not None:
-                events.append(translated)
+                candidates.append(translated)
             _accumulate_delinquency_aggregate(rec, accounts_agg)
     years_delinquent_by_account = _years_delinquent_by_account(accounts_agg)
+
+    # The "most recent cycle" is the most COMMON due-date month among
+    # candidates, not the chronological max -- confirmed live 2026-09-24
+    # that a handful of stray/supplemental-bill due_dates sit months past
+    # the real annual cycle (e.g. a single row at "2026-12" while the real
+    # current cycle, "2026-02", has 20,533 rows): taking the max alone
+    # picked that one stray row's month and produced ZERO leads. Counting
+    # occurrences and taking the most-frequent month is robust to that.
+    month_counts: dict[str, int] = {}
+    for c in candidates:
+        d = c.get("event_date")
+        if d:
+            month_counts[d[:7]] = month_counts.get(d[:7], 0) + 1
+    current_cycle_month = max(month_counts, key=month_counts.get) if month_counts else None
+
+    events = [
+        c for c in candidates
+        if c.get("event_date") and c["event_date"][:7] == current_cycle_month
+        and years_delinquent_by_account.get(c["instrument_number"], 0) >= TAX_MIN_YEARS_DELINQUENT
+    ]
+
     if verbose:
         print(f"  [translate] tax_collector: done — scanned {scanned}, "
-              f"{len(events)} suit-based events kept, years-delinquent computed "
+              f"{len(candidates)} suit-pending candidates, current due-date cycle "
+              f"{current_cycle_month} ({month_counts.get(current_cycle_month, 0)} rows), "
+              f"{len(events)} events kept (current cycle + "
+              f"{TAX_MIN_YEARS_DELINQUENT}+yr delinquent), years-delinquent computed "
               f"for {len(years_delinquent_by_account)} accounts", flush=True)
     return events, years_delinquent_by_account
 

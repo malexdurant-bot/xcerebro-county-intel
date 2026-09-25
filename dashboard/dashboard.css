@@ -384,6 +384,11 @@ body {
   cursor: help;
 }
 
+.cell-muted {
+  color: #9ca3af;
+  cursor: help;
+}
+
 .contact-executor {
   font-size: 11px;
   color: #1e3a5f;

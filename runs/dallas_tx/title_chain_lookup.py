@@ -18,7 +18,14 @@ the real distress signal). Instead, this tool:
   2. For each lead's already-resolved owner name, searches PublicSearch
      for that owner's OTHER filings.
   3. Keeps only the hits whose doc_type is in the selected tier
-     (TIER3_DOC_TYPES or TIER4_DOC_TYPES).
+     (TIER3_DOC_TYPES or TIER4_DOC_TYPES) AND whose recorded_date falls
+     within RELATED_RECORDS_WINDOW_DAYS of the ORIGINATING lead's own
+     event date (2026-09-24 per operator instruction: "only if it finds
+     something within the time frame of the original filing" — e.g. an
+     8-day-old foreclosure lead with a Tier 3/4 filing from 4 days ago
+     counts; the same owner's 2010 mortgage on an unrelated property
+     doesn't). A lead with no resolved event date is skipped entirely —
+     there's no reference point to compute "within the timeframe" against.
   4. Writes the hits to a side file (related_records.json) keyed by
      lead_id, AND attaches `related_records` / `related_records_count` /
      `has_related_records` directly onto each matching lead in a copy of
@@ -89,6 +96,26 @@ _MAX_POLLS = 12
 _POLL_INTERVAL_MS = 3_000
 DEFAULT_MAX_PAGES_PER_OWNER = 5
 DEFAULT_BUDGET_PER_TIER = 75
+RELATED_RECORDS_WINDOW_DAYS = 30  # see module docstring's point 3
+
+
+def _parse_hit_date(date_str: "str | None"):
+    """Kofile search-results dates are 'M/D/YYYY' (e.g. '5/31/2017'), not
+    ISO -- unlike every other date this pipeline handles. Returns None on
+    anything unparseable rather than raising (a hit with a bad/missing
+    date can't be judged "within timeframe", so it's dropped, not crashed
+    on -- same fail-closed spirit as the rest of this module)."""
+    from datetime import date as _date
+    if not date_str:
+        return None
+    parts = date_str.strip().split("/")
+    if len(parts) != 3:
+        return None
+    try:
+        month, day, year = (int(p) for p in parts)
+        return _date(year, month, day)
+    except ValueError:
+        return None
 
 
 def load_state(state_path: Path) -> dict:
@@ -159,10 +186,17 @@ def run_incremental_lookup(
     already_checked = set(state.get(checked_key, []))
     related_by_lead = state.setdefault("related_records", {})
 
+    # primary_event_date is required, not optional: without the
+    # originating lead's own date there's no reference point to test
+    # "within the timeframe of the original filing" against (see module
+    # docstring point 3) -- a lead missing it just waits until/unless a
+    # later enrichment pass resolves one, rather than spending budget on
+    # a search whose hits could never pass the window filter anyway.
     candidates = [
         r for r in records
         if r.get("lead_id") and r["lead_id"] not in already_checked
         and r.get("display_owner") and r["display_owner"] != "Unknown"
+        and r.get("primary_event_date")
     ]
     todo = candidates[:budget]
 
@@ -192,7 +226,10 @@ def run_incremental_lookup(
                 if verbose:
                     print(f"  [title_chain] tier {tier} [{i + 1}/{len(todo)}] "
                           f"{owner} (lead {lead_id})...", flush=True)
-                hits = lookup_owner(page, owner, tier_doc_types, verbose=verbose)
+                hits = lookup_owner(
+                    page, owner, tier_doc_types,
+                    reference_date=rec["primary_event_date"], verbose=verbose,
+                )
                 stats["attempted"] += 1
                 already_checked.add(lead_id)
                 if hits:
@@ -250,20 +287,44 @@ def _run_owner_name_search(page, owner_name: str, verbose: bool) -> str:
 
 def lookup_owner(
     page, owner_name: str, tier_doc_types: set[str],
+    reference_date: "str | None" = None,
+    window_days: int = RELATED_RECORDS_WINDOW_DAYS,
     max_pages: int = DEFAULT_MAX_PAGES_PER_OWNER, verbose: bool = False,
 ) -> list[dict]:
     """Search for owner_name and return only the rows whose doc_type is in
     tier_doc_types. do_ocr is always False here -- this tool links
     existing filings to a lead, it doesn't need the address-extraction OCR
-    pass the daily distress scraper uses."""
+    pass the daily distress scraper uses.
+
+    reference_date (ISO 'YYYY-MM-DD', the originating lead's own event
+    date): when given, a hit is kept only if its recorded_date is within
+    window_days of it (either direction) -- 2026-09-24 operator
+    instruction, see module docstring point 3. When None (the standalone
+    manual CLI's default), every doc-type match is kept regardless of
+    date, same as before this filter existed."""
     status = _run_owner_name_search(page, owner_name, verbose)
     if status != "HasRows":
         return []
 
+    from datetime import date as _date
+    ref_dt = None
+    if reference_date:
+        try:
+            ref_dt = _date.fromisoformat(reference_date)
+        except (ValueError, TypeError):
+            ref_dt = None
+
     hits: list[dict] = []
     for page_num in range(max_pages):
         rows = _scrape_current_table_page(page, do_ocr=False, verbose=verbose)
-        hits.extend(r for r in rows if (r.get("doc_type") or "").strip().upper() in tier_doc_types)
+        for r in rows:
+            if (r.get("doc_type") or "").strip().upper() not in tier_doc_types:
+                continue
+            if ref_dt is not None:
+                hit_dt = _parse_hit_date(r.get("recorded_date"))
+                if hit_dt is None or abs((hit_dt - ref_dt).days) > window_days:
+                    continue
+            hits.append(r)
         if len(rows) < 50:
             break
         if not _goto_next_page(page, verbose):
@@ -306,7 +367,10 @@ def run_lookup(
                 if verbose:
                     print(f"  [title_chain] [{i + 1}/{len(leads_to_check)}] "
                           f"{owner} (lead {lead_id})...", flush=True)
-                hits = lookup_owner(page, owner, tier_doc_types, verbose=verbose)
+                hits = lookup_owner(
+                    page, owner, tier_doc_types,
+                    reference_date=rec.get("primary_event_date"), verbose=verbose,
+                )
                 if hits:
                     results[lead_id] = {
                         "owner_name": owner,

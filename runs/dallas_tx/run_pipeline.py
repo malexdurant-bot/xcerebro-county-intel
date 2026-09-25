@@ -230,7 +230,8 @@ def main() -> None:
               f"-> {hints_path}", flush=True)
 
     print("[dallas_tx] Streaming + translating tax_collector (large file, filtered inline; "
-          "suit-required only, per operator instruction)...", flush=True)
+          "suit-required, most-recent due-date cycle, 3+yr delinquent, per operator "
+          "instruction)...", flush=True)
     tax_collector_path = RAW_DIR / "tax_collector.jsonl"
     if tax_collector_path.exists():
         tax_collector_events, years_delinquent_by_account = stream_translate_tax_collector(
@@ -239,9 +240,9 @@ def main() -> None:
     else:
         tax_collector_events, years_delinquent_by_account = [], {}
     print(f"[dallas_tx]   tax_collector: -> {len(tax_collector_events)} events "
-          f"(suit-pending + recent only); years-delinquent computed for "
-          f"{len(years_delinquent_by_account)} accounts (attached to leads below, "
-          "not used to gate them)", flush=True)
+          f"(suit-pending + most-recent due-date cycle + 3+yr delinquent); "
+          f"years-delinquent computed for {len(years_delinquent_by_account)} accounts total "
+          "(also attached to every kept lead's parcel_display for display/sort)", flush=True)
 
     print("[dallas_tx] Loading tax_foreclosure_resales + sheriff_sales (LGBS)...", flush=True)
     resales_raw = _load_jsonl(RAW_DIR / "tax_foreclosure_resales.jsonl")
@@ -611,12 +612,15 @@ def main() -> None:
                 "owner_mailing_city": match.get("owner_mailing_city"),
                 "owner_mailing_state": match.get("owner_mailing_state"),
                 "owner_mailing_zip": match.get("owner_mailing_zip"),
-                # years_tax_delinquent (2026-09-15 client request, revised):
-                # only meaningful for tax_collector-sourced leads, where
-                # primary_parcel_id IS the tax account number -- a harmless
-                # miss (None) for every other lead type, whose parcel_id is
-                # a DCAD account instead. Informational only; does not gate
-                # which rows become leads (see stream_translate_tax_collector).
+                # years_tax_delinquent (2026-09-15 client request; gating
+                # behavior revised 2026-09-24 -- see stream_translate_
+                # tax_collector's docstring): only meaningful for tax_
+                # collector-sourced leads, where primary_parcel_id IS the
+                # tax account number -- a harmless miss (None) for every
+                # other lead type, whose parcel_id is a DCAD account
+                # instead. Every tax lead reaching this point already
+                # cleared the 3+yr minimum (that's now a gate, not just
+                # informational) -- still attached here for display/sort.
                 "years_tax_delinquent": years_delinquent_by_account.get(pid),
             }
             # Schema contract: parcel_display is present iff enrichment_status

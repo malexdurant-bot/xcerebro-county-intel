@@ -513,17 +513,26 @@
           r.display_years_tax_delinquent != null
             ? `<span class="cell-tag years-delinquent-badge" title="Years tax delinquent (oldest unpaid year to today)">${r.display_years_tax_delinquent}yr delinquent</span>`
             : "";
-        // Tier 3/4 title-chain hit (2026-09-23): this owner has at least
-        // one OTHER recorded filing (mortgage, release, deed, memorandum,
-        // etc.) beyond the distress document that made them a lead —
-        // title-complexity / competing-interest signal for the operator.
-        const relatedRecordsBadge = r.has_related_records
+        // Tier 3/4 title-chain hit (2026-09-23; date-windowed 2026-09-24):
+        // this owner has at least one OTHER recorded filing (mortgage,
+        // release, deed, memorandum, etc.) that ALSO falls within
+        // RELATED_RECORDS_WINDOW_DAYS of this lead's own event date — not
+        // just any filing ever, so an old unrelated deed from a decade ago
+        // doesn't count. Own table column (not just a name-cell badge):
+        // a blue badge with the count when found, a muted dash once
+        // checked with nothing in range, or "not checked yet" if this
+        // lead hasn't had its budgeted turn (see title_chain_lookup.py).
+        const relatedRecordsCell = r.has_related_records
           ? `<span class="cell-tag related-records-badge" title="${escapeAttr(
               (r.related_records || [])
                 .map((rr) => `${rr.doc_type || "?"} (${rr.recorded_date || "?"})`)
                 .join(", ")
-            )}">⚑ ${r.related_records_count} related</span>`
-          : "";
+            )}">⚑ ${r.related_records_count}</span>`
+          : r.related_records_checked === true
+          ? `<span class="cell-muted" title="Checked — no Tier 3/4 filing within the lead's own date window">—</span>`
+          : r.related_records_checked === false
+          ? `<span class="cell-muted" title="Not checked yet (budgeted incrementally, see Tier 3/4 related records filter)">…</span>`
+          : "—";
         const flagsCell = (r.review_flags || []).length
           ? `<div class="cell-tags">${r.review_flags
               .map((f) => `<span class="cell-tag flag-tag">${escapeHtml(f)}</span>`)
@@ -534,10 +543,11 @@
           <td><span class="tier-badge" data-tier="${escapeAttr(r.display_tier)}">${escapeHtml(r.display_tier)}</span></td>
           <td>${escapeHtml(r.primary_parcel_id || "")}${pendingBadge ? " " + pendingBadge : ""}</td>
           <td>${escapeHtml(r.display_address || "")}${heirBadge ? " " + heirBadge : ""}${trustBadge ? " " + trustBadge : ""}</td>
-          <td>${escapeHtml(r.display_owner || "")}${yearsDelinquentBadge ? " " + yearsDelinquentBadge : ""}${relatedRecordsBadge ? " " + relatedRecordsBadge : ""}</td>
+          <td>${escapeHtml(r.display_owner || "")}${yearsDelinquentBadge ? " " + yearsDelinquentBadge : ""}</td>
           <td><div class="cell-tags">${(r.display_patterns || []).map((p) => `<span class="cell-tag">${escapeHtml(p)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_attributes || []).map((a) => `<span class="cell-tag">${escapeHtml(a)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_deal_paths || []).map((d) => `<span class="cell-tag">${escapeHtml(d)}</span>`).join("")}</div></td>
+          <td>${relatedRecordsCell}</td>
           <td>${r.stack_depth}</td>
           <td>${fmtMoney(r.display_assessed_value)}</td>
           <td>${fmtMoney(r.display_last_sale_price)}</td>
