@@ -273,23 +273,48 @@ def _to_wrapped_records(rows: list[dict], source_url: str, verbose: bool = False
     return out
 
 
-def _load_prior(path: Path) -> dict:
+def _load_prior(path: Path, verbose: bool = False) -> dict:
+    """2026-09-25: the daily scheduled run crashed here with
+    'OSError: [Errno 22] Invalid argument' reading this file mid-stream --
+    the file (1.4GB, under a OneDrive-synced repo) read fine moments later
+    with no code change, consistent with a transient OneDrive Files-On-
+    Demand hiccup rather than a real bug. Retries with a short backoff
+    before giving up (falls back to {} -- same as a missing file -- so a
+    still-failing read degrades to "treat every row as new" rather than
+    crashing the whole daily pipeline)."""
+    import time
+
     if not path.exists():
         return {}
-    out: dict = {}
-    with open(path, "r", encoding="utf-8") as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            rid = rec.get("raw_record_id")
-            if rid:
-                out[rid] = rec
-    return out
+    last_exc: OSError | None = None
+    for attempt in range(3):
+        if attempt:
+            if verbose:
+                print(f"  [Dallas TRW] retrying prior-state read after {last_exc} "
+                      f"(attempt {attempt + 1}/3)...", flush=True)
+            time.sleep(5 * attempt)
+        out: dict = {}
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    rid = rec.get("raw_record_id")
+                    if rid:
+                        out[rid] = rec
+            return out
+        except OSError as exc:
+            last_exc = exc
+    if verbose:
+        print(f"  [Dallas TRW] prior-state read failed 3x ({last_exc}) -- "
+              f"continuing with no prior state (every row will look NEW_RECORD "
+              f"this run rather than crashing the pipeline)", flush=True)
+    return {}
 
 
 def merge_with_prior(current: list[dict], prior: dict) -> list[dict]:
@@ -322,7 +347,7 @@ def _write_jsonl(records: list[dict], output_path: Path, verbose: bool = False) 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if verbose:
         print(f"  [Dallas TRW] loading prior state from {output_path}", flush=True)
-    prior = _load_prior(output_path)
+    prior = _load_prior(output_path, verbose=verbose)
     if verbose:
         print(f"  [Dallas TRW] merging {len(records)} current vs {len(prior)} prior records", flush=True)
     merged = merge_with_prior(records, prior)
