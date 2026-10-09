@@ -414,7 +414,7 @@ UNIVERSAL_DEBTOR_PARTY_RULES: dict[str, dict] = {
         "missing_debtor_review_reason": "owner_not_on_document",
     },
     # -----------------------------------------------------------------------
-    # Dallas client-requested expansion (2026-09-15) — two genuinely new
+    # Client-requested doc-type expansion (2026-09-15) — two genuinely new
     # doc-type concepts with no existing rule row or family alias close
     # enough to reuse verbatim (see transfer_of_tax_lien below for a case
     # that DID reuse an existing rule via fan-out instead of a new row here).
@@ -553,20 +553,18 @@ BROAD_KEY_REGISTRY_ALIASES: dict[str, tuple[str, ...]] = {
     ),
     "trustee_sale": ("trustees_deed_upon_sale",),
 }
-# transfer_of_tax_lien (Dallas client expansion, 2026-09-15): checked live
-# against real Kofile data before assuming this was a state_tax_lien-style
+# transfer_of_tax_lien (client doc-type expansion, 2026-09-15): checked live
+# against real recorder data before assuming this was a state_tax_lien-style
 # TP/GR pattern like the other tax lien types -- it is NOT reliably so.
-# Confirmed live: many TRANSFER OF TAX LIEN grantors are the actual owner
-# (e.g. "NAVARRO ORTHODONTIX OF IRVING PC", "FIVE SHADES OF GRAY LLC"), but
-# a substantial share instead show a taxing jurisdiction as grantor (e.g.
-# "DALLAS COUNTY", "RICHARDSON ISD") transferring to the same private
-# tax-lien buyer ("HOME TAX SOLUTIONS LLC", "PROPEL TAX") that appears as
-# grantee throughout -- i.e. neither party reliably names the property
-# owner on those rows. Deliberately left with NO debtor_party_engine rule
-# (same posture as mechanics_lien/construction_lien's own documented
+# Many TRANSFER OF TAX LIEN grantors are the actual property owner, but a
+# substantial share instead show a taxing jurisdiction (county / school
+# district) as grantor, transferring to the same private tax-lien buyer that
+# appears as grantee throughout -- i.e. neither party reliably names the
+# property owner on those rows. Deliberately left with NO debtor_party_engine
+# rule (same posture as mechanics_lien/construction_lien's own documented
 # "mixed/inconclusive... would be a guess" case) -- routes to
-# REVIEW_REQUIRED rather than risk resolving "DALLAS COUNTY" or "HOME TAX
-# SOLUTIONS LLC" as the lead's owner name.
+# REVIEW_REQUIRED rather than risk resolving a taxing jurisdiction or the
+# tax-lien buyer as the lead's owner name.
 """v5.4.0 Session 8 — for each broad §17 rule key, the registry-aligned
 canonical_doc_type values the same rule must fire on after the cutover. Empty
 tuple = broad bucket with no registry-fan-out (its children carry their own
@@ -616,22 +614,22 @@ _FILER_SUPPRESSION_PATTERNS: dict[str, list[tuple[str, re.Pattern]]] = {
         ("<STATE> COMPTROLLER", _ci(r"\bCOMPTROLLER\b")),
         ("<STATE> WORKFORCE COMMISSION", _ci(r"\bWORKFORCE\s+COMMISSION\b")),
         # 2026-09-22: the abbreviated "DEPT OF" never matched the spelled-
-        # out "DEPARTMENT OF" pattern -- confirmed live on a real Dallas
-        # CHILD SUPPORT LIEN row: grantee "ILLINOIS DEPT OF HEALTHCARE &
-        # FAMILY SERVICES CHILD SUPPORT ENFORCEMENT" slipped through
-        # unsuppressed.
+        # out "DEPARTMENT OF" pattern -- confirmed live on a real child-
+        # support lien row whose out-of-state agency grantee ("<OTHER
+        # STATE> DEPT OF HEALTHCARE & FAMILY SERVICES CHILD SUPPORT
+        # ENFORCEMENT") slipped through unsuppressed.
         ("<STATE> DEPARTMENT OF <*>", _ci(r"\bDEPARTMENT\s+OF\b")),
         ("<STATE> DEPT OF <*>", _ci(r"\bDEPT\.?\s+OF\b")),
     ],
-    # 2026-09-22: added after live-checking CHILD SUPPORT LIEN direction for
-    # the Dallas doc-type expansion (2026-09-15) -- found the grantor/
-    # grantee direction is genuinely mixed depending on who files: an
-    # individual obligee filing directly has grantor=filer/grantee=debtor
-    # (matches the existing rule's GR/GE default), but an out-of-state
-    # child-support ENFORCEMENT AGENCY filing has the opposite
-    # (grantor=debtor/grantee=agency) -- confirmed live, e.g. grantor "REED
-    # ALVIN T" / grantee "ILLINOIS DEPT OF HEALTHCARE & FAMILY SERVICES
-    # CHILD SUPPORT ENFORCEMENT". Rather than guess a single direction (the
+    # 2026-09-22: added after live-checking CHILD SUPPORT LIEN direction
+    # against real recorder data (client doc-type expansion, 2026-09-15) --
+    # found the grantor/grantee direction is genuinely mixed depending on
+    # who files: an individual obligee filing directly has grantor=filer/
+    # grantee=debtor (matches the existing rule's GR/GE default), but an
+    # out-of-state child-support ENFORCEMENT AGENCY filing has the opposite
+    # (grantor=debtor/grantee=agency), e.g. grantor "DOE JOHN" / grantee
+    # "<OTHER STATE> DEPT OF HEALTHCARE & FAMILY SERVICES CHILD SUPPORT
+    # ENFORCEMENT". Rather than guess a single direction (the
     # same trap transfer_of_tax_lien was deliberately left unmapped to
     # avoid), this adds a name-pattern safety net: whichever slot an
     # agency name lands in, it can never be returned as owner_name, so the

@@ -103,9 +103,17 @@ def main() -> int:
           cdt("foreclosure_notice") == "NOTICE_OF_SALE")
     check("bridge: broad §17 key `code_lien` fans out to CODE_VIOLATION_NOTICE",
           cdt("code_lien") == "CODE_VIOLATION_NOTICE")
-    check("bridge: broad §17 key with empty fan-out (administrative_lien) "
+    check("bridge: broad §17 key with empty fan-out (civil_judgment) "
           "returns None (broad bucket — children carry their own rules)",
-          cdt("administrative_lien") is None)
+          cdt("civil_judgment") is None)
+    # administrative_lien used to be the example above (broad key, empty
+    # fan-out, no registry entry). The Dallas client expansion (2026-09-15)
+    # added a real ADMINISTRATIVE_LIEN registry type, so it now resolves to
+    # that registry entry instead of None -- intentional: it lets the seam
+    # score administrative liens with the registry's own lead_pattern.
+    check("bridge: administrative_lien now resolves to its own registry "
+          "entry (ADMINISTRATIVE_LIEN), no longer a bare broad key",
+          cdt("administrative_lien") == "ADMINISTRATIVE_LIEN")
     check("bridge: unknown canonical_doc_type returns None (no fabrication)",
           cdt("not_a_real_type") is None)
     check("bridge: None / empty input returns None",

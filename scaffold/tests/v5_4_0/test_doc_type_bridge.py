@@ -301,8 +301,11 @@ def main() -> int:
           report["registry_missing_reason"] == [])
     check("bridge_totality_report: lead_types_unexplained is empty",
           report["lead_types_unexplained"] == [])
-    check("bridge_totality_report: registry_total == 74 (the registry size)",
-          report["registry_total"] == 74)
+    # 74 originally; +5 with the Dallas client expansion (administrative_lien,
+    # child_support_lien, transfer_of_tax_lien, forfeiture_of_contract,
+    # guardians_deed), all bridged to None with documented reasons.
+    check("bridge_totality_report: registry_total == 79 (the registry size)",
+          report["registry_total"] == 79)
     check("bridge_totality_report: lead_types_total == 27 (the §16 sweep size)",
           report["lead_types_total"] == 27)
 

@@ -189,6 +189,14 @@ REGISTRY_TO_LEAD_TYPE: dict[str, Optional[str]] = {
     "vacated_judgment": None,
     "hoa_lien": None,
     "hospital_lien": None,
+    # Added with the Dallas client doc-type expansion (2026-09-15) but never
+    # registered here until 2026-10-08, which broke this module's own
+    # totality test. None of the five has a §16 lead type; none is invented.
+    "administrative_lien": None,
+    "child_support_lien": None,
+    "transfer_of_tax_lien": None,
+    "forfeiture_of_contract": None,
+    "guardians_deed": None,
     "inheritance_tax_waiver": None,
     "disclaimer_of_interest": None,
     "trust_agreement": None,
@@ -241,6 +249,15 @@ REGISTRY_WITHOUT_LEAD_TYPE_REASONS: dict[str, str] = {
     "hoa_lien": "lien type not in §16 27-type sweep",
     "hospital_lien": "lien type not in §16 27-type sweep",
     "water_lien": "utility-distress sub-type not in §16 27-type sweep",
+    "administrative_lien": "lien type not in §16 27-type sweep",
+    "child_support_lien": "lien type not in §16 27-type sweep",
+    "transfer_of_tax_lien": "tax-lien assignment to a third-party lender — not the "
+                            "§16 'Tax Sale' / tax-lien-foreclosure instruments; "
+                            "not in §16 27-type sweep",
+    "forfeiture_of_contract": "contract-for-deed default notice — not in §16 "
+                              "27-type sweep",
+    "guardians_deed": "fiduciary-deed sub-type (like personal_representative_deed); "
+                      "not in §16 27-type sweep",
     # Estate enrichment.
     "inheritance_tax_waiver": "estate enrichment (state tax-clearance step)",
     "disclaimer_of_interest": "estate enrichment (heir-step sub-signal)",

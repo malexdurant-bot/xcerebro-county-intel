@@ -179,13 +179,15 @@ def main() -> int:
     # Session 7's 29 (17 Session-2 + 12 Session-7), so the §17 table carried
     # 42 keys. The post-Session-8 operator gap-fill added 3 more
     # (quitclaim_deed, partition_action, quiet_title_action), bringing the
-    # table to 45. The fan-out is sourced from BROAD_KEY_REGISTRY_ALIASES and
-    # is tested in detail by test_doc_type_bridge.py; here we pin the count so
-    # a future row addition surfaces in the gate.
-    check("§17.C UNIVERSAL_DEBTOR_PARTY_RULES covers 45 mapped doc types "
+    # table to 45. The Dallas client doc-type expansion (2026-09-15) added 2
+    # more (child_support_lien, guardians_deed) -> 47. The fan-out is
+    # sourced from BROAD_KEY_REGISTRY_ALIASES and is tested in detail by
+    # test_doc_type_bridge.py; here we pin the count so a future row
+    # addition surfaces in the gate.
+    check("§17.C UNIVERSAL_DEBTOR_PARTY_RULES covers 47 mapped doc types "
           "(17 Session 2 + 12 Session 7 + 13 Session 8 fan-out + 3 "
-          "post-Session-8 gap-fill)",
-          len(rules) == 45)
+          "post-Session-8 gap-fill + 2 Dallas expansion)",
+          len(rules) == 47)
     check("§17.C table maps `probate` (Session 2 row 17)", "probate" in rules)
     # The 12 Session-7 registry doc types are all present.
     for new_doc_type in (
@@ -202,9 +204,10 @@ def main() -> int:
     check("§17.C does NOT map `tax_delinquency` (tax-roll status, "
           "enrichment, not a recorded document — §17.K)",
           "tax_delinquency" not in rules)
-    check("§17.D defines 16 filer-suppression groups "
-          "(7 from Session 2 + 9 from Session 7)",
-          len(engine._FILER_SUPPRESSION_PATTERNS) == 16)
+    check("§17.D defines 17 filer-suppression groups "
+          "(7 from Session 2 + 9 from Session 7 + child_support_agency, "
+          "added 2026-09-15 for the Dallas child-support-lien filers)",
+          len(engine._FILER_SUPPRESSION_PATTERNS) == 17)
 
     # --- the 17 §17.C mapped doc types resolve to a real debtor -------------
     for doc_type, name_type in STRUCTURED_CASES:
