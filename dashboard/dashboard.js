@@ -59,6 +59,9 @@
       attribute: new Set(),
       deal_path: new Set(),
       stack_depth: new Set(),
+      // Values are OWNER_LOCATION_LABELS below. Multiple selected chips
+      // AND together (out-of-state + absentee = both must be true).
+      owner_location: new Set(),
     },
     // Not a Set (unlike state.filters above) -- a single numeric threshold,
     // kept outside state.filters so wireEvents' reset-filters handler
@@ -85,6 +88,14 @@
   // Paginate the TABLE render only -- tiles/chips/footer/CSV export still
   // see the full filtered set, so counts and exports stay correct.
   const PAGE_SIZE = 100;
+
+  // Owner-location chip labels (2026-10-08). Absentee = the owner's
+  // mailing address differs from the property's; out-of-state = that
+  // mailing address is outside the property's state. Both come from the
+  // county parcel file, so a lead whose parcel never matched has neither
+  // flag known (null) and matches neither chip -- "unknown" is not "no".
+  const OWNER_LOCATION_ABSENTEE = "Absentee owner";
+  const OWNER_LOCATION_OOS = "Out-of-state owner";
 
   const PRECANNED_VIEWS = [
     {
@@ -256,6 +267,15 @@
       out = out.filter((r) =>
         state.filters.stack_depth.has(String(r.stack_depth))
       );
+    if (state.filters.owner_location.size) {
+      const wantAbsentee = state.filters.owner_location.has(OWNER_LOCATION_ABSENTEE);
+      const wantOos = state.filters.owner_location.has(OWNER_LOCATION_OOS);
+      out = out.filter(
+        (r) =>
+          (!wantAbsentee || r.display_is_absentee_owner === true) &&
+          (!wantOos || r.display_is_out_of_state_owner === true)
+      );
+    }
     if (state.minYearsDelinquent != null)
       out = out.filter(
         (r) =>
@@ -352,6 +372,25 @@
       }
     }
 
+    // Owner location (absentee / out-of-state). Shown only when at least
+    // one lead has the flag populated; the hint states honestly how many
+    // leads we actually know a mailing address for, since the rest are
+    // unknown rather than "not absentee".
+    const ownerLocationCounts = {
+      [OWNER_LOCATION_ABSENTEE]: records.filter((r) => r.display_is_absentee_owner === true).length,
+      [OWNER_LOCATION_OOS]: records.filter((r) => r.display_is_out_of_state_owner === true).length,
+    };
+    const ownerLocationKnown = records.filter((r) => r.display_is_absentee_owner != null).length;
+    const ownerLocationRail = document.getElementById("rail-owner-location");
+    if (ownerLocationRail) {
+      ownerLocationRail.hidden = ownerLocationKnown === 0;
+      const hint = document.getElementById("owner-location-hint");
+      if (hint) {
+        hint.textContent =
+          `Owner mailing address on file for ${ownerLocationKnown} of ${records.length} leads`;
+      }
+    }
+
     const axes = [
       {
         elId: "chips-tier",
@@ -389,10 +428,17 @@
         keys: Object.keys(state.payload.stack_depth_distribution || {}).sort(),
         countFn: (k) => state.payload.stack_depth_distribution[k] || 0,
       },
+      {
+        elId: "chips-owner-location",
+        axis: "owner_location",
+        keys: ownerLocationKnown ? [OWNER_LOCATION_ABSENTEE, OWNER_LOCATION_OOS] : [],
+        countFn: (k) => ownerLocationCounts[k] || 0,
+      },
     ];
 
     for (const ax of axes) {
       const el = document.getElementById(ax.elId);
+      if (!el) continue; // older page copies without this rail
       el.innerHTML = ax.keys
         .map((k) =>
           chipHtml(k, ax.countFn(k), state.filters[ax.axis].has(k))
@@ -400,7 +446,12 @@
         .join("");
     }
 
-    document.querySelectorAll(".chip-group").forEach((g) => {
+    // [data-axis] only: chip groups without an axis (the Title Activity
+    // Found / Not found chips are static HTML wired in wireEvents) used to
+    // get this handler too, which threw on every click (state.filters[
+    // undefined]) and stacked another listener on those never-recreated
+    // buttons every render.
+    document.querySelectorAll(".chip-group[data-axis]").forEach((g) => {
       g.querySelectorAll(".chip").forEach((chip) => {
         chip.addEventListener("click", () => {
           const axis = g.dataset.axis;
@@ -511,6 +562,25 @@
           (r.display_pattern_set || []).includes("transfer")
             ? `<span class="cell-tag trust-badge" title="Foreclosure + transfer signal (likely living-trust owner)">trust owner</span>`
             : "";
+        // Owner-location badges + where the owner actually gets mail.
+        // Absentee: mailing address differs from the property. Out of
+        // state: that mailing address is outside the property's state
+        // (named, so "CO" is visible at a glance). The mailing line only
+        // renders for an absentee owner -- for everyone else it's just the
+        // property address again.
+        const absenteeBadge =
+          r.display_is_absentee_owner === true
+            ? `<span class="cell-tag absentee-badge" title="Owner's mailing address differs from the property address">absentee</span>`
+            : "";
+        const oosState = (r.display_owner_mailing_state || "").trim();
+        const outOfStateBadge =
+          r.display_is_out_of_state_owner === true
+            ? `<span class="cell-tag out-of-state-badge" title="Owner's mailing address is outside the property's state">out of state${oosState ? " (" + escapeHtml(oosState) + ")" : ""}</span>`
+            : "";
+        const ownerMailingLine =
+          r.display_is_absentee_owner === true && r.display_owner_mailing
+            ? `<div class="owner-mailing" title="Where the owner receives mail">Mails to: ${escapeHtml(r.display_owner_mailing)}</div>`
+            : "";
         const yearsDelinquentBadge =
           r.display_years_tax_delinquent != null
             ? `<span class="cell-tag years-delinquent-badge" title="Years tax delinquent (oldest unpaid year to today)">${r.display_years_tax_delinquent}yr delinquent</span>`
@@ -545,7 +615,7 @@
           <td><span class="tier-badge" data-tier="${escapeAttr(r.display_tier)}">${escapeHtml(r.display_tier)}</span></td>
           <td>${escapeHtml(r.primary_parcel_id || "")}${pendingBadge ? " " + pendingBadge : ""}</td>
           <td>${escapeHtml(r.display_address || "")}${heirBadge ? " " + heirBadge : ""}${trustBadge ? " " + trustBadge : ""}</td>
-          <td>${escapeHtml(r.display_owner || "")}${yearsDelinquentBadge ? " " + yearsDelinquentBadge : ""}</td>
+          <td>${escapeHtml(r.display_owner || "")}${yearsDelinquentBadge ? " " + yearsDelinquentBadge : ""}${absenteeBadge ? " " + absenteeBadge : ""}${outOfStateBadge ? " " + outOfStateBadge : ""}${ownerMailingLine}</td>
           <td><div class="cell-tags">${(r.display_patterns || []).map((p) => `<span class="cell-tag">${escapeHtml(p)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_attributes || []).map((a) => `<span class="cell-tag">${escapeHtml(a)}</span>`).join("")}</div></td>
           <td><div class="cell-tags">${(r.display_deal_paths || []).map((d) => `<span class="cell-tag">${escapeHtml(d)}</span>`).join("")}</div></td>
@@ -592,6 +662,12 @@
     "display_last_sale_price",
     "display_last_sale_date",
     "display_year_built",
+    "display_is_absentee_owner",
+    "display_is_out_of_state_owner",
+    "display_owner_mailing_address",
+    "display_owner_mailing_city",
+    "display_owner_mailing_state",
+    "display_owner_mailing_zip",
     "display_match_confidence",
     "stack_depth",
     "primary_event_date",
@@ -891,7 +967,20 @@
     "Patterns",
     "Event Date",
     "Lead ID",
+    // Appended (2026-10-08) after the original columns so anything that
+    // maps this file by position keeps working. Blank = unknown (the
+    // parcel never matched), which is different from "No".
+    "Absentee Owner",
+    "Out Of State Owner",
+    "Owner Mailing Street",
+    "Owner Mailing City",
+    "Owner Mailing State",
+    "Owner Mailing Zip",
   ];
+
+  function yesNoUnknown(v) {
+    return v === true ? "Yes" : v === false ? "No" : "";
+  }
 
   function exportSkiptraceCsv() {
     const rows = applyFilters(state.payload.records).filter(hasStructuredAddress);
@@ -916,6 +1005,12 @@
         csvEscape((r.display_patterns || []).join("; ")),
         csvEscape(r.primary_event_date),
         csvEscape(r.lead_id),
+        csvEscape(yesNoUnknown(r.display_is_absentee_owner)),
+        csvEscape(yesNoUnknown(r.display_is_out_of_state_owner)),
+        csvEscape(r.display_owner_mailing_address),
+        csvEscape(r.display_owner_mailing_city),
+        csvEscape(r.display_owner_mailing_state),
+        csvEscape(r.display_owner_mailing_zip),
       ].join(","));
     });
     downloadCsv(header, lines, "skiptrace");

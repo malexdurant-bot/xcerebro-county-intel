@@ -307,7 +307,18 @@ def main() -> None:
             live_lookup = enrich_accounts(
                 missing_accounts, verbose=True, checkpoint_path=dcad_cache_path
             )
-            dcad_lookup.update({k: v for k, v in live_lookup.items() if v})
+            # enrich_accounts() returns its WHOLE checkpoint (thousands of
+            # accounts accumulated over past runs), not just the accounts
+            # requested this run. Merging all of it overwrote good bulk
+            # entries -- which carry owner_mailing_*/is_absentee_owner/
+            # is_out_of_state_owner -- with older live entries that can't
+            # (DCAD's per-account pages expose no mailing address), leaving
+            # 96% of tax leads with those flags "unknown" (found 2026-10-08).
+            # Only accept live results for accounts the bulk file lacks.
+            missing_set = set(missing_accounts)
+            dcad_lookup.update(
+                {k: v for k, v in live_lookup.items() if v and k in missing_set}
+            )
             print(f"[dallas_tx] DCAD live fallback cache written -> {dcad_cache_path}", flush=True)
         else:
             print(f"[dallas_tx] All {len(accounts)} accounts resolved from the bulk file "

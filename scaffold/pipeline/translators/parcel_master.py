@@ -165,6 +165,29 @@ def _normalize_street(raw: str) -> str:
     return _NON_ALNUM_RE.sub("", text)
 
 
+_UNIT_TAIL_RE = re.compile(
+    r"(?:#|\b(?:APT|APARTMENT|UNIT|STE|SUITE|BLDG|BUILDING|FLOOR|RM|ROOM|SPC|SPACE|TRLR|LOT)\b\.?)"
+    r"\s*[A-Z0-9\-]*.*$"
+)
+
+
+def _normalize_street_ignoring_unit(raw: str) -> str:
+    """_normalize_street, but also dropping a trailing unit designator and
+    everything after it ('100 TEST DR # 1003' -> '100TEST'). Used ONLY to
+    decide absentee-vs-not: an owner whose mailing line is the property's
+    own street address plus an apartment/unit number lives there -- county
+    situs addresses usually omit the unit, so comparing them raw flagged
+    ~7% of county-wide 'absentee' calls wrongly (measured 2026-10-08).
+
+    Deliberately NOT folded into _normalize_street itself: that one also
+    keys address->parcel MATCHING (parcel_master_dcad_bulk_dallas), where
+    ignoring units would let a tenant's unit address match an entire
+    apartment complex's parcel -- exactly the wrong-guess the single-
+    confident-match rule exists to prevent."""
+    stripped = _UNIT_TAIL_RE.sub("", (raw or "").upper())
+    return _normalize_street(stripped) or _normalize_street(raw)
+
+
 def _derive_absentee_flags(parcel: dict) -> dict:
     """Derive is_absentee_owner / is_out_of_state_owner generically from
     fields already in this translator's contract (owner_mailing_address/
@@ -189,7 +212,10 @@ def _derive_absentee_flags(parcel: dict) -> dict:
     situs_addr = (parcel.get("address") or "").strip()
     is_absentee = None
     if mailing_addr:
-        is_absentee = _normalize_street(mailing_addr) != _normalize_street(situs_addr)
+        is_absentee = (
+            _normalize_street_ignoring_unit(mailing_addr)
+            != _normalize_street_ignoring_unit(situs_addr)
+        )
 
     mailing_state = (parcel.get("owner_mailing_state") or "").strip().upper()
     situs_state = (parcel.get("situs_state") or "").strip().upper()

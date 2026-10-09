@@ -285,9 +285,8 @@ def _write_jsonl(records: list[dict], output_path: Path, verbose: bool = False) 
 # a new network dependency. Verified live end-to-end on the case that
 # motivated this: Kofile's "LAKEWOOD POINTE Lot 23 Block 8" matched exactly
 # one DCAD account ("LAKEWOOD POINTE BLK 8 LOT 23...") whose owner name
-# ("HENDERSON JOSEPH & JOANN") matched the document's own parties
-# ("HENDERSON JOSEPH EDWIN DECD" / "HENDERSON JOANN BEAM") -- situs address
-# 6406 AMESBURY LN, ROWLETT.
+# matched the surnames of the document's own parties (a decedent and a
+# surviving relative), giving a real situs address.
 #
 # DCAD's own legal_description format ("<NAME> BLK <N> LT <N> ...") differs
 # from Kofile's ("Subdivision - Name: <NAME> Lot: <N> Block: <N> ...") in

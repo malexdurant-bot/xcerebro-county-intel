@@ -180,7 +180,7 @@ _DOCUMENT_IMAGE_WAIT_MS = 8_000
 # 2026-09-23: the FC department's document detail view is the same Kofile
 # document-viewer template as Property Records (confirmed live), which
 # exposes a structured "Property Address" panel -- sometimes a real full
-# street address (e.g. "462 ALCORN AVE DALLAS TEXAS 75217"), sometimes just
+# street address (e.g. "100 EXAMPLE ST DALLAS TEXAS 75000"), sometimes just
 # city (no better than the index row's own property_city column, confirmed
 # live on other samples). Captured here at zero extra navigation cost since
 # this page is already visited for OCR. translate.py revalidates it (must

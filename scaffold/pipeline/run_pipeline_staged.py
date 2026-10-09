@@ -183,6 +183,22 @@ def run_staged_pipeline(
 # parcel_display directly (no separate parcel-master dict required).
 # ---------------------------------------------------------------------------
 
+def _format_mailing_address(parcel: dict) -> str:
+    """'STREET, CITY, ST ZIP' from parcel_display's owner_mailing_* parts,
+    skipping whatever is missing ('' when there's no mailing street at all).
+    A 9-digit ZIP (as county bulk files often carry) is shown ZIP+4."""
+    street = (parcel.get("owner_mailing_address") or "").strip()
+    if not street:
+        return ""
+    city = (parcel.get("owner_mailing_city") or "").strip()
+    state = (parcel.get("owner_mailing_state") or "").strip()
+    zip_code = (parcel.get("owner_mailing_zip") or "").strip()
+    if len(zip_code) == 9 and zip_code.isdigit():
+        zip_code = f"{zip_code[:5]}-{zip_code[5:]}"
+    state_zip = " ".join(p for p in (state, zip_code) if p)
+    return ", ".join(p for p in (street, city, state_zip) if p)
+
+
 def project_scored_lead(scored_lead: dict) -> dict:
     """Dashboard projection from a scored_lead. The R3(iii) enrichment-optional
     rule: when scored_lead is UNENRICHED, display fields are empty strings /
@@ -250,6 +266,17 @@ def project_scored_lead(scored_lead: dict) -> dict:
         # other parcel_display field: None on an UNENRICHED lead.
         "display_is_absentee_owner": parcel.get("is_absentee_owner"),
         "display_is_out_of_state_owner": parcel.get("is_out_of_state_owner"),
+        # 2026-10-08: the owner's mailing address was on parcel_display all
+        # along but never projected, so no consumer (dashboard, CSV export)
+        # could show where an absentee / out-of-state owner actually
+        # receives mail. Components kept separate from the joined string for
+        # the same reason display_address_* are (CSV / skiptrace exports
+        # shouldn't re-parse a joined string).
+        "display_owner_mailing_address": parcel.get("owner_mailing_address"),
+        "display_owner_mailing_city": parcel.get("owner_mailing_city"),
+        "display_owner_mailing_state": parcel.get("owner_mailing_state"),
+        "display_owner_mailing_zip": parcel.get("owner_mailing_zip"),
+        "display_owner_mailing": _format_mailing_address(parcel),
         "display_years_tax_delinquent": parcel.get("years_tax_delinquent"),
         "display_match_confidence": scored_lead.get("match_confidence") or 0,
         "stack_depth": scored_lead.get("stack_depth", 0),
