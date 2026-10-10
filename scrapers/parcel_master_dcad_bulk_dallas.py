@@ -190,6 +190,30 @@ def _raw_record_id(account_num: str) -> str:
     return f"dallas_dcad_{account_num.strip().replace(' ', '_')}"
 
 
+def _owner_name(row: dict) -> str:
+    """The owner of record: OWNER_NAME1 [& OWNER_NAME2].
+
+    BIZ_NAME is NOT the owner. It's a property / operating-business
+    descriptor: 21% of Dallas accounts (180,823 of 862,771) have one, it is
+    overwhelmingly a land-use note ("VACANT" x16,875, "VACANT LAND", "LAND
+    ONLY", "PARKING", "HOUSE"...), and 180,795 of those accounts ALSO carry
+    a real owner name. This used to take BIZ_NAME first, which (found
+    2026-10-09) put "VACANT" on ~94 leads as the owner and, worse, made
+    every one of those accounts unmatchable by its true owner name in
+    lookup_by_owner_name. BIZ_NAME is used only when an account has no owner
+    name at all (28 accounts)."""
+    name1 = (row.get("OWNER_NAME1") or "").strip()
+    name2 = (row.get("OWNER_NAME2") or "").strip()
+    owner = " & ".join(n for n in (name1, name2) if n)
+    # DCAD writes a joint owner as "A B &" (name1) + "& C D" or "C D" (name2),
+    # so joining can double the ampersand ("A B & & C D", 26 accounts).
+    # Collapse repeats only; the single trailing "&" convention on ~156k
+    # accounts is DCAD's own and is left as-is (changing it would alter
+    # owner-name matching county-wide).
+    owner = re.sub(r"(?:&\s*){2,}", "& ", owner + " ").strip()
+    return owner or (row.get("BIZ_NAME") or "").strip()
+
+
 def parse_account_info(zip_path: Path, verbose: bool = False) -> list[dict]:
     """Streams ACCOUNT_INFO.CSV out of the zip (352MB / 863k rows -- do NOT
     read it fully into memory) and returns wrapped raw records already
@@ -210,11 +234,7 @@ def parse_account_info(zip_path: Path, verbose: bool = False) -> list[dict]:
                 if not account:
                     continue
 
-                owner_name = (row.get("BIZ_NAME") or "").strip()
-                if not owner_name:
-                    name1 = (row.get("OWNER_NAME1") or "").strip()
-                    name2 = (row.get("OWNER_NAME2") or "").strip()
-                    owner_name = " & ".join(n for n in (name1, name2) if n)
+                owner_name = _owner_name(row)
 
                 mailing_street = _pick_street_line([
                     row.get("OWNER_ADDRESS_LINE1") or "",
