@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-09T14:23:21Z",
+  "generated_at": "2026-10-10T14:22:45Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -77479,7 +77479,7 @@
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_unresolved_26ES4001624",
@@ -77891,7 +77891,7 @@
     }
   ],
   "recency_distribution": {
-    "Active": 673,
-    "Aged": 390
+    "Active": 672,
+    "Aged": 391
   }
 }
