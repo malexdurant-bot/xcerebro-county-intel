@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-10-10T01:43:44Z",
+  "generated_at": "2026-10-10T02:06:10Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "full_rebuild",
   "county": "Dallas",
   "state": "TX",
   "semantic_verdict": "NEEDS_OPERATOR_REVIEW",
-  "lead_total": 4638,
+  "lead_total": 4640,
   "enrichment_breakdown": {
-    "ENRICHED": 3703,
+    "ENRICHED": 3705,
     "UNENRICHED": 935
   },
   "pattern_counts": {
@@ -15,27 +15,27 @@
     "code": 46,
     "divorce": 13,
     "estate": 181,
-    "foreclosure": 1332,
+    "foreclosure": 1347,
     "lien": 363,
     "lis_pendens": 20,
     "tax": 3080
   },
   "attribute_counts": {},
   "stack_depth_distribution": {
-    "1": 4244,
-    "2": 390,
+    "1": 4233,
+    "2": 403,
     "3": 4
   },
   "score_tier_distribution": {
     "Archive": 332,
     "Hot": 4,
     "Low": 189,
-    "Strong": 809,
-    "Workable": 3304
+    "Strong": 822,
+    "Workable": 3293
   },
   "deal_path_distribution": {
     "messy_title": 28,
-    "wholesale": 4638
+    "wholesale": 4640
   },
   "records": [
     {
@@ -9047,7 +9047,7 @@
     },
     {
       "lead_id": "lead_parcel_00000176338000000",
-      "scored_lead_id": "scored_a79ebb006594d5e9",
+      "scored_lead_id": "scored_ceb16e453f92428f",
       "primary_parcel_id": "00000176338000000",
       "display_address": "3922 COOLIDGE ST, DALLAS, TX",
       "display_address_street": "3922 COOLIDGE ST",
@@ -9056,18 +9056,22 @@
       "display_address_zip": null,
       "display_owner": "HINES TRUDIE JEAN ET AL &",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -9078,7 +9082,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -9096,11 +9100,15 @@
       "display_owner_mailing": "615 E CENTER ST, DUNCANVILLE, TX 75116-4007",
       "display_years_tax_delinquent": 22.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -9108,6 +9116,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011155914",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -10684,7 +10693,7 @@
     },
     {
       "lead_id": "lead_parcel_00000179336000000",
-      "scored_lead_id": "scored_0d736a18e6cf7a3a",
+      "scored_lead_id": "scored_555e87a74f525f23",
       "primary_parcel_id": "00000179336000000",
       "display_address": "4224 SCYENE RD, DALLAS, TX",
       "display_address_street": "4224 SCYENE RD",
@@ -10693,18 +10702,22 @@
       "display_address_zip": null,
       "display_owner": "DAUCHAN DAVY",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -10715,7 +10728,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -10733,18 +10746,23 @@
       "display_owner_mailing": "301 JOAN VISTA ST, EL SOBRANTE, CA 94803-1911",
       "display_years_tax_delinquent": 10.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": "2026-02-01",
+      "primary_event_date": "2026-11-03",
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1009229212",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -15140,7 +15158,7 @@
     },
     {
       "lead_id": "lead_parcel_00000215458000000",
-      "scored_lead_id": "scored_0711ba769e71da72",
+      "scored_lead_id": "scored_137d4acf01feff6c",
       "primary_parcel_id": "00000215458000000",
       "display_address": "4535 WAHOO ST, DALLAS, TX",
       "display_address_street": "4535 WAHOO ST",
@@ -15149,18 +15167,22 @@
       "display_address_zip": null,
       "display_owner": "EUBANKS RUEY",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -15171,7 +15193,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -15189,11 +15211,15 @@
       "display_owner_mailing": "4535 WAHOO ST, DALLAS, TX 75210-0000",
       "display_years_tax_delinquent": 23.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -15201,6 +15227,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1010182084",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -30748,27 +30775,31 @@
     },
     {
       "lead_id": "lead_parcel_00000305719000000",
-      "scored_lead_id": "scored_ef16d3e360d01ef7",
+      "scored_lead_id": "scored_6cc09d1ebd5f0cc7",
       "primary_parcel_id": "00000305719000000",
       "display_address": "710 E SANER AVE, DALLAS, TX",
       "display_address_street": "710 E SANER AVE",
       "display_address_city": "DALLAS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "GODBOLT JAMES L JR",
+      "display_owner": "VACANT",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -30779,7 +30810,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -30797,18 +30828,23 @@
       "display_owner_mailing": "2412 CLUB MANOR DR, DALLAS, TX 75237-2702",
       "display_years_tax_delinquent": 5.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": "2026-02-01",
+      "primary_event_date": "2026-11-03",
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011225385",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -40014,27 +40050,31 @@
     },
     {
       "lead_id": "lead_parcel_00000363676000000",
-      "scored_lead_id": "scored_583156adac240fcf",
+      "scored_lead_id": "scored_bd6a55e1cdf20d32",
       "primary_parcel_id": "00000363676000000",
       "display_address": "2554 E ANN ARBOR AVE, DALLAS, TX",
       "display_address_street": "2554 E ANN ARBOR AVE",
       "display_address_city": "DALLAS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "NEW GREATER EMMANUEL",
+      "display_owner": "LAND ONLY",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -40045,7 +40085,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -40063,11 +40103,15 @@
       "display_owner_mailing": "900 PLANTATION DR, DESOTO, TX 75115-5262",
       "display_years_tax_delinquent": 3.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -40075,6 +40119,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1013886881",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -48207,6 +48252,76 @@
       "related_records_checked": false
     },
     {
+      "lead_id": "lead_parcel_00000455899000000",
+      "scored_lead_id": "scored_2d04bc842a0be7cb",
+      "primary_parcel_id": "00000455899000000",
+      "display_address": "1202 PURITAN DR, DALLAS, TX",
+      "display_address_street": "1202 PURITAN DR",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "GRO PROPERTIES INC",
+      "display_owner_type": "ENTITY",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "sheriff_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": true,
+      "display_is_out_of_state_owner": false,
+      "display_owner_mailing_address": "10527 CHURCH RD",
+      "display_owner_mailing_city": "DALLAS",
+      "display_owner_mailing_state": "TX",
+      "display_owner_mailing_zip": "752382224",
+      "display_owner_mailing": "10527 CHURCH RD, DALLAS, TX 75238-2224",
+      "display_years_tax_delinquent": 2.7,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-11-03",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1010302907"
+      ],
+      "related_records": [],
+      "related_records_count": 0,
+      "has_related_records": false,
+      "related_records_checked": false
+    },
+    {
       "lead_id": "lead_parcel_00000455902000000",
       "scored_lead_id": "scored_c118c74ebc376225",
       "primary_parcel_id": "00000455902000000",
@@ -52507,27 +52622,31 @@
     },
     {
       "lead_id": "lead_parcel_00000478420000000",
-      "scored_lead_id": "scored_941e34d17e533ac7",
+      "scored_lead_id": "scored_4d02b4e1e847df59",
       "primary_parcel_id": "00000478420000000",
       "display_address": "3413 MARYLAND AVE, DALLAS, TX",
       "display_address_street": "3413 MARYLAND AVE",
       "display_address_city": "DALLAS",
       "display_address_state": "TX",
       "display_address_zip": null,
-      "display_owner": "YANEZ MIGUEL",
+      "display_owner": "YANEZ MIGUEL &",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -52538,7 +52657,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -52556,11 +52675,15 @@
       "display_owner_mailing": "610 TRUMAN CT, DUNCANVILLE, TX 75137-2542",
       "display_years_tax_delinquent": 4.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -52568,6 +52691,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011094731",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -73246,6 +73370,76 @@
       "related_records_checked": false
     },
     {
+      "lead_id": "lead_parcel_00000629794000000",
+      "scored_lead_id": "scored_90e5d2780e474758",
+      "primary_parcel_id": "00000629794000000",
+      "display_address": "9311 RENOVA DR, DALLAS, TX",
+      "display_address_street": "9311 RENOVA DR",
+      "display_address_city": "DALLAS",
+      "display_address_state": "TX",
+      "display_address_zip": null,
+      "display_owner": "TOVAR MIGUEL &",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "sheriff_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": false,
+      "display_is_out_of_state_owner": false,
+      "display_owner_mailing_address": "9311 RENOVA DR",
+      "display_owner_mailing_city": "DALLAS",
+      "display_owner_mailing_state": "TX",
+      "display_owner_mailing_zip": "752278010",
+      "display_owner_mailing": "9311 RENOVA DR, DALLAS, TX 75227-8010",
+      "display_years_tax_delinquent": 1.7,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011296819"
+      ],
+      "related_records": [],
+      "related_records_count": 0,
+      "has_related_records": false,
+      "related_records_checked": false
+    },
+    {
       "lead_id": "lead_parcel_00000630127000000",
       "scored_lead_id": "scored_2e69996a7bd6af13",
       "primary_parcel_id": "00000630127000000",
@@ -74738,7 +74932,7 @@
     },
     {
       "lead_id": "lead_parcel_00000638074000000",
-      "scored_lead_id": "scored_26f71814109c8fa0",
+      "scored_lead_id": "scored_a882ead3d8d119c5",
       "primary_parcel_id": "00000638074000000",
       "display_address": "6044 GOLDEN GATE CIR, DALLAS, TX",
       "display_address_street": "6044 GOLDEN GATE CIR",
@@ -74747,18 +74941,22 @@
       "display_address_zip": null,
       "display_owner": "PRICE KARLE WAYNE",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -74769,7 +74967,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -74787,11 +74985,15 @@
       "display_owner_mailing": "6044 GOLDEN GATE CIR, DALLAS, TX 75241-5258",
       "display_years_tax_delinquent": 24.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -74799,6 +75001,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011414171",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -87041,7 +87244,7 @@
     },
     {
       "lead_id": "lead_parcel_00000690442000000",
-      "scored_lead_id": "scored_0d52ea185590f3d9",
+      "scored_lead_id": "scored_e748d17516a0ca7c",
       "primary_parcel_id": "00000690442000000",
       "display_address": "3416 ODESSA ST, DALLAS, TX",
       "display_address_street": "3416 ODESSA ST",
@@ -87050,18 +87253,22 @@
       "display_address_zip": null,
       "display_owner": "DOMINGUEZ SALLY G",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -87072,7 +87279,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -87090,11 +87297,15 @@
       "display_owner_mailing": "3416 ODESSA ST, DALLAS, TX 75212-0000",
       "display_years_tax_delinquent": 19.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -87102,6 +87313,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011527361",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -88827,7 +89039,7 @@
     },
     {
       "lead_id": "lead_parcel_00000698356000000",
-      "scored_lead_id": "scored_acbc8fec426edbd0",
+      "scored_lead_id": "scored_9e39b148a8bbadd6",
       "primary_parcel_id": "00000698356000000",
       "display_address": "2306 TALLYHO LN, DALLAS, TX",
       "display_address_street": "2306 TALLYHO LN",
@@ -88836,18 +89048,22 @@
       "display_address_zip": null,
       "display_owner": "RODRIGUEZ ANDREW F &",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -88858,7 +89074,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -88876,18 +89092,23 @@
       "display_owner_mailing": "2307 LAPSLEY ST, DALLAS, TX 75212-5636",
       "display_years_tax_delinquent": 3.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": "2026-02-01",
+      "primary_event_date": "2026-11-03",
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011572796",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -128404,7 +128625,7 @@
     },
     {
       "lead_id": "lead_parcel_201126400A0160000",
-      "scored_lead_id": "scored_84a596d6843c7592",
+      "scored_lead_id": "scored_a0c7bb1dc736f761",
       "primary_parcel_id": "201126400A0160000",
       "display_address": "1701 WINDMILL CIR, DESOTO, TX",
       "display_address_street": "1701 WINDMILL CIR",
@@ -128413,18 +128634,22 @@
       "display_address_zip": null,
       "display_owner": "RESIDENTIAL PROPERTY INVENTORY LLC",
       "display_owner_type": "ENTITY",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -128435,7 +128660,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -128453,11 +128678,15 @@
       "display_owner_mailing": "302 W COMMERCE ST, DALLAS, TX 75208-1917",
       "display_years_tax_delinquent": 18.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -128465,6 +128694,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011305032",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -148429,7 +148659,7 @@
     },
     {
       "lead_id": "lead_parcel_32087500020080000",
-      "scored_lead_id": "scored_f0ca3601e66c5eb7",
+      "scored_lead_id": "scored_738e48635b6f1a84",
       "primary_parcel_id": "32087500020080000",
       "display_address": "610 N DELAWARE ST, IRVING, TX",
       "display_address_street": "610 N DELAWARE ST",
@@ -148438,18 +148668,22 @@
       "display_address_zip": null,
       "display_owner": "FINLEY DOROTHY R",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -148460,7 +148694,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -148478,11 +148712,15 @@
       "display_owner_mailing": "610 N DELAWARE ST, IRVING, TX 75061-7622",
       "display_years_tax_delinquent": 3.4,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -148490,6 +148728,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1011639737",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -148726,7 +148965,7 @@
     },
     {
       "lead_id": "lead_parcel_32121500020010000",
-      "scored_lead_id": "scored_504d300e7b4b31f5",
+      "scored_lead_id": "scored_591c06b8fcb89898",
       "primary_parcel_id": "32121500020010000",
       "display_address": "1502 W 4TH ST, IRVING, TX",
       "display_address_street": "1502 W 4TH ST",
@@ -148735,18 +148974,22 @@
       "display_address_zip": null,
       "display_owner": "RODRIGUEZ JORGE &",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -148757,7 +149000,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -148775,11 +149018,15 @@
       "display_owner_mailing": "1502 W 4TH ST, IRVING, TX 75060-2506",
       "display_years_tax_delinquent": 6.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -148787,6 +149034,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1009538768",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
@@ -150182,7 +150430,7 @@
     },
     {
       "lead_id": "lead_parcel_32289500000110300",
-      "scored_lead_id": "scored_48e10958f989786f",
+      "scored_lead_id": "scored_332e073b1173eed2",
       "primary_parcel_id": "32289500000110300",
       "display_address": "125 W UNION BOWER RD, IRVING, TX",
       "display_address_street": "125 W UNION BOWER RD",
@@ -150191,18 +150439,22 @@
       "display_address_zip": null,
       "display_owner": "SCHARDEIN JACK RAY II",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
-      "display_tier": "Workable",
+      "display_score": 72,
+      "display_tier": "Strong",
       "display_patterns": [
+        "foreclosure",
         "tax"
       ],
       "stack_contrib_patterns": [
+        "foreclosure",
         "tax"
       ],
       "display_pattern_set": [
+        "foreclosure",
         "tax"
       ],
       "display_doc_types": [
+        "sheriff_sale",
         "tax_foreclosure_notice"
       ],
       "display_attributes": [],
@@ -150213,7 +150465,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -150231,11 +150483,15 @@
       "display_owner_mailing": "108 HAPPY HILL TRL, GUN BARREL CY, TX 75156-5388",
       "display_years_tax_delinquent": 26.7,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
+          "factor": "base_SHERIFF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         }
       ],
       "evidence_ids": [],
@@ -150243,6 +150499,7 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
+        "https://taxsales.lgbs.com/api/property_sales/?uid=1010394446",
         "https://www.dallascounty.org/Assets/uploads/docs/tax/trw/trwfile.754635.zip"
       ],
       "related_records": [],
