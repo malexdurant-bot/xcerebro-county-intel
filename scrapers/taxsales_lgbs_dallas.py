@@ -86,6 +86,11 @@ def _now_iso() -> str:
     )
 
 
+def _missing_issuer_error(exc: requests.exceptions.SSLError) -> bool:
+    text = str(exc)
+    return "unable to get local issuer certificate" in text or "CERTIFICATE_VERIFY_FAILED" in text
+
+
 def fetch_all_listings(verbose: bool) -> list[dict]:
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT})
@@ -101,7 +106,28 @@ def fetch_all_listings(verbose: bool) -> list[dict]:
             "limit": PAGE_LIMIT,
             "offset": offset,
         }
-        resp = session.get(API_URL, params=params, timeout=30)
+        try:
+            resp = session.get(API_URL, params=params, timeout=30)
+        except requests.exceptions.SSLError as exc:
+            # 2026-10-09: taxsales.lgbs.com began sending its leaf cert
+            # without the DigiCert intermediate, so Python (unlike curl /
+            # browsers) can't build the chain. Repair it with a verified
+            # copy of the missing intermediate -- see scrapers/_tls_repair.py;
+            # verification is never disabled. Only attempted once, and only
+            # for a chain-building failure; anything else re-raises.
+            if session.verify is not True or not _missing_issuer_error(exc):
+                raise
+            try:
+                from scrapers._tls_repair import verified_bundle_for
+            except ImportError:
+                sys.path.insert(0, str(REPO_ROOT))
+                from scrapers._tls_repair import verified_bundle_for
+            host = API_URL.split("/")[2]
+            session.verify = verified_bundle_for(host, REPO_ROOT / "data" / "cache" / "tls")
+            if verbose:
+                print(f"  [Dallas LGBS] {host} omits its intermediate certificate; "
+                      f"using a verified copy ({session.verify})", flush=True)
+            resp = session.get(API_URL, params=params, timeout=30)
         resp.raise_for_status()
         data = resp.json()
         page = data.get("results", [])

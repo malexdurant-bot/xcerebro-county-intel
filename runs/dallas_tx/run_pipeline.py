@@ -129,6 +129,40 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Step 1 — Scrape all 4 sources
     # ------------------------------------------------------------------
+    source_failures: list[dict] = []
+
+    def _scrape(source: str, fn) -> None:
+        """Run one source's scraper without letting it take the whole daily
+        run down. From Sep 29 to Oct 9 a single failing source (tax roll
+        MemoryError, then a TLS error on the tax-sale feed) aborted Step 1,
+        so NOTHING refreshed and the dashboard went ~9 days stale. A failing
+        source now falls back to its own last-good raw file, and the failure
+        is printed loudly, listed again at the end of the run, and written to
+        pipeline_output/source_failures.json -- degraded, not silent, not
+        dead. The portal scrapers report most problems by RETURNING an
+        `errors` list rather than raising, which used to be ignored; those
+        are surfaced the same way."""
+        try:
+            stats = fn()
+        except Exception as exc:  # noqa: BLE001 -- must not abort the run
+            import traceback
+            traceback.print_exc()
+            print(f"[dallas_tx] WARNING: {source} scrape FAILED "
+                  f"({type(exc).__name__}: {exc}) -- continuing with its last good raw data",
+                  flush=True)
+            source_failures.append({
+                "source": source, "kind": "exception",
+                "error": f"{type(exc).__name__}: {exc}"[:500],
+            })
+            return
+        errs = stats.get("errors") if isinstance(stats, dict) else None
+        if errs:
+            print(f"[dallas_tx] WARNING: {source} scrape reported errors: {errs}", flush=True)
+            source_failures.append({
+                "source": source, "kind": "reported_errors",
+                "error": "; ".join(str(e) for e in errs)[:500],
+            })
+
     if args.skip_scrape:
         print("[dallas_tx] --skip-scrape: reusing existing raw JSONL for all sources")
     else:
@@ -139,25 +173,31 @@ def main() -> None:
         from scrapers.parcel_master_dcad_bulk_dallas import run_scraper as scrape_dcad_bulk  # noqa: E402
 
         print("[dallas_tx] Scraping clerk_recordings + foreclosure_notices (PublicSearch)...")
-        scrape_clerk_recordings(RAW_DIR, verbose=True)
-        scrape_foreclosure_notices(RAW_DIR, verbose=True)
+        _scrape("clerk_recordings", lambda: scrape_clerk_recordings(RAW_DIR, verbose=True))
+        _scrape("foreclosure_notices", lambda: scrape_foreclosure_notices(RAW_DIR, verbose=True))
 
         if args.skip_tax_collector:
             print("[dallas_tx] --skip-tax-collector: reusing existing raw tax_collector.jsonl")
         else:
-            print("[dallas_tx] Scraping tax_collector (weekly bulk TRW file — this can take "
-                  "several minutes even with a cached zip)...")
-            scrape_tax_collector(RAW_DIR, verbose=True)
+            print("[dallas_tx] Scraping tax_collector (weekly bulk TRW file — skipped "
+                  "automatically when this week's file was already merged)...")
+            _scrape("tax_collector", lambda: scrape_tax_collector(RAW_DIR, verbose=True))
 
         print("[dallas_tx] Scraping tax_foreclosure_resales + sheriff_sales (LGBS API)...")
-        scrape_taxsales_lgbs(RAW_DIR, verbose=True)
+        _scrape("tax_sales_lgbs", lambda: scrape_taxsales_lgbs(RAW_DIR, verbose=True))
 
         if args.skip_dcad_bulk:
             print("[dallas_tx] --skip-dcad-bulk: reusing existing raw parcel_master.jsonl")
         else:
             print("[dallas_tx] Scraping parcel_master (DCAD bulk Data Products download — "
                   "~170MB, a few minutes; cached weekly, see data/cache/dallas_dcad_bulk/)...")
-            scrape_dcad_bulk(RAW_DIR, verbose=True)
+            _scrape("parcel_master_dcad_bulk", lambda: scrape_dcad_bulk(RAW_DIR, verbose=True))
+
+        WORKDIR.mkdir(parents=True, exist_ok=True)
+        (WORKDIR / "source_failures.json").write_text(
+            json.dumps({"run_started": ts_start, "failures": source_failures}, indent=2) + "\n",
+            encoding="utf-8",
+        )
 
     if args.dry_run:
         print("[dallas_tx] --dry-run: stopping before pipeline stages. Done.")
@@ -819,6 +859,11 @@ def main() -> None:
             "skipping (not fatal; only affects this machine)"
         )
 
+    if source_failures:
+        print("[dallas_tx] *** NOT FULLY REFRESHED: "
+              + ", ".join(f["source"] for f in source_failures)
+              + " did not scrape cleanly this run and used last-good data "
+              f"(details: {WORKDIR / 'source_failures.json'}) ***", flush=True)
     print(f"[dallas_tx] Pipeline complete — "
           f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}")
 
