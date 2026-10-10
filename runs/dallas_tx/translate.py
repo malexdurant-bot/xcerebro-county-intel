@@ -592,17 +592,30 @@ def stream_translate_tax_collector(path, verbose: bool = True) -> "tuple[list[di
     return events, years_delinquent_by_account
 
 
+def _today_iso() -> str:
+    from datetime import date as _date
+    return _date.today().isoformat()
+
+
 def _accumulate_delinquency_aggregate(rec: dict, agg: dict) -> None:
     """Per-account rollup across a delinquent account's multiple tax-year
-    rows (tax_collector.jsonl already only contains TOT_AMT_DUE > 0 rows —
-    see tax_collector_dallas.py). Tracks the OLDEST unpaid due_date (the
-    real delinquency age) so a multi-year-delinquent account gets one
-    years-delinquent number, not one per year row."""
+    rows. Tracks the OLDEST unpaid due_date (the real delinquency age) so a
+    multi-year-delinquent account gets one years-delinquent number, not one
+    per year row.
+
+    Rows tax_collector_dallas.py has marked DISAPPEARED (a year that fell
+    off the weekly delinquent roll -- i.e. paid) are kept in the raw file as
+    history but are NOT unpaid, so they must not set the "oldest unpaid"
+    date (2026-10-09)."""
+    if rec.get("change_status") == "DISAPPEARED":
+        return
     payload = rec.get("raw_payload", {}) or {}
     account = payload.get("account")
     due_date = payload.get("due_date")
     if not account or not due_date:
         return
+    if due_date > _today_iso():
+        return  # billed but not yet due -- not delinquent (see _iter_trw_rows)
     entry = agg.get(account)
     if entry is None:
         entry = agg[account] = {"earliest_due_date": due_date}
@@ -648,13 +661,24 @@ def _translate_tax_collector_row(rec: dict) -> dict | None:
     dump is not a curated lead list) and tractable for the per-record
     staged pipeline (debtor resolution + aggregation + scoring). Raise
     this constant (or drop the filter) once the pipeline's performance on
-    large volumes has been separately validated. Returns None to skip."""
+    large volumes has been separately validated. Returns None to skip.
+
+    2026-10-09: also skips rows marked DISAPPEARED. tax_collector_dallas.py
+    keeps a row that fell off the weekly delinquent roll (paid / resolved)
+    in the raw file as history, with its old suit_pending/causeno intact --
+    and this function never looked at change_status, so those paid-off
+    accounts kept surfacing as live "tax lawsuit" leads (1,485 of the
+    ~60k lead-gate candidates in the 9/29 file were such rows)."""
+    if rec.get("change_status") == "DISAPPEARED":
+        return None
     payload = rec.get("raw_payload", {}) or {}
     if not payload.get("suit_pending") or not payload.get("causeno"):
         return None
     due_date = payload.get("due_date") or ""
     if not due_date[:4].isdigit() or int(due_date[:4]) < TAX_COLLECTOR_MIN_DUE_YEAR:
         return None
+    if due_date > _today_iso():
+        return None  # billed but not yet due -- not delinquent (see _iter_trw_rows)
 
     parties = []
     p = _party(payload.get("owner_name"), "TP")

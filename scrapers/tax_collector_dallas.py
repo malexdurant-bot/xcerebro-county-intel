@@ -59,12 +59,14 @@ Requires: pip install requests (already a framework dependency elsewhere)
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Iterable, Iterator
 
 import requests
 
@@ -184,9 +186,18 @@ def _find_flat_member(zf: zipfile.ZipFile) -> str:
 _TOT_AMT_DUE_START, _TOT_AMT_DUE_LEN = 490, 11
 
 
-def parse_trw_file(zip_path: Path, verbose: bool) -> list[dict]:
-    records: list[dict] = []
+def _iter_trw_rows(zip_path: Path, verbose: bool) -> Iterator[dict]:
+    """Yield one delinquent (TOT_AMT_DUE > 0) row's raw fields at a time.
+
+    2026-10-09: was a list-returning parse_trw_file(). Holding all ~1.4M
+    rows (40 string fields each) plus a second wrapped copy plus the prior
+    state needed several GB at once and MemoryError'd the daily run on a
+    7.7 GB machine whenever anything else was open (failing since Sep 29).
+    Streaming keeps the whole scrape to roughly one row in flight."""
+    kept = 0
     scanned = 0
+    not_yet_due = 0
+    today_iso = datetime.now(timezone.utc).date().isoformat()
     with zipfile.ZipFile(zip_path) as zf:
         member = _find_flat_member(zf)
         if verbose:
@@ -209,12 +220,28 @@ def parse_trw_file(zip_path: Path, verbose: bool) -> list[dict]:
                 }
                 if not _cents_to_dollars(fields["TOT_AMT_DUE"]):
                     continue  # $0 due = paid/current, not a distress event
-                records.append(fields)
-                if verbose and len(records) % 200_000 == 0:
-                    print(f"  [Dallas TRW] ...{len(records)} delinquent rows so far ({scanned} scanned)", flush=True)
+                # An amount due is NOT the same as delinquent. Each October
+                # the county issues the new year's bills -- due the following
+                # Jan 31, so not yet delinquent -- and the weekly roll then
+                # lists them with TOT_AMT_DUE > 0. The 2026-10-09 file went
+                # from ~1.36M rows with an amount due to ~4.49M, of which
+                # ~3.13M (3,134,230 of them tax year 2026) were due AFTER
+                # today. Left in, they would have quadrupled the data AND
+                # flipped the lead gating's "current due-date cycle" to the
+                # not-yet-delinquent one (the suit flag repeats across an
+                # account's rows, so ~31k of them look suit-pending). Only a
+                # row already past its due date is a delinquency.
+                due_iso = _parse_yyyymmdd(fields["DUE_DATE"])
+                if due_iso and due_iso > today_iso:
+                    not_yet_due += 1
+                    continue
+                kept += 1
+                if verbose and kept % 200_000 == 0:
+                    print(f"  [Dallas TRW] ...{kept} delinquent rows so far ({scanned} scanned)", flush=True)
+                yield fields
     if verbose:
-        print(f"  [Dallas TRW] {len(records)} delinquent (TOT_AMT_DUE > 0) rows out of {scanned} scanned", flush=True)
-    return records
+        print(f"  [Dallas TRW] {kept} delinquent (past due, TOT_AMT_DUE > 0) rows out of "
+              f"{scanned} scanned ({not_yet_due} skipped: billed but not yet due)", flush=True)
 
 
 def _raw_record_id(fields: dict) -> str:
@@ -224,12 +251,9 @@ def _raw_record_id(fields: dict) -> str:
     return f"dallas_tax_{account}_{year}_{jurisdiction}"
 
 
-def _to_wrapped_records(rows: list[dict], source_url: str, verbose: bool = False) -> list[dict]:
+def _iter_wrapped_records(rows: Iterable[dict], source_url: str) -> Iterator[dict]:
     now = _now_iso()
-    out: list[dict] = []
-    for i, f in enumerate(rows):
-        if verbose and i and i % 200_000 == 0:
-            print(f"  [Dallas TRW] wrapped {i}/{len(rows)}", flush=True)
+    for f in rows:
         owner_lines = [f["OWNER"].strip(), f["ADDRESS2"].strip(), f["ADDRESS3"].strip(), f["ADDRESS4"].strip()]
         owner_lines = [l for l in owner_lines if l]
 
@@ -262,26 +286,40 @@ def _to_wrapped_records(rows: list[dict], source_url: str, verbose: bool = False
             "homestead_exemption": f["HOMESTEAD"].strip() == "Y",
         }
 
-        out.append({
+        yield {
             "raw_record_id": _raw_record_id(f),
             "source_id": SOURCE_ID,
             "source_url": source_url,
             "source_fetched_at": now,
             "parser_confidence": 100,
             "raw_payload": raw_payload,
-        })
-    return out
+        }
 
 
-def _load_prior(path: Path, verbose: bool = False) -> dict:
-    """2026-09-25: the daily scheduled run crashed here with
-    'OSError: [Errno 22] Invalid argument' reading this file mid-stream --
-    the file (1.4GB, under a OneDrive-synced repo) read fine moments later
-    with no code change, consistent with a transient OneDrive Files-On-
-    Demand hiccup rather than a real bug. Retries with a short backoff
-    before giving up (falls back to {} -- same as a missing file -- so a
-    still-failing read degrades to "treat every row as new" rather than
-    crashing the whole daily pipeline)."""
+def _payload_digest(payload: dict) -> bytes:
+    """Compact fingerprint of a raw_payload, so "did this row change since
+    last run" can be answered from a small index instead of keeping every
+    prior record in memory. Canonical JSON (sorted keys) so key order never
+    matters; 12 bytes of blake2b makes an accidental collision (a changed
+    row wrongly reported SAME) astronomically unlikely."""
+    text = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.blake2b(text.encode("utf-8"), digest_size=12).digest()
+
+
+def _load_prior_index(path: Path, verbose: bool = False) -> dict:
+    """{raw_record_id: (first_seen_at, payload_digest)} from the prior output.
+
+    Holds only what the merge needs, NOT the records themselves. The old
+    version kept every prior record (~1.4M full dicts) alongside the parsed
+    rows and the wrapped records -- three full copies -- and MemoryError'd
+    the daily run on a 7.7 GB machine from Sep 29 onward.
+
+    2026-09-25: an earlier crash here was 'OSError: [Errno 22] Invalid
+    argument' mid-read on this 1.4GB file (under a OneDrive-synced repo),
+    which read fine moments later -- consistent with a transient OneDrive
+    Files-On-Demand hiccup. So: retry with a short backoff, and if it still
+    fails fall back to {} (same as a missing file: every row looks NEW)
+    rather than crashing the whole daily pipeline."""
     import time
 
     if not path.exists():
@@ -293,7 +331,7 @@ def _load_prior(path: Path, verbose: bool = False) -> dict:
                 print(f"  [Dallas TRW] retrying prior-state read after {last_exc} "
                       f"(attempt {attempt + 1}/3)...", flush=True)
             time.sleep(5 * attempt)
-        out: dict = {}
+        index: dict = {}
         try:
             with open(path, "r", encoding="utf-8") as fh:
                 for line in fh:
@@ -306,8 +344,12 @@ def _load_prior(path: Path, verbose: bool = False) -> dict:
                         continue
                     rid = rec.get("raw_record_id")
                     if rid:
-                        out[rid] = rec
-            return out
+                        first_seen = rec.get("first_seen_at")
+                        index[rid] = (
+                            sys.intern(first_seen) if isinstance(first_seen, str) else None,
+                            _payload_digest(rec.get("raw_payload")),
+                        )
+            return index
         except OSError as exc:
             last_exc = exc
     if verbose:
@@ -317,60 +359,90 @@ def _load_prior(path: Path, verbose: bool = False) -> dict:
     return {}
 
 
-def merge_with_prior(current: list[dict], prior: dict) -> list[dict]:
-    now = _now_iso()
-    merged: list[dict] = []
-    seen_ids = set()
-    for rec in current:
-        rid = rec["raw_record_id"]
-        seen_ids.add(rid)
-        prev = prior.get(rid)
-        if prev is None:
-            rec["first_seen_at"] = now
-            rec["last_seen_at"] = now
-            rec["change_status"] = "NEW_RECORD"
-        else:
-            rec["first_seen_at"] = prev.get("first_seen_at", now)
-            rec["last_seen_at"] = now
-            rec["change_status"] = (
-                "SAME" if prev.get("raw_payload") == rec["raw_payload"] else "UPDATED"
-            )
-        merged.append(rec)
-    for rid, prev in prior.items():
-        if rid not in seen_ids:
-            prev["change_status"] = "DISAPPEARED"  # paid off / resolved since last week's roll
-            merged.append(prev)
-    return merged
-
-
-def _write_jsonl(records: list[dict], output_path: Path, verbose: bool = False) -> dict:
+def _stream_merge_write(records: Iterable[dict], output_path: Path, verbose: bool = False) -> dict:
+    """Merge the current weekly roll against the prior output and write the
+    result, streaming: each current record is classified and written as it
+    arrives, and prior rows that vanished from the roll (paid off / resolved
+    since last week) are then copied across from the old file with
+    change_status DISAPPEARED. Output order and field semantics match the
+    old list-based merge_with_prior(): current rows first (in roll order),
+    then disappeared rows (in prior-file order)."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if verbose:
         print(f"  [Dallas TRW] loading prior state from {output_path}", flush=True)
-    prior = _load_prior(output_path, verbose=verbose)
+    prior = _load_prior_index(output_path, verbose=verbose)
     if verbose:
-        print(f"  [Dallas TRW] merging {len(records)} current vs {len(prior)} prior records", flush=True)
-    merged = merge_with_prior(records, prior)
+        print(f"  [Dallas TRW] {len(prior)} prior records indexed; streaming current "
+              f"rows through the merge", flush=True)
 
-    if verbose:
-        print(f"  [Dallas TRW] writing {len(merged)} records to {output_path}", flush=True)
+    now = _now_iso()
+    counts = {"NEW_RECORD": 0, "SAME": 0, "UPDATED": 0, "DISAPPEARED": 0}
+    seen: set = set()
+    pulled = 0
     tmp = output_path.with_suffix(".jsonl.tmp")
-    with open(tmp, "w", encoding="utf-8") as fh:
-        for i, rec in enumerate(merged):
-            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
-            if verbose and i and i % 200_000 == 0:
-                print(f"  [Dallas TRW] wrote {i}/{len(merged)}", flush=True)
+    with open(tmp, "w", encoding="utf-8") as out:
+        for rec in records:
+            pulled += 1
+            rid = rec["raw_record_id"]
+            seen.add(rid)
+            prev = prior.get(rid)
+            if prev is None:
+                rec["first_seen_at"] = now
+                rec["last_seen_at"] = now
+                rec["change_status"] = "NEW_RECORD"
+            else:
+                first_seen, digest = prev
+                rec["first_seen_at"] = first_seen or now
+                rec["last_seen_at"] = now
+                rec["change_status"] = (
+                    "SAME" if digest == _payload_digest(rec["raw_payload"]) else "UPDATED"
+                )
+            counts[rec["change_status"]] += 1
+            out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            if verbose and pulled % 200_000 == 0:
+                print(f"  [Dallas TRW] merged/wrote {pulled} records", flush=True)
+
+        n_missing = sum(1 for rid in prior if rid not in seen)
+        if n_missing:
+            if verbose:
+                print(f"  [Dallas TRW] carrying {n_missing} prior records no longer on "
+                      f"the roll across as DISAPPEARED", flush=True)
+            written_missing: set = set()
+            try:
+                with open(output_path, "r", encoding="utf-8") as old:
+                    for line in old:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            rec = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+                        rid = rec.get("raw_record_id")
+                        if (not rid or rid in seen or rid not in prior
+                                or rid in written_missing):
+                            continue
+                        written_missing.add(rid)
+                        rec["change_status"] = "DISAPPEARED"
+                        counts["DISAPPEARED"] += 1
+                        out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            except OSError as exc:
+                # Disappeared rows are history only (they were paid off); losing
+                # some on a transient read error must not fail the whole run.
+                if verbose:
+                    print(f"  [Dallas TRW] could not finish copying DISAPPEARED rows "
+                          f"({exc}); {counts['DISAPPEARED']}/{n_missing} carried", flush=True)
     tmp.replace(output_path)
 
     return {
         "output_path": str(output_path),
-        "records_pulled": len(records),
+        "records_pulled": pulled,
         "prior_count": len(prior),
-        "total_after_merge": len(merged),
-        "new_record_count": sum(1 for r in merged if r["change_status"] == "NEW_RECORD"),
-        "same_record_count": sum(1 for r in merged if r["change_status"] == "SAME"),
-        "updated_record_count": sum(1 for r in merged if r["change_status"] == "UPDATED"),
-        "disappeared_record_count": sum(1 for r in merged if r["change_status"] == "DISAPPEARED"),
+        "total_after_merge": pulled + counts["DISAPPEARED"],
+        "new_record_count": counts["NEW_RECORD"],
+        "same_record_count": counts["SAME"],
+        "updated_record_count": counts["UPDATED"],
+        "disappeared_record_count": counts["DISAPPEARED"],
     }
 
 
@@ -379,23 +451,63 @@ def _write_jsonl(records: list[dict], output_path: Path, verbose: bool = False) 
 # ---------------------------------------------------------------------------
 
 
-def run_scraper(out_dir: Path, verbose: bool = True) -> dict:
+_LAST_PARSED_MARKER = "tax_collector.last_parsed.json"
+
+
+def _read_marker(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def run_scraper(out_dir: Path, verbose: bool = True, force: bool = False) -> dict:
+    """The county republishes the roll weekly, but the pipeline runs daily.
+    Re-parsing and re-merging the ~1.4M-row file on the six days it hasn't
+    changed does nothing except burn ~10 minutes and risk the memory crash
+    that failed the daily run from Sep 29 -- so when the discovered weekly
+    file is the one already merged into tax_collector.jsonl (recorded in a
+    marker written only AFTER a successful merge), skip it. force=True
+    re-parses regardless."""
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT})
 
     download_url = discover_download_url(session)
-    zip_path = download_zip(session, download_url, verbose)
-    rows = parse_trw_file(zip_path, verbose)
-    records = _to_wrapped_records(rows, download_url, verbose)
-
     out_path = out_dir / "tax_collector.jsonl"
-    stats = _write_jsonl(records, out_path, verbose)
+    marker_path = out_dir / _LAST_PARSED_MARKER
+
+    if not force:
+        last = _read_marker(marker_path)
+        if (last and last.get("download_url") == download_url
+                and out_path.exists() and out_path.stat().st_size > 0):
+            if verbose:
+                print(f"  [Dallas TRW] weekly file unchanged since last merge "
+                      f"({download_url.rsplit('/', 1)[-1]}, merged {last.get('completed_at')}) "
+                      f"-- skipping re-parse/merge (use force to override)", flush=True)
+            return {
+                "source_page": TAX_ROLL_PAGE_URL,
+                "download_url": download_url,
+                "skipped_unchanged": True,
+                "last_merged_at": last.get("completed_at"),
+                "tax_collector": last.get("stats"),
+            }
+
+    zip_path = download_zip(session, download_url, verbose)
+    rows = _iter_trw_rows(zip_path, verbose)
+    records = _iter_wrapped_records(rows, download_url)
+    stats = _stream_merge_write(records, out_path, verbose)
+
+    marker_path.write_text(json.dumps({
+        "download_url": download_url,
+        "completed_at": _now_iso(),
+        "stats": stats,
+    }, indent=2) + "\n", encoding="utf-8")
 
     return {
         "source_page": TAX_ROLL_PAGE_URL,
         "download_url": download_url,
         "zip_cached_at": str(zip_path),
-        "delinquent_rows_parsed": len(rows),
+        "delinquent_rows_parsed": stats["records_pulled"],
         "tax_collector": stats,
     }
 
@@ -417,10 +529,13 @@ def main() -> int:
     )
     parser.add_argument("--out-dir", default=None,
                          help="Output directory for tax_collector.jsonl. Default: data/raw/")
+    parser.add_argument("--force", action="store_true",
+                         help="Re-parse and re-merge even if this week's file was "
+                              "already merged into tax_collector.jsonl.")
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir) if args.out_dir else REPO_ROOT / "data" / "raw"
-    stats = run_scraper(out_dir)
+    stats = run_scraper(out_dir, force=args.force)
     print(json.dumps(stats, indent=2))
     return 0
 
