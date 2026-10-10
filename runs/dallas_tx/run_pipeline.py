@@ -421,6 +421,7 @@ def main() -> None:
         addr_owner_attempted = 0
         name_fallback_hits = 0
         bulk_hits = 0
+        live_hits_upgraded = 0  # live matches that took mailing/flags from the bulk entry
 
         def _cached_lookup(cache_key: str, do_lookup) -> "dict | None":
             if cache_key in addr_owner_cache:
@@ -434,15 +435,39 @@ def main() -> None:
         # dict lookups instead of network round-trips, and the bulk hit
         # already carries owner_mailing_*/is_absentee_owner/
         # is_out_of_state_owner, which the live DCADSession lookup can't.
+        def _prefer_bulk_entry(live_hit: "dict | None") -> "dict | None":
+            """A live DCAD lookup finds the right ACCOUNT but cannot carry the
+            owner's mailing address or absentee flags (DCAD's detail pages are
+            off-limits). The bulk file holds the same county record WITH
+            them, so once the live lookup has named the account, take the
+            bulk entry's fields (non-null ones only: bulk has no assessed
+            value, live does). Found 2026-10-10: without this, 216
+            foreclosure leads had a matched parcel but no mailing address."""
+            nonlocal live_hits_upgraded
+            if live_hit and dcad_bulk_lookup is not None:
+                bulk = dcad_bulk_lookup["by_account"].get(live_hit.get("account_number"))
+                if bulk:
+                    live_hits_upgraded += 1
+                    return {**live_hit, **{k: v for k, v in bulk.items() if v is not None}}
+            return live_hit
+
         def _lookup_address(addr: str) -> "dict | None":
             nonlocal bulk_hits
             if dcad_bulk_lookup is not None:
-                from scrapers.parcel_master_dcad_bulk_dallas import lookup_by_address as _bulk_lookup_by_address
-                hit = _bulk_lookup_by_address(dcad_bulk_lookup, addr)
+                from scrapers.parcel_master_dcad_bulk_dallas import lookup_by_address_ex as _bulk_lookup_by_address_ex
+                hit, reason = _bulk_lookup_by_address_ex(dcad_bulk_lookup, addr)
                 if hit:
                     bulk_hits += 1
                     return hit
-            return _cached_lookup(f"addr:{addr}", lambda a=addr: dcad_session.lookup_by_address(a, verbose=True))
+                if reason != "not_found":
+                    # A deliberate refusal (ambiguous street, unit address,
+                    # ZIP mismatch, no house number) -- the slow live lookup
+                    # must not be allowed to overrule it. Only a street the
+                    # bulk file simply doesn't have is worth a second look.
+                    return None
+            return _prefer_bulk_entry(
+                _cached_lookup(f"addr:{addr}", lambda a=addr: dcad_session.lookup_by_address(a, verbose=True))
+            )
 
         def _lookup_owner_name(name: str) -> "dict | None":
             nonlocal bulk_hits
@@ -452,7 +477,9 @@ def main() -> None:
                 if hit:
                     bulk_hits += 1
                     return hit
-            return _cached_lookup(f"owner:{name}", lambda n=name: dcad_session.lookup_by_owner_name(n, verbose=True))
+            return _prefer_bulk_entry(
+                _cached_lookup(f"owner:{name}", lambda n=name: dcad_session.lookup_by_owner_name(n, verbose=True))
+            )
 
         # 2026-09-22: probate/heirship-family docs on the Kofile RP index
         # often have no address on the index row AND an unresolved debtor
@@ -549,7 +576,8 @@ def main() -> None:
         _enrich_events_needing_parcel(clerk_events, try_address=True)
         print(f"[dallas_tx]   {addr_owner_hits}/{addr_owner_attempted} address/owner lookups matched "
               f"a single confident DCAD account ({bulk_hits} from the bulk index, "
-              f"{addr_owner_hits - bulk_hits} via live fallback)", flush=True)
+              f"{addr_owner_hits - bulk_hits} via live fallback, "
+              f"{live_hits_upgraded} of those upgraded with the bulk mailing address/flags)", flush=True)
         print(f"[dallas_tx]   {name_fallback_hits} of those also injected a DCAD owner-of-record name "
               f"as a MORTGAGOR fallback (debtor wasn't otherwise resolved)", flush=True)
 

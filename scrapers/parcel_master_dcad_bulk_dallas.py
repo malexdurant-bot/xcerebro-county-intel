@@ -375,6 +375,7 @@ def build_lookup(records: list[dict]) -> dict:
         entry = {
             "situs_address": p.get("address"),
             "situs_city": p.get("city"),
+            "situs_zip": p.get("zip"),
             "owner_name": p.get("owner_name"),
             "assessed_value": None,  # not in ACCOUNT_INFO.CSV; left for shape-compat with the old live lookup
             "property_type": None,
@@ -424,22 +425,89 @@ def lookup_by_account(lookup: dict, account: str) -> "dict | None":
     return lookup["by_account"].get(account)
 
 
-def lookup_by_address(lookup: dict, raw_address: str) -> "dict | None":
-    """Same single-confident-match discipline as the live DCADSession
-    version: only returns a hit when the normalized street matches exactly
-    one account. Returns the same dict shape as lookup_by_account, plus
-    account_number (the live version's contract includes it since, unlike
-    an account lookup, the caller doesn't already know it)."""
-    from scaffold.pipeline.translators.parcel_master import _normalize_street
+_ZIP_TAIL_RE = re.compile(r"[\s,]+(\d{5})(?:-\d{4})?\s*$")
+_STATE_TAIL_RE = re.compile(r"[\s,]+(?:TEXAS|TX)\.?\s*$", re.IGNORECASE)
 
-    accounts = lookup["by_street"].get(_normalize_street(raw_address))
-    if not accounts or len(accounts) != 1:
-        return None
-    account = accounts[0]
-    entry = lookup["by_account"].get(account)
-    if entry is None:
-        return None
-    return {**entry, "account_number": account}
+
+def _street_candidates(raw_address: str) -> "tuple[list[str], str | None]":
+    """Split a free-form address into (candidate street strings, ZIP).
+
+    Addresses reach the lookup as 'STREET CITY TEXAS ZIP' with no separator
+    ('311 S. EBRITE STREET MESQUITE TEXAS 75149'), as 'STREET, CITY, TX ZIP',
+    or as a bare street. The county index is keyed by the STREET alone, and
+    a city name can't be told apart from a street name by looking at it
+    ('2017 VILLAGE GREEN RICHARDSON'), so: drop a trailing ZIP and state,
+    take what precedes the first comma, and offer every word-prefix of it,
+    longest first. The caller takes the longest one that exists in the
+    index, so a city only ever gets trimmed when the street is real."""
+    s = (raw_address or "").strip()
+    zip5 = None
+    m = _ZIP_TAIL_RE.search(s)
+    if m:
+        zip5 = m.group(1)
+        s = s[:m.start()]
+    s = _STATE_TAIL_RE.sub("", s)
+    s = s.split(",", 1)[0].strip()
+    tokens = s.split()
+    return [" ".join(tokens[:n]) for n in range(len(tokens), 1, -1)], zip5
+
+
+def lookup_by_address(lookup: dict, raw_address: str) -> "dict | None":
+    """See lookup_by_address_ex; this returns just the match (or None)."""
+    return lookup_by_address_ex(lookup, raw_address)[0]
+
+
+def lookup_by_address_ex(lookup: dict, raw_address: str) -> "tuple[dict | None, str]":
+    """(match_or_None, reason). reason is 'matched', or why it declined:
+    'empty', 'no_house_number', 'unit', 'not_found', 'ambiguous',
+    'zip_mismatch'. Callers use it to decide whether a second opinion (the
+    slow live DCAD lookup) is appropriate: only 'not_found' is a gap the
+    live lookup could fill; every other reason is a DELIBERATE refusal that
+    a second lookup must not override.
+
+    Same single-confident-match discipline as the live DCADSession
+    version: only returns a hit when the street matches exactly one
+    account. Returns the same dict shape as lookup_by_account, plus
+    account_number (the live version's contract includes it since, unlike
+    an account lookup, the caller doesn't already know it).
+
+    2026-10-10: this used to normalize the WHOLE string and look for an
+    exact street-only key, so any address with a city / state / ZIP attached
+    (every foreclosure-portal address) matched nothing -- 0 of 401 on real
+    data -- and the pipeline fell back to the slow live lookup, whose hits
+    carry no mailing address. Now the street is isolated first (see
+    _street_candidates). Never guesses:
+      - ambiguous at the longest street that exists in the index -> None
+        (it does NOT fall back to a shorter, different street);
+      - an address with a unit / suite / apt -> None (a unit is not the
+        building's parcel; condo units each have their own account anyway);
+      - a ZIP that disagrees with the matched parcel's -> None (the same
+        number + street name exists in several of the county's cities);
+      - no leading house number -> None."""
+    from scaffold.pipeline.translators.parcel_master import _UNIT_TAIL_RE, _normalize_street
+
+    candidates, zip5 = _street_candidates(raw_address)
+    if not candidates:
+        return None, "empty"
+    if not candidates[0].split()[0][:1].isdigit():
+        return None, "no_house_number"
+    if _UNIT_TAIL_RE.search((raw_address or "").upper()):
+        return None, "unit"
+    for candidate in candidates:
+        accounts = lookup["by_street"].get(_normalize_street(candidate))
+        if not accounts:
+            continue
+        if len(accounts) != 1:
+            return None, "ambiguous"
+        account = accounts[0]
+        entry = lookup["by_account"].get(account)
+        if entry is None:
+            return None, "not_found"
+        parcel_zip = (entry.get("situs_zip") or "")[:5]
+        if zip5 and parcel_zip and zip5 != parcel_zip:
+            return None, "zip_mismatch"
+        return {**entry, "account_number": account}, "matched"
+    return None, "not_found"
 
 
 def lookup_by_owner_name(lookup: dict, name: str) -> "dict | None":

@@ -433,6 +433,43 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
     return events
 
 
+# Only an EXPLICIT property label is trusted. A scanned trustee-sale notice
+# also contains addresses that are NOT the property -- the trustee's office
+# (often another city), the courthouse where the sale is held -- so "any
+# street-shaped text" would put the wrong building on a lead. 261 of the 357
+# address-less notices contain some street-shaped address; only ~50 state the
+# property under one of these labels. ("street address" and "located at" are
+# deliberately NOT here: they introduce the trustee's office / sale location.)
+_PROPERTY_ADDRESS_LABEL_RE = re.compile(
+    r"(?:commonly\s+known\s+as|property\s+address|address\s+of\s+(?:the\s+)?property)\s*[:\-]?",
+    re.IGNORECASE,
+)
+# house number, street words (+ any city words), then ', TX 7xxxx' -- anchoring on
+# a Texas ZIP is what keeps this from capturing arbitrary numbered text.
+_LABELED_ADDRESS_RE = re.compile(
+    r"(\d{1,6}\s+[A-Za-z][A-Za-z0-9.'#\- ,]{3,70}?)[,\s]+(?:TX|TEXAS)\.?[,\s]+(\d{5})(?:-\d{4})?\b",
+    re.IGNORECASE,
+)
+
+
+def _labeled_property_address(text: "str | None") -> "str | None":
+    """The property address from a notice's scanned text, only when it follows
+    an explicit property label and ends in a Texas ZIP. Returns 'STREET [CITY]
+    TX ZIP' (the county matcher trims the city and checks the ZIP) or None.
+    OCR text is noisy, so this is a candidate generator: the county lookup it
+    feeds still has to find exactly one parcel at that street AND agree on the
+    ZIP before anything is attached to a lead."""
+    if not text:
+        return None
+    flat = re.sub(r"\s+", " ", text)
+    for label in _PROPERTY_ADDRESS_LABEL_RE.finditer(flat):
+        window = flat[label.end(): label.end() + 140]
+        found = _LABELED_ADDRESS_RE.search(window)
+        if found:
+            return f"{found.group(1).strip(' ,')} TX {found.group(2)}"
+    return None
+
+
 def translate_foreclosure_notices(wrapped_records: list[dict]) -> list[dict]:
     events: list[dict] = []
     for rec in wrapped_records:
@@ -479,6 +516,10 @@ def translate_foreclosure_notices(wrapped_records: list[dict]) -> list[dict]:
                         if payload.get("city") and len(str(payload.get("city")).split(",")) >= 3
                         else None
                     )
+                    # last resort: the property address printed on the notice
+                    # itself (2026-10-10) -- ~47% of notices have no address
+                    # on the document's detail page.
+                    or _labeled_property_address(payload.get("document_body_text"))
                 ),
                 "legal_description": None,
                 "case_number": None,
