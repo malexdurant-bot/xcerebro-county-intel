@@ -402,6 +402,11 @@ def main() -> None:
     # ever returns a hit when there's EXACTLY one match, same "never guess"
     # principle as the debtor-name extraction fixes above.
     # ------------------------------------------------------------------
+    # instrument number -> the county (DCAD) entry its property matched, so a
+    # lead whose parcel the staged pipeline later drops (unresolved debtor)
+    # can still show the owner's mailing address -- see Step 3c.
+    hit_by_instrument: dict = {}
+
     if args.skip_dcad_enrichment:
         print("[dallas_tx] --skip-dcad-enrichment: skipping address/owner DCAD lookups too", flush=True)
     else:
@@ -422,6 +427,7 @@ def main() -> None:
         name_fallback_hits = 0
         bulk_hits = 0
         live_hits_upgraded = 0  # live matches that took mailing/flags from the bulk entry
+        address_match_kinds: dict = {}  # bulk address-match reason -> count ('matched_unit', ...)
 
         def _cached_lookup(cache_key: str, do_lookup) -> "dict | None":
             if cache_key in addr_owner_cache:
@@ -458,6 +464,7 @@ def main() -> None:
                 hit, reason = _bulk_lookup_by_address_ex(dcad_bulk_lookup, addr)
                 if hit:
                     bulk_hits += 1
+                    address_match_kinds[reason] = address_match_kinds.get(reason, 0) + 1
                     return hit
                 if reason != "not_found":
                     # A deliberate refusal (ambiguous street, unit address,
@@ -557,6 +564,8 @@ def main() -> None:
                 if hit:
                     addr_owner_hits += 1
                     ev["property_refs"]["parcel_id"] = hit["account_number"]
+                    if ev.get("instrument_number"):
+                        hit_by_instrument[str(ev["instrument_number"])] = hit
                     # hit may come from either the bulk lookup (carries
                     # owner_mailing_*/is_absentee_owner/is_out_of_state_owner)
                     # or the live DCADSession (doesn't) -- pass through
@@ -578,6 +587,9 @@ def main() -> None:
               f"a single confident DCAD account ({bulk_hits} from the bulk index, "
               f"{addr_owner_hits - bulk_hits} via live fallback, "
               f"{live_hits_upgraded} of those upgraded with the bulk mailing address/flags)", flush=True)
+        if address_match_kinds:
+            print("[dallas_tx]   address matches by kind: "
+                  + ", ".join(f"{k}={v}" for k, v in sorted(address_match_kinds.items())), flush=True)
         print(f"[dallas_tx]   {name_fallback_hits} of those also injected a DCAD owner-of-record name "
               f"as a MORTGAGOR fallback (debtor wasn't otherwise resolved)", flush=True)
 
@@ -727,6 +739,7 @@ def main() -> None:
     # county property records the way the Step 3b matches are.
     # ------------------------------------------------------------------
     ocr_enriched_count = 0
+    county_matched_unresolved = 0
     for lead in scored_leads:
         if lead.get("primary_parcel_id") or lead.get("parcel_display"):
             continue  # already handled above, or has a real parcel match
@@ -735,7 +748,29 @@ def main() -> None:
             continue
         instrument = lead_id[len("lead_unresolved_"):]
         addr = ocr_address_by_instrument.get(instrument)
-        if addr:
+        # 2026-10-10: the address may ALSO have matched a county parcel in
+        # Step 2c. The staged pipeline still drops the parcel when the debtor
+        # isn't resolved (§13.14), but the property -- and so where its
+        # owner's mail goes -- is known. Carry the county's address and the
+        # owner's mailing address / absentee flags; the parcel id stays null.
+        county = hit_by_instrument.get(instrument)
+        if county and county.get("situs_address"):
+            lead["parcel_display"] = {
+                "situs_address": county.get("situs_address"),
+                "situs_city": county.get("situs_city"),
+                "situs_state": "TX",
+                "assessed_value": county.get("assessed_value"),
+                "is_absentee_owner": county.get("is_absentee_owner"),
+                "is_out_of_state_owner": county.get("is_out_of_state_owner"),
+                "owner_mailing_address": county.get("owner_mailing_address"),
+                "owner_mailing_city": county.get("owner_mailing_city"),
+                "owner_mailing_state": county.get("owner_mailing_state"),
+                "owner_mailing_zip": county.get("owner_mailing_zip"),
+            }
+            lead["enrichment_status"] = "ENRICHED"
+            ocr_enriched_count += 1
+            county_matched_unresolved += 1
+        elif addr:
             lead["parcel_display"] = {
                 "situs_address": addr,
                 "situs_city": None,
@@ -745,7 +780,8 @@ def main() -> None:
             lead["enrichment_status"] = "ENRICHED"
             ocr_enriched_count += 1
     print(f"[dallas_tx] Document-OCR-enriched {ocr_enriched_count}/{len(scored_leads)} additional "
-          f"leads with an address DCAD couldn't confirm", flush=True)
+          f"leads with an address ({county_matched_unresolved} of them matched a county parcel and "
+          f"carry its owner's mailing address)", flush=True)
 
     # ------------------------------------------------------------------
     # Step 4 — Dashboard payload (LOCAL ONLY — see note below)

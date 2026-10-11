@@ -78,6 +78,25 @@ case("scanned text is the fallback when nothing else has a street address",
 case("no address anywhere -> None",
      event(property_address_detail="DALLAS TEXAS", city="DALLAS", document_body_text="nothing useful") is None)
 
+print("clerk documents: a trustee's or lender's office is not the property")
+
+
+def clerk_address(hint):
+    rec = {"raw_record_id": "rid", "source_url": "u", "parser_confidence": 100,
+           "raw_payload": {"doc_type": "APPOINTMENT OF SUBSTITUTE TRUSTEE", "doc_number": "1",
+                           "grantor_name": "TEST BANK", "grantee_name": "TEST OWNER",
+                           "situs_address_ocr_hint": hint}}
+    return tr.translate_clerk_recordings([rec])[0]["property_refs"]["situs_address"]
+
+
+case("a plain street address hint is kept", clerk_address("100 TEST CT DALLAS TX 75001") == "100 TEST CT DALLAS TX 75001")
+for office in ("100 TEST BLVD, Suite 200, TX", "100 TEST RD Ste 4", "100 TEST BLVD, Mail Code 1011-F, TX",
+               "100 TEST AVE, Building 5", "100 TEST ST, Floor 3", "100 TEST ST, P.O. Box 12"):
+    case(f"an office hint is dropped: {office}", clerk_address(office) is None)
+case("a condo unit hint is still kept (a unit is a home, a suite is an office)",
+     clerk_address("100 TEST CT APT 5 DALLAS TX 75001") == "100 TEST CT APT 5 DALLAS TX 75001")
+case("a street named 'FLORIDA' is not mistaken for 'FL'", clerk_address("100 FLORIDA ST DALLAS TX 75001") == "100 FLORIDA ST DALLAS TX 75001")
+
 if FAILS:
     print(f"\n{len(FAILS)} FAILED")
     sys.exit(1)

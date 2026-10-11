@@ -401,7 +401,9 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
         ocr_address_hint = payload.get("situs_address_ocr_hint")
         situs_address = (
             ocr_address_hint
-            if ocr_address_hint and re.match(r"^\d", ocr_address_hint.strip())
+            if ocr_address_hint
+            and re.match(r"^\d", ocr_address_hint.strip())
+            and not _OFFICE_ADDRESS_RE.search(ocr_address_hint)
             else None
         )
 
@@ -432,6 +434,16 @@ def translate_clerk_recordings(wrapped_records: list[dict]) -> list[dict]:
         })
     return events
 
+
+# An address with an office-type designator is a business's office -- on
+# appointment-of-trustee / trustee's-deed documents that is the TRUSTEE's or
+# LENDER's address ('... Suite 200', '... Mail Code 1011-F'), found next to the
+# borrower's name by the OCR hint, not the property. Found 2026-10-10: 7
+# leads displayed a law firm's or bank's office as the property address.
+_OFFICE_ADDRESS_RE = re.compile(
+    r"\b(?:STE|SUITE|SNITE|BLDG|BUILDING|FLOOR|FL|MAIL\s*CODE)\b|P\.?\s*O\.?\s*BOX",
+    re.IGNORECASE,
+)
 
 # Only an EXPLICIT property label is trusted. A scanned trustee-sale notice
 # also contains addresses that are NOT the property -- the trustee's office
