@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-11T14:22:23Z",
+  "generated_at": "2026-10-12T14:22:33Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -36,8 +36,8 @@
     "Archive": 10,
     "Hot": 1,
     "Low": 74,
-    "Strong": 181,
-    "Workable": 797
+    "Strong": 180,
+    "Workable": 798
   },
   "deal_path_distribution": {
     "messy_title": 62,
@@ -8995,7 +8995,7 @@
     },
     {
       "lead_id": "lead_parcel_R08914-01-10",
-      "scored_lead_id": "scored_8fbd5ed6c5719ead",
+      "scored_lead_id": "scored_2d69c663d4694598",
       "primary_parcel_id": "R08914-01-10",
       "display_address": "602 HUGER ST, COLUMBIA, SC",
       "display_address_street": "602 HUGER ST",
@@ -9004,8 +9004,8 @@
       "display_address_zip": "29201",
       "display_owner": "604 HUGER LLC",
       "display_owner_type": "ENTITY",
-      "display_score": 66,
-      "display_tier": "Strong",
+      "display_score": 61,
+      "display_tier": "Workable",
       "display_patterns": [
         "lien",
         "lien",
@@ -9061,10 +9061,6 @@
         {
           "factor": "stack_depth_3",
           "delta": 24
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         },
         {
           "factor": "attribute_bonus",
