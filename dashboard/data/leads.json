@@ -1,49 +1,49 @@
 {
-  "generated_at": "2026-10-13T14:22:28Z",
+  "generated_at": "2026-10-15T21:00:07Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
   "state": "SC",
   "semantic_verdict": "DEPLOY_OK",
-  "lead_total": 1063,
+  "lead_total": 1098,
   "enrichment_breakdown": {
-    "ENRICHED": 812,
-    "UNENRICHED": 251
+    "ENRICHED": 836,
+    "UNENRICHED": 262
   },
   "pattern_counts": {
-    "estate": 329,
-    "foreclosure": 45,
+    "estate": 353,
+    "foreclosure": 55,
     "lien": 31,
-    "lis_pendens": 63,
+    "lis_pendens": 66,
     "tax": 603
   },
   "attribute_counts": {
-    "absentee": 430,
-    "entity_owned": 151,
-    "free_and_clear": 133,
-    "high_equity": 346,
-    "long_term_owned": 294,
+    "absentee": 436,
+    "entity_owned": 153,
+    "free_and_clear": 134,
+    "high_equity": 352,
+    "long_term_owned": 302,
     "out_of_state": 43,
-    "senior_owner": 41,
-    "vacant": 8
+    "senior_owner": 42,
+    "vacant": 9
   },
   "stack_depth_distribution": {
-    "1": 1056,
-    "2": 6,
+    "1": 1089,
+    "2": 8,
     "3": 1
   },
   "score_tier_distribution": {
     "Archive": 10,
     "Hot": 1,
-    "Low": 74,
-    "Strong": 180,
-    "Workable": 798
+    "Low": 77,
+    "Strong": 184,
+    "Workable": 826
   },
   "deal_path_distribution": {
-    "messy_title": 62,
-    "partial_interest": 69,
-    "sub_to": 21,
-    "wholesale": 1063
+    "messy_title": 65,
+    "partial_interest": 72,
+    "sub_to": 26,
+    "wholesale": 1098
   },
   "records": [
     {
@@ -758,6 +758,89 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_parcel_14700-04-80",
+      "scored_lead_id": "scored_00f99fcc7e613910",
+      "primary_parcel_id": "14700-04-80",
+      "display_address": "E/S WILSON BLVD, BLYTHEWOOD, SC",
+      "display_address_street": "E/S WILSON BLVD",
+      "display_address_city": "BLYTHEWOOD",
+      "display_address_state": "SC",
+      "display_address_zip": "29016",
+      "display_owner": "Any heirs-at-law or devisees of Eric T. Jones a/k/a Eric Terry Jones, deceased, their heirs, Personal Representatives, Administrators, Successors",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 45,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_doc_types": [
+        "lis_pendens"
+      ],
+      "display_attributes": [
+        "absentee",
+        "entity_owned",
+        "vacant"
+      ],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": 10800.0,
+      "display_last_sale_price": 2800000.0,
+      "display_last_sale_date": "2024-12-17",
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "405 WESTERN LN",
+      "display_owner_mailing_city": "IRMO",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "290639071",
+      "display_owner_mailing": "405 WESTERN LN, IRMO, SC 29063-9071",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 10
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2006-12-21",
+      "review_flags": [
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
       "lead_id": "lead_parcel_14906-01-11",
       "scored_lead_id": "scored_5a9434f51712b996",
       "primary_parcel_id": "14906-01-11",
@@ -1144,6 +1227,73 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_parcel_17414-01-25",
+      "scored_lead_id": "scored_52d5709396e2a090",
+      "primary_parcel_id": "17414-01-25",
+      "display_address": "208 HARDWOOD DR, COLUMBIA, SC",
+      "display_address_street": "208 HARDWOOD DR",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29229",
+      "display_owner": "Harry H Williams, Jr",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 221400.0,
+      "display_last_sale_price": 135000.0,
+      "display_last_sale_date": "2015-09-24",
+      "display_year_built": 2004,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "208 HARDWOOD DR",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292290000",
+      "display_owner_mailing": "208 HARDWOOD DR, COLUMBIA, SC 29229-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_19703-",
       "scored_lead_id": "scored_3ac8471998f76f39",
       "primary_parcel_id": "19703-",
@@ -1438,6 +1588,158 @@
         "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
       ],
       "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_parcel_30600-01-09",
+      "scored_lead_id": "scored_b8d178fe168209a9",
+      "primary_parcel_id": "30600-01-09",
+      "display_address": "1009 R L COWARD RD, EASTOVER, SC",
+      "display_address_street": "1009 R L COWARD RD",
+      "display_address_city": "EASTOVER",
+      "display_address_state": "SC",
+      "display_address_zip": "29044",
+      "display_owner": "R D Black, Sr a/k/a R D Black, Vikki Mureddy, Danny C Jones, Iris Vargas ANDIFRDBlack,Sra/k/a R D Black, Vikki Mureddy, Danny C Jones",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 63,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "sub_to",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "sub_to",
+          "confidence": "moderate",
+          "rationale": "Foreclosure on long-term-owned parcel; investigate loan terms for subject-to."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 52300.0,
+      "display_last_sale_price": 60000.0,
+      "display_last_sale_date": "2005-08-22",
+      "display_year_built": 1930,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "1009 R L COWARD RD",
+      "display_owner_mailing_city": "EASTOVER",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "290440000",
+      "display_owner_mailing": "1009 R L COWARD RD, EASTOVER, SC 29044-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_parcel_M90010-36-88",
+      "scored_lead_id": "scored_99487e2e41ab144b",
+      "primary_parcel_id": "M90010-36-88",
+      "display_address": "8883 DECAL SC, SC",
+      "display_address_street": "8883 DECAL SC",
+      "display_address_city": "",
+      "display_address_state": "SC",
+      "display_address_zip": "",
+      "display_owner": "DONALD EUGENE HORNSBY",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 58,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "absentee"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 3900.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1977,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "8018 MONTICELLO RD",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292030000",
+      "display_owner_mailing": "8018 MONTICELLO RD, COLUMBIA, SC 29203-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-10-06",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Active"
     },
     {
       "lead_id": "lead_parcel_M90011-11-29",
@@ -1897,7 +2199,8 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -3257,6 +3560,86 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_parcel_R03404-06-16",
+      "scored_lead_id": "scored_18d1d4b58274f0fc",
+      "primary_parcel_id": "R03404-06-16",
+      "display_address": "12 HARLAN CT, IRMO, SC",
+      "display_address_street": "12 HARLAN CT",
+      "display_address_city": "IRMO",
+      "display_address_state": "SC",
+      "display_address_zip": "29063",
+      "display_owner": "NANCY LOUISE TODD",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 61,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "long_term_owned",
+        "senior_owner"
+      ],
+      "display_deal_paths": [
+        "partial_interest",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 176600.0,
+      "display_last_sale_price": 174501.0,
+      "display_last_sale_date": "2001-06-29",
+      "display_year_built": 2001,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "12 HARLAN CT",
+      "display_owner_mailing_city": "IRMO",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "290630000",
+      "display_owner_mailing": "12 HARLAN CT, IRMO, SC 29063-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 6
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-18",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
       "lead_id": "lead_parcel_R03407-03-17",
       "scored_lead_id": "scored_a470109ea253b3c9",
       "primary_parcel_id": "R03407-03-17",
@@ -3406,7 +3789,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -4575,6 +4959,87 @@
         "https://richlandmaps.com/apps/delinquent/"
       ],
       "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_parcel_R04009-02-06",
+      "scored_lead_id": "scored_b9cc7006957ff5fa",
+      "primary_parcel_id": "R04009-02-06",
+      "display_address": "607 CHARING CROSS RD, IRMO, SC",
+      "display_address_street": "607 CHARING CROSS RD",
+      "display_address_city": "IRMO",
+      "display_address_state": "SC",
+      "display_address_zip": "29063",
+      "display_owner": "RICHARD CARRINGTON HOLLIDAY",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 66,
+      "display_tier": "Strong",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "free_and_clear",
+        "high_equity",
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "partial_interest",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 146500.0,
+      "display_last_sale_price": 1.0,
+      "display_last_sale_date": "2005-08-10",
+      "display_year_built": 1974,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "607 CHARING CROSS RD",
+      "display_owner_mailing_city": "IRMO",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "290630000",
+      "display_owner_mailing": "607 CHARING CROSS RD, IRMO, SC 29063-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 11
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-25",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_R04100-03-13",
@@ -7900,6 +8365,86 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_parcel_R07407-05-33",
+      "scored_lead_id": "scored_9afc33f0ade71676",
+      "primary_parcel_id": "R07407-05-33",
+      "display_address": "1900 SPOTSWOOD DR, COLUMBIA, SC",
+      "display_address_street": "1900 SPOTSWOOD DR",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29210",
+      "display_owner": "Shelya Smith a/k/a Shelya A Smith",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 66,
+      "display_tier": "Strong",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [
+        "absentee",
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "sub_to",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "sub_to",
+          "confidence": "high",
+          "rationale": "Foreclosure paired with bankruptcy stay or absentee owner; subject-to acquisition pattern fits."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 18300.0,
+      "display_last_sale_price": 82900.0,
+      "display_last_sale_date": "2005-09-29",
+      "display_year_built": 1970,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "1900 SPOTS WOOD DR",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292100000",
+      "display_owner_mailing": "1900 SPOTS WOOD DR, COLUMBIA, SC 29210-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 6
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_R07408-05-14",
       "scored_lead_id": "scored_e368adcd57a4281c",
       "primary_parcel_id": "R07408-05-14",
@@ -8703,6 +9248,79 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_parcel_R07700-03-12",
+      "scored_lead_id": "scored_352d2dea3bac9139",
+      "primary_parcel_id": "R07700-03-12",
+      "display_address": "N/S HEYWARD BROCKINGTON SC, SC",
+      "display_address_street": "N/S HEYWARD BROCKINGTON SC",
+      "display_address_city": "",
+      "display_address_state": "SC",
+      "display_address_zip": "",
+      "display_owner": "REUBEN DAVIS JR",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 58,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "absentee"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 2600.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "121 FAIRLAWN CT",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292030000",
+      "display_owner_mailing": "121 FAIRLAWN CT, COLUMBIA, SC 29203-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_R07714-04-02",
       "scored_lead_id": "scored_6e5acf79fbf26de4",
       "primary_parcel_id": "R07714-04-02",
@@ -8992,6 +9610,73 @@
         "https://richlandmaps.com/apps/delinquent/"
       ],
       "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_parcel_R08816-01-06",
+      "scored_lead_id": "scored_b0c8d914cc9ed0b8",
+      "primary_parcel_id": "R08816-01-06",
+      "display_address": "813 SILVER ST, COLUMBIA, SC",
+      "display_address_street": "813 SILVER ST",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29201",
+      "display_owner": "LOUISE OXNER",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 83300.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1920,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "813 SILVER ST",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292014329",
+      "display_owner_mailing": "813 SILVER ST, COLUMBIA, SC 29201-4329",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-22",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_R08914-01-10",
@@ -9739,6 +10424,73 @@
         "https://richlandmaps.com/apps/delinquent/"
       ],
       "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_parcel_R09105-06-08",
+      "scored_lead_id": "scored_da9dd16f381cb9e4",
+      "primary_parcel_id": "R09105-06-08",
+      "display_address": "3000 LINDSAY ST, COLUMBIA, SC",
+      "display_address_street": "3000 LINDSAY ST",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29201",
+      "display_owner": "THELMA G. STEWART",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 117800.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1938,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "3000 LINDSAY ST",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292011522",
+      "display_owner_mailing": "3000 LINDSAY ST, COLUMBIA, SC 29201-1522",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-21",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_R09106-02-45",
@@ -13201,6 +13953,79 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_parcel_R09411-05-23",
+      "scored_lead_id": "scored_d4b7826623a65683",
+      "primary_parcel_id": "R09411-05-23",
+      "display_address": "1128 SLASH PINE LN, COLUMBIA, SC",
+      "display_address_street": "1128 SLASH PINE LN",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29203",
+      "display_owner": "LUTHER GASTON JR",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 6100.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2019-11-26",
+      "display_year_built": 1973,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "1128 SLASH PINE LN",
+      "display_owner_mailing_city": "Columbia",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "29203",
+      "display_owner_mailing": "1128 SLASH PINE LN, Columbia, SC 29203",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_R09411-05-61",
       "scored_lead_id": "scored_ca747560cf5e0d54",
       "primary_parcel_id": "R09411-05-61",
@@ -16608,6 +17433,73 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_parcel_R11504-13-10",
+      "scored_lead_id": "scored_659e4f7b94633ad4",
+      "primary_parcel_id": "R11504-13-10",
+      "display_address": "1907 LIBERTY ST, COLUMBIA, SC",
+      "display_address_street": "1907 LIBERTY ST",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29203",
+      "display_owner": "LEROY BELL",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 36700.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1912,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "1907 LIBERTY ST",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292037341",
+      "display_owner_mailing": "1907 LIBERTY ST, COLUMBIA, SC 29203-7341",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-11",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
       "lead_id": "lead_parcel_R11506-04-15",
       "scored_lead_id": "scored_fb31092a43c49c13",
       "primary_parcel_id": "R11506-04-15",
@@ -16761,7 +17653,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/public-notices-1847/",
-        "https://www.thecolumbiastar.com/articles/public-notices-1849/"
+        "https://www.thecolumbiastar.com/articles/public-notices-1849/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -17715,6 +18608,80 @@
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-892/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-893/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-894/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_parcel_R11581-07-12",
+      "scored_lead_id": "scored_cedb004e4a31c796",
+      "primary_parcel_id": "R11581-07-12",
+      "display_address": "1825 SAINT JULIAN PL 7L APT, COLUMBIA, SC",
+      "display_address_street": "1825 SAINT JULIAN PL 7L APT",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29204",
+      "display_owner": "PAMELA S. BILTON",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 63,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "absentee",
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 101500.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2023-06-05",
+      "display_year_built": 1974,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "1825 SAINT JULIAN PL APT 7L",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292042421",
+      "display_owner_mailing": "1825 SAINT JULIAN PL APT 7L, COLUMBIA, SC 29204-2421",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 8
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-08-31",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -24687,7 +25654,8 @@
       ],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1849/"
+        "https://www.thecolumbiastar.com/articles/public-notices-1849/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -26384,7 +27352,7 @@
     },
     {
       "lead_id": "lead_parcel_R13715-05-03",
-      "scored_lead_id": "scored_ad366fc13581c83a",
+      "scored_lead_id": "scored_53b3f31559e45596",
       "primary_parcel_id": "R13715-05-03",
       "display_address": "190 PRESERVE LN, COLUMBIA, SC",
       "display_address_street": "190 PRESERVE LN",
@@ -26393,12 +27361,14 @@
       "display_address_zip": "29209",
       "display_owner": "KATHLEEN LAFORGE NUNNERY",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 66,
+      "display_score": 78,
       "display_tier": "Strong",
       "display_patterns": [
+        "estate",
         "estate"
       ],
       "stack_contrib_patterns": [
+        "estate",
         "estate"
       ],
       "display_pattern_set": [
@@ -26424,8 +27394,8 @@
         },
         {
           "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "confidence": "high",
+          "rationale": "Multi-signal distress + investor-friendly attribute set."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -26443,11 +27413,15 @@
       "display_owner_mailing": "190 PRESERVE LN, COLUMBIA, SC 29209-0000",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
           "factor": "base_LETTERS_TESTAMENTARY",
           "delta": 55
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         },
         {
           "factor": "attribute_bonus",
@@ -26460,7 +27434,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -28481,7 +29456,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -31397,6 +32373,79 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_parcel_R14781-01-09",
+      "scored_lead_id": "scored_113235be702bd8ee",
+      "primary_parcel_id": "R14781-01-09",
+      "display_address": "217 DAVIS SMITH RD, COLUMBIA, SC",
+      "display_address_street": "217 DAVIS SMITH RD",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29203",
+      "display_owner": "DANNY BRUCE LOWMAN",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 73900.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2025-07-16",
+      "display_year_built": 1940,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "217 DAVIS SMITH RD",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292039737",
+      "display_owner_mailing": "217 DAVIS SMITH RD, COLUMBIA, SC 29203-9737",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-24",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
       "lead_id": "lead_parcel_R14800-02-13",
       "scored_lead_id": "scored_38394243ad793022",
       "primary_parcel_id": "R14800-02-13",
@@ -32607,7 +33656,8 @@
       ],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1849/"
+        "https://www.thecolumbiastar.com/articles/public-notices-1849/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -33472,7 +34522,8 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -33861,7 +34912,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -34565,6 +35617,73 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-298/"
       ],
       "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_parcel_R16711-07-58",
+      "scored_lead_id": "scored_5e215d257b684201",
+      "primary_parcel_id": "R16711-07-58",
+      "display_address": "317 EAGLE FEATHER LOOP, COLUMBIA, SC",
+      "display_address_street": "317 EAGLE FEATHER LOOP",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29206",
+      "display_owner": "Avril LaShonn Allen",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 225000.0,
+      "display_last_sale_price": 225000.0,
+      "display_last_sale_date": "2025-07-23",
+      "display_year_built": 2010,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "317 EAGLE FEATHER LOOP",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292065090",
+      "display_owner_mailing": "317 EAGLE FEATHER LOOP, COLUMBIA, SC 29206-5090",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
     },
     {
       "lead_id": "lead_parcel_R16782-01-05",
@@ -37406,6 +38525,85 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_parcel_R17214-01-46",
+      "scored_lead_id": "scored_052bef6e1cb0f22c",
+      "primary_parcel_id": "R17214-01-46",
+      "display_address": "137 CHARLESWOOD DR, COLUMBIA, SC",
+      "display_address_street": "137 CHARLESWOOD DR",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29223",
+      "display_owner": "Lula Mae Jones",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 63,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "sub_to",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "sub_to",
+          "confidence": "moderate",
+          "rationale": "Foreclosure on long-term-owned parcel; investigate loan terms for subject-to."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 42400.0,
+      "display_last_sale_price": 40587.0,
+      "display_last_sale_date": "1988-06-01",
+      "display_year_built": 1972,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "137 CHARLESWOOD DR",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292235003",
+      "display_owner_mailing": "137 CHARLESWOOD DR, COLUMBIA, SC 29223-5003",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -43109,6 +44307,73 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_parcel_R20110-01-13",
+      "scored_lead_id": "scored_e85f1dc716a3c9dd",
+      "primary_parcel_id": "R20110-01-13",
+      "display_address": "5 MOUNTAIN LAUREL CT, COLUMBIA, SC",
+      "display_address_street": "5 MOUNTAIN LAUREL CT",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29223",
+      "display_owner": "WILBUR WILLIAM WAHL JR",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 166100.0,
+      "display_last_sale_price": 134900.0,
+      "display_last_sale_date": "2014-07-02",
+      "display_year_built": 1991,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "5 MOUNTAIN LAUREL CT",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292230000",
+      "display_owner_mailing": "5 MOUNTAIN LAUREL CT, COLUMBIA, SC 29223-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_R20111-01-22",
       "scored_lead_id": "scored_403b9a7f44f88944",
       "primary_parcel_id": "R20111-01-22",
@@ -43324,6 +44589,81 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_parcel_R20309-07-02",
+      "scored_lead_id": "scored_133acd45f580fb26",
+      "primary_parcel_id": "R20309-07-02",
+      "display_address": "107 ASHLEY PLACE RD, COLUMBIA, SC",
+      "display_address_street": "107 ASHLEY PLACE RD",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29229",
+      "display_owner": "WILLIESTENE HILLS",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 35,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_doc_types": [
+        "lis_pendens"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": 226000.0,
+      "display_last_sale_price": 196500.0,
+      "display_last_sale_date": "2019-04-11",
+      "display_year_built": 1999,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "107 ASHLEY PLACE RD",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292299626",
+      "display_owner_mailing": "107 ASHLEY PLACE RD, COLUMBIA, SC 29229-9626",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -44070,7 +45410,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -47333,6 +48674,73 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_parcel_R22011-05-15",
+      "scored_lead_id": "scored_22bd474291aaa13e",
+      "primary_parcel_id": "R22011-05-15",
+      "display_address": "3218 RAGSDALE DR, COLUMBIA, SC",
+      "display_address_street": "3218 RAGSDALE DR",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29209",
+      "display_owner": "LIZIELLA BEADLE",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 50200.0,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": 1974,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "3218 RAGSDALE DR",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292090000",
+      "display_owner_mailing": "3218 RAGSDALE DR, COLUMBIA, SC 29209-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-07-14",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
       "lead_id": "lead_parcel_R22011-06-13",
       "scored_lead_id": "scored_b457f0ded2ee836b",
       "primary_parcel_id": "R22011-06-13",
@@ -47626,7 +49034,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -47866,6 +49275,79 @@
         "https://www7.richlandcountysc.gov/rodpublicviewer/viewer.aspx"
       ],
       "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_parcel_R22707-02-03",
+      "scored_lead_id": "scored_0eb479549f13903f",
+      "primary_parcel_id": "R22707-02-03",
+      "display_address": "229 HOLLIDAY RD, COLUMBIA, SC",
+      "display_address_street": "229 HOLLIDAY RD",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29223",
+      "display_owner": "ROBERT WILSON BAUCOM III",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "high_equity"
+      ],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 423300.0,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2022-01-25",
+      "display_year_built": 1982,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "229 HOLLIDAY RD",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292233123",
+      "display_owner_mailing": "229 HOLLIDAY RD, COLUMBIA, SC 29223-3123",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Active"
     },
     {
       "lead_id": "lead_parcel_R22710-03-01",
@@ -48165,21 +49647,23 @@
     },
     {
       "lead_id": "lead_parcel_R22815-01-33",
-      "scored_lead_id": "scored_655775713b4d702d",
+      "scored_lead_id": "scored_70c06a82695d0d88",
       "primary_parcel_id": "R22815-01-33",
       "display_address": "112 BRASSIE CT, COLUMBIA, SC",
       "display_address_street": "112 BRASSIE CT",
       "display_address_city": "COLUMBIA",
       "display_address_state": "SC",
       "display_address_zip": "29229",
-      "display_owner": "DONALD GERARD EYKYN",
+      "display_owner": "LOLLIE BARBARE EYKYN",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 61,
-      "display_tier": "Workable",
+      "display_score": 73,
+      "display_tier": "Strong",
       "display_patterns": [
+        "estate",
         "estate"
       ],
       "stack_contrib_patterns": [
+        "estate",
         "estate"
       ],
       "display_pattern_set": [
@@ -48205,7 +49689,7 @@
         {
           "path": "wholesale",
           "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+          "rationale": "Multi-signal distress stack; standard wholesale flow."
         }
       ],
       "display_title_complexity_tier": "None",
@@ -48223,11 +49707,15 @@
       "display_owner_mailing": "112 BRASSIE CT, COLUMBIA, SC 29229-0000",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
-      "stack_depth": 1,
+      "stack_depth": 2,
       "score_reasons": [
         {
           "factor": "base_LETTERS_TESTAMENTARY",
           "delta": 55
+        },
+        {
+          "factor": "stack_depth_2",
+          "delta": 12
         },
         {
           "factor": "attribute_bonus",
@@ -48235,15 +49723,16 @@
         }
       ],
       "evidence_ids": [],
-      "primary_event_date": "2026-05-21",
+      "primary_event_date": "2026-10-06",
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-889/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
-      "display_recency_bucket": "Aged"
+      "display_recency_bucket": "Active"
     },
     {
       "lead_id": "lead_parcel_R22881-02-13",
@@ -49353,7 +50842,8 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -49668,7 +51158,7 @@
     },
     {
       "lead_id": "lead_parcel_R23108-02-34",
-      "scored_lead_id": "scored_1f14a17d03a8f8a1",
+      "scored_lead_id": "scored_21f6bf7445d5e380",
       "primary_parcel_id": "R23108-02-34",
       "display_address": "202 BRITTANY PARK RD, COLUMBIA, SC",
       "display_address_street": "202 BRITTANY PARK RD",
@@ -49677,8 +51167,8 @@
       "display_address_zip": "29229",
       "display_owner": "Michquel Jones",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
-      "display_tier": "Workable",
+      "display_score": 65,
+      "display_tier": "Strong",
       "display_patterns": [
         "foreclosure"
       ],
@@ -49691,11 +51181,20 @@
       "display_doc_types": [
         "notice_of_sale"
       ],
-      "display_attributes": [],
+      "display_attributes": [
+        "absentee",
+        "entity_owned"
+      ],
       "display_deal_paths": [
+        "sub_to",
         "wholesale"
       ],
       "display_deal_path_details": [
+        {
+          "path": "sub_to",
+          "confidence": "high",
+          "rationale": "Foreclosure paired with bankruptcy stay or absentee owner; subject-to acquisition pattern fits."
+        },
         {
           "path": "wholesale",
           "confidence": "moderate",
@@ -49705,16 +51204,16 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 217000.0,
-      "display_last_sale_price": 217000.0,
-      "display_last_sale_date": "2023-03-23",
+      "display_last_sale_price": 162000.0,
+      "display_last_sale_date": "2026-07-06",
       "display_year_built": 2003,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "202 BRITTANY PARK RD",
-      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_address": "3101 TRADE ST",
+      "display_owner_mailing_city": "WEST COLUMBIA",
       "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292297694",
-      "display_owner_mailing": "202 BRITTANY PARK RD, COLUMBIA, SC 29229-7694",
+      "display_owner_mailing_zip": "291697688",
+      "display_owner_mailing": "3101 TRADE ST, WEST COLUMBIA, SC 29169-7688",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -49722,6 +51221,10 @@
         {
           "factor": "base_NOTICE_OF_SALE",
           "delta": 60
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -50176,7 +51679,8 @@
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/masters-sales-299/",
         "https://www.thecolumbiastar.com/articles/masters-sales-300/",
-        "https://www.thecolumbiastar.com/articles/masters-sales-301/"
+        "https://www.thecolumbiastar.com/articles/masters-sales-301/",
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -50418,6 +51922,164 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_parcel_R23213-01-73",
+      "scored_lead_id": "scored_90a4f958ba188d03",
+      "primary_parcel_id": "R23213-01-73",
+      "display_address": "1618 SUMMIT RIDGE DR, COLUMBIA, SC",
+      "display_address_street": "1618 SUMMIT RIDGE DR",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29229",
+      "display_owner": "ANKE SIEBEL SHEALY",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 58,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "partial_interest",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "partial_interest",
+          "confidence": "high",
+          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 103700.0,
+      "display_last_sale_price": 110935.0,
+      "display_last_sale_date": "2005-05-06",
+      "display_year_built": 2002,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "1618 SUMMIT RIDGE DR",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292290000",
+      "display_owner_mailing": "1618 SUMMIT RIDGE DR, COLUMBIA, SC 29229-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-06-17",
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_parcel_R23301-09-10",
+      "scored_lead_id": "scored_078c3cddabeb3116",
+      "primary_parcel_id": "R23301-09-10",
+      "display_address": "12 AUSTREE CT, COLUMBIA, SC",
+      "display_address_street": "12 AUSTREE CT",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29229",
+      "display_owner": "Clarence L Scott",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 63,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "sub_to",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "sub_to",
+          "confidence": "moderate",
+          "rationale": "Foreclosure on long-term-owned parcel; investigate loan terms for subject-to."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 230900.0,
+      "display_last_sale_price": 229362.0,
+      "display_last_sale_date": "2005-03-21",
+      "display_year_built": 2005,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "12 AUSTREE CT",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292290000",
+      "display_owner_mailing": "12 AUSTREE CT, COLUMBIA, SC 29229-0000",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_R23301-09-15",
       "scored_lead_id": "scored_b33e8551294a4b1a",
       "primary_parcel_id": "R23301-09-15",
@@ -50497,6 +52159,73 @@
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-897/"
       ],
       "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_parcel_R23306-07-05",
+      "scored_lead_id": "scored_9dcf30b06605cf99",
+      "primary_parcel_id": "R23306-07-05",
+      "display_address": "110 BAYSDALE DR, COLUMBIA, SC",
+      "display_address_street": "110 BAYSDALE DR",
+      "display_address_city": "COLUMBIA",
+      "display_address_state": "SC",
+      "display_address_zip": "29229",
+      "display_owner": "Franette O Boyd",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": 164500.0,
+      "display_last_sale_price": 143000.0,
+      "display_last_sale_date": "2018-10-12",
+      "display_year_built": 2008,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "110 BAYSDALE DR",
+      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "292297597",
+      "display_owner_mailing": "110 BAYSDALE DR, COLUMBIA, SC 29229-7597",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
     },
     {
       "lead_id": "lead_parcel_R23309-01-07",
@@ -53096,7 +54825,8 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -53400,7 +55130,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -53989,6 +55720,87 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_parcel_R25911-09-13",
+      "scored_lead_id": "scored_d0f050287451d5bd",
+      "primary_parcel_id": "R25911-09-13",
+      "display_address": "232 SUNDAY SILENCE LN, ELGIN, SC",
+      "display_address_street": "232 SUNDAY SILENCE LN",
+      "display_address_city": "ELGIN",
+      "display_address_state": "SC",
+      "display_address_zip": "29045",
+      "display_owner": "DREMARIEA TAYLOR TIMMONS",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 38,
+      "display_tier": "Low",
+      "display_patterns": [
+        "lis_pendens"
+      ],
+      "stack_contrib_patterns": [
+        "lis_pendens"
+      ],
+      "display_pattern_set": [
+        "lis_pendens"
+      ],
+      "display_doc_types": [
+        "lis_pendens"
+      ],
+      "display_attributes": [
+        "long_term_owned"
+      ],
+      "display_deal_paths": [
+        "messy_title",
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "messy_title",
+          "confidence": "moderate",
+          "rationale": "Lis pendens filed — pending litigation clouds title; curative work required before closing."
+        },
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": 194500.0,
+      "display_last_sale_price": 137874.0,
+      "display_last_sale_date": "2009-10-21",
+      "display_year_built": 2009,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": "232 SUNDAY SILENCE LN",
+      "display_owner_mailing_city": "ELGIN",
+      "display_owner_mailing_state": "SC",
+      "display_owner_mailing_zip": "290457121",
+      "display_owner_mailing": "232 SUNDAY SILENCE LN, ELGIN, SC 29045-7121",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LIS_PENDENS",
+          "delta": 35
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 3
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "lis_pendens_review"
+      ],
+      "enrichment_status": "ENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_parcel_R25911-17-04",
       "scored_lead_id": "scored_6812c3f55442fc81",
       "primary_parcel_id": "R25911-17-04",
@@ -54112,7 +55924,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 40000.0,
+      "display_assessed_value": 300.0,
       "display_last_sale_price": 5.0,
       "display_last_sale_date": "1986-10-04",
       "display_year_built": null,
@@ -54185,7 +55997,7 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 80000.0,
+      "display_assessed_value": 500.0,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
@@ -54591,7 +56403,8 @@
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -57038,7 +58851,7 @@
     },
     {
       "lead_id": "lead_parcel_R32400-07-37",
-      "scored_lead_id": "scored_c81d6f259d07d230",
+      "scored_lead_id": "scored_fd6f0a068c7fbec9",
       "primary_parcel_id": "R32400-07-37",
       "display_address": "2623 S CEDAR CREEK RD, GADSDEN, SC",
       "display_address_street": "2623 S CEDAR CREEK RD",
@@ -57047,7 +58860,7 @@
       "display_address_zip": "29052",
       "display_owner": "JAMES HENRY KETCHUM",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 58,
+      "display_score": 63,
       "display_tier": "Workable",
       "display_patterns": [
         "estate"
@@ -57062,7 +58875,8 @@
         "letters_testamentary"
       ],
       "display_attributes": [
-        "absentee"
+        "absentee",
+        "high_equity"
       ],
       "display_deal_paths": [
         "wholesale"
@@ -57077,8 +58891,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 203700.0,
-      "display_last_sale_price": 235000.0,
-      "display_last_sale_date": "2026-09-11",
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2021-10-26",
       "display_year_built": 1975,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -57097,7 +58911,7 @@
         },
         {
           "factor": "attribute_bonus",
-          "delta": 3
+          "delta": 8
         }
       ],
       "evidence_ids": [],
@@ -60465,7 +62279,8 @@
       "review_flags": [],
       "enrichment_status": "ENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -61637,6 +63452,146 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_unresolved_2025CP4006020",
+      "scored_lead_id": "scored_c0efb7e6af50e1d6",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "notice_of_sale against unidentified party",
+      "display_owner_type": "UNKNOWN",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_unresolved_2025CP4006757",
+      "scored_lead_id": "scored_db8ded12921ca372",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "notice_of_sale against unidentified party",
+      "display_owner_type": "UNKNOWN",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_unresolved_2025CP4008609",
       "scored_lead_id": "scored_b353f0a81562e2bd",
       "primary_parcel_id": null,
@@ -61779,7 +63734,8 @@
       ],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1849/"
+        "https://www.thecolumbiastar.com/articles/public-notices-1849/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -63075,7 +65031,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/public-notices-1847/",
-        "https://www.thecolumbiastar.com/articles/public-notices-1849/"
+        "https://www.thecolumbiastar.com/articles/public-notices-1849/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -63150,7 +65107,8 @@
       ],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/public-notices-1849/"
+        "https://www.thecolumbiastar.com/articles/public-notices-1849/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -63302,7 +65260,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/public-notices-1847/",
-        "https://www.thecolumbiastar.com/articles/public-notices-1849/"
+        "https://www.thecolumbiastar.com/articles/public-notices-1849/",
+        "https://www.thecolumbiastar.com/articles/public-notices-1850/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -66687,6 +68646,76 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_unresolved_2026CP4004028",
+      "scored_lead_id": "scored_065166a2528fba79",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "notice_of_sale against unidentified party",
+      "display_owner_type": "UNKNOWN",
+      "display_score": 60,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "foreclosure"
+      ],
+      "stack_contrib_patterns": [
+        "foreclosure"
+      ],
+      "display_pattern_set": [
+        "foreclosure"
+      ],
+      "display_doc_types": [
+        "notice_of_sale"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "REVIEW_REQUIRED",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_NOTICE_OF_SALE",
+          "delta": 60
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [
+        "parcel_resolution_review_required",
+        "matched_lead_review_reason:expected_debtor_name_type DF missing"
+      ],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/masters-sales-311/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_unresolved_25ES4001848",
       "scored_lead_id": "scored_9b88b853690bd800",
       "primary_parcel_id": null,
@@ -69836,7 +71865,8 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -73908,6 +75938,73 @@
       "display_recency_bucket": "Aged"
     },
     {
+      "lead_id": "lead_unresolved_26ES4001219",
+      "scored_lead_id": "scored_445e81a11fe33f7b",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "CHARLES MCGIRT GRAHAM III",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
       "lead_id": "lead_unresolved_26ES4001228",
       "scored_lead_id": "scored_068579d914bdd614",
       "primary_parcel_id": null,
@@ -74937,7 +77034,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -75419,7 +77517,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -75556,7 +77655,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -75693,7 +77793,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -76382,7 +78483,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -76518,7 +78620,8 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -76937,6 +79040,73 @@
       "display_recency_bucket": "Active"
     },
     {
+      "lead_id": "lead_unresolved_26ES4001503",
+      "scored_lead_id": "scored_da32ca7eb1eaf72c",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "MARY A. FRANKLIN BARNHILL",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-14",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
       "lead_id": "lead_unresolved_26ES4001509",
       "scored_lead_id": "scored_ca7d5f474348b335",
       "primary_parcel_id": null,
@@ -77000,7 +79170,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -77136,7 +79307,75 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001542",
+      "scored_lead_id": "scored_1331d3bf8a5024cc",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "MAXIMINA RAMOS MEDINA",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-18",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -77204,7 +79443,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -77271,7 +79511,75 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001574",
+      "scored_lead_id": "scored_c0b8254e220a4cfc",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "ERIC JACKSON",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-22",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -77339,7 +79647,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Active"
     },
@@ -77406,9 +79715,77 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001591",
+      "scored_lead_id": "scored_ca2cc0e17287906a",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "EUELL SCOTT CROUCH",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-24",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_unresolved_26ES4001623",
@@ -77473,7 +79850,8 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -77540,9 +79918,211 @@
       "review_flags": [],
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001635",
+      "scored_lead_id": "scored_70510334ac91b297",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "JESSIE MAE SARGENT",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-09-30",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001640",
+      "scored_lead_id": "scored_ad8919ec103dc0b5",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "VIRGINIA ANN STOUT",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-10-01",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_unresolved_26ES4001658",
+      "scored_lead_id": "scored_2bc69792a42fadf6",
+      "primary_parcel_id": null,
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "JEFFREY RANDALL STRANGE",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-10-02",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
+      ],
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_unresolved_26ES400850",
@@ -77675,7 +80255,8 @@
       "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-902/",
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/"
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-903/",
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
       "display_recency_bucket": "Aged"
     },
@@ -77887,7 +80468,7 @@
     }
   ],
   "recency_distribution": {
-    "Active": 672,
-    "Aged": 391
+    "Active": 691,
+    "Aged": 407
   }
 }
