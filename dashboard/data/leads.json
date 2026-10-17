@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T21:00:07Z",
+  "generated_at": "2026-10-17T16:22:24Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -20,9 +20,9 @@
   "attribute_counts": {
     "absentee": 436,
     "entity_owned": 153,
-    "free_and_clear": 134,
+    "free_and_clear": 133,
     "high_equity": 352,
-    "long_term_owned": 302,
+    "long_term_owned": 301,
     "out_of_state": 43,
     "senior_owner": 42,
     "vacant": 9
@@ -33,11 +33,11 @@
     "3": 1
   },
   "score_tier_distribution": {
-    "Archive": 10,
+    "Archive": 14,
     "Hot": 1,
-    "Low": 77,
-    "Strong": 184,
-    "Workable": 826
+    "Low": 73,
+    "Strong": 183,
+    "Workable": 827
   },
   "deal_path_distribution": {
     "messy_title": 65,
@@ -806,8 +806,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "REVIEW_REQUIRED",
       "display_assessed_value": 10800.0,
-      "display_last_sale_price": 2800000.0,
-      "display_last_sale_date": "2024-12-17",
+      "display_last_sale_price": 7904000.0,
+      "display_last_sale_date": "2026-08-25",
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -1739,7 +1739,7 @@
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_M90011-11-29",
@@ -4443,7 +4443,7 @@
     },
     {
       "lead_id": "lead_parcel_R04000-04-34",
-      "scored_lead_id": "scored_a450a3c2ddd9ef68",
+      "scored_lead_id": "scored_e84ffa2cebfe8d92",
       "primary_parcel_id": "R04000-04-34",
       "display_address": "305 WHISPERING MEADOW LN, IRMO, SC",
       "display_address_street": "305 WHISPERING MEADOW LN",
@@ -4452,8 +4452,8 @@
       "display_address_zip": "29063",
       "display_owner": "RAY JAMES H",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 66,
-      "display_tier": "Strong",
+      "display_score": 60,
+      "display_tier": "Workable",
       "display_patterns": [
         "tax"
       ],
@@ -4467,9 +4467,7 @@
         "tax_foreclosure_notice"
       ],
       "display_attributes": [
-        "free_and_clear",
-        "high_equity",
-        "long_term_owned"
+        "high_equity"
       ],
       "display_deal_paths": [
         "wholesale"
@@ -4484,16 +4482,16 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 69600.0,
-      "display_last_sale_price": 18000.0,
-      "display_last_sale_date": "2008-08-04",
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2026-09-30",
       "display_year_built": 2015,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
       "display_owner_mailing_address": "305 WHISPERING MEADOW LN",
       "display_owner_mailing_city": "IRMO",
       "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290630000",
-      "display_owner_mailing": "305 WHISPERING MEADOW LN, IRMO, SC 29063-0000",
+      "display_owner_mailing_zip": "290639091",
+      "display_owner_mailing": "305 WHISPERING MEADOW LN, IRMO, SC 29063-9091",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -4504,7 +4502,7 @@
         },
         {
           "factor": "attribute_bonus",
-          "delta": 11
+          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -18653,8 +18651,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 101500.0,
-      "display_last_sale_price": 5.0,
-      "display_last_sale_date": "2023-06-05",
+      "display_last_sale_price": 10.0,
+      "display_last_sale_date": "2026-09-23",
       "display_year_built": 1974,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -20159,7 +20157,7 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-309/",
         "https://www.thecolumbiastar.com/articles/masters-sales-310/"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_R11613-13-07",
@@ -49732,7 +49730,7 @@
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-890/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-904/"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_parcel_R22881-02-13",
@@ -63449,7 +63447,7 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-309/",
         "https://www.thecolumbiastar.com/articles/masters-sales-310/"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_unresolved_2025CP4006020",
@@ -67934,7 +67932,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026046258",
-      "scored_lead_id": "scored_2d676c1970cae0d5",
+      "scored_lead_id": "scored_8adba7299edf333e",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -67943,8 +67941,8 @@
       "display_address_zip": null,
       "display_owner": "TREVETTI, DAN",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -67988,10 +67986,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -68005,7 +67999,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026046260",
-      "scored_lead_id": "scored_82643759b2f3eb81",
+      "scored_lead_id": "scored_15b887df7a56b8c1",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -68014,8 +68008,8 @@
       "display_address_zip": null,
       "display_owner": "RICHARDSON, EDWARD A",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -68059,10 +68053,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -68076,7 +68066,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026046266",
-      "scored_lead_id": "scored_9ef534e87570e8be",
+      "scored_lead_id": "scored_09813fd18dee9616",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -68085,8 +68075,8 @@
       "display_address_zip": null,
       "display_owner": "HALLORAN, LAUREN E",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -68130,10 +68120,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -68147,7 +68133,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026046270",
-      "scored_lead_id": "scored_f462bf5468d08f47",
+      "scored_lead_id": "scored_d1125dc42e560797",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -68156,8 +68142,8 @@
       "display_address_zip": null,
       "display_owner": "ADDISON POINTE APARTMENTS",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -68201,10 +68187,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -68571,7 +68553,7 @@
         "https://www.thecolumbiastar.com/articles/masters-sales-309/",
         "https://www.thecolumbiastar.com/articles/masters-sales-310/"
       ],
-      "display_recency_bucket": "Active"
+      "display_recency_bucket": "Aged"
     },
     {
       "lead_id": "lead_unresolved_2026CP4002821",
@@ -80468,7 +80450,7 @@
     }
   ],
   "recency_distribution": {
-    "Active": 691,
-    "Aged": 407
+    "Active": 686,
+    "Aged": 412
   }
 }
