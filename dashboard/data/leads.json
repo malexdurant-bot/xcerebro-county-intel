@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T16:22:24Z",
+  "generated_at": "2026-10-18T18:09:28Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -33,9 +33,9 @@
     "3": 1
   },
   "score_tier_distribution": {
-    "Archive": 14,
+    "Archive": 17,
     "Hot": 1,
-    "Low": 73,
+    "Low": 70,
     "Strong": 183,
     "Workable": 827
   },
@@ -68200,7 +68200,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026046561",
-      "scored_lead_id": "scored_05e86be2b3bc978a",
+      "scored_lead_id": "scored_8d59fe919c700bdc",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -68209,8 +68209,8 @@
       "display_address_zip": null,
       "display_owner": "CORE CONCRETE, LLC",
       "display_owner_type": "ENTITY",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -68254,10 +68254,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -68271,7 +68267,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026046563",
-      "scored_lead_id": "scored_e0bffbbca3cfac21",
+      "scored_lead_id": "scored_068b3058b47afdb5",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -68280,8 +68276,8 @@
       "display_address_zip": null,
       "display_owner": "AREC ORIGINATIONS 2, LLC",
       "display_owner_type": "ENTITY",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -68325,10 +68321,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -68342,7 +68334,7 @@
     },
     {
       "lead_id": "lead_unresolved_2026046717",
-      "scored_lead_id": "scored_db0c4aadc5f5af14",
+      "scored_lead_id": "scored_fe35ed1794c4c703",
       "primary_parcel_id": null,
       "display_address": "",
       "display_address_street": null,
@@ -68351,8 +68343,8 @@
       "display_address_zip": null,
       "display_owner": "ARTHUR STATE BANK",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -68396,10 +68388,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
