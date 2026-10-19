@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-18T18:09:28Z",
+  "generated_at": "2026-10-19T14:22:22Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -33,9 +33,9 @@
     "3": 1
   },
   "score_tier_distribution": {
-    "Archive": 17,
+    "Archive": 18,
     "Hot": 1,
-    "Low": 70,
+    "Low": 69,
     "Strong": 183,
     "Workable": 827
   },
@@ -52302,7 +52302,7 @@
     },
     {
       "lead_id": "lead_parcel_R23406-01-19",
-      "scored_lead_id": "scored_fa1b95eb33dfe05b",
+      "scored_lead_id": "scored_bfa9452684f4e218",
       "primary_parcel_id": "R23406-01-19",
       "display_address": "1073 GREY DUCK LN, BLYTHEWOOD, SC",
       "display_address_street": "1073 GREY DUCK LN",
@@ -52311,8 +52311,8 @@
       "display_address_zip": "29016",
       "display_owner": "BOOKER, CATINA",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 35,
-      "display_tier": "Low",
+      "display_score": 30,
+      "display_tier": "Archive",
       "display_patterns": [
         "lien"
       ],
@@ -52356,10 +52356,6 @@
         {
           "factor": "base_MECHANICS_LIEN",
           "delta": 30
-        },
-        {
-          "factor": "recent_filing_within_30_days",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
