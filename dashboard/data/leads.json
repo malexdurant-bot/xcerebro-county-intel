@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T14:22:33Z",
+  "generated_at": "2026-10-22T14:22:33Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -18,10 +18,10 @@
     "tax": 603
   },
   "attribute_counts": {
-    "absentee": 436,
-    "entity_owned": 153,
+    "absentee": 437,
+    "entity_owned": 154,
     "free_and_clear": 133,
-    "high_equity": 352,
+    "high_equity": 353,
     "long_term_owned": 301,
     "out_of_state": 43,
     "senior_owner": 42,
@@ -806,8 +806,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "REVIEW_REQUIRED",
       "display_assessed_value": 10800.0,
-      "display_last_sale_price": 7904000.0,
-      "display_last_sale_date": "2026-08-25",
+      "display_last_sale_price": 2800000.0,
+      "display_last_sale_date": "2024-12-17",
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -35993,7 +35993,7 @@
     },
     {
       "lead_id": "lead_parcel_R16815-04-02",
-      "scored_lead_id": "scored_7298de4acd825d14",
+      "scored_lead_id": "scored_01cffe8b4f092bf4",
       "primary_parcel_id": "R16815-04-02",
       "display_address": "1707 CERMACK ST, COLUMBIA, SC",
       "display_address_street": "1707 CERMACK ST",
@@ -36002,7 +36002,7 @@
       "display_address_zip": "29223",
       "display_owner": "SANDRA VINEDA EL AMIN",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
+      "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
         "estate"
@@ -36016,7 +36016,10 @@
       "display_doc_types": [
         "letters_testamentary"
       ],
-      "display_attributes": [],
+      "display_attributes": [
+        "absentee",
+        "entity_owned"
+      ],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -36030,16 +36033,16 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 60800.0,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
+      "display_last_sale_price": 90000.0,
+      "display_last_sale_date": "2026-09-24",
       "display_year_built": 1967,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "1707 CERMACK ST",
+      "display_owner_mailing_address": "2241 BUSH RIVER RD",
       "display_owner_mailing_city": "COLUMBIA",
       "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292230000",
-      "display_owner_mailing": "1707 CERMACK ST, COLUMBIA, SC 29223-0000",
+      "display_owner_mailing_zip": "292105626",
+      "display_owner_mailing": "2241 BUSH RIVER RD, COLUMBIA, SC 29210-5626",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -36047,6 +36050,10 @@
         {
           "factor": "base_LETTERS_TESTAMENTARY",
           "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
         }
       ],
       "evidence_ids": [],
@@ -36573,7 +36580,7 @@
     },
     {
       "lead_id": "lead_parcel_R17001-02-25",
-      "scored_lead_id": "scored_99b471ae2d89c5d5",
+      "scored_lead_id": "scored_11a06a0218bd6415",
       "primary_parcel_id": "R17001-02-25",
       "display_address": "7433 CLAUDIA DR, COLUMBIA, SC",
       "display_address_street": "7433 CLAUDIA DR",
@@ -36582,7 +36589,7 @@
       "display_address_zip": "29223",
       "display_owner": "PAUL USHER SR",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 55,
+      "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
         "estate"
@@ -36596,7 +36603,9 @@
       "display_doc_types": [
         "letters_testamentary"
       ],
-      "display_attributes": [],
+      "display_attributes": [
+        "high_equity"
+      ],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -36610,8 +36619,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 43500.0,
-      "display_last_sale_price": null,
-      "display_last_sale_date": null,
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2026-08-27",
       "display_year_built": 1960,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -36627,6 +36636,10 @@
         {
           "factor": "base_LETTERS_TESTAMENTARY",
           "delta": 55
+        },
+        {
+          "factor": "attribute_bonus",
+          "delta": 5
         }
       ],
       "evidence_ids": [],
