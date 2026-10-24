@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-23T14:24:43Z",
+  "generated_at": "2026-10-24T14:22:42Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -18,7 +18,7 @@
     "tax": 603
   },
   "attribute_counts": {
-    "absentee": 439,
+    "absentee": 438,
     "entity_owned": 154,
     "free_and_clear": 135,
     "high_equity": 356,
@@ -11194,7 +11194,7 @@
     },
     {
       "lead_id": "lead_parcel_R09113-03-04",
-      "scored_lead_id": "scored_8457dfe55624df2f",
+      "scored_lead_id": "scored_1d9001beb10dce80",
       "primary_parcel_id": "R09113-03-04",
       "display_address": "1407 SUMMERVILLE AVE, COLUMBIA, SC",
       "display_address_street": "1407 SUMMERVILLE AVE",
@@ -11203,7 +11203,7 @@
       "display_address_zip": "29201",
       "display_owner": "DUNN ALLYSON H",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 63,
+      "display_score": 60,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -11218,7 +11218,6 @@
         "tax_foreclosure_notice"
       ],
       "display_attributes": [
-        "absentee",
         "high_equity"
       ],
       "display_deal_paths": [
@@ -11239,11 +11238,11 @@
       "display_year_built": 1922,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "1414 ANTHONY AVE",
-      "display_owner_mailing_city": "COLUMBIA",
+      "display_owner_mailing_address": "1407 SUMMERVILLE AVE",
+      "display_owner_mailing_city": "Columbia",
       "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292011706",
-      "display_owner_mailing": "1414 ANTHONY AVE, COLUMBIA, SC 29201-1706",
+      "display_owner_mailing_zip": "29201",
+      "display_owner_mailing": "1407 SUMMERVILLE AVE, Columbia, SC 29201",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -11254,7 +11253,7 @@
         },
         {
           "factor": "attribute_bonus",
-          "delta": 8
+          "delta": 5
         }
       ],
       "evidence_ids": [],
