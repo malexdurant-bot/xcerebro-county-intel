@@ -329,68 +329,6 @@ def _build_probate_name_map(probate_events: list[dict]) -> dict[str, dict]:
     return out
 
 
-def _cross_ref_tps_addresses(
-    addresses: list[str],
-    decedent_name: str,
-    verbose: bool,
-) -> tuple[Optional[str], Optional[str]]:
-    """
-    For each address returned by TruePeopleSearch, look it up in the Shelby
-    County parcel layer and check whether the owner name matches the decedent.
-
-    Returns (confirmed_address_str, confirmed_parcel_id) or (None, None).
-    """
-    from scrapers.parcel_master_shelby import lookup_by_address
-
-    def _tokens(s: str) -> set[str]:
-        return {t for t in re.sub(r"[^A-Z ]", "", s.upper()).split() if len(t) > 1}
-
-    decedent_tokens = _tokens(decedent_name)
-
-    for raw_addr in addresses:
-        # Extract street portion for ArcGIS query
-        street_match = re.search(
-            r"\d{1,5}\s+[A-Z][A-Za-z ]{2,30}"
-            r"(?:St|Ave|Rd|Dr|Ln|Ct|Blvd|Way|Pl|Ter|Cir|Hwy|Pkwy|Pike)\b",
-            raw_addr,
-            re.IGNORECASE,
-        )
-        if not street_match:
-            # Fallback: first segment before comma
-            street = raw_addr.split(",")[0].strip().upper()
-        else:
-            street = street_match.group(0).strip().upper()
-
-        if len(street) < 5:
-            continue
-
-        try:
-            candidates = lookup_by_address(street, max_results=15)
-        except Exception as exc:
-            if verbose:
-                print(f"    [CrossRef] Parcel lookup error for {street!r}: {exc}", flush=True)
-            continue
-
-        for cand in candidates:
-            owner = (cand.get("OWNER") or "").strip().upper()
-            owner_tokens = _tokens(owner)
-            overlap = len(decedent_tokens & owner_tokens)
-            if overlap >= 2:
-                situs = (cand.get("PAR_ADDR1") or "").strip()
-                city = (cand.get("MUNI") or "Memphis").strip()
-                confirmed = f"{situs}, {city}, TN" if situs else None
-                parcel_id = (cand.get("PARCELID") or "").strip() or None
-                if verbose:
-                    print(
-                        f"    [CrossRef] Confirmed: {decedent_name!r} -> "
-                        f"{confirmed} (overlap={overlap})",
-                        flush=True,
-                    )
-                return confirmed, parcel_id
-
-    return None, None
-
-
 _PARCEL_MATCH_REVIEW_FLAGS: dict[str, str] = {
     "ambiguous_name": "parcel_match_ambiguous_common_name",
     "no_candidates": "parcel_match_not_found",
@@ -400,106 +338,32 @@ _PARCEL_MATCH_REVIEW_FLAGS: dict[str, str] = {
 }
 
 
-def _enrich_probate_contacts(
+def _annotate_probate_leads(
     scored_leads: list[dict],
     probate_name_map: dict[str, dict],
-    cache_path: Path,
-    verbose: bool,
     match_status: dict[str, str] | None = None,
 ) -> None:
     """
-    Post-pipeline TruePeopleSearch enrichment for probate scored leads.
+    Attach court-record details to probate scored leads (no skip tracing).
 
     For each probate lead:
-      1. Search TPS for decedent name -> collect listed addresses
-      2. Cross-reference each address with Shelby County parcel layer
-         to confirm property ownership
-      3. Search TPS for executor name -> collect phone numbers
-      4. Attach contact_info dict to the scored lead in place
-      5. Tag review_flags with *why* the parcel/skip-trace match failed
-         (ambiguous common name, no candidates, TPS blocked, etc.) so these
-         leads stay visible for manual client review instead of just
-         showing a blank address.
+      1. Attach contact_info with the executor named in the CourtConnect case
+      2. Tag review_flags with *why* the parcel match failed (ambiguous common
+         name, no candidates, etc.) so these leads stay visible for manual
+         client review instead of just showing a blank address.
 
-    Modifies scored_leads in place; never raises (failures logged and skipped).
+    Modifies scored_leads in place.
     """
     match_status = match_status or {}
-    try:
-        from scrapers.truepeoplesearch_shelby import batch_enrich_leads
-    except ImportError as exc:
-        print(f"  [CONTACT] TruePeopleSearch scraper unavailable: {exc}", flush=True)
-        return
-
-    probate_leads = [
-        lead for lead in scored_leads
-        if "probate_court_shelby" in lead.get("source_ids", [])
-    ]
-
-    if not probate_leads:
-        return
-
-    print(
-        f"\n[CONTACT] TruePeopleSearch enrichment for {len(probate_leads)} probate leads "
-        f"(cache: {cache_path.name})...",
-        flush=True,
-    )
-
-    # Build the batch input list (always includes executor_name from CourtConnect)
-    batch_input = []
-    for lead in probate_leads:
-        decedent_name = lead.get("owner_name", "").strip()
-        if not decedent_name:
+    for lead in scored_leads:
+        if "probate_court_shelby" not in lead.get("source_ids", []):
             continue
-        name_info = probate_name_map.get(decedent_name.upper(), {})
-        executor_name = name_info.get("executor_name", "")
-        batch_input.append({"decedent_name": decedent_name, "executor_name": executor_name})
-
-    # Run single-browser batch (4s inter-lead delay)
-    try:
-        tps_results = batch_enrich_leads(
-            batch_input,
-            city_state="Memphis TN",
-            inter_lead_delay=4.0,
-            cache_path=cache_path,
-            verbose=verbose,
-        )
-    except Exception as exc:
-        if verbose:
-            print(f"  [CONTACT] TPS batch error: {exc}", flush=True)
-        tps_results = {}
-
-    # Apply results to scored leads
-    enriched = 0
-    for lead in probate_leads:
         decedent_name = lead.get("owner_name", "").strip()
         if not decedent_name:
             continue
 
         name_info = probate_name_map.get(decedent_name.upper(), {})
-        executor_name = name_info.get("executor_name", "")
-        tps = tps_results.get(decedent_name.upper())
-
-        confirmed_address, confirmed_parcel_id = None, None
-        if tps:
-            confirmed_address, confirmed_parcel_id = _cross_ref_tps_addresses(
-                tps.get("tps_decedent_addresses", []),
-                decedent_name,
-                verbose,
-            )
-
-        lead["contact_info"] = {
-            "executor_name": executor_name or None,
-            "executor_phone": tps.get("executor_phone") if tps else None,
-            "confirmed_address": confirmed_address,
-            "confirmed_parcel_id": confirmed_parcel_id,
-            "tps_decedent_addresses": tps.get("tps_decedent_addresses", []) if tps else [],
-            "tps_enriched": bool(tps and tps.get("tps_enriched")),
-        }
-
-        if confirmed_address and not lead.get("parcel_display"):
-            lead["tps_confirmed_address"] = confirmed_address
-        if confirmed_parcel_id and not lead.get("primary_parcel_id"):
-            lead["tps_confirmed_parcel_id"] = confirmed_parcel_id
+        lead["contact_info"] = {"executor_name": name_info.get("executor_name") or None}
 
         flags = list(lead.get("review_flags") or [])
         parcel_flag = _PARCEL_MATCH_REVIEW_FLAGS.get(
@@ -507,18 +371,7 @@ def _enrich_probate_contacts(
         )
         if parcel_flag and parcel_flag not in flags:
             flags.append(parcel_flag)
-        if not lead["contact_info"]["tps_enriched"] and not confirmed_address:
-            if "skiptrace_unconfirmed" not in flags:
-                flags.append("skiptrace_unconfirmed")
         lead["review_flags"] = flags
-
-        enriched += 1
-
-    print(
-        f"  [CONTACT] Enriched {enriched}/{len(probate_leads)} probate leads "
-        f"(TPS hits: {sum(1 for r in tps_results.values() if r.get('tps_enriched'))})",
-        flush=True,
-    )
 
 
 # Name suffixes that must never be mistaken for a surname. Decedent names
@@ -1146,18 +999,15 @@ def run_pipeline(
     print(f"\n[RESULT] {len(scored_leads)} scored leads written to {result['scored_leads_path']}")
     print(f"  Semantic verdict: {result['semantic_verdict']}")
 
-    # --- Post-pipeline: TruePeopleSearch contact enrichment for probate ----
+    # --- Post-pipeline: executor name + parcel-match flags for probate -----
     if probate_events:
-        tps_cache = REPO_ROOT / "data" / "cache" / "tps_shelby.json"
-        _enrich_probate_contacts(
+        _annotate_probate_leads(
             scored_leads,
             probate_name_map,
-            cache_path=tps_cache,
-            verbose=verbose,
             match_status=probate_match_status,
         )
 
-    # --- Re-write scored_leads.json to include contact_info from enrichment --
+    # --- Re-write scored_leads.json to include contact_info ------------------
     if probate_events:
         scored_leads_path = result["scored_leads_path"]
         Path(scored_leads_path).write_text(
@@ -1175,22 +1025,16 @@ def run_pipeline(
         build_label="PARTIAL_BUILD",
     )
 
-    # Patch contact_info + tps_confirmed_address onto dashboard records.
-    # project_scored_lead (in the universal scaffold) doesn't know about
-    # Shelby probate enrichment fields; we merge them here.
+    # Patch contact_info onto dashboard records. project_scored_lead (in the
+    # universal scaffold) doesn't know about Shelby probate fields; we merge
+    # them here.
     _scored_by_id = {s["scored_lead_id"]: s for s in scored_leads}
     for rec in dashboard.get("records", []):
         _s = _scored_by_id.get(rec.get("scored_lead_id"))
-        if not _s:
-            continue
-        if _s.get("contact_info"):
+        if _s and _s.get("contact_info"):
             rec["contact_info"] = _s["contact_info"]
-        if _s.get("tps_confirmed_address"):
-            rec["tps_confirmed_address"] = _s["tps_confirmed_address"]
-        if _s.get("tps_confirmed_parcel_id"):
-            rec["tps_confirmed_parcel_id"] = _s["tps_confirmed_parcel_id"]
 
-    # Add primary_source_urls to each record (TPS detail URL for probate leads)
+    # Add primary_source_urls to each record
     for rec in dashboard.get("records", []):
         _s = _scored_by_id.get(rec.get("scored_lead_id"))
         if _s and _s.get("source_urls") and "primary_source_urls" not in rec:
@@ -1258,11 +1102,26 @@ def run_pipeline(
                  f"data: dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
                 cwd=str(_client_repo_dir), check=True, capture_output=True,
             )
-            _subprocess.run(
-                ["git", "push", "origin", "main"],
-                cwd=str(_client_repo_dir), check=True, capture_output=True, timeout=60,
-            )
-            print("  Client dashboard updated → https://shelbytn.justfriday.ai/")
+            # Push without pipes and with prompts disabled. On Windows a
+            # timed-out push leaves git's HTTPS/credential helper holding any
+            # captured pipes, and subprocess.run() then blocks forever draining
+            # them -- that hung the whole daily run until the task's 6h limit.
+            import os as _os
+            import tempfile as _tempfile
+            with _tempfile.TemporaryFile() as _push_err:
+                try:
+                    _subprocess.run(
+                        ["git", "push", "origin", "main"],
+                        cwd=str(_client_repo_dir), check=True, timeout=120,
+                        stdout=_subprocess.DEVNULL, stderr=_push_err,
+                        env={**_os.environ, "GIT_TERMINAL_PROMPT": "0", "GCM_INTERACTIVE": "never"},
+                    )
+                    print("  Client dashboard updated → https://shelbytn.justfriday.ai/")
+                except _subprocess.TimeoutExpired:
+                    print("  Client dashboard push timed out (non-fatal) — commit kept locally, pushes next run")
+                except _subprocess.CalledProcessError:
+                    _push_err.seek(0)
+                    print(f"  Client dashboard push failed (non-fatal): {_push_err.read().decode(errors='replace')[:200]}")
         except _subprocess.CalledProcessError as exc:
             _stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
             if "nothing to commit" in _stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):

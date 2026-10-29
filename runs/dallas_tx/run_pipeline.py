@@ -906,11 +906,27 @@ def main() -> None:
                  f"data: dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
                 cwd=str(_client_repo_dir), check=True, capture_output=True,
             )
-            _subprocess.run(
-                ["git", "push", "origin", "main"],
-                cwd=str(_client_repo_dir), check=True, capture_output=True, timeout=60,
-            )
-            print("[dallas_tx] Client dashboard updated → https://dallastx.justfriday.ai/")
+            # Push without pipes and with prompts disabled. On Windows a
+            # timed-out push leaves git's HTTPS/credential helper holding any
+            # captured pipes, and subprocess.run() then blocks draining them.
+            # A timeout here is non-fatal: the commit stays local and goes out
+            # with the next successful push.
+            import os as _os
+            import tempfile as _tempfile
+            with _tempfile.TemporaryFile() as _push_err:
+                try:
+                    _subprocess.run(
+                        ["git", "push", "origin", "main"],
+                        cwd=str(_client_repo_dir), check=True, timeout=120,
+                        stdout=_subprocess.DEVNULL, stderr=_push_err,
+                        env={**_os.environ, "GIT_TERMINAL_PROMPT": "0", "GCM_INTERACTIVE": "never"},
+                    )
+                    print("[dallas_tx] Client dashboard updated → https://dallastx.justfriday.ai/")
+                except _subprocess.TimeoutExpired:
+                    print("[dallas_tx] Client dashboard push timed out (non-fatal) — commit kept locally, pushes next run")
+                except _subprocess.CalledProcessError:
+                    _push_err.seek(0)
+                    print(f"[dallas_tx] Client dashboard push failed (non-fatal): {_push_err.read().decode(errors='replace')[:200]}")
         except _subprocess.CalledProcessError as exc:
             _stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
             if "nothing to commit" in _stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):

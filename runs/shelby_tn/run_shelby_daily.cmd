@@ -8,6 +8,9 @@ REM day's run. Whatever sources succeed still feed the pipeline in step 6/6,
 REM so one bad portal doesn't cost you every other source's leads for the day.
 setlocal
 
+REM Unbuffered output so the log shows exactly where a killed/hung run stopped.
+set PYTHONUNBUFFERED=1
+
 cd /d "C:\Users\makia\OneDrive\Documents\GitHub\xcerebro-county-intel"
 
 echo === Shelby Daily Lead Run: %DATE% %TIME% ===

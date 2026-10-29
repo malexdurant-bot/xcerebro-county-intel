@@ -531,11 +531,25 @@ def main() -> None:
              f"data(richland_sc): dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
             cwd=str(ROOT), check=True, capture_output=True,
         )
-        subprocess.run(
-            ["git", "push", "pages", "main"],
-            cwd=str(ROOT), check=True, capture_output=True, timeout=60,
-        )
-        print("[richland_sc] GitHub Pages updated → https://malexdurant-bot.github.io/xcerebro-county-intel/dashboard/")
+        # Push without pipes and with prompts disabled. On Windows a
+        # timed-out push leaves git's HTTPS/credential helper holding any
+        # captured pipes, and subprocess.run() then blocks draining them.
+        # A timeout here is non-fatal so Step 5b still publishes.
+        import tempfile  # noqa: PLC0415
+        with tempfile.TemporaryFile() as push_err:
+            try:
+                subprocess.run(
+                    ["git", "push", "pages", "main"],
+                    cwd=str(ROOT), check=True, timeout=120,
+                    stdout=subprocess.DEVNULL, stderr=push_err,
+                    env={**os.environ, "GIT_TERMINAL_PROMPT": "0", "GCM_INTERACTIVE": "never"},
+                )
+                print("[richland_sc] GitHub Pages updated → https://malexdurant-bot.github.io/xcerebro-county-intel/dashboard/")
+            except subprocess.TimeoutExpired:
+                print("[richland_sc] GitHub Pages push timed out (non-fatal) — commit kept locally, pushes next run")
+            except subprocess.CalledProcessError:
+                push_err.seek(0)
+                print(f"[richland_sc] GitHub Pages push failed (non-fatal): {push_err.read().decode(errors='replace')[:200]}")
     except subprocess.CalledProcessError as exc:
         # Non-fatal — pipeline succeeded even if publish fails
         stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
