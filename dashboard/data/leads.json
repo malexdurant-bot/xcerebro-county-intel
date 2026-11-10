@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-09T15:05:06Z",
+  "generated_at": "2026-11-10T15:47:13Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -7,8 +7,8 @@
   "semantic_verdict": "DEPLOY_OK",
   "lead_total": 2825,
   "enrichment_breakdown": {
-    "ENRICHED": 2531,
-    "UNENRICHED": 294
+    "ENRICHED": 2508,
+    "UNENRICHED": 317
   },
   "pattern_counts": {
     "estate": 410,
@@ -18,12 +18,12 @@
     "tax": 2263
   },
   "attribute_counts": {
-    "absentee": 1507,
-    "entity_owned": 510,
-    "free_and_clear": 422,
-    "high_equity": 1026,
-    "long_term_owned": 824,
-    "out_of_state": 220,
+    "absentee": 1495,
+    "entity_owned": 506,
+    "free_and_clear": 420,
+    "high_equity": 1020,
+    "long_term_owned": 821,
+    "out_of_state": 218,
     "senior_owner": 53,
     "vacant": 10
   },
@@ -36,12 +36,12 @@
     "Archive": 18,
     "Hot": 1,
     "Low": 79,
-    "Strong": 592,
-    "Workable": 2135
+    "Strong": 589,
+    "Workable": 2138
   },
   "deal_path_distribution": {
     "messy_title": 75,
-    "partial_interest": 87,
+    "partial_interest": 86,
     "sub_to": 29,
     "wholesale": 2825
   },
@@ -1000,7 +1000,7 @@
     },
     {
       "lead_id": "lead_parcel_17208-04-23",
-      "scored_lead_id": "scored_afe5f33682ca3018",
+      "scored_lead_id": "scored_9d72c5da414d9ddf",
       "primary_parcel_id": "17208-04-23",
       "display_address": "208 BIRCHFIELD DR, COLUMBIA, SC",
       "display_address_street": "208 BIRCHFIELD DR",
@@ -1009,7 +1009,7 @@
       "display_address_zip": "29203",
       "display_owner": "Luther Porter",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 67,
+      "display_score": 70,
       "display_tier": "Strong",
       "display_patterns": [
         "foreclosure"
@@ -1025,7 +1025,7 @@
       ],
       "display_attributes": [
         "absentee",
-        "entity_owned",
+        "high_equity",
         "out_of_state"
       ],
       "display_deal_paths": [
@@ -1047,16 +1047,16 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 278000.0,
-      "display_last_sale_price": 200000.0,
-      "display_last_sale_date": "2026-09-28",
+      "display_last_sale_price": 5.0,
+      "display_last_sale_date": "2026-10-16",
       "display_year_built": 2014,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "2460 PASEO VERDE PKWY STE 110",
-      "display_owner_mailing_city": "HENDERSON",
-      "display_owner_mailing_state": "NV",
-      "display_owner_mailing_zip": "890747136",
-      "display_owner_mailing": "2460 PASEO VERDE PKWY STE 110, HENDERSON, NV 89074-7136",
+      "display_owner_mailing_address": "3401 W END AVE # 760W",
+      "display_owner_mailing_city": "NASHVILLE",
+      "display_owner_mailing_state": "TN",
+      "display_owner_mailing_zip": "372031042",
+      "display_owner_mailing": "3401 W END AVE # 760W, NASHVILLE, TN 37203-1042",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -1067,7 +1067,7 @@
         },
         {
           "factor": "attribute_bonus",
-          "delta": 7
+          "delta": 10
         }
       ],
       "evidence_ids": [],
@@ -4305,13 +4305,13 @@
     },
     {
       "lead_id": "lead_parcel_R03206-01-69",
-      "scored_lead_id": "scored_e3933c6598c2a197",
+      "scored_lead_id": "scored_6cfa9f0156f49846",
       "primary_parcel_id": "R03206-01-69",
-      "display_address": "413 LEAMINGTON WAY, IRMO, SC",
-      "display_address_street": "413 LEAMINGTON WAY",
-      "display_address_city": "IRMO",
-      "display_address_state": "SC",
-      "display_address_zip": "29063",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "LINDA GRIST HAYES",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -4341,17 +4341,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 304800.0,
-      "display_last_sale_price": 265000.0,
-      "display_last_sale_date": "2022-06-01",
-      "display_year_built": 1999,
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "413 LEAMINGTON WAY",
-      "display_owner_mailing_city": "IRMO",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290638189",
-      "display_owner_mailing": "413 LEAMINGTON WAY, IRMO, SC 29063-8189",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -4364,7 +4364,7 @@
       "evidence_ids": [],
       "primary_event_date": "2026-05-21",
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/"
@@ -13923,13 +13923,13 @@
     },
     {
       "lead_id": "lead_parcel_R06103-01-07",
-      "scored_lead_id": "scored_efe5dd36422d67cc",
+      "scored_lead_id": "scored_4c30467d5c191633",
       "primary_parcel_id": "R06103-01-07",
-      "display_address": "110 MAGGIE HIPP RD, COLUMBIA, SC",
-      "display_address_street": "110 MAGGIE HIPP RD",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29210",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "GOLDEN CLAUDIA L",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -13959,17 +13959,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 100800.0,
+      "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
-      "display_year_built": 1984,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "110 MAGGIE HIPP RD",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292104334",
-      "display_owner_mailing": "110 MAGGIE HIPP RD, COLUMBIA, SC 29210-4334",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -13982,7 +13982,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -77743,13 +77743,13 @@
     },
     {
       "lead_id": "lead_parcel_R12300-08-11",
-      "scored_lead_id": "scored_cc4023143f9f7ea6",
+      "scored_lead_id": "scored_34d9afc74229f3a7",
       "primary_parcel_id": "R12300-08-11",
-      "display_address": "1002 LORICK RD, BLYTHEWOOD, SC",
-      "display_address_street": "1002 LORICK RD",
-      "display_address_city": "BLYTHEWOOD",
-      "display_address_state": "SC",
-      "display_address_zip": "29016",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "Shanel W Jackson",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 47,
@@ -77787,17 +77787,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "REVIEW_REQUIRED",
-      "display_assessed_value": 115100.0,
-      "display_last_sale_price": 140000.0,
-      "display_last_sale_date": "2022-07-25",
-      "display_year_built": 1979,
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "1002 LORICK RD",
-      "display_owner_mailing_city": "BLYTHEWOOD",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290169618",
-      "display_owner_mailing": "1002 LORICK RD, BLYTHEWOOD, SC 29016-9618",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 2,
@@ -77816,7 +77816,7 @@
       "review_flags": [
         "lis_pendens_review"
       ],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/public-notices-1849/",
         "https://www.thecolumbiastar.com/articles/public-notices-1850/",
@@ -84162,16 +84162,16 @@
     },
     {
       "lead_id": "lead_parcel_R13804-16-14",
-      "scored_lead_id": "scored_1eb6eae8cf1eae80",
+      "scored_lead_id": "scored_2fcd5c8c15762aa2",
       "primary_parcel_id": "R13804-16-14",
-      "display_address": "614 SIMS AVE, COLUMBIA, SC",
-      "display_address_street": "614 SIMS AVE",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29205",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "JASON MICHAEL SCHMIDT",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 58,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "estate"
@@ -84185,9 +84185,7 @@
       "display_doc_types": [
         "letters_testamentary"
       ],
-      "display_attributes": [
-        "absentee"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -84200,17 +84198,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 470600.0,
-      "display_last_sale_price": 515000.0,
-      "display_last_sale_date": "2021-12-17",
-      "display_year_built": 1989,
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "108 SIR EDWARDS LN",
-      "display_owner_mailing_city": "LEXINGTON",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290727092",
-      "display_owner_mailing": "108 SIR EDWARDS LN, LEXINGTON, SC 29072-7092",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -84218,16 +84216,12 @@
         {
           "factor": "base_LETTERS_TESTAMENTARY",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 3
         }
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-08-26",
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-899/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-900/",
@@ -108270,13 +108264,13 @@
     },
     {
       "lead_id": "lead_parcel_R16842-01-33",
-      "scored_lead_id": "scored_22ffb808abd5a977",
+      "scored_lead_id": "scored_d177d7c820430773",
       "primary_parcel_id": "R16842-01-33",
-      "display_address": "3630 RANCH RD 94 APT, COLUMBIA, SC",
-      "display_address_street": "3630 RANCH RD 94 APT",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29206",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "ARETE WELLESLEY  HOLDINGS LL",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -108309,13 +108303,13 @@
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
-      "display_year_built": 1971,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "",
-      "display_owner_mailing_city": "",
-      "display_owner_mailing_state": "",
-      "display_owner_mailing_zip": "",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
       "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
@@ -108329,7 +108323,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -111108,13 +111102,13 @@
     },
     {
       "lead_id": "lead_parcel_R16842-02-47",
-      "scored_lead_id": "scored_e6841890679f6997",
+      "scored_lead_id": "scored_e80b08b84cecc6fb",
       "primary_parcel_id": "R16842-02-47",
-      "display_address": "3630 RANCH RD 126 APT, COLUMBIA, SC",
-      "display_address_street": "3630 RANCH RD 126 APT",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29206",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "ARETE WELLESLEY  HOLDINGS LL",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -111147,13 +111141,13 @@
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
-      "display_year_built": 1971,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "",
-      "display_owner_mailing_city": "",
-      "display_owner_mailing_state": "",
-      "display_owner_mailing_zip": "",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
       "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
@@ -111167,7 +111161,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -111175,13 +111169,13 @@
     },
     {
       "lead_id": "lead_parcel_R16842-02-48",
-      "scored_lead_id": "scored_52add63b2f8edb0b",
+      "scored_lead_id": "scored_0b61b0749e35a41f",
       "primary_parcel_id": "R16842-02-48",
-      "display_address": "3630 RANCH RD 125 APT, COLUMBIA, SC",
-      "display_address_street": "3630 RANCH RD 125 APT",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29206",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "ARETE WELLESLEY  HOLDINGS LL",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -111214,13 +111208,13 @@
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
-      "display_year_built": 1971,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "",
-      "display_owner_mailing_city": "",
-      "display_owner_mailing_state": "",
-      "display_owner_mailing_zip": "",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
       "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
@@ -111234,7 +111228,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -120260,16 +120254,16 @@
     },
     {
       "lead_id": "lead_parcel_R17500-03-58",
-      "scored_lead_id": "scored_c4390c994a537411",
+      "scored_lead_id": "scored_c74768fb75a65350",
       "primary_parcel_id": "R17500-03-58",
-      "display_address": "W/S LONGTOWN RD SC, SC",
-      "display_address_street": "W/S LONGTOWN RD SC",
-      "display_address_city": "",
-      "display_address_state": "SC",
-      "display_address_zip": "",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "BRICKYARD LONGTOWN LLC.",
       "display_owner_type": "ENTITY",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -120283,10 +120277,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "entity_owned"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -120299,17 +120290,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 200.0,
+      "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "441 WESTERN LN",
-      "display_owner_mailing_city": "IRMO",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290630000",
-      "display_owner_mailing": "441 WESTERN LN, IRMO, SC 29063-0000",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -120317,16 +120308,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -124160,16 +124147,16 @@
     },
     {
       "lead_id": "lead_parcel_R19114-01-09",
-      "scored_lead_id": "scored_343cb7462a70c99a",
+      "scored_lead_id": "scored_1beac40232966d4b",
       "primary_parcel_id": "R19114-01-09",
-      "display_address": "9513 COMMONWEALTH BLVD, COLUMBIA, SC",
-      "display_address_street": "9513 COMMONWEALTH BLVD",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "ZR PROPERTIES LLC",
       "display_owner_type": "ENTITY",
-      "display_score": 62,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -124183,11 +124170,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "entity_owned",
-        "out_of_state"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -124200,17 +124183,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 10000.0,
-      "display_last_sale_price": 48000.0,
-      "display_last_sale_date": "2023-08-18",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "3995 BONNETT CREEK LN",
-      "display_owner_mailing_city": "HOSCHTON",
-      "display_owner_mailing_state": "GA",
-      "display_owner_mailing_zip": "305486205",
-      "display_owner_mailing": "3995 BONNETT CREEK LN, HOSCHTON, GA 30548-6205",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -124218,16 +124201,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 7
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -124235,16 +124214,16 @@
     },
     {
       "lead_id": "lead_parcel_R19114-02-05",
-      "scored_lead_id": "scored_50e48131a84f7c2c",
+      "scored_lead_id": "scored_2e872f611df3b7fa",
       "primary_parcel_id": "R19114-02-05",
-      "display_address": "9526 COMMONWEALTH BLVD, COLUMBIA, SC",
-      "display_address_street": "9526 COMMONWEALTH BLVD",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "KN DAVIS INC",
       "display_owner_type": "ENTITY",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -124258,10 +124237,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "entity_owned"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -124274,17 +124250,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 15000.0,
-      "display_last_sale_price": 15000.0,
-      "display_last_sale_date": "2025-03-31",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "2801 LEAPHART RD",
-      "display_owner_mailing_city": "WEST COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "291693312",
-      "display_owner_mailing": "2801 LEAPHART RD, WEST COLUMBIA, SC 29169-3312",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -124292,16 +124268,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 5
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -124309,16 +124281,16 @@
     },
     {
       "lead_id": "lead_parcel_R19114-05-17",
-      "scored_lead_id": "scored_8b9e07c077f1c208",
+      "scored_lead_id": "scored_7f69a7ca7cbf0bd1",
       "primary_parcel_id": "R19114-05-17",
-      "display_address": "5 BLACKWELL CIR, COLUMBIA, SC",
-      "display_address_street": "5 BLACKWELL CIR",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "POWELL RUSSELL L",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 61,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -124332,10 +124304,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "long_term_owned"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -124348,17 +124317,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 117100.0,
-      "display_last_sale_price": 75000.0,
-      "display_last_sale_date": "2009-02-02",
-      "display_year_built": 1990,
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "P O BOX 9901",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292900000",
-      "display_owner_mailing": "P O BOX 9901, COLUMBIA, SC 29290-0000",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -124366,16 +124335,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 6
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -124383,13 +124348,13 @@
     },
     {
       "lead_id": "lead_parcel_R19116-05-16",
-      "scored_lead_id": "scored_32d0af7af9120746",
+      "scored_lead_id": "scored_a35cbc02c3fa5d05",
       "primary_parcel_id": "R19116-05-16",
-      "display_address": "2818 BERKELEY FOREST DR, COLUMBIA, SC",
-      "display_address_street": "2818 BERKELEY FOREST DR",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "MULLEN TERESA",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -124419,17 +124384,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 144800.0,
+      "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
-      "display_year_built": 1974,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "2818 BERKELEY FOREST DR",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292094155",
-      "display_owner_mailing": "2818 BERKELEY FOREST DR, COLUMBIA, SC 29209-4155",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -124442,7 +124407,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -124822,97 +124787,16 @@
     },
     {
       "lead_id": "lead_parcel_R19203-14-02",
-      "scored_lead_id": "scored_c4aa5ddc584d39b7",
+      "scored_lead_id": "scored_e7fe2c294b65eb23",
       "primary_parcel_id": "R19203-14-02",
-      "display_address": "1604 ALMA RD, COLUMBIA, SC",
-      "display_address_street": "1604 ALMA RD",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "CHARLENE STEWART MODE",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 66,
-      "display_tier": "Strong",
-      "display_patterns": [
-        "estate"
-      ],
-      "stack_contrib_patterns": [
-        "estate"
-      ],
-      "display_pattern_set": [
-        "estate"
-      ],
-      "display_doc_types": [
-        "letters_testamentary"
-      ],
-      "display_attributes": [
-        "free_and_clear",
-        "high_equity",
-        "long_term_owned"
-      ],
-      "display_deal_paths": [
-        "partial_interest",
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "partial_interest",
-          "confidence": "high",
-          "rationale": "Estate pattern paired with intra-family transfer or long-held parcel; multiple heirs likely."
-        },
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 185000.0,
-      "display_last_sale_price": 1.0,
-      "display_last_sale_date": "2008-08-19",
-      "display_year_built": 1973,
-      "display_is_absentee_owner": null,
-      "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "1604 ALMA RD",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292090000",
-      "display_owner_mailing": "1604 ALMA RD, COLUMBIA, SC 29209-0000",
-      "display_years_tax_delinquent": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_LETTERS_TESTAMENTARY",
-          "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 11
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": "2026-10-23",
-      "review_flags": [],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-907/"
-      ],
-      "display_recency_bucket": "Aged"
-    },
-    {
-      "lead_id": "lead_parcel_R19205-07-06",
-      "scored_lead_id": "scored_14bbb5c76b303267",
-      "primary_parcel_id": "R19205-07-06",
-      "display_address": "7507 TYSON ST, COLUMBIA, SC",
-      "display_address_street": "7507 TYSON ST",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
-      "display_owner": "HELEN MCKENZIE TRULUCK",
-      "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "estate"
@@ -124926,9 +124810,7 @@
       "display_doc_types": [
         "letters_testamentary"
       ],
-      "display_attributes": [
-        "high_equity"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -124941,17 +124823,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 60600.0,
-      "display_last_sale_price": 5.0,
-      "display_last_sale_date": "2021-10-13",
-      "display_year_built": 1961,
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "7507 TYSON ST",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292094009",
-      "display_owner_mailing": "7507 TYSON ST, COLUMBIA, SC 29209-4009",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -124959,16 +124841,79 @@
         {
           "factor": "base_LETTERS_TESTAMENTARY",
           "delta": 55
-        },
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": "2026-10-23",
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-907/"
+      ],
+      "display_recency_bucket": "Aged"
+    },
+    {
+      "lead_id": "lead_parcel_R19205-07-06",
+      "scored_lead_id": "scored_bfc2e581633edb0c",
+      "primary_parcel_id": "R19205-07-06",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "HELEN MCKENZIE TRULUCK",
+      "display_owner_type": "INDIVIDUAL",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "estate"
+      ],
+      "stack_contrib_patterns": [
+        "estate"
+      ],
+      "display_pattern_set": [
+        "estate"
+      ],
+      "display_doc_types": [
+        "letters_testamentary"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
         {
-          "factor": "attribute_bonus",
-          "delta": 5
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_LETTERS_TESTAMENTARY",
+          "delta": 55
         }
       ],
       "evidence_ids": [],
       "primary_event_date": "2026-06-02",
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/"
@@ -125556,16 +125501,16 @@
     },
     {
       "lead_id": "lead_parcel_R19213-02-28",
-      "scored_lead_id": "scored_e8dac7e71c1d56d4",
+      "scored_lead_id": "scored_f0f0ec860132af92",
       "primary_parcel_id": "R19213-02-28",
-      "display_address": "2616 BANNER HILL RD, COLUMBIA, SC",
-      "display_address_street": "2616 BANNER HILL RD",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "DAVIS HAROLD S",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 58,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -125579,9 +125524,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -125594,17 +125537,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 16800.0,
+      "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "1628 LAKE RD",
-      "display_owner_mailing_city": "RIDGEWAY",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "291300000",
-      "display_owner_mailing": "1628 LAKE RD, RIDGEWAY, SC 29130-0000",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -125612,16 +125555,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 3
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -125629,16 +125568,16 @@
     },
     {
       "lead_id": "lead_parcel_R19216-02-23",
-      "scored_lead_id": "scored_12d749783cb49aee",
+      "scored_lead_id": "scored_b405556d8c68ab51",
       "primary_parcel_id": "R19216-02-23",
-      "display_address": "2605 PLEASANT RIDGE DR, COLUMBIA, SC",
-      "display_address_street": "2605 PLEASANT RIDGE DR",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "WILLIAMS MELVIN",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 61,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -125652,10 +125591,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "long_term_owned"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -125668,17 +125604,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 21000.0,
-      "display_last_sale_price": 12500.0,
-      "display_last_sale_date": "1994-10-19",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "226 JIM WILLIAMS RD",
-      "display_owner_mailing_city": "EASTOVER",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290440000",
-      "display_owner_mailing": "226 JIM WILLIAMS RD, EASTOVER, SC 29044-0000",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -125686,16 +125622,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 6
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -125703,92 +125635,16 @@
     },
     {
       "lead_id": "lead_parcel_R19216-05-06",
-      "scored_lead_id": "scored_8e5fa946feeeb87d",
+      "scored_lead_id": "scored_d99daa9c35d5a001",
       "primary_parcel_id": "R19216-05-06",
-      "display_address": "7501 MOUNTAINBROOK DR, COLUMBIA, SC",
-      "display_address_street": "7501 MOUNTAINBROOK DR",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29209",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "POWELL RUSSELL L",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 67,
-      "display_tier": "Strong",
-      "display_patterns": [
-        "tax"
-      ],
-      "stack_contrib_patterns": [
-        "tax"
-      ],
-      "display_pattern_set": [
-        "tax"
-      ],
-      "display_doc_types": [
-        "tax_foreclosure_notice"
-      ],
-      "display_attributes": [
-        "absentee",
-        "free_and_clear",
-        "high_equity",
-        "long_term_owned"
-      ],
-      "display_deal_paths": [
-        "wholesale"
-      ],
-      "display_deal_path_details": [
-        {
-          "path": "wholesale",
-          "confidence": "moderate",
-          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
-        }
-      ],
-      "display_title_complexity_tier": "None",
-      "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 162400.0,
-      "display_last_sale_price": 42000.0,
-      "display_last_sale_date": "2004-09-14",
-      "display_year_built": 1972,
-      "display_is_absentee_owner": null,
-      "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "7501 MOUNTAINBROOK DR",
-      "display_owner_mailing_city": "HOPKINS",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290610000",
-      "display_owner_mailing": "7501 MOUNTAINBROOK DR, HOPKINS, SC 29061-0000",
-      "display_years_tax_delinquent": null,
-      "display_match_confidence": 0,
-      "stack_depth": 1,
-      "score_reasons": [
-        {
-          "factor": "base_TAX_FORECLOSURE_NOTICE",
-          "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 12
-        }
-      ],
-      "evidence_ids": [],
-      "primary_event_date": null,
-      "review_flags": [],
-      "enrichment_status": "ENRICHED",
-      "primary_source_urls": [
-        "https://richlandmaps.com/apps/delinquent/"
-      ],
-      "display_recency_bucket": "Active"
-    },
-    {
-      "lead_id": "lead_parcel_R19604-04-43",
-      "scored_lead_id": "scored_c837d969ba086e9b",
-      "primary_parcel_id": "R19604-04-43",
-      "display_address": "1622 MORNINGLO LN, COLUMBIA, SC",
-      "display_address_street": "1622 MORNINGLO LN",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29223",
-      "display_owner": "THE SUPPLEMENTAL NEEDS TRUST",
-      "display_owner_type": "TRUST",
-      "display_score": 63,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -125802,10 +125658,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "high_equity"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -125818,17 +125671,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 44900.0,
-      "display_last_sale_price": 5.0,
-      "display_last_sale_date": "2024-03-29",
-      "display_year_built": 1957,
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "61 DINWOOD CIR",
-      "display_owner_mailing_city": "Columbia",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "29204",
-      "display_owner_mailing": "61 DINWOOD CIR, Columbia, SC 29204",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -125836,16 +125689,79 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 8
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
+      "primary_source_urls": [
+        "https://richlandmaps.com/apps/delinquent/"
+      ],
+      "display_recency_bucket": "Active"
+    },
+    {
+      "lead_id": "lead_parcel_R19604-04-43",
+      "scored_lead_id": "scored_94d45f482b8f509e",
+      "primary_parcel_id": "R19604-04-43",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
+      "display_owner": "THE SUPPLEMENTAL NEEDS TRUST",
+      "display_owner_type": "TRUST",
+      "display_score": 55,
+      "display_tier": "Workable",
+      "display_patterns": [
+        "tax"
+      ],
+      "stack_contrib_patterns": [
+        "tax"
+      ],
+      "display_pattern_set": [
+        "tax"
+      ],
+      "display_doc_types": [
+        "tax_foreclosure_notice"
+      ],
+      "display_attributes": [],
+      "display_deal_paths": [
+        "wholesale"
+      ],
+      "display_deal_path_details": [
+        {
+          "path": "wholesale",
+          "confidence": "moderate",
+          "rationale": "Single-signal distress; lower-conviction wholesale candidate."
+        }
+      ],
+      "display_title_complexity_tier": "None",
+      "display_lead_status": "APPROVED_FOR_DASHBOARD",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
+      "display_years_tax_delinquent": null,
+      "display_match_confidence": 0,
+      "stack_depth": 1,
+      "score_reasons": [
+        {
+          "factor": "base_TAX_FORECLOSURE_NOTICE",
+          "delta": 55
+        }
+      ],
+      "evidence_ids": [],
+      "primary_event_date": null,
+      "review_flags": [],
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -126776,17 +126692,17 @@
     },
     {
       "lead_id": "lead_parcel_R19702-11-14",
-      "scored_lead_id": "scored_46562554b488be24",
+      "scored_lead_id": "scored_7178ea92ab54aa5f",
       "primary_parcel_id": "R19702-11-14",
-      "display_address": "2026 MORNINGLO LN, COLUMBIA, SC",
-      "display_address_street": "2026 MORNINGLO LN",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29223",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "SECRETARY OF VETERANS AFFAIR",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 65,
-      "display_tier": "Strong",
+      "display_score": 55,
+      "display_tier": "Workable",
       "display_patterns": [
         "tax"
       ],
@@ -126799,11 +126715,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "high_equity",
-        "out_of_state"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -126816,17 +126728,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 13200.0,
-      "display_last_sale_price": 5224.0,
-      "display_last_sale_date": "2026-06-11",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "ATTN:BANK OF AMERICA 2380 PERFORMANCE DR BLDG C",
-      "display_owner_mailing_city": "RICHARDSON",
-      "display_owner_mailing_state": "TX",
-      "display_owner_mailing_zip": "750824333",
-      "display_owner_mailing": "ATTN:BANK OF AMERICA 2380 PERFORMANCE DR BLDG C, RICHARDSON, TX 75082-4333",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -126834,16 +126746,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 10
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -128022,13 +127930,13 @@
     },
     {
       "lead_id": "lead_parcel_R19901-07-02",
-      "scored_lead_id": "scored_7cc8f8074bb74e67",
+      "scored_lead_id": "scored_ba3419bd7b7e900e",
       "primary_parcel_id": "R19901-07-02",
-      "display_address": "3028 AINTREE DR, COLUMBIA, SC",
-      "display_address_street": "3028 AINTREE DR",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29223",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "STAALEY RONALD",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -128061,13 +127969,13 @@
       "display_assessed_value": null,
       "display_last_sale_price": null,
       "display_last_sale_date": null,
-      "display_year_built": 1970,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "",
-      "display_owner_mailing_city": "",
-      "display_owner_mailing_state": "",
-      "display_owner_mailing_zip": "",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
       "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
@@ -128081,7 +127989,7 @@
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -128089,13 +127997,13 @@
     },
     {
       "lead_id": "lead_parcel_R19901-08-05",
-      "scored_lead_id": "scored_74cb2600027366e9",
+      "scored_lead_id": "scored_d162d28aa36fe5c9",
       "primary_parcel_id": "R19901-08-05",
-      "display_address": "3016 WOODWAY LN, COLUMBIA, SC",
-      "display_address_street": "3016 WOODWAY LN",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29223",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "JOSEPH ANTHONY EDWARD DUDZIK",
       "display_owner_type": "INDIVIDUAL",
       "display_score": 55,
@@ -128125,17 +128033,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 109100.0,
-      "display_last_sale_price": 79900.0,
-      "display_last_sale_date": "2016-07-21",
-      "display_year_built": 1968,
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "3016 WOODWAY LN",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292230000",
-      "display_owner_mailing": "3016 WOODWAY LN, COLUMBIA, SC 29223-0000",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -128148,7 +128056,7 @@
       "evidence_ids": [],
       "primary_event_date": "2026-06-01",
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-887/",
         "https://www.thecolumbiastar.com/articles/notice-to-creditors-of-estates-888/",
@@ -128158,16 +128066,16 @@
     },
     {
       "lead_id": "lead_parcel_R19902-02-04",
-      "scored_lead_id": "scored_0a721249654cd477",
+      "scored_lead_id": "scored_b5f4c63004168034",
       "primary_parcel_id": "R19902-02-04",
-      "display_address": "509 HORSESHOE CIR, COLUMBIA, SC",
-      "display_address_street": "509 HORSESHOE CIR",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29223",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "STONE CYNTHIA /ETAL",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 63,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -128181,10 +128089,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "high_equity"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -128197,17 +128102,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 16100.0,
-      "display_last_sale_price": 5.0,
-      "display_last_sale_date": "2025-12-03",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "608 N BRICKYARD RD",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292238217",
-      "display_owner_mailing": "608 N BRICKYARD RD, COLUMBIA, SC 29223-8217",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -128215,16 +128120,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 8
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
@@ -131141,7 +131042,7 @@
     },
     {
       "lead_id": "lead_parcel_R20101-02-08",
-      "scored_lead_id": "scored_de65c417966798c3",
+      "scored_lead_id": "scored_ab1a170f095eb3de",
       "primary_parcel_id": "R20101-02-08",
       "display_address": "912 FLORA DR, COLUMBIA, SC",
       "display_address_street": "912 FLORA DR",
@@ -131150,7 +131051,7 @@
       "display_address_zip": "29223",
       "display_owner": "BURLESON DARRIEL A",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 60,
+      "display_score": 63,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -131166,7 +131067,8 @@
       ],
       "display_attributes": [
         "absentee",
-        "entity_owned"
+        "entity_owned",
+        "long_term_owned"
       ],
       "display_deal_paths": [
         "wholesale"
@@ -131181,8 +131083,8 @@
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
       "display_assessed_value": 57600.0,
-      "display_last_sale_price": 90000.0,
-      "display_last_sale_date": "2026-10-23",
+      "display_last_sale_price": 66000.0,
+      "display_last_sale_date": "1997-09-16",
       "display_year_built": 1981,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
@@ -131201,7 +131103,7 @@
         },
         {
           "factor": "attribute_bonus",
-          "delta": 5
+          "delta": 8
         }
       ],
       "evidence_ids": [],
@@ -184965,16 +184867,16 @@
     },
     {
       "lead_id": "lead_parcel_R38700-04-47",
-      "scored_lead_id": "scored_a24db24e856db237",
+      "scored_lead_id": "scored_c35d3b2650863b47",
       "primary_parcel_id": "R38700-04-47",
-      "display_address": "N/S BLUFF RD SC, SC",
-      "display_address_street": "N/S BLUFF RD SC",
-      "display_address_city": "",
-      "display_address_state": "SC",
-      "display_address_zip": "",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "FREEMAN OJETTA JONES",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 63,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -184988,10 +184890,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "high_equity"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -185004,17 +184903,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 6600.0,
-      "display_last_sale_price": 1.0,
-      "display_last_sale_date": "2015-04-27",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
       "display_year_built": null,
       "display_is_absentee_owner": null,
       "display_is_out_of_state_owner": null,
-      "display_owner_mailing_address": "204 HARWOOD DR",
-      "display_owner_mailing_city": "HOPKINS",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "290610000",
-      "display_owner_mailing": "204 HARWOOD DR, HOPKINS, SC 29061-0000",
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -185022,16 +184921,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 8
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
