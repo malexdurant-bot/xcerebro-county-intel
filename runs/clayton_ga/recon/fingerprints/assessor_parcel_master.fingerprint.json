@@ -1,0 +1,30 @@
+{
+  "url": "https://publicaccess.claytoncountyga.gov/search/commonsearch.aspx?mode=realprop",
+  "portal_type": "tyler_iasworld_public_access",
+  "portal_family": "Tyler iasWorld Public Access",
+  "access_pattern": "static_html",
+  "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+  "public_access_status": "FULL_PUBLIC_ACCESS",
+  "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+  "search_fields": [
+    "parcel id",
+    "owner",
+    "address",
+    "advanced/sales search"
+  ],
+  "records_available": [
+    "owner",
+    "mailing address",
+    "situs",
+    "values",
+    "sales",
+    "tax bill"
+  ],
+  "verification_note": "Root redirects to Search/Disclaimer.aspx (click-through disclaimer, session cookie). Tyler branding in page. County assessor page also links Schneider Beacon AppID=1234 (Cloudflare challenge to plain HTTP) and an ArcGIS Experience parcel map.",
+  "known_limitations": [
+    "Disclaimer acceptance sets a session; scraper must accept it",
+    "ENRICHMENT ONLY \u2014 never originates a lead"
+  ],
+  "source_id": "assessor_parcel_master",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

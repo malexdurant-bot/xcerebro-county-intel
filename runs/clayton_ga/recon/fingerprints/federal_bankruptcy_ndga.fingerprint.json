@@ -1,0 +1,23 @@
+{
+  "url": "https://www.ganb.uscourts.gov/",
+  "portal_type": "pacer_cmecf",
+  "portal_family": "PACER / CM/ECF",
+  "access_pattern": "paywall",
+  "access_method": "PAID_SUBSCRIPTION_REQUIRED",
+  "public_access_status": "LOGIN_REQUIRED",
+  "document_access_status": "DOCUMENTS_PAID_SUBSCRIPTION_REQUIRED",
+  "search_fields": [
+    "name",
+    "case number",
+    "filed date"
+  ],
+  "records_available": [
+    "bankruptcy petitions",
+    "debtor names and addresses",
+    "schedules"
+  ],
+  "verification_note": "ganb.uscourts.gov reachable; case data is via PACER, which requires a funded account. Per \u00a701.27 q11: flag for operator decision, do not auto-resolve.",
+  "known_limitations": [],
+  "source_id": "federal_bankruptcy_ndga",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

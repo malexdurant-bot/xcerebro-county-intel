@@ -1,0 +1,30 @@
+{
+  "url": "https://www.georgiaprobaterecords.com/",
+  "portal_type": "aspnet_webforms_telerik",
+  "portal_family": "georgiaprobaterecords.com (Council of Probate Court Judges of Georgia portal)",
+  "access_pattern": "spa_with_api",
+  "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+  "public_access_status": "FULL_PUBLIC_ACCESS",
+  "document_access_status": "DOCUMENTS_PUBLIC",
+  "search_fields": [
+    "county",
+    "last/first name",
+    "deceased date range",
+    "filed date range",
+    "case number"
+  ],
+  "records_available": [
+    "estates",
+    "wills",
+    "guardianships",
+    "deaths",
+    "hearing calendars"
+  ],
+  "verification_note": "County probate page instructs: go to georgiaprobaterecords.com > Estates > select Clayton > search by name or by Deceased/Filed date range; 'estate records can be viewed online at no cost'; available documents show a PDF icon. Portal reachable (HTTP 200, Cloudflare front, no challenge to plain GET). A live filed-date search was not executed during recon (ASP.NET/Telerik postback).",
+  "known_limitations": [
+    "Estate records give decedent + petitioner/fiduciary, usually not the property \u2014 must match decedent to parcel owner via enrichment",
+    "Cloudflare front \u2014 may challenge automated clients under load"
+  ],
+  "source_id": "probate_estates",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

@@ -1,0 +1,6 @@
+[clayton_cases] magistrate: frontier 2026CM28795, backfilling 150
+[clayton_cases] magistrate: {'fetched': 165, 'events': 37, 'skipped_institutional': 62, 'non_target': 51, 'pending_added': 0, 'pending_resolved': 0}
+[clayton_cases] state: frontier 2026CV07971, backfilling 80
+[clayton_cases] state: {'fetched': 95, 'events': 0, 'skipped_institutional': 0, 'non_target': 0, 'pending_added': 80, 'pending_resolved': 0}
+[clayton_cases] wrote 37 events -> C:\Users\makia\Videos\xcerebro-county-intel\data\raw\clayton_case_inquiry\clayton_cases_20261112_080045.jsonl
+Total new case events: 37

@@ -1,0 +1,20 @@
+{
+  "url": "https://publicaccess.claytoncountyga.gov/content/PDF/DQ759GA.pdf",
+  "portal_type": "pdf_publication",
+  "portal_family": "Tyler iasWorld Public Access content folder",
+  "access_pattern": "static_html",
+  "access_method": "PDF_PUBLICATION",
+  "public_access_status": "FULL_PUBLIC_ACCESS",
+  "document_access_status": "DOCUMENTS_PUBLIC",
+  "search_fields": [],
+  "records_available": [
+    "excess funds (surplus) after tax sale: former owner name, parcel #, amount, sale date"
+  ],
+  "verification_note": "Linked from Tax Commissioner tax-sales page ('Excess Funds Listing'). June 2026 listing inspected: text-extractable, name + parcel + amount + sale date.",
+  "known_limitations": [
+    "No situs address \u2014 parcel id join to assessor required",
+    "Updated irregularly (June 2026 edition current at recon)"
+  ],
+  "source_id": "excess_funds_listing",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

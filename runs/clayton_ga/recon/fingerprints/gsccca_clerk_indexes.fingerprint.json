@@ -1,0 +1,26 @@
+{
+  "url": "https://search.gsccca.org/RealEstate/",
+  "portal_type": "classic_asp_search",
+  "portal_family": "GSCCCA search.gsccca.org",
+  "access_pattern": "paywall",
+  "access_method": "PAID_SUBSCRIPTION_REQUIRED",
+  "public_access_status": "LOGIN_REQUIRED",
+  "document_access_status": "DOCUMENTS_PAID_SUBSCRIPTION_REQUIRED",
+  "search_fields": [
+    "county",
+    "party name",
+    "instrument type",
+    "date range",
+    "book/page"
+  ],
+  "records_available": [
+    "real estate index (deeds, security deeds, deeds under power, lis pendens, affidavits of descent)",
+    "lien index (FiFa / writs, mechanics & materialman liens, federal & state tax liens)",
+    "PT-61 transfer index",
+    "plat index"
+  ],
+  "verification_note": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon).",
+  "known_limitations": [],
+  "source_id": "gsccca_clerk_indexes",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

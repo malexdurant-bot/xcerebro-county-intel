@@ -1,0 +1,13 @@
+{
+  "gate_id": "REVIEW_GATE_1",
+  "reviewed_at": "2026-11-12T16:10:00Z",
+  "reviewer": "operator",
+  "status": "APPROVED",
+  "notes": "Operator approved Build Mode via explicit 'Proceed partial' at the Build Mode Approval Gate. build_verdict=READY_WITH_BLOCKERS, build label PARTIAL_BUILD. Live primary sources in scope: magistrate_court_civil_evictions, state_court_civil_judgments, probate_estates, tax_sale_listings, excess_funds_listing. Enrichment: assessor_parcel_master (iasWorld Public Access). Out of scope pending operator action: gsccca_clerk_indexes (paid subscription), ga_public_notice_foreclosures (reCAPTCHA + no-scraping terms), federal_bankruptcy_ndga (PACER). superior_court_civil deferred until the case-number format is known.",
+  "approved_artifacts": [
+    "config/counties/clayton_ga.json",
+    "runs/clayton_ga/LAUNCH_CLAYTON_GA.md",
+    "runs/clayton_ga/recon/recon_summary.md",
+    "runs/clayton_ga/recon/build_eligibility_handoff.md"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "url": "https://www.georgiapublicnotice.com/",
+  "portal_type": "aspnet_webforms",
+  "portal_family": "GeorgiaPublicNotice.com (GPA)",
+  "access_pattern": "spa_recaptcha",
+  "access_method": "PUBLIC_BUT_CAPTCHA_PROTECTED",
+  "public_access_status": "CAPTCHA_PROTECTED",
+  "document_access_status": "DOCUMENTS_PUBLIC_WITH_CAPTCHA",
+  "search_fields": [
+    "county",
+    "category",
+    "publication",
+    "date range",
+    "keywords"
+  ],
+  "records_available": [
+    "Notice of Sale Under Power (non-judicial foreclosure)",
+    "Notice of Foreclosure of Right of Redemption (tax deed)",
+    "Sheriff's/Marshal's sales",
+    "Tax sales",
+    "Probate notices",
+    "Condemnations"
+  ],
+  "verification_note": "Clayton County Clerk of Superior Court page links 'Legal Notices of the Clayton News-Daily' -> news-daily.com/.../legal/, which 301s to georgiapublicnotice.com. County=Clayton search (no CAPTCHA) returned ~100 pages for 9/13\u201311/12/2026 incl. 'Notice of Sale Under Power ... County of Clayton' and 'Notice of Foreclosure of Right of Redemption'; results show only a ~300-char teaser. Details.aspx requires a reCAPTCHA challenge and the Terms notice prohibits scraping, spidering or use in any database.",
+  "known_limitations": [],
+  "source_id": "ga_public_notice_foreclosures",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

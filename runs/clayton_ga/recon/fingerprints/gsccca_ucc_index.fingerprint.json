@@ -1,0 +1,21 @@
+{
+  "url": "https://search.gsccca.org/UCC_Search/",
+  "portal_type": "classic_asp_search",
+  "portal_family": "GSCCCA search.gsccca.org",
+  "access_pattern": "paywall",
+  "access_method": "LOGIN_REQUIRED",
+  "public_access_status": "LOGIN_REQUIRED",
+  "document_access_status": "DOCUMENTS_UNKNOWN",
+  "search_fields": [
+    "debtor name",
+    "file number",
+    "secured party"
+  ],
+  "records_available": [
+    "UCC financing statements"
+  ],
+  "verification_note": "Same GSCCCA login wall as the real estate index. Future enrichment only per \u00a701.27 q15.",
+  "known_limitations": [],
+  "source_id": "gsccca_ucc_index",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

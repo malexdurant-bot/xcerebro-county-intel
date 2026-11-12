@@ -1,0 +1,32 @@
+{
+  "url": "https://weba.claytoncountyga.gov/casinqsvr/htdocs/index.shtml",
+  "portal_type": "county_case_inquiry_cgi",
+  "portal_family": "IBM i CGI (casinqcgi-bin/wci01xr.pgm) \u2014 county-built JIS front end",
+  "access_pattern": "static_html",
+  "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+  "public_access_status": "FULL_PUBLIC_ACCESS",
+  "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+  "search_fields": [
+    "court (L/M/U)",
+    "case year",
+    "case type (2 chars)",
+    "case sequence (5 digits)",
+    "last/first name"
+  ],
+  "records_available": [
+    "dispossessory (Patho) filings",
+    "magistrate civil suits",
+    "garnishments",
+    "docket activity",
+    "party names and addresses",
+    "disposition"
+  ],
+  "verification_note": "Clerk site case-search page iframes weba.claytoncountyga.gov/casinqsvr. Sample GET wci010r.pgm?rtype=E&ctt=M&cyr=2026&ctp=CM&csq=00100 returned case 2026CM00100: landlord plaintiff vs tenant defendant, case type 'Patho Dispossessory', filing 01/02/2026, defendant street address, docket + disposition. Server-rendered HTML, no login, no CAPTCHA.",
+  "known_limitations": [
+    "No date-range or case-type browse; enumeration is by walking sequential case numbers per year/type",
+    "Docket shows 'Image Document' entries but images are not served publicly",
+    "Tenant-defendant is often not the property owner \u2014 eviction signals a landlord-side lead (tired landlord) and must be matched to parcel owner via enrichment"
+  ],
+  "source_id": "magistrate_court_civil_evictions",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

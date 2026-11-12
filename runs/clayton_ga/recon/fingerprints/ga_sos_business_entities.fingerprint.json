@@ -1,0 +1,19 @@
+{
+  "url": "https://ecorp.sos.ga.gov/",
+  "portal_type": "state_entity_registry",
+  "portal_family": "GA SOS eCorp",
+  "access_pattern": "waf_imperva",
+  "access_method": "PUBLIC_BUT_WAF_PROTECTED",
+  "public_access_status": "WAF_PROTECTED",
+  "document_access_status": "DOCUMENTS_UNKNOWN",
+  "search_fields": [
+    "entity name"
+  ],
+  "records_available": [
+    "LLC / corporation registered agents and officers"
+  ],
+  "verification_note": "Plain HTTP GET returns Cloudflare 'Just a moment...' (403). Recorded per \u00a701.27 q15 as future enrichment only; no adapter.",
+  "known_limitations": [],
+  "source_id": "ga_sos_business_entities",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

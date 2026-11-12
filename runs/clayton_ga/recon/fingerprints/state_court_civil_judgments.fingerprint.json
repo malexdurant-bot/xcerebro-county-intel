@@ -1,0 +1,28 @@
+{
+  "url": "https://weba.claytoncountyga.gov/casinqsvr/htdocs/index.shtml",
+  "portal_type": "county_case_inquiry_cgi",
+  "portal_family": "IBM i CGI \u2014 county-built JIS front end",
+  "access_pattern": "static_html",
+  "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+  "public_access_status": "FULL_PUBLIC_ACCESS",
+  "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+  "search_fields": [
+    "case year",
+    "case type",
+    "case sequence",
+    "name"
+  ],
+  "records_available": [
+    "civil suits",
+    "default judgments",
+    "dispositions",
+    "party names and addresses"
+  ],
+  "verification_note": "Sample 2026CV00100 (State Court, ctt=L): filed 01/08/2026, disposition 'Default Judgment' 09/25/2026, defendant name + Jonesboro street address. Same CGI as Magistrate.",
+  "known_limitations": [
+    "Most judgments are consumer debt (auto finance, credit cards) \u2014 judgment debtor must be matched to a parcel owner before it becomes a lead",
+    "Judgment becomes a property lien only once the FiFa is recorded in the GSCCCA lien index (paid)"
+  ],
+  "source_id": "state_court_civil_judgments",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

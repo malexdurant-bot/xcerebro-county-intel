@@ -1,0 +1,1873 @@
+{
+  "county_id": "clayton_ga",
+  "county_name": "Clayton",
+  "state": "GA",
+  "subject_state_full": "Georgia",
+  "state_rule_family": "",
+  "fips_code": "13063",
+  "timezone": "America/New_York",
+  "operator_market_priority": "exploratory",
+  "geography": {
+    "municipalities": [
+      {
+        "name": "Jonesboro",
+        "code": "jonesboro"
+      },
+      {
+        "name": "Forest Park",
+        "code": "forest_park"
+      },
+      {
+        "name": "Morrow",
+        "code": "morrow"
+      },
+      {
+        "name": "Riverdale",
+        "code": "riverdale"
+      },
+      {
+        "name": "Lake City",
+        "code": "lake_city"
+      },
+      {
+        "name": "Lovejoy",
+        "code": "lovejoy"
+      },
+      {
+        "name": "College Park",
+        "code": "college_park"
+      }
+    ],
+    "parcel_id_format": "^[0-9]{5}[A-Z]?\\s?[A-Z0-9]{3,6}(\\s[A-Z0-9]{2,3})?$",
+    "parcel_id_normalization": "collapse-whitespace",
+    "address_format_notes": "Parcel ids seen as '05079A A026', '05015 017010', '05213 214013 A07'. College Park is only partly in Clayton (mostly Fulton)."
+  },
+  "sources": {
+    "magistrate_court_civil_evictions": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "custom",
+      "ttl_days": 60,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [
+        "No date-range or case-type browse; enumeration is by walking sequential case numbers per year/type",
+        "Docket shows 'Image Document' entries but images are not served publicly",
+        "Tenant-defendant is often not the property owner — eviction signals a landlord-side lead (tired landlord) and must be matched to parcel owner via enrichment"
+      ],
+      "open_questions": [
+        "Confirm the full list of Magistrate case-type codes (CM observed for dispossessory/civil) — is there a separate code for dispossessory vs general civil?",
+        "Operator: confirm acceptable request rate for sequential case walking (default 10 rpm)."
+      ],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "lead",
+      "subtype": "court_eviction",
+      "url": "https://weba.claytoncountyga.gov/casinqsvr/htdocs/index.shtml",
+      "access_pattern": "static_html",
+      "scraper_module": "scrapers/clayton_case_inquiry.py",
+      "refresh_cadence": "daily",
+      "source_priority": "P0",
+      "build_priority": "mvp_required",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_COURT",
+      "official_entity": "Clayton County Clerk of Superior & Magistrate Courts (Magistrate Court civil)",
+      "portal_type": "county_case_inquiry_cgi",
+      "portal_family": "IBM i CGI (casinqcgi-bin/wci01xr.pgm) — county-built JIS front end",
+      "records_available": [
+        "dispossessory (Patho) filings",
+        "magistrate civil suits",
+        "garnishments",
+        "docket activity",
+        "party names and addresses",
+        "disposition"
+      ],
+      "search_fields": [
+        "court (L/M/U)",
+        "case year",
+        "case type (2 chars)",
+        "case sequence (5 digits)",
+        "last/first name"
+      ],
+      "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+      "public_access_status": "FULL_PUBLIC_ACCESS",
+      "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+      "source_role": "PRIMARY_LEAD_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "HIGH",
+      "verification_method": "official_page_link",
+      "verified_from_url": "https://clerk.claytoncountyga.gov/case-search/",
+      "verification_note": "Clerk site case-search page iframes weba.claytoncountyga.gov/casinqsvr. Sample GET wci010r.pgm?rtype=E&ctt=M&cyr=2026&ctp=CM&csq=00100 returned case 2026CM00100: landlord plaintiff vs tenant defendant, case type 'Patho Dispossessory', filing 01/02/2026, defendant street address, docket + disposition. Server-rendered HTML, no login, no CAPTCHA.",
+      "sample_record_path_confirmed": true,
+      "sample_record_type": "Magistrate civil case summary (dispossessory)",
+      "sample_search_possible": true,
+      "sample_document_view_possible": false
+    },
+    "state_court_civil_judgments": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "custom",
+      "ttl_days": 180,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [
+        "Most judgments are consumer debt (auto finance, credit cards) — judgment debtor must be matched to a parcel owner before it becomes a lead",
+        "Judgment becomes a property lien only once the FiFa is recorded in the GSCCCA lien index (paid)"
+      ],
+      "open_questions": [],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "lead",
+      "subtype": "court_civil",
+      "url": "https://weba.claytoncountyga.gov/casinqsvr/htdocs/index.shtml",
+      "access_pattern": "static_html",
+      "scraper_module": "scrapers/clayton_case_inquiry.py",
+      "refresh_cadence": "daily",
+      "source_priority": "P1",
+      "build_priority": "high_value",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_COURT",
+      "official_entity": "State Court of Clayton County (via county Case Inquiry)",
+      "portal_type": "county_case_inquiry_cgi",
+      "portal_family": "IBM i CGI — county-built JIS front end",
+      "records_available": [
+        "civil suits",
+        "default judgments",
+        "dispositions",
+        "party names and addresses"
+      ],
+      "search_fields": [
+        "case year",
+        "case type",
+        "case sequence",
+        "name"
+      ],
+      "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+      "public_access_status": "FULL_PUBLIC_ACCESS",
+      "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+      "source_role": "PRIMARY_LEAD_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "HIGH",
+      "verification_method": "official_page_link",
+      "verified_from_url": "https://clerk.claytoncountyga.gov/case-search/",
+      "verification_note": "Sample 2026CV00100 (State Court, ctt=L): filed 01/08/2026, disposition 'Default Judgment' 09/25/2026, defendant name + Jonesboro street address. Same CGI as Magistrate.",
+      "sample_record_path_confirmed": true,
+      "sample_record_type": "State Court civil case summary with default judgment",
+      "sample_search_possible": true,
+      "sample_document_view_possible": false
+    },
+    "superior_court_civil": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "custom",
+      "ttl_days": 180,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [
+        "Bulk enumeration unproven — currently name search only (PER_RECORD_ONLY)"
+      ],
+      "open_questions": [
+        "What is the Superior Court civil case-number format (type code / sequence width / division suffix)? A single recent Superior case number from the operator would unblock enumeration."
+      ],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "lead",
+      "subtype": "court_family",
+      "url": "https://weba.claytoncountyga.gov/casinqcgi-bin/wci011r.pgm?rtype=I&dvt=V",
+      "access_pattern": "static_html",
+      "scraper_module": "scrapers/clayton_case_inquiry.py",
+      "refresh_cadence": "weekly",
+      "source_priority": "P2",
+      "build_priority": "optional",
+      "source_reliability_grade": "B",
+      "official_status": "OFFICIAL_COURT",
+      "official_entity": "Clayton County Superior Court (via county Case Inquiry)",
+      "portal_type": "county_case_inquiry_cgi",
+      "portal_family": "IBM i CGI — county-built JIS front end",
+      "records_available": [
+        "divorce",
+        "quiet title / equity",
+        "civil",
+        "party names"
+      ],
+      "search_fields": [
+        "name (court=U)",
+        "case number (format unconfirmed)"
+      ],
+      "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+      "public_access_status": "FULL_PUBLIC_ACCESS",
+      "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+      "source_role": "SUPPORTING_LEAD_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "MEDIUM",
+      "verification_method": "official_page_link",
+      "verified_from_url": "https://clerk.claytoncountyga.gov/case-search/",
+      "verification_note": "Name-search form for Superior Court is public. Case-number probes 2026/2025 CV 00001/00100/01000 with ctt=U all returned 'Case# not found' — Superior numbering differs from State/Magistrate, so sequential enumeration is not yet proven.",
+      "sample_record_path_confirmed": false,
+      "sample_record_type": "",
+      "sample_search_possible": true,
+      "sample_document_view_possible": false
+    },
+    "probate_estates": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "custom",
+      "ttl_days": 365,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [
+        "Estate records give decedent + petitioner/fiduciary, usually not the property — must match decedent to parcel owner via enrichment",
+        "Cloudflare front — may challenge automated clients under load"
+      ],
+      "open_questions": [
+        "Phase 1: execute one Clayton filed-date search to confirm result fields (decedent address present?) and pagination."
+      ],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "lead",
+      "subtype": "court_probate",
+      "url": "https://www.georgiaprobaterecords.com/",
+      "access_pattern": "spa_with_api",
+      "scraper_module": "scrapers/georgia_probate_records.py",
+      "refresh_cadence": "daily",
+      "source_priority": "P0",
+      "build_priority": "mvp_required",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_VENDOR_PORTAL",
+      "official_entity": "Clayton County Probate Court (Georgia Probate Records statewide portal)",
+      "portal_type": "aspnet_webforms_telerik",
+      "portal_family": "georgiaprobaterecords.com (Council of Probate Court Judges of Georgia portal)",
+      "records_available": [
+        "estates",
+        "wills",
+        "guardianships",
+        "deaths",
+        "hearing calendars"
+      ],
+      "search_fields": [
+        "county",
+        "last/first name",
+        "deceased date range",
+        "filed date range",
+        "case number"
+      ],
+      "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+      "public_access_status": "FULL_PUBLIC_ACCESS",
+      "document_access_status": "DOCUMENTS_PUBLIC",
+      "source_role": "PRIMARY_LEAD_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "MEDIUM",
+      "verification_method": "official_vendor_link",
+      "verified_from_url": "https://www.claytoncountyga.gov/government/courts/probate-court/online-estate-records/",
+      "verification_note": "County probate page instructs: go to georgiaprobaterecords.com > Estates > select Clayton > search by name or by Deceased/Filed date range; 'estate records can be viewed online at no cost'; available documents show a PDF icon. Portal reachable (HTTP 200, Cloudflare front, no challenge to plain GET). A live filed-date search was not executed during recon (ASP.NET/Telerik postback).",
+      "sample_record_path_confirmed": false,
+      "sample_record_type": "",
+      "sample_search_possible": true,
+      "sample_document_view_possible": true
+    },
+    "tax_sale_listings": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "csv_static_list",
+      "ttl_days": 45,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [
+        "Only parcels already levied for sale — not the full delinquent roll",
+        "PDF filenames are ad hoc (e.g. 'NOVEMBER TAX SALE LISTING 10-27-26.pdf'); discover via the landing page, not by URL pattern",
+        "Multi-line owner/address cells require layout-aware parsing; some rows interleave two parcels"
+      ],
+      "open_questions": [],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "lead",
+      "subtype": "tax_delinquency",
+      "url": "https://publicaccess.claytoncountyga.gov/content/home_commissioner.htm",
+      "access_pattern": "static_html",
+      "scraper_module": "scrapers/clayton_tax_sale_pdf.py",
+      "refresh_cadence": "weekly",
+      "source_priority": "P0",
+      "build_priority": "mvp_required",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_COUNTY",
+      "official_entity": "Clayton County Tax Commissioner",
+      "portal_type": "pdf_publication",
+      "portal_family": "Tyler iasWorld Public Access content folder",
+      "records_available": [
+        "monthly tax sale listing: sale date, parcel #, owner name, situs address, delinquent years, fair market value, cry-out bid"
+      ],
+      "search_fields": [],
+      "access_method": "PDF_PUBLICATION",
+      "public_access_status": "FULL_PUBLIC_ACCESS",
+      "document_access_status": "DOCUMENTS_PUBLIC",
+      "source_role": "PRIMARY_LEAD_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "HIGH",
+      "verification_method": "official_page_link",
+      "verified_from_url": "https://www.claytoncountytc.com/tax-sales/",
+      "verification_note": "claytoncountytc.com/tax-sales links 'View Tax Sale Listings' -> publicaccess.claytoncountyga.gov/content/home_commissioner.htm, which links the current 'November 2026 Tax Sales' PDF. Inspected Sep-2026 and Nov-2026 PDFs: text-extractable (pdftotext -layout), rows carry sale date, parcel id (e.g. '05079A A026'), owner, situs address, years delinquent, FMV, cry-out bid.",
+      "sample_record_path_confirmed": true,
+      "sample_record_type": "Tax sale listing PDF row",
+      "sample_search_possible": false,
+      "sample_document_view_possible": true
+    },
+    "excess_funds_listing": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "csv_static_list",
+      "ttl_days": 120,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [
+        "No situs address — parcel id join to assessor required",
+        "Updated irregularly (June 2026 edition current at recon)"
+      ],
+      "open_questions": [],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "lead",
+      "subtype": "tax_delinquency",
+      "url": "https://publicaccess.claytoncountyga.gov/content/PDF/DQ759GA.pdf",
+      "access_pattern": "static_html",
+      "scraper_module": "scrapers/clayton_tax_sale_pdf.py",
+      "refresh_cadence": "monthly",
+      "source_priority": "P1",
+      "build_priority": "high_value",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_COUNTY",
+      "official_entity": "Clayton County Tax Commissioner",
+      "portal_type": "pdf_publication",
+      "portal_family": "Tyler iasWorld Public Access content folder",
+      "records_available": [
+        "excess funds (surplus) after tax sale: former owner name, parcel #, amount, sale date"
+      ],
+      "search_fields": [],
+      "access_method": "PDF_PUBLICATION",
+      "public_access_status": "FULL_PUBLIC_ACCESS",
+      "document_access_status": "DOCUMENTS_PUBLIC",
+      "source_role": "PRIMARY_LEAD_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "HIGH",
+      "verification_method": "official_page_link",
+      "verified_from_url": "https://www.claytoncountytc.com/tax-sales/",
+      "verification_note": "Linked from Tax Commissioner tax-sales page ('Excess Funds Listing'). June 2026 listing inspected: text-extractable, name + parcel + amount + sale date.",
+      "sample_record_path_confirmed": true,
+      "sample_record_type": "Excess funds listing PDF row",
+      "sample_search_possible": false,
+      "sample_document_view_possible": true
+    },
+    "gsccca_clerk_indexes": {
+      "auth_required": true,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "custom",
+      "ttl_days": 365,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [],
+      "open_questions": [
+        "Does the operator already hold a GSCCCA subscription (and at which tier)? Premium unlocks instrument-type + daily search, which is what a lis pendens / deed-under-power feed needs."
+      ],
+      "blocker": "GSCCCA index search requires a logged-in subscription account; premium tier needed for instrument-type/daily search.",
+      "blocker_type": "PAID_ACCESS_REQUIRED",
+      "next_access_strategy": "use_paid_subscription_if_operator_provides",
+      "auto_resolve_status": "REQUIRES_PAYMENT",
+      "final_resolution_status": "PAYMENT_REQUIRED",
+      "auto_resolve_attempts": [
+        {
+          "attempt_order": 1,
+          "strategy": "discover_public_search_endpoint",
+          "timestamp": "2026-11-12T15:30:00Z",
+          "status": "FAILED",
+          "blocker_type": "PAID_ACCESS_REQUIRED",
+          "result": "names.asp POST redirects to login; no anonymous endpoint"
+        },
+        {
+          "attempt_order": 2,
+          "strategy": "use_paid_subscription_if_operator_provides",
+          "timestamp": "2026-11-12T15:30:00Z",
+          "status": "BLOCKED_BY_COST",
+          "blocker_type": "PAID_ACCESS_REQUIRED",
+          "result": "Permission blocker — paid account requires operator approval and credentials",
+          "next_step": "Operator decides on GSCCCA subscription tier"
+        }
+      ],
+      "estimated_cost_category": "REQUIRES_OPERATOR_APPROVAL",
+      "category": "lead",
+      "subtype": "clerk_recordings",
+      "url": "https://search.gsccca.org/RealEstate/",
+      "access_pattern": "paywall",
+      "scraper_module": "scrapers/gsccca_indexes.py",
+      "refresh_cadence": "daily",
+      "source_priority": "P0",
+      "build_priority": "high_value",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_STATE",
+      "official_entity": "Georgia Superior Court Clerks' Cooperative Authority (statewide index for Clayton Clerk of Superior Court, county ID 31)",
+      "portal_type": "classic_asp_search",
+      "portal_family": "GSCCCA search.gsccca.org",
+      "records_available": [
+        "real estate index (deeds, security deeds, deeds under power, lis pendens, affidavits of descent)",
+        "lien index (FiFa / writs, mechanics & materialman liens, federal & state tax liens)",
+        "PT-61 transfer index",
+        "plat index"
+      ],
+      "search_fields": [
+        "county",
+        "party name",
+        "instrument type",
+        "date range",
+        "book/page"
+      ],
+      "access_method": "PAID_SUBSCRIPTION_REQUIRED",
+      "public_access_status": "LOGIN_REQUIRED",
+      "document_access_status": "DOCUMENTS_PAID_SUBSCRIPTION_REQUIRED",
+      "source_role": "BLOCKED_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "BLOCKED",
+      "verification_method": "official_page_link",
+      "verified_from_url": "https://clerk.claytoncountyga.gov/real-estate-division/",
+      "verification_note": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon).",
+      "sample_record_path_confirmed": false,
+      "sample_record_type": "",
+      "sample_search_possible": false,
+      "sample_document_view_possible": false,
+      "blocked_unblock_paths": [
+        "operator_login",
+        "manual_pull"
+      ]
+    },
+    "ga_public_notice_foreclosures": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "foreclosure_notices",
+      "ttl_days": 45,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [],
+      "open_questions": [
+        "Operator: would you use GPA 'Smart Search' saved-search email alerts (sign-in) and forward/drop the notices for ingestion, or license notices from GPA / Clayton News Daily directly?",
+        "Alternative: once GSCCCA access exists, foreclosures can be detected post-sale via recorded Deeds Under Power (later in the cycle)."
+      ],
+      "blocker": "Full notice text behind reCAPTCHA; site Terms prohibit automated collection.",
+      "blocker_type": "PERMISSION_BLOCKER",
+      "next_access_strategy": "manual_operator_assisted_pull",
+      "auto_resolve_status": "NOT_ALLOWED",
+      "final_resolution_status": "UNRESOLVED_NOT_ALLOWED",
+      "auto_resolve_attempts": [
+        {
+          "attempt_order": 1,
+          "strategy": "find_official_vendor_link",
+          "timestamp": "2026-11-12T15:30:00Z",
+          "status": "FAILED",
+          "blocker_type": "PERMISSION_BLOCKER",
+          "result": "Clayton News-Daily legal page redirects to the same GPA site; no separate county posting page found"
+        },
+        {
+          "attempt_order": 2,
+          "strategy": "use_captcha_solver",
+          "timestamp": "2026-11-12T15:30:00Z",
+          "status": "SKIPPED_NOT_ALLOWED",
+          "blocker_type": "PERMISSION_BLOCKER",
+          "result": "CAPTCHA solving forbidden in recon and Terms of Use prohibit scraping",
+          "next_step": "Operator chooses manual notice feed or licensed source"
+        }
+      ],
+      "estimated_cost_category": "UNKNOWN",
+      "category": "lead",
+      "subtype": "sheriff_sales",
+      "url": "https://www.georgiapublicnotice.com/",
+      "access_pattern": "spa_recaptcha",
+      "scraper_module": "scrapers/ga_public_notice.py",
+      "refresh_cadence": "weekly",
+      "source_priority": "P0",
+      "build_priority": "high_value",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_VENDOR_PORTAL",
+      "official_entity": "Georgia Press Association statewide public-notice site (carries Clayton News Daily legal notices)",
+      "portal_type": "aspnet_webforms",
+      "portal_family": "GeorgiaPublicNotice.com (GPA)",
+      "records_available": [
+        "Notice of Sale Under Power (non-judicial foreclosure)",
+        "Notice of Foreclosure of Right of Redemption (tax deed)",
+        "Sheriff's/Marshal's sales",
+        "Tax sales",
+        "Probate notices",
+        "Condemnations"
+      ],
+      "search_fields": [
+        "county",
+        "category",
+        "publication",
+        "date range",
+        "keywords"
+      ],
+      "access_method": "PUBLIC_BUT_CAPTCHA_PROTECTED",
+      "public_access_status": "CAPTCHA_PROTECTED",
+      "document_access_status": "DOCUMENTS_PUBLIC_WITH_CAPTCHA",
+      "source_role": "BLOCKED_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "BLOCKED",
+      "verification_method": "official_page_link",
+      "verified_from_url": "https://clerk.claytoncountyga.gov/",
+      "verification_note": "Clayton County Clerk of Superior Court page links 'Legal Notices of the Clayton News-Daily' -> news-daily.com/.../legal/, which 301s to georgiapublicnotice.com. County=Clayton search (no CAPTCHA) returned ~100 pages for 9/13–11/12/2026 incl. 'Notice of Sale Under Power ... County of Clayton' and 'Notice of Foreclosure of Right of Redemption'; results show only a ~300-char teaser. Details.aspx requires a reCAPTCHA challenge and the Terms notice prohibits scraping, spidering or use in any database.",
+      "sample_record_path_confirmed": true,
+      "sample_record_type": "Search-result teaser (full text CAPTCHA-gated)",
+      "sample_search_possible": true,
+      "sample_document_view_possible": false,
+      "blocked_unblock_paths": [
+        "manual_pull",
+        "operator_login"
+      ]
+    },
+    "assessor_parcel_master": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": true,
+      "allowed_to_export": true,
+      "translator": "parcel_master",
+      "ttl_days": 9999,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [
+        "Disclaimer acceptance sets a session; scraper must accept it",
+        "ENRICHMENT ONLY — never originates a lead"
+      ],
+      "open_questions": [],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "enrichment",
+      "subtype": "parcel_master",
+      "url": "https://publicaccess.claytoncountyga.gov/search/commonsearch.aspx?mode=realprop",
+      "access_pattern": "static_html",
+      "scraper_module": "scrapers/clayton_iasworld_publicaccess.py",
+      "refresh_cadence": "weekly",
+      "source_priority": "P2",
+      "build_priority": "enrichment",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_COUNTY",
+      "official_entity": "Clayton County Tax Assessor / Tax Commissioner",
+      "portal_type": "tyler_iasworld_public_access",
+      "portal_family": "Tyler iasWorld Public Access",
+      "records_available": [
+        "owner",
+        "mailing address",
+        "situs",
+        "values",
+        "sales",
+        "tax bill"
+      ],
+      "search_fields": [
+        "parcel id",
+        "owner",
+        "address",
+        "advanced/sales search"
+      ],
+      "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+      "public_access_status": "FULL_PUBLIC_ACCESS",
+      "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+      "source_role": "ENRICHMENT_SOURCE",
+      "lead_value": "ENRICHMENT",
+      "verification_confidence": "HIGH",
+      "verification_method": "official_domain",
+      "verified_from_url": "https://publicaccess.claytoncountyga.gov/content/home_commissioner.htm",
+      "verification_note": "Root redirects to Search/Disclaimer.aspx (click-through disclaimer, session cookie). Tyler branding in page. County assessor page also links Schneider Beacon AppID=1234 (Cloudflare challenge to plain HTTP) and an ArcGIS Experience parcel map.",
+      "sample_record_path_confirmed": false,
+      "sample_record_type": "",
+      "sample_search_possible": true,
+      "sample_document_view_possible": false,
+      "fields": {
+        "parcel_id": "PARID",
+        "owner_name": "Owner",
+        "situs_address": "Location"
+      }
+    },
+    "federal_bankruptcy_ndga": {
+      "auth_required": true,
+      "rate_limit_rpm": 10,
+      "enabled": false,
+      "allowed_to_export": true,
+      "translator": "custom",
+      "ttl_days": 180,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [],
+      "open_questions": [],
+      "blocker": "PACER account with per-page fees required.",
+      "blocker_type": "PAID_ACCESS_REQUIRED",
+      "next_access_strategy": "use_paid_subscription_if_operator_provides",
+      "auto_resolve_status": "REQUIRES_PAYMENT",
+      "final_resolution_status": "PAYMENT_REQUIRED",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "REQUIRES_OPERATOR_APPROVAL",
+      "category": "lead",
+      "subtype": "court_civil",
+      "url": "https://www.ganb.uscourts.gov/",
+      "access_pattern": "paywall",
+      "scraper_module": "scrapers/pacer_bankruptcy.py",
+      "refresh_cadence": "daily",
+      "source_priority": "P2",
+      "build_priority": "future",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_COURT",
+      "official_entity": "U.S. Bankruptcy Court, Northern District of Georgia (Atlanta Division covers Clayton)",
+      "portal_type": "pacer_cmecf",
+      "portal_family": "PACER / CM/ECF",
+      "records_available": [
+        "bankruptcy petitions",
+        "debtor names and addresses",
+        "schedules"
+      ],
+      "search_fields": [
+        "name",
+        "case number",
+        "filed date"
+      ],
+      "access_method": "PAID_SUBSCRIPTION_REQUIRED",
+      "public_access_status": "LOGIN_REQUIRED",
+      "document_access_status": "DOCUMENTS_PAID_SUBSCRIPTION_REQUIRED",
+      "source_role": "BLOCKED_SOURCE",
+      "lead_value": "LEAD_GENERATING",
+      "verification_confidence": "BLOCKED",
+      "verification_method": "court_portal",
+      "verified_from_url": "https://www.ganb.uscourts.gov/",
+      "verification_note": "ganb.uscourts.gov reachable; case data is via PACER, which requires a funded account. Per §01.27 q11: flag for operator decision, do not auto-resolve.",
+      "sample_record_path_confirmed": false,
+      "sample_record_type": "",
+      "sample_search_possible": false,
+      "sample_document_view_possible": false
+    },
+    "ga_sos_business_entities": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": false,
+      "allowed_to_export": false,
+      "translator": "",
+      "ttl_days": 9999,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [],
+      "open_questions": [],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "enrichment",
+      "subtype": "parcel_master",
+      "url": "https://ecorp.sos.ga.gov/",
+      "access_pattern": "waf_imperva",
+      "scraper_module": "scrapers/none_future.py",
+      "refresh_cadence": "on_demand",
+      "source_priority": "P2",
+      "build_priority": "future",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_STATE",
+      "official_entity": "Georgia Secretary of State Corporations Division",
+      "portal_type": "state_entity_registry",
+      "portal_family": "GA SOS eCorp",
+      "records_available": [
+        "LLC / corporation registered agents and officers"
+      ],
+      "search_fields": [
+        "entity name"
+      ],
+      "access_method": "PUBLIC_BUT_WAF_PROTECTED",
+      "public_access_status": "WAF_PROTECTED",
+      "document_access_status": "DOCUMENTS_UNKNOWN",
+      "source_role": "ENRICHMENT_SOURCE",
+      "lead_value": "ENRICHMENT",
+      "verification_confidence": "MEDIUM",
+      "verification_method": "official_domain",
+      "verified_from_url": "https://ecorp.sos.ga.gov/",
+      "verification_note": "Plain HTTP GET returns Cloudflare 'Just a moment...' (403). Recorded per §01.27 q15 as future enrichment only; no adapter.",
+      "sample_record_path_confirmed": false,
+      "sample_record_type": "",
+      "sample_search_possible": false,
+      "sample_document_view_possible": false
+    },
+    "gsccca_ucc_index": {
+      "auth_required": false,
+      "rate_limit_rpm": 10,
+      "enabled": false,
+      "allowed_to_export": false,
+      "translator": "",
+      "ttl_days": 9999,
+      "operator_override": false,
+      "last_verified_at": "2026-11-12T15:30:00Z",
+      "known_limitations": [],
+      "open_questions": [],
+      "blocker": "",
+      "blocker_type": "",
+      "next_access_strategy": "",
+      "auto_resolve_status": "NOT_ATTEMPTED",
+      "final_resolution_status": "",
+      "auto_resolve_attempts": [],
+      "estimated_cost_category": "FREE",
+      "category": "enrichment",
+      "subtype": "parcel_master",
+      "url": "https://search.gsccca.org/UCC_Search/",
+      "access_pattern": "paywall",
+      "scraper_module": "scrapers/none_future.py",
+      "refresh_cadence": "on_demand",
+      "source_priority": "P2",
+      "build_priority": "future",
+      "source_reliability_grade": "A",
+      "official_status": "OFFICIAL_STATE",
+      "official_entity": "GSCCCA statewide UCC index",
+      "portal_type": "classic_asp_search",
+      "portal_family": "GSCCCA search.gsccca.org",
+      "records_available": [
+        "UCC financing statements"
+      ],
+      "search_fields": [
+        "debtor name",
+        "file number",
+        "secured party"
+      ],
+      "access_method": "LOGIN_REQUIRED",
+      "public_access_status": "LOGIN_REQUIRED",
+      "document_access_status": "DOCUMENTS_UNKNOWN",
+      "source_role": "ENRICHMENT_SOURCE",
+      "lead_value": "ENRICHMENT",
+      "verification_confidence": "MEDIUM",
+      "verification_method": "official_domain",
+      "verified_from_url": "https://clerk.claytoncountyga.gov/real-estate-division/uniform-commercial-code-ucc/",
+      "verification_note": "Same GSCCCA login wall as the real estate index. Future enrichment only per §01.27 q15.",
+      "sample_record_path_confirmed": false,
+      "sample_record_type": "",
+      "sample_search_possible": false,
+      "sample_document_view_possible": false
+    }
+  },
+  "scoring_overrides": {},
+  "storage": {
+    "mode": "STATIC_JSON_MODE",
+    "supabase_enabled": false,
+    "retain_raw_records_days": 90,
+    "retain_source_runs_days": 30
+  },
+  "dashboard": {
+    "title": "Clayton County GA — Lead Intelligence",
+    "subtitle": "Jonesboro, Georgia",
+    "primary_color": "#1A3A5C",
+    "accent_color": "#C8A951",
+    "default_view": "all_leads",
+    "fields": [
+      "lead_type",
+      "owner_name",
+      "situs_address",
+      "parcel_id",
+      "event_date",
+      "score",
+      "deal_path",
+      "evidence"
+    ],
+    "precanned_views": [
+      {
+        "id": "eviction",
+        "label": "Evictions (tired landlord)",
+        "filter": "lead_type:eviction"
+      },
+      {
+        "id": "probate",
+        "label": "Probate",
+        "filter": "lead_type:probate"
+      },
+      {
+        "id": "tax_distress",
+        "label": "Tax Sale / Excess Funds",
+        "filter": "lead_type:tax_sale"
+      },
+      {
+        "id": "judgment",
+        "label": "Civil Judgments",
+        "filter": "lead_type:civil_judgment"
+      },
+      {
+        "id": "high_score",
+        "label": "High Score (≥70)",
+        "filter": "score:>=70"
+      }
+    ],
+    "view_modes": [
+      "CLIENT_VIEW",
+      "OPERATOR_VIEW"
+    ],
+    "build_label": "PARTIAL_BUILD",
+    "build_label_reason": "Foreclosure, lis pendens and recorded-lien coverage blocked (GSCCCA paid; GPA notices CAPTCHA/ToS)."
+  },
+  "deployment": {
+    "github_org": "malexdurant-bot",
+    "github_repo": "xcerebro-county-intel",
+    "scheduler_runtime_class": "SCHEDULER_NOT_CONFIGURED",
+    "production_verification_status": "NOT_RUN"
+  },
+  "build_verdict": "READY_WITH_BLOCKERS",
+  "build_verdict_reason": "Five verified, publicly accessible PRIMARY_LEAD_SOURCE feeds: Magistrate Court evictions (daily, HIGH), State Court civil judgments (HIGH), Probate estates via georgiaprobaterecords.com (MEDIUM — live date search still to be sampled), Tax Commissioner monthly tax sale listings (HIGH) and excess-funds listing (HIGH). Blocked: GSCCCA clerk indexes (lis pendens, deeds, FiFa/tax/mechanics liens) need a paid subscription; non-judicial foreclosure / sheriff sale notices on GeorgiaPublicNotice.com are reCAPTCHA-gated with no-scraping terms; bankruptcy needs PACER. Foreclosure — the highest-value Georgia signal — is therefore not covered until the operator supplies GSCCCA access or a manual notice feed.",
+  "build_verdict_at": "2026-11-12T15:30:00Z",
+  "auto_resolve_status": "REQUIRES_OPERATOR_APPROVAL",
+  "final_resolution_status": "OPERATOR_REQUIRED",
+  "operator_override_audit": [],
+  "source_of_record_matrix": {
+    "county_slug": "clayton_ga",
+    "county_name": "Clayton",
+    "state": "GA",
+    "framework_version": "v5.1.2-beta-r3",
+    "generated_at": "2026-11-12T15:30:00Z",
+    "county_build_status": "PARTIAL_BUILD_READY",
+    "lead_types": [
+      {
+        "lead_type": "Foreclosure",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Legal organ (Clayton News Daily) via GPA",
+          "Clerk of Superior Court (deed under power)"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "ga_public_notice_foreclosures",
+            "official_url": "https://www.georgiapublicnotice.com/",
+            "authority_type": "state_press_association",
+            "vendor_name": "GeorgiaPublicNotice.com",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "CAPTCHA_PROTECTED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_VENDOR_PORTAL via https://clerk.claytoncountyga.gov/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — CAPTCHA_PROTECTED",
+              "extractability": "PASS",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "publication",
+              "publish_date",
+              "notice_teaser"
+            ],
+            "operator_verified": false,
+            "notes": "Clayton County Clerk of Superior Court page links 'Legal Notices of the Clayton News-Daily' -> news-daily.com/.../legal/, which 301s to georgiapublicnotice.com. County=Clayton search (no CAPTCHA) returned ~100 pages for 9/13–11/12/2026 incl. 'Notice of Sale Under Power ... County of Clayton' and 'No"
+          },
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "ga_public_notice_foreclosures",
+        "status": "SOURCE_FOUND_CAPTCHA",
+        "notes": "Georgia is non-judicial (power of sale in security deed). Notices run 4 weeks before first-Tuesday sale. Full text CAPTCHA-gated; GSCCCA paid."
+      },
+      {
+        "lead_type": "Trustee Sale",
+        "state_applicability": "NOT_APPLICABLE_IN_STATE",
+        "expected_authorities": [
+          "n/a"
+        ],
+        "candidate_sources": [],
+        "selected_source_id": "",
+        "status": "NOT_APPLICABLE_IN_STATE",
+        "notes": "Georgia uses security deeds with power of sale, not deeds of trust/trustees."
+      },
+      {
+        "lead_type": "Notice of Trustee Sale",
+        "state_applicability": "NOT_APPLICABLE_IN_STATE",
+        "expected_authorities": [
+          "n/a"
+        ],
+        "candidate_sources": [],
+        "selected_source_id": "",
+        "status": "NOT_APPLICABLE_IN_STATE",
+        "notes": "See Foreclosure — GA equivalent is Notice of Sale Under Power."
+      },
+      {
+        "lead_type": "Notice of Substitute Trustee Sale",
+        "state_applicability": "NOT_APPLICABLE_IN_STATE",
+        "expected_authorities": [
+          "n/a"
+        ],
+        "candidate_sources": [],
+        "selected_source_id": "",
+        "status": "NOT_APPLICABLE_IN_STATE",
+        "notes": "Texas-specific instrument."
+      },
+      {
+        "lead_type": "Sheriff Sale",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Sheriff via legal organ"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "ga_public_notice_foreclosures",
+            "official_url": "https://www.georgiapublicnotice.com/",
+            "authority_type": "state_press_association",
+            "vendor_name": "GeorgiaPublicNotice.com",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "CAPTCHA_PROTECTED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_VENDOR_PORTAL via https://clerk.claytoncountyga.gov/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — CAPTCHA_PROTECTED",
+              "extractability": "PASS",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "publication",
+              "publish_date",
+              "notice_teaser"
+            ],
+            "operator_verified": false,
+            "notes": "Clayton County Clerk of Superior Court page links 'Legal Notices of the Clayton News-Daily' -> news-daily.com/.../legal/, which 301s to georgiapublicnotice.com. County=Clayton search (no CAPTCHA) returned ~100 pages for 9/13–11/12/2026 incl. 'Notice of Sale Under Power ... County of Clayton' and 'No"
+          }
+        ],
+        "selected_source_id": "ga_public_notice_foreclosures",
+        "status": "SOURCE_FOUND_CAPTCHA",
+        "notes": "No sheriff sale page on claytoncountyga.gov/government/sheriff/ (only jail docket). Levy sales advertised under GPA 'Sheriff's/Marshal's Sales'."
+      },
+      {
+        "lead_type": "Tax Lien Foreclosure",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Tax deed holder via legal organ"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "ga_public_notice_foreclosures",
+            "official_url": "https://www.georgiapublicnotice.com/",
+            "authority_type": "state_press_association",
+            "vendor_name": "GeorgiaPublicNotice.com",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "CAPTCHA_PROTECTED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_VENDOR_PORTAL via https://clerk.claytoncountyga.gov/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — CAPTCHA_PROTECTED",
+              "extractability": "PASS",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "publication",
+              "publish_date",
+              "notice_teaser"
+            ],
+            "operator_verified": false,
+            "notes": "Clayton County Clerk of Superior Court page links 'Legal Notices of the Clayton News-Daily' -> news-daily.com/.../legal/, which 301s to georgiapublicnotice.com. County=Clayton search (no CAPTCHA) returned ~100 pages for 9/13–11/12/2026 incl. 'Notice of Sale Under Power ... County of Clayton' and 'No"
+          }
+        ],
+        "selected_source_id": "ga_public_notice_foreclosures",
+        "status": "SOURCE_FOUND_CAPTCHA",
+        "notes": "Observed 'Notice of Foreclosure of Right of Redemption ... County of Clayton' in GPA results."
+      },
+      {
+        "lead_type": "Tax Sale",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Tax Commissioner"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "tax_sale_listings",
+            "official_url": "https://publicaccess.claytoncountyga.gov/content/home_commissioner.htm",
+            "authority_type": "county_tax_commissioner",
+            "vendor_name": "Tyler iasWorld Public Access (PDF)",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "FULL_COUNTY_BULK",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COUNTY via https://www.claytoncountytc.com/tax-sales/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "PASS",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": true,
+            "minimum_lead_fields_available": [
+              "parcel_id",
+              "owner_name",
+              "situs_address",
+              "sale_date",
+              "delinquent_years",
+              "amount"
+            ],
+            "operator_verified": false,
+            "notes": "claytoncountytc.com/tax-sales links 'View Tax Sale Listings' -> publicaccess.claytoncountyga.gov/content/home_commissioner.htm, which links the current 'November 2026 Tax Sales' PDF. Inspected Sep-2026 and Nov-2026 PDFs: text-extractable (pdftotext -layout), rows carry sale date, parcel id (e.g. '05"
+          }
+        ],
+        "selected_source_id": "tax_sale_listings",
+        "status": "LIVE_SOURCE_FOUND",
+        "notes": "Monthly PDF listings, text-extractable."
+      },
+      {
+        "lead_type": "Tax Sale Certificate",
+        "state_applicability": "NOT_APPLICABLE_IN_STATE",
+        "expected_authorities": [
+          "n/a"
+        ],
+        "candidate_sources": [],
+        "selected_source_id": "",
+        "status": "NOT_APPLICABLE_IN_STATE",
+        "notes": "Georgia sells tax deeds with right of redemption, not certificates."
+      },
+      {
+        "lead_type": "Tax Delinquency",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Tax Commissioner"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "tax_sale_listings",
+            "official_url": "https://publicaccess.claytoncountyga.gov/content/home_commissioner.htm",
+            "authority_type": "county_tax_commissioner",
+            "vendor_name": "Tyler iasWorld Public Access (PDF)",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "FULL_COUNTY_BULK",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COUNTY via https://www.claytoncountytc.com/tax-sales/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "PASS",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": true,
+            "minimum_lead_fields_available": [
+              "parcel_id",
+              "owner_name",
+              "situs_address",
+              "sale_date",
+              "delinquent_years",
+              "amount"
+            ],
+            "operator_verified": false,
+            "notes": "claytoncountytc.com/tax-sales links 'View Tax Sale Listings' -> publicaccess.claytoncountyga.gov/content/home_commissioner.htm, which links the current 'November 2026 Tax Sales' PDF. Inspected Sep-2026 and Nov-2026 PDFs: text-extractable (pdftotext -layout), rows carry sale date, parcel id (e.g. '05"
+          }
+        ],
+        "selected_source_id": "tax_sale_listings",
+        "status": "LIVE_SOURCE_FOUND_LIMITED_COVERAGE",
+        "notes": "Only levied parcels appear on sale lists; full delinquent roll not published. iasWorld bill inquiry is per-parcel (enrichment)."
+      },
+      {
+        "lead_type": "Lis Pendens",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clerk of Superior Court via GSCCCA"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": "GSCCCA subscription required."
+      },
+      {
+        "lead_type": "Civil Judgment",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "State Court",
+          "Magistrate Court"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "state_court_civil_judgments",
+            "official_url": "https://weba.claytoncountyga.gov/casinqsvr/htdocs/index.shtml",
+            "authority_type": "county_court",
+            "vendor_name": "Clayton County (county-built CGI)",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COURT via https://clerk.claytoncountyga.gov/case-search/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "PASS",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "case_number",
+              "filing_date",
+              "plaintiff",
+              "defendant",
+              "defendant_address",
+              "disposition"
+            ],
+            "operator_verified": false,
+            "notes": "Sample 2026CV00100 (State Court, ctt=L): filed 01/08/2026, disposition 'Default Judgment' 09/25/2026, defendant name + Jonesboro street address. Same CGI as Magistrate."
+          },
+          {
+            "source_id": "magistrate_court_civil_evictions",
+            "official_url": "https://weba.claytoncountyga.gov/casinqsvr/htdocs/index.shtml",
+            "authority_type": "county_court",
+            "vendor_name": "Clayton County (county-built CGI)",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COURT via https://clerk.claytoncountyga.gov/case-search/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "PASS",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "case_number",
+              "filing_date",
+              "plaintiff",
+              "defendant",
+              "defendant_address",
+              "case_type",
+              "disposition"
+            ],
+            "operator_verified": false,
+            "notes": "Clerk site case-search page iframes weba.claytoncountyga.gov/casinqsvr. Sample GET wci010r.pgm?rtype=E&ctt=M&cyr=2026&ctp=CM&csq=00100 returned case 2026CM00100: landlord plaintiff vs tenant defendant, case type 'Patho Dispossessory', filing 01/02/2026, defendant street address, docket + disposition"
+          }
+        ],
+        "selected_source_id": "state_court_civil_judgments",
+        "status": "LIVE_SOURCE_FOUND",
+        "notes": "Default judgments visible with defendant address."
+      },
+      {
+        "lead_type": "Abstract of Judgment",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clerk of Superior Court lien index (FiFa)"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": "GA equivalent is a recorded writ of fieri facias (FiFa)."
+      },
+      {
+        "lead_type": "Mechanic Lien",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "GSCCCA lien index"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": ""
+      },
+      {
+        "lead_type": "Construction Lien",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "GSCCCA lien index"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": "Materialman's liens."
+      },
+      {
+        "lead_type": "Federal Tax Lien",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "GSCCCA lien index"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": ""
+      },
+      {
+        "lead_type": "State Tax Lien",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "GSCCCA lien index",
+          "GA DOR pending lien search (GSCCCA-hosted, login)"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": ""
+      },
+      {
+        "lead_type": "Probate",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Probate Court"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "probate_estates",
+            "official_url": "https://www.georgiaprobaterecords.com/",
+            "authority_type": "state_vendor_portal",
+            "vendor_name": "georgiaprobaterecords.com",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_VENDOR_PORTAL via https://www.claytoncountyga.gov/government/courts/probate-court/online-estate-records/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": true,
+            "minimum_lead_fields_available": [
+              "case_number",
+              "decedent_name",
+              "filed_date",
+              "deceased_date"
+            ],
+            "operator_verified": false,
+            "notes": "County probate page instructs: go to georgiaprobaterecords.com > Estates > select Clayton > search by name or by Deceased/Filed date range; 'estate records can be viewed online at no cost'; available documents show a PDF icon. Portal reachable (HTTP 200, Cloudflare front, no challenge to plain GET)."
+          }
+        ],
+        "selected_source_id": "probate_estates",
+        "status": "LIVE_SOURCE_FOUND",
+        "notes": "Free online estate search with filed-date range."
+      },
+      {
+        "lead_type": "Affidavit of Heirship",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clerk of Superior Court (affidavit of descent)"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": ""
+      },
+      {
+        "lead_type": "Executor Deed",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clerk of Superior Court"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": ""
+      },
+      {
+        "lead_type": "Administrator Deed",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clerk of Superior Court"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "gsccca_clerk_indexes",
+            "official_url": "https://search.gsccca.org/RealEstate/",
+            "authority_type": "state_clerk_authority",
+            "vendor_name": "GSCCCA",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_STATE via https://clerk.claytoncountyga.gov/real-estate-division/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "Clayton Clerk Real Estate Division links to gsccca.org/search. Submitting the Real Estate name-search form returns an auto-submitting redirect to apps.gsccca.org/login.asp; instrument-type and daily searches are labelled PREMIUM subscription. No account created (forbidden during recon)."
+          }
+        ],
+        "selected_source_id": "gsccca_clerk_indexes",
+        "status": "SOURCE_FOUND_PAID",
+        "notes": ""
+      },
+      {
+        "lead_type": "Code Lien",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Code Enforcement"
+        ],
+        "candidate_sources": [],
+        "selected_source_id": "",
+        "status": "SOURCE_NOT_FOUND",
+        "notes": "No online violation/lien lookup found; county pages describe complaint intake only."
+      },
+      {
+        "lead_type": "Demolition",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Code Enforcement"
+        ],
+        "candidate_sources": [],
+        "selected_source_id": "",
+        "status": "SOURCE_NOT_FOUND",
+        "notes": "No online demolition / unsafe-structure list found."
+      },
+      {
+        "lead_type": "Condemnation",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Legal organ via GPA"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "ga_public_notice_foreclosures",
+            "official_url": "https://www.georgiapublicnotice.com/",
+            "authority_type": "state_press_association",
+            "vendor_name": "GeorgiaPublicNotice.com",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "CAPTCHA_PROTECTED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_VENDOR_PORTAL via https://clerk.claytoncountyga.gov/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — CAPTCHA_PROTECTED",
+              "extractability": "PASS",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "publication",
+              "publish_date",
+              "notice_teaser"
+            ],
+            "operator_verified": false,
+            "notes": "Clayton County Clerk of Superior Court page links 'Legal Notices of the Clayton News-Daily' -> news-daily.com/.../legal/, which 301s to georgiapublicnotice.com. County=Clayton search (no CAPTCHA) returned ~100 pages for 9/13–11/12/2026 incl. 'Notice of Sale Under Power ... County of Clayton' and 'No"
+          }
+        ],
+        "selected_source_id": "ga_public_notice_foreclosures",
+        "status": "SOURCE_FOUND_CAPTCHA",
+        "notes": "GPA has a Condemnations category."
+      },
+      {
+        "lead_type": "Eviction",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Magistrate Court"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "magistrate_court_civil_evictions",
+            "official_url": "https://weba.claytoncountyga.gov/casinqsvr/htdocs/index.shtml",
+            "authority_type": "county_court",
+            "vendor_name": "Clayton County (county-built CGI)",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COURT via https://clerk.claytoncountyga.gov/case-search/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "PASS",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "case_number",
+              "filing_date",
+              "plaintiff",
+              "defendant",
+              "defendant_address",
+              "case_type",
+              "disposition"
+            ],
+            "operator_verified": false,
+            "notes": "Clerk site case-search page iframes weba.claytoncountyga.gov/casinqsvr. Sample GET wci010r.pgm?rtype=E&ctt=M&cyr=2026&ctp=CM&csq=00100 returned case 2026CM00100: landlord plaintiff vs tenant defendant, case type 'Patho Dispossessory', filing 01/02/2026, defendant street address, docket + disposition"
+          }
+        ],
+        "selected_source_id": "magistrate_court_civil_evictions",
+        "status": "LIVE_SOURCE_FOUND",
+        "notes": "Dispossessory cases enumerable by sequential case number."
+      },
+      {
+        "lead_type": "Divorce",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Superior Court"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "superior_court_civil",
+            "official_url": "https://weba.claytoncountyga.gov/casinqcgi-bin/wci011r.pgm?rtype=I&dvt=V",
+            "authority_type": "county_court",
+            "vendor_name": "Clayton County (county-built CGI)",
+            "source_role": "SUPPORTING_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "PER_RECORD_ONLY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COURT via https://clerk.claytoncountyga.gov/case-search/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "case_number",
+              "party_names"
+            ],
+            "operator_verified": false,
+            "notes": "Name-search form for Superior Court is public. Case-number probes 2026/2025 CV 00001/00100/01000 with ctt=U all returned 'Case# not found' — Superior numbering differs from State/Magistrate, so sequential enumeration is not yet proven."
+          }
+        ],
+        "selected_source_id": "superior_court_civil",
+        "status": "LIVE_SOURCE_FOUND_LIMITED_COVERAGE",
+        "notes": "Name search only until case-number format confirmed."
+      },
+      {
+        "lead_type": "Bankruptcy",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "U.S. Bankruptcy Court N.D. Ga."
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "federal_bankruptcy_ndga",
+            "official_url": "https://www.ganb.uscourts.gov/",
+            "authority_type": "federal_court",
+            "vendor_name": "PACER",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COURT via https://www.ganb.uscourts.gov/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "ganb.uscourts.gov reachable; case data is via PACER, which requires a funded account. Per §01.27 q11: flag for operator decision, do not auto-resolve."
+          }
+        ],
+        "selected_source_id": "federal_bankruptcy_ndga",
+        "status": "SOURCE_FOUND_NEEDS_LOGIN",
+        "notes": "PACER."
+      },
+      {
+        "lead_type": "Surplus",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton County Tax Commissioner"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "excess_funds_listing",
+            "official_url": "https://publicaccess.claytoncountyga.gov/content/PDF/DQ759GA.pdf",
+            "authority_type": "county_tax_commissioner",
+            "vendor_name": "Tyler iasWorld Public Access (PDF)",
+            "source_role": "PRIMARY_EVENT_SOURCE",
+            "access_status": "OPEN_PUBLIC",
+            "bulk_availability": "FULL_COUNTY_BULK",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COUNTY via https://www.claytoncountytc.com/tax-sales/",
+              "lead_type_relevance": "PASS",
+              "access": "PASS",
+              "extractability": "PASS",
+              "refresh_provenance": "monthly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": true,
+            "minimum_lead_fields_available": [
+              "owner_name",
+              "parcel_id",
+              "amount",
+              "sale_date"
+            ],
+            "operator_verified": false,
+            "notes": "Linked from Tax Commissioner tax-sales page ('Excess Funds Listing'). June 2026 listing inspected: text-extractable, name + parcel + amount + sale date."
+          }
+        ],
+        "selected_source_id": "excess_funds_listing",
+        "status": "LIVE_SOURCE_FOUND",
+        "notes": "Excess funds listing PDF."
+      },
+      {
+        "lead_type": "Bankruptcy Notice",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "U.S. Bankruptcy Court N.D. Ga."
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "federal_bankruptcy_ndga",
+            "official_url": "https://www.ganb.uscourts.gov/",
+            "authority_type": "federal_court",
+            "vendor_name": "PACER",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "PAID_SUBSCRIPTION_REQUIRED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_COURT via https://www.ganb.uscourts.gov/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — PAID_SUBSCRIPTION_REQUIRED",
+              "extractability": "UNPROVEN",
+              "refresh_provenance": "daily"
+            },
+            "sample_record_path_confirmed": false,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [],
+            "operator_verified": false,
+            "notes": "ganb.uscourts.gov reachable; case data is via PACER, which requires a funded account. Per §01.27 q11: flag for operator decision, do not auto-resolve."
+          }
+        ],
+        "selected_source_id": "federal_bankruptcy_ndga",
+        "status": "SOURCE_FOUND_NEEDS_LOGIN",
+        "notes": "PACER."
+      },
+      {
+        "lead_type": "Public Notice",
+        "state_applicability": "APPLICABLE",
+        "expected_authorities": [
+          "Clayton News Daily via GeorgiaPublicNotice.com"
+        ],
+        "candidate_sources": [
+          {
+            "source_id": "ga_public_notice_foreclosures",
+            "official_url": "https://www.georgiapublicnotice.com/",
+            "authority_type": "state_press_association",
+            "vendor_name": "GeorgiaPublicNotice.com",
+            "source_role": "BLOCKED_SOURCE",
+            "access_status": "CAPTCHA_PROTECTED",
+            "bulk_availability": "BATCH_QUERY",
+            "verification_layers": {
+              "authority": "PASS — OFFICIAL_VENDOR_PORTAL via https://clerk.claytoncountyga.gov/",
+              "lead_type_relevance": "PASS",
+              "access": "FAIL — CAPTCHA_PROTECTED",
+              "extractability": "PASS",
+              "refresh_provenance": "weekly"
+            },
+            "sample_record_path_confirmed": true,
+            "sample_document_view_possible": false,
+            "minimum_lead_fields_available": [
+              "publication",
+              "publish_date",
+              "notice_teaser"
+            ],
+            "operator_verified": false,
+            "notes": "Clayton County Clerk of Superior Court page links 'Legal Notices of the Clayton News-Daily' -> news-daily.com/.../legal/, which 301s to georgiapublicnotice.com. County=Clayton search (no CAPTCHA) returned ~100 pages for 9/13–11/12/2026 incl. 'Notice of Sale Under Power ... County of Clayton' and 'No"
+          }
+        ],
+        "selected_source_id": "ga_public_notice_foreclosures",
+        "status": "SOURCE_FOUND_CAPTCHA",
+        "notes": ""
+      }
+    ]
+  },
+  "source_coverage_map": {
+    "live_sources": [
+      "magistrate_court_civil_evictions",
+      "state_court_civil_judgments",
+      "probate_estates",
+      "tax_sale_listings",
+      "excess_funds_listing",
+      "superior_court_civil",
+      "assessor_parcel_master"
+    ],
+    "blocked_sources": [
+      "gsccca_clerk_indexes",
+      "ga_public_notice_foreclosures",
+      "federal_bankruptcy_ndga"
+    ],
+    "limited_coverage_sources": [
+      "tax_sale_listings",
+      "superior_court_civil",
+      "probate_estates"
+    ],
+    "not_found_lead_types": [
+      "Code Lien",
+      "Demolition"
+    ],
+    "operator_review_required": [
+      "gsccca_clerk_indexes",
+      "ga_public_notice_foreclosures",
+      "federal_bankruptcy_ndga",
+      "superior_court_civil"
+    ]
+  },
+  "api_discovery": {
+    "searched": [
+      "weba.claytoncountyga.gov/{api,swagger,docs}",
+      "publicaccess.claytoncountyga.gov (Tyler iasWorld — no public API doc)",
+      "georgiaprobaterecords.com (ASP.NET WebForms, no API doc)",
+      "search.gsccca.org (no public API; login)",
+      "georgiapublicnotice.com (no API; ToS forbids automated use)",
+      "ArcGIS Experience parcel map daff6d6be7a14000a1595a99bb67b1f8 (REST layer not enumerated)",
+      "GitHub / Postman: 'Clayton County GA api', 'gsccca api', 'iasworld api'"
+    ],
+    "found": [
+      {
+        "name": "Clayton County GIS Tax Parcels",
+        "api_type": "ArcGIS",
+        "url": "https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0",
+        "source_role": "ENRICHMENT_SOURCE",
+        "notes": "Found in Build Mode 2026-11-12 via the official Parcel Viewer web map. ~92,100 parcels, maxRecordCount 2000, public query, owner/mailing/situs/value/sale/homestead/DELINQUENT fields."
+      }
+    ],
+    "search_notes": "No documented APIs for lead sources. The county case inquiry is a stable GET-parameter CGI (effectively an undocumented HTTP API). Bulk parcel enrichment comes from the county ArcGIS MapServer behind the official Parcel Viewer."
+  },
+  "enrichment_index_strategy": {
+    "bulk_index_available": true,
+    "bulk_index_source": "https://gis.claytoncountyga.gov/server/rest/services/TaxAssessor/Parcels/MapServer/0",
+    "per_record_query_required": false,
+    "per_record_query_cost_estimate": "NONE — full layer cached weekly (~47 paged requests)",
+    "recommended_strategy": "scrapers/clayton_parcel_index.py caches the full layer; enrichment by parcel id, and parcel resolution by situs address for court/probate events with owner-name agreement checks."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "url": "https://publicaccess.claytoncountyga.gov/content/home_commissioner.htm",
+  "portal_type": "pdf_publication",
+  "portal_family": "Tyler iasWorld Public Access content folder",
+  "access_pattern": "static_html",
+  "access_method": "PDF_PUBLICATION",
+  "public_access_status": "FULL_PUBLIC_ACCESS",
+  "document_access_status": "DOCUMENTS_PUBLIC",
+  "search_fields": [],
+  "records_available": [
+    "monthly tax sale listing: sale date, parcel #, owner name, situs address, delinquent years, fair market value, cry-out bid"
+  ],
+  "verification_note": "claytoncountytc.com/tax-sales links 'View Tax Sale Listings' -> publicaccess.claytoncountyga.gov/content/home_commissioner.htm, which links the current 'November 2026 Tax Sales' PDF. Inspected Sep-2026 and Nov-2026 PDFs: text-extractable (pdftotext -layout), rows carry sale date, parcel id (e.g. '05079A A026'), owner, situs address, years delinquent, FMV, cry-out bid.",
+  "known_limitations": [
+    "Only parcels already levied for sale \u2014 not the full delinquent roll",
+    "PDF filenames are ad hoc (e.g. 'NOVEMBER TAX SALE LISTING 10-27-26.pdf'); discover via the landing page, not by URL pattern",
+    "Multi-line owner/address cells require layout-aware parsing; some rows interleave two parcels"
+  ],
+  "source_id": "tax_sale_listings",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}

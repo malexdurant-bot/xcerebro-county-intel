@@ -1,0 +1,25 @@
+{
+  "url": "https://weba.claytoncountyga.gov/casinqcgi-bin/wci011r.pgm?rtype=I&dvt=V",
+  "portal_type": "county_case_inquiry_cgi",
+  "portal_family": "IBM i CGI \u2014 county-built JIS front end",
+  "access_pattern": "static_html",
+  "access_method": "SEARCHABLE_PUBLIC_PORTAL",
+  "public_access_status": "FULL_PUBLIC_ACCESS",
+  "document_access_status": "DOCUMENTS_NOT_AVAILABLE",
+  "search_fields": [
+    "name (court=U)",
+    "case number (format unconfirmed)"
+  ],
+  "records_available": [
+    "divorce",
+    "quiet title / equity",
+    "civil",
+    "party names"
+  ],
+  "verification_note": "Name-search form for Superior Court is public. Case-number probes 2026/2025 CV 00001/00100/01000 with ctt=U all returned 'Case# not found' \u2014 Superior numbering differs from State/Magistrate, so sequential enumeration is not yet proven.",
+  "known_limitations": [
+    "Bulk enumeration unproven \u2014 currently name search only (PER_RECORD_ONLY)"
+  ],
+  "source_id": "superior_court_civil",
+  "fingerprinted_at": "2026-11-12T15:30:00Z"
+}
