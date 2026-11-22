@@ -161,6 +161,40 @@ OCR_AVAILABLE = _configure_tesseract()
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+# doc_number -> the per-row fields _fetch_and_ocr_row_document produces, for
+# every notice already OCR'd. Recorded documents don't change, so entries
+# never expire; the file only grows by the day's new filings.
+DOC_CACHE_PATH = REPO_ROOT / "data" / "cache" / "dallas_foreclosure_doc_cache.json"
+_DOC_CACHE_FIELDS = ("document_body_text", "debtor_name_ocr_hint", "detail_url", "property_address_detail")
+
+
+def _load_doc_cache(path: Path, prior_jsonl: Path) -> dict:
+    try:
+        cache = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        cache = {}
+    # Seed from notices already OCR'd into the output file (pre-cache runs),
+    # so the first cached run doesn't redo them all.
+    for rec in _load_prior(prior_jsonl).values():
+        p = rec.get("raw_payload") or {}
+        doc_number = p.get("doc_number")
+        if doc_number and doc_number not in cache and p.get("document_body_text"):
+            url = rec.get("source_url") or ""
+            cache[doc_number] = {
+                "document_body_text": p["document_body_text"],
+                "debtor_name_ocr_hint": p.get("debtor_name_ocr_hint"),
+                "detail_url": None if url.startswith("about:blank") else url,
+                "property_address_detail": p.get("property_address_detail"),
+            }
+    return cache
+
+
+def _save_doc_cache(path: Path, cache: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -325,8 +359,30 @@ def _run_search(page, date_from: datetime, date_to: datetime, verbose: bool) -> 
     # connection open indefinitely, confirmed live 2026-08-28 - a plain
     # networkidle goto reliably burns the full 30s timeout). Wait for the
     # DOM plus the #docTypes combobox we actually need instead.
-    page.goto(ADVANCED_SEARCH_URL, wait_until="domcontentloaded", timeout=30_000)
-    page.wait_for_selector("#docTypes", timeout=15_000)
+    # 2026-11-22: the Nov 21-22 runs failed this 15s wait when the portal
+    # answered with its bot-check page ('Performing security verification').
+    # Back off and reload a few times -- never solve or evade the check.
+    last_exc = None
+    for attempt in range(1, 4):
+        try:
+            page.goto(ADVANCED_SEARCH_URL, wait_until="domcontentloaded", timeout=45_000)
+            body = page.inner_text("body")[:400]
+            if "Performing security verification" in body:
+                raise RuntimeError("Dallas FC: portal returned its bot-check page")
+            page.wait_for_selector("#docTypes", timeout=45_000)
+            last_exc = None
+            break
+        except Exception as exc:  # noqa: BLE001 -- retried, then re-raised
+            last_exc = exc
+            if attempt == 3:
+                break
+            wait_s = 120 * attempt
+            if verbose:
+                print(f"  [Dallas FC] search page not ready (attempt {attempt}/3: "
+                      f"{type(exc).__name__}); backing off {wait_s}s", flush=True)
+            page.wait_for_timeout(wait_s * 1000)
+    if last_exc is not None:
+        raise last_exc
     page.wait_for_timeout(1_000)
     _select_foreclosures_doc_type(page)
 
@@ -354,7 +410,8 @@ def _run_search(page, date_from: datetime, date_to: datetime, verbose: bool) -> 
     return "Error"
 
 
-def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose: bool = False) -> list[dict]:
+def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose: bool = False,
+                               doc_cache: "dict | None" = None) -> list[dict]:
     """Scrape the visible results table. When do_ocr is True, also clicks into
     each row's detail view to OCR its page-1 document image (see
     _fetch_and_ocr_row_document) before moving to the next row.
@@ -397,7 +454,16 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
             "property_address_detail": None,
         }
 
-        if do_ocr:
+        # The 5-day window overlaps yesterday's by ~4 days; reuse any notice
+        # already read on an earlier run instead of re-opening and re-OCRing
+        # it (two OCR passes each).
+        cached = (doc_cache or {}).get(doc_number) if do_ocr else None
+        if cached:
+            for k in _DOC_CACHE_FIELDS:
+                row[k] = cached.get(k)
+            if verbose:
+                print(f"    [Dallas FC] doc {doc_number}: document body captured (cached)", flush=True)
+        elif do_ocr:
             expected_count = len(trs)
             (
                 row["document_body_text"],
@@ -405,6 +471,9 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
                 row["detail_url"],
                 row["property_address_detail"],
             ) = _fetch_and_ocr_row_document(page, context, tr_index, verbose)
+            # Only cache a real capture -- an image timeout retries next run.
+            if doc_cache is not None and row["document_body_text"]:
+                doc_cache[doc_number] = {k: row[k] for k in _DOC_CACHE_FIELDS}
             if verbose:
                 got = "captured" if row["document_body_text"] else "none"
                 print(f"    [Dallas FC] doc {doc_number}: document body {got}", flush=True)
@@ -618,6 +687,7 @@ def _scrape_window(
     max_pages: int,
     verbose: bool,
     fetch_document_body: bool = True,
+    doc_cache: "dict | None" = None,
 ) -> list[dict]:
     status = _run_search(page, date_from, date_to, verbose)
     if status == "NoResults":
@@ -637,7 +707,8 @@ def _scrape_window(
 
     rows_out: list[dict] = []
     for page_num in range(max_pages):
-        page_rows = _scrape_current_table_page(page, context=context, do_ocr=do_ocr, verbose=verbose)
+        page_rows = _scrape_current_table_page(page, context=context, do_ocr=do_ocr, verbose=verbose,
+                                               doc_cache=doc_cache)
         if verbose:
             print(f"  [Dallas FC] page {page_num}: {len(page_rows)} rows", flush=True)
 
@@ -768,6 +839,9 @@ def run_scraper(
 
     errors: list[str] = []
     scraped_rows: list[dict] = []
+    out_path = out_dir / "foreclosure_notices.jsonl"
+    doc_cache = _load_doc_cache(DOC_CACHE_PATH, out_path)
+    cached_before = len(doc_cache)
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=headless)
         context = browser.new_context(
@@ -779,17 +853,22 @@ def run_scraper(
             scraped_rows = _scrape_window(
                 page, context, date_from, date_to, limit_per_page, max_pages, verbose,
                 fetch_document_body=fetch_document_body,
+                doc_cache=doc_cache,
             )
         except Exception as exc:
             errors.append(f"scrape_error: {exc}")
             if verbose:
                 print(f"  [Dallas FC] ERROR: {exc}", flush=True)
+        finally:
+            # Save even after a mid-run failure so finished notices aren't redone.
+            _save_doc_cache(DOC_CACHE_PATH, doc_cache)
+            if verbose:
+                print(f"  [Dallas FC] document cache: {cached_before} -> {len(doc_cache)} entries", flush=True)
         browser.close()
 
     records = _to_wrapped_records(scraped_rows)
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "foreclosure_notices.jsonl"
     stats = _write_jsonl(records, out_path, out_path)
 
     return {

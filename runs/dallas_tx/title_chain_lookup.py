@@ -84,6 +84,9 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from scrapers.publicsearch_recorder_dallas import (  # noqa: E402
+    _open_home,
+    _is_challenge,
+    PortalChallengeError,
     PORTAL_URL,
     USER_AGENT,
     _click_button_by_text,
@@ -201,7 +204,9 @@ def run_incremental_lookup(
     todo = candidates[:budget]
 
     stats = {"tier": tier, "attempted": 0, "leads_with_hits": 0,
-              "remaining_backlog": max(0, len(candidates) - len(todo))}
+              "remaining_backlog": max(0, len(candidates) - len(todo)),
+              "failed": 0, "aborted": False, "errors": []}
+    consecutive_failures = 0
 
     if not todo:
         if verbose:
@@ -223,13 +228,36 @@ def run_incremental_lookup(
             for i, rec in enumerate(todo):
                 owner = rec["display_owner"]
                 lead_id = rec["lead_id"]
+                if i:
+                    # Polite pacing between searches (2026-11-22: the portal's
+                    # bot check starts answering after a burst of searches).
+                    page.wait_for_timeout(_OWNER_PACING_MS)
                 if verbose:
                     print(f"  [title_chain] tier {tier} [{i + 1}/{len(todo)}] "
                           f"{owner} (lead {lead_id})...", flush=True)
-                hits = lookup_owner(
-                    page, owner, tier_doc_types,
-                    reference_date=rec["primary_event_date"], verbose=verbose,
-                )
+                try:
+                    hits = lookup_owner(
+                        page, owner, tier_doc_types,
+                        reference_date=rec["primary_event_date"], verbose=verbose,
+                    )
+                except Exception as exc:  # noqa: BLE001 -- one owner must not kill the run
+                    # Not marked checked, so it is retried next run.
+                    consecutive_failures += 1
+                    if isinstance(exc, PortalChallengeError):
+                        consecutive_failures = _MAX_CONSECUTIVE_OWNER_FAILURES
+                    stats["failed"] += 1
+                    stats["errors"].append(f"{type(exc).__name__}: {exc}"[:300])
+                    if verbose:
+                        print(f"    [title_chain] lookup FAILED for this owner "
+                              f"({type(exc).__name__}); left unchecked for next run", flush=True)
+                    if consecutive_failures >= _MAX_CONSECUTIVE_OWNER_FAILURES:
+                        stats["aborted"] = True
+                        if verbose:
+                            print(f"  [title_chain] tier {tier}: {consecutive_failures} lookups "
+                                  f"failed in a row -- stopping this tier for this run", flush=True)
+                        break
+                    continue
+                consecutive_failures = 0
                 stats["attempted"] += 1
                 already_checked.add(lead_id)
                 if hits:
@@ -254,6 +282,16 @@ def run_incremental_lookup(
     return stats
 
 
+_SEARCH_BOX_SELECTOR = (
+    'input[placeholder*="grantor/grantee"], '
+    'input[placeholder*="Search for grantor"]'
+)
+# Stop a tier after this many owners fail in a row (site down) -- the
+# remaining owners stay unchecked and are retried next run.
+_MAX_CONSECUTIVE_OWNER_FAILURES = 3
+_OWNER_PACING_MS = 6_000
+
+
 def _run_owner_name_search(page, owner_name: str, verbose: bool) -> str:
     """Party-name text search via the Quick Search box (placeholder
     "Search for grantor/grantee, subdivision, doc type, or doc#" -- live-
@@ -262,11 +300,15 @@ def _run_owner_name_search(page, owner_name: str, verbose: bool) -> str:
     'Error', same status contract as publicsearch_recorder_dallas.py's
     _run_search (not reused directly -- that function only drives the
     date-range fields, this one drives the search-term box instead)."""
-    page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=30_000)
-    page.wait_for_selector(
-        'input[placeholder*="grantor/grantee"]', timeout=15_000
-    )
-    page.fill('input[placeholder*="grantor/grantee"]', owner_name)
+    # 2026-11-22: both Nov 21 attempts timed out waiting for this box. The
+    # selector is unchanged (re-verified live); the cause was the portal's
+    # bot check answering a repeated full page load with a 403 'security
+    # verification' page. _open_home loads the home page once per browser
+    # and returns to the form inside the app after that; it raises
+    # PortalChallengeError (never bypassed) if the check appears anyway.
+    _open_home(page, verbose)
+    page.wait_for_selector(_SEARCH_BOX_SELECTOR, timeout=45_000)
+    page.fill(_SEARCH_BOX_SELECTOR, owner_name)
     _click_button_by_text(page, "Search")
 
     for i in range(_MAX_POLLS):
@@ -303,6 +345,14 @@ def lookup_owner(
     manual CLI's default), every doc-type match is kept regardless of
     date, same as before this filter existed."""
     status = _run_owner_name_search(page, owner_name, verbose)
+    if status == "Error":
+        # 2026-11-22: a search that never resolves (typically the portal's
+        # bot check throttling the results request) used to return [] and
+        # the lead was marked "checked, no related records" for good. Raise
+        # instead, so it stays unchecked and retries on a later run.
+        if _is_challenge(page):
+            raise PortalChallengeError("Dallas title-chain: portal bot-check page during search")
+        raise RuntimeError("Dallas title-chain: owner search did not resolve")
     if status != "HasRows":
         return []
 

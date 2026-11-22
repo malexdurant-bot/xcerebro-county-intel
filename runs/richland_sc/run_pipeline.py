@@ -235,6 +235,12 @@ def main() -> None:
         default=False,
         help="Halt on NEEDS_OPERATOR_REVIEW instead of auto-approving",
     )
+    parser.add_argument(
+        "--skip-publish",
+        action="store_true",
+        help="Skip GitHub Pages, client-backend, agent-API, and "
+             "richland-sc-leads commit/push steps",
+    )
     args = parser.parse_args()
 
     incremental = not args.full
@@ -257,14 +263,20 @@ def main() -> None:
     dt_records = scrape_delinquent_tax(incremental=incremental)
     print(f"[richland_sc] Delinquent tax: {len(dt_records)} new records")
 
+    rod_failure = None
     try:
         rod_records = scrape_register_of_deeds(incremental=incremental)
     except Exception as exc:
+        # 2026-11-22: still don't abort the other sources, but a dead
+        # Register of Deeds is now a FAILED run (exit 3 at the very end,
+        # after every other step has run and published) instead of a quiet
+        # "0 new records" -- it had been silently failing since September.
+        rod_failure = f"{type(exc).__name__}: {exc}"
         # Non-fatal: the SMS portal is a fragile, unofficial-API third-party
         # ASP.NET WebForms app (see module docstring) — a session/site hiccup
         # here shouldn't take down Columbia Star + delinquent tax, which are
         # this county's primary, more reliable sources.
-        print(f"[richland_sc] Register of Deeds scrape failed (non-fatal): {exc}")
+        print(f"[richland_sc] *** Register of Deeds scrape FAILED: {exc} ***")
         rod_records = []
     print(f"[richland_sc] Register of Deeds: {len(rod_records)} new records")
 
@@ -507,176 +519,187 @@ def main() -> None:
 
     # Also write to the static dashboard's data directory so opening
     # dashboard/index.html shows live Richland SC leads immediately.
+    # This is a shared live slot — skip it during --skip-publish test runs.
     static_dash_path = ROOT / "dashboard" / "data" / "leads.json"
-    static_dash_path.parent.mkdir(parents=True, exist_ok=True)
-    static_dash_path.write_text(payload_json, encoding="utf-8")
+    if not args.skip_publish:
+        static_dash_path.parent.mkdir(parents=True, exist_ok=True)
+        static_dash_path.write_text(payload_json, encoding="utf-8")
 
     print(f"[richland_sc] Dashboard written  → {dash_path}")
-    print(f"[richland_sc] Static dashboard   → {static_dash_path}")
+    if not args.skip_publish:
+        print(f"[richland_sc] Static dashboard   → {static_dash_path}")
     print(f"[richland_sc] Lead total:          {payload['lead_total']}")
     print(f"[richland_sc] Score tiers:         {payload['score_tier_distribution']}")
     print(f"[richland_sc] Patterns:            {payload['pattern_counts']}")
 
     # ------------------------------------------------------------------
-    # Step 5 — Publish to GitHub Pages (malexdurant-bot fork)
-    # ------------------------------------------------------------------
-    import subprocess  # noqa: PLC0415
-    try:
-        subprocess.run(
-            ["git", "add", str(static_dash_path)],
-            cwd=str(ROOT), check=True, capture_output=True,
-        )
-        subprocess.run(
-            ["git", "commit", "-m",
-             f"data(richland_sc): dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
-            cwd=str(ROOT), check=True, capture_output=True,
-        )
-        # Push without pipes and with prompts disabled. On Windows a
-        # timed-out push leaves git's HTTPS/credential helper holding any
-        # captured pipes, and subprocess.run() then blocks draining them.
-        # A timeout here is non-fatal so Step 5b still publishes.
-        import tempfile  # noqa: PLC0415
-        with tempfile.TemporaryFile() as push_err:
-            try:
-                subprocess.run(
-                    ["git", "push", "pages", "main"],
-                    cwd=str(ROOT), check=True, timeout=120,
-                    stdout=subprocess.DEVNULL, stderr=push_err,
-                    env={**os.environ, "GIT_TERMINAL_PROMPT": "0", "GCM_INTERACTIVE": "never"},
-                )
-                print("[richland_sc] GitHub Pages updated → https://malexdurant-bot.github.io/xcerebro-county-intel/dashboard/")
-            except subprocess.TimeoutExpired:
-                print("[richland_sc] GitHub Pages push timed out (non-fatal) — commit kept locally, pushes next run")
-            except subprocess.CalledProcessError:
-                push_err.seek(0)
-                print(f"[richland_sc] GitHub Pages push failed (non-fatal): {push_err.read().decode(errors='replace')[:200]}")
-    except subprocess.CalledProcessError as exc:
-        # Non-fatal — pipeline succeeded even if publish fails
-        stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
-        if "nothing to commit" in stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):
-            print("[richland_sc] GitHub Pages: no changes to publish")
-        else:
-            print(f"[richland_sc] GitHub Pages publish failed (non-fatal): {stderr[:200]}")
-
-    # ------------------------------------------------------------------
-    # Step 5b — Publish to the login-gated client dashboard backend
-    # (richlandsc.justfriday.ai serves a static, credential-free frontend;
-    # the actual lead data is fetched client-side only after the visitor
-    # authenticates, from this hosted table — never committed to a repo).
-    # ------------------------------------------------------------------
-    if LEADS_BACKEND_URL and LEADS_BACKEND_WRITE_KEY:
-        try:
-            resp = requests.post(
-                f"{LEADS_BACKEND_URL}/rest/v1/dashboard_payloads",
-                headers={
-                    "apikey": LEADS_BACKEND_WRITE_KEY,
-                    "Authorization": f"Bearer {LEADS_BACKEND_WRITE_KEY}",
-                    "Content-Type": "application/json",
-                    "Prefer": "resolution=merge-duplicates",
-                },
-                json={
-                    "county": "richland_sc",
-                    "payload": json.loads(payload_json),
-                    "updated_at": datetime.now(timezone.utc).isoformat(),
-                },
-                timeout=30,
-            )
-            resp.raise_for_status()
-            print("[richland_sc] Client dashboard data updated → https://richlandsc.justfriday.ai/")
-        except requests.RequestException as exc:
-            print(f"[richland_sc] Client dashboard publish failed (non-fatal): {exc}")
+    if args.skip_publish:
+        print("[richland_sc] --skip-publish: skipping GitHub Pages, client backend, agent API, and richlandsc.justfriday.ai publish steps")
     else:
-        print(
-            "[richland_sc] Client dashboard backend not configured "
-            "(LEADS_BACKEND_URL / LEADS_BACKEND_WRITE_KEY not set in .env) — "
-            "skipping client publish"
-        )
-
-    # ------------------------------------------------------------------
-    # Step 5c — Push to the client-agent leads API (runs/richland_sc/
-    # api_server.py, deployed separately e.g. on Render). That process
-    # doesn't share this machine's filesystem, so it can't read data.json
-    # itself — we push it the finished payload after every run instead.
-    # ------------------------------------------------------------------
-    if RICHLAND_AGENT_API_URL and RICHLAND_AGENT_API_INGEST_KEY:
-        try:
-            resp = requests.post(
-                f"{RICHLAND_AGENT_API_URL}/richland/ingest",
-                headers={
-                    "X-Ingest-Key": RICHLAND_AGENT_API_INGEST_KEY,
-                    "Content-Type": "application/json",
-                },
-                data=payload_json.encode("utf-8"),
-                timeout=30,
-            )
-            resp.raise_for_status()
-            print(f"[richland_sc] Agent API updated → {RICHLAND_AGENT_API_URL}/richland/leads/new")
-        except requests.RequestException as exc:
-            print(f"[richland_sc] Agent API push failed (non-fatal): {exc}")
-    else:
-        print(
-            "[richland_sc] Agent API not configured "
-            "(RICHLAND_AGENT_API_URL / RICHLAND_AGENT_API_INGEST_KEY not set in .env) — "
-            "skipping agent API push"
-        )
-
-    # ------------------------------------------------------------------
-    # Step 5d — Push to the richlandsc.justfriday.ai dashboard's own repo
-    # (malexdurant-bot/richland-sc-leads, a separate GitHub Pages site on a
-    # custom domain — isolated from this repo so the client never sees our
-    # scraper source). That repo's data/leads.json was hand-published once
-    # on 2026-08-24 and never updated again — the LEADS_BACKEND_URL/
-    # LEADS_BACKEND_WRITE_KEY Supabase-REST design above was a different,
-    # never-provisioned approach; confirmed live 2026-09-04 (via the site's
-    # own network requests) that the deployed frontend actually just fetches
-    # a static data/leads.json from its own domain, identical in shape to
-    # payload_json. Uses the GitHub Contents API via `gh api` (already
-    # authenticated on this machine) rather than a local git clone, since
-    # this repo has no working tree for richland-sc-leads. Fetch-then-PUT
-    # (not a plain git push) because the Contents API requires the
-    # existing file's blob sha to update it.
-    # ------------------------------------------------------------------
-    RICHLAND_SC_LEADS_REPO = "malexdurant-bot/richland-sc-leads"
-    RICHLAND_SC_LEADS_PATH = "data/leads.json"
-    try:
-        import base64  # noqa: PLC0415
-        import tempfile  # noqa: PLC0415
-
-        sha_result = subprocess.run(
-            ["gh", "api", f"repos/{RICHLAND_SC_LEADS_REPO}/contents/{RICHLAND_SC_LEADS_PATH}",
-             "--jq", ".sha"],
-            capture_output=True, text=True, check=True, timeout=30,
-        )
-        current_sha = sha_result.stdout.strip()
-
-        body = {
-            "message": f"data(richland_sc): dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}",
-            "content": base64.b64encode(payload_json.encode("utf-8")).decode("ascii"),
-            "sha": current_sha,
-            "branch": "main",
-        }
-        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as f:
-            json.dump(body, f)
-            tmp_path = f.name
+        # Step 5 — Publish to GitHub Pages (malexdurant-bot fork)
+        # ------------------------------------------------------------------
+        import subprocess  # noqa: PLC0415
         try:
             subprocess.run(
-                ["gh", "api", f"repos/{RICHLAND_SC_LEADS_REPO}/contents/{RICHLAND_SC_LEADS_PATH}",
-                 "-X", "PUT", "--input", tmp_path],
-                check=True, capture_output=True, timeout=60,
+                ["git", "add", str(static_dash_path)],
+                cwd=str(ROOT), check=True, capture_output=True,
             )
-        finally:
-            os.unlink(tmp_path)
-        print("[richland_sc] richlandsc.justfriday.ai updated → https://richlandsc.justfriday.ai/")
-    except subprocess.CalledProcessError as exc:
-        stderr = exc.stderr.decode(errors="replace") if isinstance(exc.stderr, bytes) else (exc.stderr or "")
-        print(f"[richland_sc] richlandsc.justfriday.ai publish failed (non-fatal): {stderr[:300]}")
-    except Exception as exc:  # noqa: BLE001 - best-effort publish, never block the pipeline
-        print(f"[richland_sc] richlandsc.justfriday.ai publish failed (non-fatal): {exc}")
+            subprocess.run(
+                ["git", "commit", "-m",
+                 f"data(richland_sc): dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"],
+                cwd=str(ROOT), check=True, capture_output=True,
+            )
+            # Push without pipes and with prompts disabled. On Windows a
+            # timed-out push leaves git's HTTPS/credential helper holding any
+            # captured pipes, and subprocess.run() then blocks draining them.
+            # A timeout here is non-fatal so Step 5b still publishes.
+            import tempfile  # noqa: PLC0415
+            with tempfile.TemporaryFile() as push_err:
+                try:
+                    subprocess.run(
+                        ["git", "push", "pages", "main"],
+                        cwd=str(ROOT), check=True, timeout=120,
+                        stdout=subprocess.DEVNULL, stderr=push_err,
+                        env={**os.environ, "GIT_TERMINAL_PROMPT": "0", "GCM_INTERACTIVE": "never"},
+                    )
+                    print("[richland_sc] GitHub Pages updated → https://malexdurant-bot.github.io/xcerebro-county-intel/dashboard/")
+                except subprocess.TimeoutExpired:
+                    print("[richland_sc] GitHub Pages push timed out (non-fatal) — commit kept locally, pushes next run")
+                except subprocess.CalledProcessError:
+                    push_err.seek(0)
+                    print(f"[richland_sc] GitHub Pages push failed (non-fatal): {push_err.read().decode(errors='replace')[:200]}")
+        except subprocess.CalledProcessError as exc:
+            # Non-fatal — pipeline succeeded even if publish fails
+            stderr = exc.stderr.decode(errors="replace") if exc.stderr else ""
+            if "nothing to commit" in stderr or "nothing to commit" in (exc.stdout or b"").decode(errors="replace"):
+                print("[richland_sc] GitHub Pages: no changes to publish")
+            else:
+                print(f"[richland_sc] GitHub Pages publish failed (non-fatal): {stderr[:200]}")
+
+        # ------------------------------------------------------------------
+        # Step 5b — Publish to the login-gated client dashboard backend
+        # (richlandsc.justfriday.ai serves a static, credential-free frontend;
+        # the actual lead data is fetched client-side only after the visitor
+        # authenticates, from this hosted table — never committed to a repo).
+        # ------------------------------------------------------------------
+        if LEADS_BACKEND_URL and LEADS_BACKEND_WRITE_KEY:
+            try:
+                resp = requests.post(
+                    f"{LEADS_BACKEND_URL}/rest/v1/dashboard_payloads",
+                    headers={
+                        "apikey": LEADS_BACKEND_WRITE_KEY,
+                        "Authorization": f"Bearer {LEADS_BACKEND_WRITE_KEY}",
+                        "Content-Type": "application/json",
+                        "Prefer": "resolution=merge-duplicates",
+                    },
+                    json={
+                        "county": "richland_sc",
+                        "payload": json.loads(payload_json),
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                    },
+                    timeout=30,
+                )
+                resp.raise_for_status()
+                print("[richland_sc] Client dashboard data updated → https://richlandsc.justfriday.ai/")
+            except requests.RequestException as exc:
+                print(f"[richland_sc] Client dashboard publish failed (non-fatal): {exc}")
+        else:
+            print(
+                "[richland_sc] Client dashboard backend not configured "
+                "(LEADS_BACKEND_URL / LEADS_BACKEND_WRITE_KEY not set in .env) — "
+                "skipping client publish"
+            )
+
+        # ------------------------------------------------------------------
+        # Step 5c — Push to the client-agent leads API (runs/richland_sc/
+        # api_server.py, deployed separately e.g. on Render). That process
+        # doesn't share this machine's filesystem, so it can't read data.json
+        # itself — we push it the finished payload after every run instead.
+        # ------------------------------------------------------------------
+        if RICHLAND_AGENT_API_URL and RICHLAND_AGENT_API_INGEST_KEY:
+            try:
+                resp = requests.post(
+                    f"{RICHLAND_AGENT_API_URL}/richland/ingest",
+                    headers={
+                        "X-Ingest-Key": RICHLAND_AGENT_API_INGEST_KEY,
+                        "Content-Type": "application/json",
+                    },
+                    data=payload_json.encode("utf-8"),
+                    timeout=30,
+                )
+                resp.raise_for_status()
+                print(f"[richland_sc] Agent API updated → {RICHLAND_AGENT_API_URL}/richland/leads/new")
+            except requests.RequestException as exc:
+                print(f"[richland_sc] Agent API push failed (non-fatal): {exc}")
+        else:
+            print(
+                "[richland_sc] Agent API not configured "
+                "(RICHLAND_AGENT_API_URL / RICHLAND_AGENT_API_INGEST_KEY not set in .env) — "
+                "skipping agent API push"
+            )
+
+        # ------------------------------------------------------------------
+        # Step 5d — Push to the richlandsc.justfriday.ai dashboard's own repo
+        # (malexdurant-bot/richland-sc-leads, a separate GitHub Pages site on a
+        # custom domain — isolated from this repo so the client never sees our
+        # scraper source). That repo's data/leads.json was hand-published once
+        # on 2026-08-24 and never updated again — the LEADS_BACKEND_URL/
+        # LEADS_BACKEND_WRITE_KEY Supabase-REST design above was a different,
+        # never-provisioned approach; confirmed live 2026-09-04 (via the site's
+        # own network requests) that the deployed frontend actually just fetches
+        # a static data/leads.json from its own domain, identical in shape to
+        # payload_json. Uses the GitHub Contents API via `gh api` (already
+        # authenticated on this machine) rather than a local git clone, since
+        # this repo has no working tree for richland-sc-leads. Fetch-then-PUT
+        # (not a plain git push) because the Contents API requires the
+        # existing file's blob sha to update it.
+        # ------------------------------------------------------------------
+        RICHLAND_SC_LEADS_REPO = "malexdurant-bot/richland-sc-leads"
+        RICHLAND_SC_LEADS_PATH = "data/leads.json"
+        try:
+            import base64  # noqa: PLC0415
+            import tempfile  # noqa: PLC0415
+
+            sha_result = subprocess.run(
+                ["gh", "api", f"repos/{RICHLAND_SC_LEADS_REPO}/contents/{RICHLAND_SC_LEADS_PATH}",
+                 "--jq", ".sha"],
+                capture_output=True, text=True, check=True, timeout=30,
+            )
+            current_sha = sha_result.stdout.strip()
+
+            body = {
+                "message": f"data(richland_sc): dashboard update {datetime.now(timezone.utc).strftime('%Y-%m-%d')}",
+                "content": base64.b64encode(payload_json.encode("utf-8")).decode("ascii"),
+                "sha": current_sha,
+                "branch": "main",
+            }
+            with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as f:
+                json.dump(body, f)
+                tmp_path = f.name
+            try:
+                subprocess.run(
+                    ["gh", "api", f"repos/{RICHLAND_SC_LEADS_REPO}/contents/{RICHLAND_SC_LEADS_PATH}",
+                     "-X", "PUT", "--input", tmp_path],
+                    check=True, capture_output=True, timeout=60,
+                )
+            finally:
+                os.unlink(tmp_path)
+            print("[richland_sc] richlandsc.justfriday.ai updated → https://richlandsc.justfriday.ai/")
+        except subprocess.CalledProcessError as exc:
+            stderr = exc.stderr.decode(errors="replace") if isinstance(exc.stderr, bytes) else (exc.stderr or "")
+            print(f"[richland_sc] richlandsc.justfriday.ai publish failed (non-fatal): {stderr[:300]}")
+        except Exception as exc:  # noqa: BLE001 - best-effort publish, never block the pipeline
+            print(f"[richland_sc] richlandsc.justfriday.ai publish failed (non-fatal): {exc}")
+
 
     print(
         f"[richland_sc] Pipeline complete — "
         f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}"
     )
+    if rod_failure:
+        print(f"[richland_sc] *** FAILED: Register of Deeds did not scrape -- {rod_failure[:300]} ***",
+              flush=True)
+        sys.exit(3)
 
 
 if __name__ == "__main__":

@@ -121,6 +121,7 @@ import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import parse_qsl, urlsplit
 
 try:
     from playwright.sync_api import sync_playwright
@@ -374,6 +375,60 @@ def _extract_address_near_name(
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+# doc_number -> {document_body_text, detail_url, legal_description} for every
+# document already OCR'd. Recorded documents don't change, so entries never
+# expire; the file only grows by the day's new filings.
+DOC_CACHE_PATH = REPO_ROOT / "data" / "cache" / "dallas_recorder_doc_cache.json"
+
+
+def _load_doc_cache(path: Path, prior_jsonl: Path) -> dict:
+    try:
+        cache = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        cache = {}
+    # Seed from documents already OCR'd into the output file (pre-cache
+    # runs), so the first cached run doesn't redo them all.
+    for rec in _load_prior(prior_jsonl).values():
+        p = rec.get("raw_payload") or {}
+        doc_number = p.get("doc_number")
+        if doc_number and doc_number not in cache and p.get("document_body_text"):
+            url = rec.get("source_url") or ""
+            ld = p.get("legal_description")
+            cache[doc_number] = {
+                "document_body_text": p["document_body_text"],
+                "detail_url": None if url.startswith("about:blank") else url,
+                "legal_description": None if ld in (None, "", "N/A") else ld,
+            }
+    return cache
+
+
+# Recorded days (YYYYMMDD) already read completely at or before the
+# portal's certified date -- final, so not re-read.
+DAYS_STATE_PATH = REPO_ROOT / "data" / "cache" / "dallas_recorder_days_done.json"
+
+
+def _load_days_state(path: Path) -> dict:
+    try:
+        st = json.loads(path.read_text(encoding="utf-8"))
+        st.setdefault("complete", [])
+        return st
+    except (OSError, ValueError):
+        return {"complete": []}
+
+
+def _save_days_state(path: Path, st: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(st, indent=1), encoding="utf-8")
+    tmp.replace(path)
+
+
+def _save_doc_cache(path: Path, cache: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -482,23 +537,150 @@ def _click_button_by_text(page, text: str, timeout_ms: int = 10_000) -> None:
     raise RuntimeError(f"Dallas RP: no <button> with exact text {text!r} found")
 
 
+class RecorderDateRangeError(RuntimeError):
+    """The portal did not apply the requested recorded-date range, or a
+    searched weekday came back with no in-range rows. Raised loudly so the
+    run is flagged instead of quietly storing the wrong documents."""
+
+
+_CERTIFIED_RE = re.compile(r"Certified through\s+(\d{1,2})/(\d{1,2})/(\d{4})", re.I)
+_PAGE_LOAD_ATTEMPTS = 3
+_CHALLENGE_BACKOFF_S = 120
+
+
+class PortalChallengeError(RuntimeError):
+    """The portal answered with its bot-check ('Performing security
+    verification') page. Never worked around -- the run stops and reports."""
+
+
+def _is_challenge(page) -> bool:
+    try:
+        body = page.inner_text("body")[:400]
+    except Exception:  # noqa: BLE001
+        return False
+    return "Performing security verification" in body or "__cf_chl" in page.url
+
+
+def _open_home(page, verbose: bool) -> None:
+    """Get to the quick-search form.
+
+    2026-11-22, confirmed live: the portal sits behind a bot check that
+    answers a SECOND full page load of the home page in the same browser
+    with a 403 'Performing security verification' page. That is what failed
+    both Nov 21 nightly attempts (recorder and title-chain alike: each
+    search did a fresh page.goto). So: load the home page once per browser,
+    and for every later search go back to the form inside the app via the
+    results page's own 'Edit Search Criteria' link -- no new page load. The
+    bot check is never bypassed; if it appears we stop and report it."""
+    on_portal = PORTAL_HOST in (page.url or "")
+    if on_portal and not _is_challenge(page):
+        if page.query_selector("button:has-text('Recorded Date')") and \
+                page.is_visible("button:has-text('Recorded Date')"):
+            return
+        link = page.query_selector("a:has-text('Edit Search Criteria')") or page.query_selector('a[href="/"]')
+        if link is not None:
+            try:
+                link.click(timeout=15_000)
+                page.wait_for_selector("button:has-text('Recorded Date')", timeout=45_000)
+                page.wait_for_timeout(1_000)
+                return
+            except Exception as exc:  # noqa: BLE001 -- fall through to one page load
+                if verbose:
+                    print(f"  [Dallas RP] in-app return to the search form failed: {type(exc).__name__}", flush=True)
+    if on_portal and not _is_challenge(page) and page.query_selector("button:has-text('Recorded Date')"):
+        return
+    last_exc = None
+    for attempt in range(1, _PAGE_LOAD_ATTEMPTS + 1):
+        try:
+            page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=45_000)
+            if _is_challenge(page):
+                raise PortalChallengeError(
+                    "Dallas RP: portal returned its bot-check page ('Performing security "
+                    "verification') -- not bypassed; stopping")
+            page.wait_for_selector("button:has-text('Recorded Date')", timeout=45_000)
+            page.wait_for_timeout(1_000)
+            return
+        except PortalChallengeError as exc:
+            # Back off and try a plain reload later -- never solve or evade it.
+            last_exc = exc
+            if attempt == _PAGE_LOAD_ATTEMPTS:
+                raise
+            wait_s = _CHALLENGE_BACKOFF_S * attempt
+            if verbose:
+                print(f"  [Dallas RP] portal bot-check page (attempt {attempt}/{_PAGE_LOAD_ATTEMPTS}); "
+                      f"backing off {wait_s}s", flush=True)
+            page.wait_for_timeout(wait_s * 1000)
+            continue
+        except Exception as exc:  # noqa: BLE001 -- retried, then re-raised
+            last_exc = exc
+            if verbose:
+                print(f"  [Dallas RP] home page not ready (attempt {attempt}/{_PAGE_LOAD_ATTEMPTS}): "
+                      f"{type(exc).__name__}", flush=True)
+            page.wait_for_timeout(10_000 * attempt)
+    raise last_exc
+
+
+def read_certified_through(page, verbose: bool = False) -> "datetime | None":
+    """The portal's 'Certified through MM/DD/YYYY' banner -- the last
+    recorded date actually in the index."""
+    _open_home(page, verbose)
+    m = _CERTIFIED_RE.search(page.inner_text("body"))
+    if not m:
+        return None
+    return datetime(int(m.group(3)), int(m.group(1)), int(m.group(2)), tzinfo=timezone.utc)
+
+
+def _set_date_input(page, selector: str, value: str) -> None:
+    page.fill(selector, value)
+    page.wait_for_timeout(200)
+
+
+def _set_date_range(page, date_from: datetime, date_to: datetime) -> None:
+    """The form keeps the previous search's dates after the in-app return,
+    and the app silently rejects a start date later than the CURRENT end
+    date (confirmed live 2026-11-22: start 11/13 typed while end was still
+    11/12 was dropped, so the portal searched 11/12-11/13). Setting end,
+    start, then end again is valid whichever way the window moved."""
+    s_sel = 'input[aria-label="Starting Recorded Date"]'
+    e_sel = 'input[aria-label="Ending Recorded Date"]'
+    f, t = date_from.strftime("%m/%d/%Y"), date_to.strftime("%m/%d/%Y")
+    _set_date_input(page, e_sel, t)
+    _set_date_input(page, s_sel, f)
+    _set_date_input(page, e_sel, t)
+    if page.input_value(s_sel) != f or page.input_value(e_sel) != t:
+        raise RecorderDateRangeError(f"Dallas RP: date inputs would not take {f}-{t}")
+
+
 def _run_search(page, date_from: datetime, date_to: datetime, verbose: bool) -> str:
     """Drive the homepage UI to start a search. Returns final status string:
-    'HasRows' | 'NoResults' | 'Error'. Raises on unexpected states."""
+    'HasRows' | 'NoResults' | 'Error'. Raises on unexpected states.
+
+    2026-11-22 root cause of the Nov 6-21 "same old 1971-2016 documents"
+    bug, confirmed live: when the START date is after the portal's
+    'Certified through' date, the portal silently replaces the whole range
+    with 1800-01-01..<certified date> and returns all ~20M documents, oldest
+    pages first. run_scraper now never asks past the certified date, and
+    this function checks the range the portal actually used (the
+    recordedDateRange in the results URL) and raises if it differs."""
     # networkidle is unreliable on this SPA family - the FC adapter's
     # advanced-search page never reaches idle at all (confirmed live
     # 2026-08-28). Use domcontentloaded + an explicit selector wait instead.
-    page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=30_000)
-    page.wait_for_selector("button:has-text('Recorded Date')", timeout=15_000)
-    page.wait_for_timeout(1_000)
+    _open_home(page, verbose)
     _click_button_by_text(page, "Recorded Date")
     page.wait_for_timeout(1_000)
-    page.fill('input[aria-label="Starting Recorded Date"]', date_from.strftime("%m/%d/%Y"))
-    page.fill('input[aria-label="Ending Recorded Date"]', date_to.strftime("%m/%d/%Y"))
+    _set_date_range(page, date_from, date_to)
+    pre_url = page.url
     _click_button_by_text(page, "Search")
 
+    want = f"{_fmt_yyyymmdd(date_from)},{_fmt_yyyymmdd(date_to)}"
     for i in range(_MAX_POLLS):
         page.wait_for_timeout(_POLL_INTERVAL_MS)
+        if page.url == pre_url:
+            continue  # still on the form -- don't read a stale table
+        got = dict(parse_qsl(urlsplit(page.url).query)).get("recordedDateRange")
+        if got is not None and got != want:
+            raise RecorderDateRangeError(
+                f"Dallas RP: portal ignored the date range (asked {want}, it searched {got})")
         body = page.inner_text("body")
         trs = page.query_selector_all("table tbody tr")
         if trs:
@@ -596,11 +778,14 @@ def _fetch_and_ocr_row_document(page, context, row_index: int, verbose: bool) ->
         print(f"  [Dallas RP] no page-1 image response observed within {_DOCUMENT_IMAGE_WAIT_MS}ms", flush=True)
 
     page.go_back()
-    page.wait_for_timeout(1_500)
+    # 3s (was 1.5s): polite pacing between document opens -- 2026-11-22 the
+    # portal's bot check cut in after ~55 rapid opens.
+    page.wait_for_timeout(3_000)
     return text, detail_url, legal_description
 
 
-def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose: bool = False) -> list[dict]:
+def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose: bool = False,
+                               doc_cache: "dict | None" = None) -> list[dict]:
     """Scrape the visible results table. When do_ocr is True, also clicks
     into each row whose doc_type is in DISTRESS_DOC_TYPES to OCR its page-1
     document image and extract a candidate debtor address (see module
@@ -645,10 +830,26 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
         }
 
         if do_ocr and (doc_type or "").strip().upper() in DISTRESS_DOC_TYPES:
-            expected_count = len(trs)
-            row["document_body_text"], row["detail_url"], detail_legal_description = _fetch_and_ocr_row_document(
-                page, context, tr_index, verbose
-            )
+            # The 5-day window overlaps yesterday's by ~4 days; reuse any
+            # document already read on an earlier run instead of re-opening
+            # and re-OCRing it (~12s each).
+            cached = (doc_cache or {}).get(doc_number)
+            if cached:
+                row["document_body_text"] = cached["document_body_text"]
+                row["detail_url"] = cached["detail_url"]
+                detail_legal_description = cached["legal_description"]
+            else:
+                expected_count = len(trs)
+                row["document_body_text"], row["detail_url"], detail_legal_description = _fetch_and_ocr_row_document(
+                    page, context, tr_index, verbose
+                )
+                # Only cache a real capture -- an image timeout retries next run.
+                if doc_cache is not None and row["document_body_text"]:
+                    doc_cache[doc_number] = {
+                        "document_body_text": row["document_body_text"],
+                        "detail_url": row["detail_url"],
+                        "legal_description": detail_legal_description,
+                    }
             # The detail page's own Legal Description text is more reliable
             # than the search-results table's column (see
             # _fetch_and_ocr_row_document's docstring) -- prefer it whenever
@@ -670,8 +871,14 @@ def _scrape_current_table_page(page, context=None, do_ocr: bool = False, verbose
                 got = "captured" if row["document_body_text"] else "none"
                 addr = row["situs_address_ocr_hint"] or "-"
                 ld = "found" if detail_legal_description else "none"
-                print(f"    [Dallas RP] doc {doc_number} ({doc_type}): document body {got}, "
+                src = " (cached)" if cached else ""
+                print(f"    [Dallas RP] doc {doc_number} ({doc_type}): document body {got}{src}, "
                       f"address hint: {addr}, legal description: {ld}", flush=True)
+            if cached:
+                # Never left the results table, so no re-render to wait out.
+                rows_out.append(row)
+                tr_index += 1
+                continue
             # Poll rather than a single immediate snapshot -- confirmed live
             # 2026-08-29 on the FC adapter that a fixed post-go_back wait
             # false-positives this check after a handful of rows, silently
@@ -725,6 +932,7 @@ def _scrape_window(
     max_pages: int,
     verbose: bool,
     fetch_document_body: bool = True,
+    doc_cache: "dict | None" = None,
 ) -> list[dict]:
     status = _run_search(page, date_from, date_to, verbose)
     if status == "NoResults":
@@ -743,16 +951,44 @@ def _scrape_window(
               "— document_body_text will be None for all rows", flush=True)
 
     rows_out: list[dict] = []
+    truncated = False
     for page_num in range(max_pages):
-        page_rows = _scrape_current_table_page(page, context=context, do_ocr=do_ocr, verbose=verbose)
+        page_rows = _scrape_current_table_page(page, context=context, do_ocr=do_ocr, verbose=verbose,
+                                               doc_cache=doc_cache)
         if verbose:
             print(f"  [Dallas RP] page {page_num}: {len(page_rows)} rows", flush=True)
         rows_out.extend(page_rows)
         if len(page_rows) < limit:
             break
+        if page_num == max_pages - 1:
+            truncated = True
+            break
         if not _goto_next_page(page, verbose):
             break
-    return rows_out
+    if truncated:
+        print(f"  [Dallas RP] WARNING: hit the {max_pages}-page cap for "
+              f"{date_from:%m/%d/%Y}-{date_to:%m/%d/%Y}; later rows were not read", flush=True)
+
+    # Never keep a row recorded outside the requested window.
+    lo, hi = date_from.date(), date_to.date()
+    in_range, dropped = [], 0
+    for r in rows_out:
+        try:
+            rd = datetime.strptime((r.get("recorded_date") or "").strip(), "%m/%d/%Y").date()
+        except ValueError:
+            dropped += 1
+            continue
+        if lo <= rd <= hi:
+            in_range.append(r)
+        else:
+            dropped += 1
+    if dropped:
+        print(f"  [Dallas RP] WARNING: dropped {dropped} row(s) recorded outside "
+              f"{lo:%m/%d/%Y}-{hi:%m/%d/%Y}", flush=True)
+        if not in_range:
+            raise RecorderDateRangeError(
+                f"Dallas RP: all {dropped} rows were outside {lo}..{hi} -- date filter not applied")
+    return in_range
 
 
 def _to_wrapped_records(scraped_rows: list[dict]) -> list[dict]:
@@ -851,7 +1087,7 @@ def run_scraper(
     out_dir: Path,
     days_back: int = DEFAULT_DAYS_BACK,
     limit_per_page: int = 50,
-    max_pages: int = 20,
+    max_pages: int = 40,
     headless: bool = True,
     verbose: bool = True,
     fetch_document_body: bool = True,
@@ -871,11 +1107,22 @@ def run_scraper(
     if not PLAYWRIGHT_AVAILABLE:
         raise RuntimeError(_PLAYWRIGHT_INSTALL_MSG)
 
-    date_to = datetime.now(timezone.utc)
-    date_from = date_to - timedelta(days=days_back)
-
+    # 2026-11-22: search ONE recorded day at a time (a 5-day window is
+    # ~4,000 rows, far past the 20-page x 50-row = 1,000-row cap, so older
+    # runs only ever read the first day), and never past the portal's
+    # 'Certified through' date (asking past it makes the portal drop the
+    # range entirely -- see _run_search). Days at or before the certified
+    # date that were read completely are final and are not re-read.
     errors: list[str] = []
     scraped_rows: list[dict] = []
+    doc_cache = _load_doc_cache(DOC_CACHE_PATH, out_dir / "clerk_recordings.jsonl")
+    cached_before = len(doc_cache)
+    days_state = _load_days_state(DAYS_STATE_PATH)
+    today = datetime.now(timezone.utc)
+    certified = None
+    days_searched: list[str] = []
+    weekday_days_with_rows = 0
+    weekday_days_searched = 0
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=headless)
         context = browser.new_context(
@@ -884,14 +1131,60 @@ def run_scraper(
         )
         page = context.new_page()
         try:
-            scraped_rows = _scrape_window(
-                page, context, date_from, date_to, limit_per_page, max_pages, verbose,
-                fetch_document_body=fetch_document_body,
-            )
+            certified = read_certified_through(page, verbose)
+            if certified is None:
+                raise RuntimeError("Dallas RP: could not read the 'Certified through' date from the portal")
+            date_to = min(certified, today)
+            date_from = date_to - timedelta(days=days_back - 1)
+            lag = (today.date() - certified.date()).days
+            if lag > 7:
+                print(f"  [Dallas RP] WARNING: the county index is {lag} days behind "
+                      f"(certified through {certified:%m/%d/%Y}) -- no newer recordings exist yet", flush=True)
+            if verbose:
+                print(f"  [Dallas RP] portal certified through {certified:%m/%d/%Y} "
+                      f"({lag} day(s) behind); window {date_from:%m/%d/%Y}-{date_to:%m/%d/%Y}", flush=True)
+            day = date_from
+            while day.date() <= date_to.date():
+                key = _fmt_yyyymmdd(day)
+                if key in days_state["complete"]:
+                    if verbose:
+                        print(f"  [Dallas RP] {day:%m/%d/%Y}: already read completely on an earlier run, skipping", flush=True)
+                    day += timedelta(days=1)
+                    continue
+                days_searched.append(key)
+                is_weekday = day.weekday() < 5
+                if is_weekday:
+                    weekday_days_searched += 1
+                day_rows = _scrape_window(
+                    page, context, day, day, limit_per_page, max_pages, verbose,
+                    fetch_document_body=fetch_document_body,
+                    doc_cache=doc_cache,
+                )
+                if verbose:
+                    print(f"  [Dallas RP] {day:%m/%d/%Y}: {len(day_rows)} in-range row(s)", flush=True)
+                scraped_rows.extend(day_rows)
+                if day_rows and is_weekday:
+                    weekday_days_with_rows += 1
+                # Final once certified and read under the page cap.
+                if len(day_rows) < limit_per_page * max_pages and (day_rows or not is_weekday):
+                    days_state["complete"].append(key)
+                day += timedelta(days=1)
+            if weekday_days_searched and weekday_days_with_rows == 0:
+                raise RecorderDateRangeError(
+                    f"Dallas RP: {weekday_days_searched} weekday(s) searched "
+                    f"({', '.join(days_searched)}) and none returned an in-range row")
         except Exception as exc:
-            errors.append(f"scrape_error: {exc}")
+            kind = "date_range_error" if isinstance(exc, RecorderDateRangeError) else "scrape_error"
+            errors.append(f"{kind}: {exc}")
             if verbose:
                 print(f"  [Dallas RP] ERROR: {exc}", flush=True)
+        finally:
+            # Save even after a mid-run failure so finished documents aren't redone.
+            _save_doc_cache(DOC_CACHE_PATH, doc_cache)
+            days_state["complete"] = sorted(set(days_state["complete"]))[-120:]
+            _save_days_state(DAYS_STATE_PATH, days_state)
+            if verbose:
+                print(f"  [Dallas RP] document cache: {cached_before} -> {len(doc_cache)} entries", flush=True)
         browser.close()
 
     clerk_recs = _to_wrapped_records(scraped_rows)
@@ -903,8 +1196,8 @@ def run_scraper(
     return {
         "portal_url": PORTAL_URL,
         "department": DEPARTMENT,
-        "date_from": _fmt_yyyymmdd(date_from),
-        "date_to": _fmt_yyyymmdd(date_to),
+        "certified_through": _fmt_yyyymmdd(certified) if certified else None,
+        "days_searched": days_searched,
         "rows_scraped": len(scraped_rows),
         "clerk_recordings": clerk_stats,
         "errors": errors,
@@ -936,7 +1229,7 @@ def main() -> int:
     parser.add_argument("--limit-per-page", type=int, default=50, metavar="N",
                          help="Must match the portal's actual results-per-page (50). Used only "
                               "to detect the last page, not to request a page size.")
-    parser.add_argument("--max-pages", type=int, default=20, metavar="N",
+    parser.add_argument("--max-pages", type=int, default=40, metavar="N",
                          help="Safety cap on paginated requests per run.")
     parser.add_argument("--out-dir", default=None,
                          help="Output directory for the two JSONL files. Default: data/raw/")

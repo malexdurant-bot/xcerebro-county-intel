@@ -107,6 +107,8 @@ from typing import Optional
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 
 if sys.platform == "win32":
@@ -224,6 +226,29 @@ def _dedupe_qs(url: str) -> str:
 # Login / navigation
 # ---------------------------------------------------------------------------
 
+
+def _mount_retries(session: requests.Session) -> requests.Session:
+    """Bounded backoff on 500/502/503/504 and connection errors.
+
+    The SMS portal returned a bare 500 on Home.aspx during the 2026-11-16
+    box run; a short retry usually clears a transient IIS/SMS failure.
+    Does not change headers or user-agent.
+    """
+    retry = Retry(
+        total=3,
+        connect=3,
+        read=3,
+        backoff_factor=2,
+        status_forcelist=(500, 502, 503, 504),
+        allowed_methods=frozenset({"GET", "POST"}),
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
+
 def login(session: Optional[requests.Session] = None) -> requests.Session:
     """Log in to the SMS portal. Returns an authenticated requests.Session.
 
@@ -239,6 +264,7 @@ def login(session: Optional[requests.Session] = None) -> requests.Session:
         )
 
     s = session or requests.Session()
+    _mount_retries(s)
     s.headers.update({"User-Agent": _UA})
 
     r0 = s.get(LOGIN_URL, timeout=20)
@@ -261,7 +287,17 @@ def login(session: Optional[requests.Session] = None) -> requests.Session:
     if "lblFail" in r1.text and "incorrect" in r1.text.lower():
         raise RuntimeError("SMS login rejected — check RICHLAND_SMS_USERNAME/PASSWORD")
 
+    # 2026-11-22: the login POST redirects to Home.aspx?&UserGuid=<token>;
+    # that page (r1, after redirects) is the logged-in home page. Fetching
+    # bare HOME_URL again without the UserGuid is what returned the 500
+    # "Internal Server Error ... Home.aspx" on every run since September.
+    s.rod_home_response = r1 if "Home.aspx" in (r1.url or "") else None
     return s
+
+
+class RodSubscriptionError(RuntimeError):
+    """Logged in fine, but the account has no active Register of Deeds
+    subscription, so there is no document search to open."""
 
 
 def open_document_search(session: requests.Session, home_html: str, home_url: str) -> tuple[str, str, requests.Session]:
@@ -660,7 +696,15 @@ def scrape(incremental: bool = True) -> list[dict]:
 
     print(f"[richland_register_of_deeds] Logging in…")
     session = login()
-    home = session.get(HOME_URL, timeout=20)
+    home = getattr(session, "rod_home_response", None)
+    if home is None:
+        home = session.get(HOME_URL, timeout=20)
+    home.raise_for_status()
+    if "No Current Subscriptions" in home.text:
+        raise RodSubscriptionError(
+            "Register of Deeds: login OK, but the SMS account shows 'No Current "
+            "Subscriptions' -- the document-search subscription has lapsed and "
+            "must be renewed on the county SMS portal before this source can run")
     qp_html, qp_url, session = open_document_search(session, home.text, home.url)
 
     all_records: list[dict] = []
@@ -674,8 +718,10 @@ def scrape(incremental: bool = True) -> list[dict]:
     try:
         pages = search_all_pages(session, qp_html, qp_url, doc_codes, date_begin, today)
     except Exception as exc:
+        # 2026-11-22: re-raised (was `return []`) so a dead search is a
+        # failure the run reports, not a quiet zero.
         print(f"[richland_register_of_deeds] Search failed: {exc}")
-        return []
+        raise
 
     for page_html in pages:
         for row in parse_result_rows(page_html):

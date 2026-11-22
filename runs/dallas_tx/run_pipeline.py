@@ -36,7 +36,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 if sys.platform == "win32":
@@ -81,6 +81,73 @@ def _load_jsonl(path: Path) -> list[dict]:
     return out
 
 
+# Dates before 1990 are treated as sentinels / parse artifacts (Dallas
+# 2026-11-16 run: 71 clustered 1971-02/03 lien dates + one 1800-01-01).
+# Dates more than ~1 year in the future are also dropped from recency/sort
+# fields. The lead itself is kept. Upcoming sale dates inside that window
+# (e.g. 2026-12-01 sheriff / tax-foreclosure sales) are left in place.
+_DATE_SANITY_MIN = date(1990, 1, 1)
+_DATE_SANITY_FUTURE_DAYS = 366
+
+
+def _parse_lead_date(raw) -> date | None:
+    if not raw:
+        return None
+    s = str(raw).strip()
+    for fmt, width in (("%Y-%m-%d", 10), ("%m/%d/%Y", 10)):
+        try:
+            return datetime.strptime(s[:width], fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def _sanitize_event_dates(leads: list[dict], report_path: Path, *, today: date | None = None) -> int:
+    today = today or date.today()
+    future_limit = today + timedelta(days=_DATE_SANITY_FUTURE_DAYS)
+    affected: list[dict] = []
+    kept_future: list[dict] = []
+    for lead in leads:
+        raw = lead.get("primary_event_date")
+        parsed = _parse_lead_date(raw)
+        if parsed is None:
+            continue
+        row = {
+            "lead_id": lead.get("lead_id") or lead.get("scored_lead_id"),
+            "original_primary_event_date": raw,
+            "patterns": lead.get("patterns") or lead.get("display_patterns") or [],
+        }
+        if parsed < _DATE_SANITY_MIN:
+            row["reason"] = "before_1990"
+            lead["primary_event_date"] = None
+            affected.append(row)
+        elif parsed > future_limit:
+            row["reason"] = "more_than_one_year_future"
+            lead["primary_event_date"] = None
+            affected.append(row)
+        elif parsed > today:
+            row["reason"] = "future_sale_within_one_year_kept"
+            kept_future.append(row)
+    report = {
+        "as_of": today.isoformat(),
+        "future_limit": future_limit.isoformat(),
+        "nulled_count": len(affected),
+        "kept_future_count": len(kept_future),
+        "note": (
+            "Nulled primary_event_date on the lead for recency/sorting only; "
+            "the lead was kept. Dates within one year in the future (including "
+            "sheriff/tax sale dates such as 2026-12-01) were kept."
+        ),
+        "nulled": affected,
+        "kept_future": kept_future,
+    }
+    report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    print(f"[dallas_tx] Date sanity: nulled {len(affected)} primary_event_date(s) "
+          f"(before 1990 or >{future_limit.isoformat()}); kept {len(kept_future)} "
+          f"upcoming date(s) within one year → {report_path}", flush=True)
+    return len(affected)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Dallas County TX daily pipeline")
     parser.add_argument("--dry-run", action="store_true",
@@ -113,6 +180,10 @@ def main() -> None:
                          help="Skip the Tier 3/4 title-chain lookup step (2026-09-23 -- "
                               "made standard/automatic; each not-yet-checked lead costs "
                               "~15-25s of real browser search, see --title-chain-budget).")
+    parser.add_argument("--skip-publish", action="store_true",
+                         help="Skip writing/committing/pushing the sibling "
+                              "client dashboard repo (dallastx.justfriday.ai). "
+                              "Local pipeline_output and per-county dashboard files still write.")
     parser.add_argument("--title-chain-budget", type=int, default=75,
                          help="Max not-yet-checked leads to search PER TIER per run "
                               "(default 75 -- so ~150 leads x ~20s = ~50min added per "
@@ -786,6 +857,7 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Step 4 — Dashboard payload (LOCAL ONLY — see note below)
     # ------------------------------------------------------------------
+    _sanitize_event_dates(scored_leads, WORKDIR / "date_sanity_review.json")
     payload = build_dashboard_payload(
         scored_leads,
         semantic_verdict=semantic_verdict,
@@ -833,16 +905,48 @@ def main() -> None:
         )
         title_chain_state_path = WORKDIR / "title_chain_state.json"
         title_chain_state = load_state(title_chain_state_path)
+        # 2026-11-22: a title-chain failure (Nov 21: search-box timeout on the
+        # first owner, both attempts) used to crash the whole run AFTER
+        # scoring, so nothing published. It is enrichment only: record the
+        # failure, keep the leads already scored, and finish the run.
+        title_chain_problems: list[dict] = []
         for tier in (3, 4):
-            stats = run_incremental_lookup(
-                payload["records"], tier, title_chain_state,
-                budget=args.title_chain_budget, headless=True, verbose=True,
-            )
+            try:
+                stats = run_incremental_lookup(
+                    payload["records"], tier, title_chain_state,
+                    budget=args.title_chain_budget, headless=True, verbose=True,
+                )
+            except Exception as exc:  # noqa: BLE001 -- enrichment must not abort the run
+                import traceback
+                traceback.print_exc()
+                print(f"[dallas_tx] WARNING: Tier {tier} title-chain FAILED "
+                      f"({type(exc).__name__}: {exc}) -- continuing without it", flush=True)
+                title_chain_problems.append({"tier": tier, "kind": "exception",
+                                             "error": f"{type(exc).__name__}: {exc}"[:500]})
+                continue
             print(f"[dallas_tx]   Tier {stats['tier']} title-chain: checked "
                   f"{stats['attempted']} lead(s), {stats['leads_with_hits']} had a hit "
                   f"({stats['remaining_backlog']} still unchecked, budget "
                   f"{args.title_chain_budget}/run)", flush=True)
+            if stats.get("failed"):
+                print(f"[dallas_tx] WARNING: Tier {tier} title-chain: {stats['failed']} lookup(s) "
+                      f"failed{' -- tier stopped early' if stats.get('aborted') else ''}; "
+                      f"they stay unchecked and retry next run", flush=True)
+                title_chain_problems.append({"tier": tier, "kind": "lookup_failures",
+                                             "failed": stats["failed"],
+                                             "aborted": bool(stats.get("aborted")),
+                                             "errors": stats.get("errors", [])[:5]})
             save_state(title_chain_state_path, title_chain_state)
+        (WORKDIR / "title_chain_failures.json").write_text(
+            json.dumps({"run_started": ts_start, "failures": title_chain_problems}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        if title_chain_problems:
+            source_failures.append({
+                "source": "title_chain", "kind": "enrichment_failed",
+                "error": "; ".join(f"tier {p['tier']}: {p.get('error') or p.get('errors')}"
+                                   for p in title_chain_problems)[:500],
+            })
         hydrate_records(payload["records"], title_chain_state)
         total_with_hits = sum(1 for r in payload["records"] if r.get("has_related_records"))
         total_checked = sum(1 for r in payload["records"] if r.get("related_records_checked"))
@@ -890,8 +994,12 @@ def main() -> None:
     # path to another county's data. Not fatal if the sibling checkout
     # doesn't exist on a given machine (e.g. a fresh clone elsewhere).
     # ------------------------------------------------------------------
-    _client_repo_dir = ROOT.parent / "dallas-tx-leads"
-    if _client_repo_dir.is_dir():
+    if args.skip_publish:
+        print("[dallas_tx] --skip-publish: not writing or pushing the client dashboard repo")
+        _client_repo_dir = None
+    else:
+        _client_repo_dir = ROOT.parent / "dallas-tx-leads"
+    if _client_repo_dir is not None and _client_repo_dir.is_dir():
         try:
             import subprocess as _subprocess
             _client_data_path = _client_repo_dir / "data" / "leads.json"
@@ -946,6 +1054,16 @@ def main() -> None:
               f"(details: {WORKDIR / 'source_failures.json'}) ***", flush=True)
     print(f"[dallas_tx] Pipeline complete — "
           f"{datetime.now(timezone.utc).isoformat(timespec='seconds')}")
+    # 2026-11-22: a recorder search that ignores its date range (or finds
+    # nothing in range on a weekday) is a dead source, not a quiet zero --
+    # everything above still ran and published, but the run exits non-zero
+    # so the nightly runner retries/flags it and the portal hook holds.
+    dead = [f for f in source_failures
+            if f.get("source") == "clerk_recordings" and "date_range_error" in (f.get("error") or "")]
+    if dead:
+        print(f"[dallas_tx] *** FAILED: clerk_recordings date-range check -- {dead[0]['error'][:300]} ***",
+              flush=True)
+        sys.exit(3)
 
 
 if __name__ == "__main__":
