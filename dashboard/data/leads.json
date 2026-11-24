@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-23T17:42:18Z",
+  "generated_at": "2026-11-24T15:43:39Z",
   "build_label": "PARTIAL_BUILD",
   "mode": "incremental",
   "county": "Richland",
@@ -7,8 +7,8 @@
   "semantic_verdict": "DEPLOY_OK",
   "lead_total": 2869,
   "enrichment_breakdown": {
-    "ENRICHED": 2554,
-    "UNENRICHED": 315
+    "ENRICHED": 2553,
+    "UNENRICHED": 316
   },
   "pattern_counts": {
     "estate": 440,
@@ -18,10 +18,10 @@
     "tax": 2265
   },
   "attribute_counts": {
-    "absentee": 1514,
+    "absentee": 1513,
     "entity_owned": 511,
     "free_and_clear": 423,
-    "high_equity": 1038,
+    "high_equity": 1037,
     "long_term_owned": 830,
     "out_of_state": 221,
     "senior_owner": 55,
@@ -51855,16 +51855,16 @@
     },
     {
       "lead_id": "lead_parcel_R11410-07-14",
-      "scored_lead_id": "scored_3471f4b57164bf5e",
+      "scored_lead_id": "scored_923a512c16167101",
       "primary_parcel_id": "R11410-07-14",
-      "display_address": "2451 SENATE ST, COLUMBIA, SC",
-      "display_address_street": "2451 SENATE ST",
-      "display_address_city": "COLUMBIA",
-      "display_address_state": "SC",
-      "display_address_zip": "29205",
+      "display_address": "",
+      "display_address_street": null,
+      "display_address_city": null,
+      "display_address_state": null,
+      "display_address_zip": null,
       "display_owner": "BROWN THEONIS",
       "display_owner_type": "INDIVIDUAL",
-      "display_score": 63,
+      "display_score": 55,
       "display_tier": "Workable",
       "display_patterns": [
         "tax"
@@ -51878,10 +51878,7 @@
       "display_doc_types": [
         "tax_foreclosure_notice"
       ],
-      "display_attributes": [
-        "absentee",
-        "high_equity"
-      ],
+      "display_attributes": [],
       "display_deal_paths": [
         "wholesale"
       ],
@@ -51894,17 +51891,17 @@
       ],
       "display_title_complexity_tier": "None",
       "display_lead_status": "APPROVED_FOR_DASHBOARD",
-      "display_assessed_value": 92900.0,
-      "display_last_sale_price": 5.0,
-      "display_last_sale_date": "2016-07-23",
-      "display_year_built": 1950,
-      "display_is_absentee_owner": true,
-      "display_is_out_of_state_owner": false,
-      "display_owner_mailing_address": "7 MONARCH LN",
-      "display_owner_mailing_city": "COLUMBIA",
-      "display_owner_mailing_state": "SC",
-      "display_owner_mailing_zip": "292298115",
-      "display_owner_mailing": "7 MONARCH LN, COLUMBIA, SC 29229-8115",
+      "display_assessed_value": null,
+      "display_last_sale_price": null,
+      "display_last_sale_date": null,
+      "display_year_built": null,
+      "display_is_absentee_owner": null,
+      "display_is_out_of_state_owner": null,
+      "display_owner_mailing_address": null,
+      "display_owner_mailing_city": null,
+      "display_owner_mailing_state": null,
+      "display_owner_mailing_zip": null,
+      "display_owner_mailing": "",
       "display_years_tax_delinquent": null,
       "display_match_confidence": 0,
       "stack_depth": 1,
@@ -51912,16 +51909,12 @@
         {
           "factor": "base_TAX_FORECLOSURE_NOTICE",
           "delta": 55
-        },
-        {
-          "factor": "attribute_bonus",
-          "delta": 8
         }
       ],
       "evidence_ids": [],
       "primary_event_date": null,
       "review_flags": [],
-      "enrichment_status": "ENRICHED",
+      "enrichment_status": "UNENRICHED",
       "primary_source_urls": [
         "https://richlandmaps.com/apps/delinquent/"
       ],
